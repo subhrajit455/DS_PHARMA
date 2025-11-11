@@ -1,0 +1,50 @@
+@import url('https://fonts.googleapis.com/css2?family=Gyrotrope:wght@300;400;500;600;700;800;900&display=swap');
+@import "tailwindcss";
+
+* {
+  margin: 0;
+  padding: 0;
+  box-sizing: border-box;
+  font-family: 'Gyrotrope';
+}
+
+html {
+  scroll-behavior: smooth;
+  font-family: 'Gyrotrope';
+}
+
+body {
+  font-family: 'Gyrotrope';
+  line-height: 1.6;
+  color: #333;
+  background-color: #ffffff;
+}
+
+/* Mobile-specific styles for bottom navigation */
+@media (max-width: 768px) {
+  body {
+    padding-bottom: env(safe-area-inset-bottom);
+  }
+}
+
+/* Custom scrollbar */
+::-webkit-scrollbar {
+  width: 6px;
+}
+
+::-webkit-scrollbar-track {
+  background: #f1f1f1;
+}
+
+::-webkit-scrollbar-thumb {
+  background: #14b8a6;
+  border-radius: 3px;
+}
+
+::-webkit-scrollbar-thumb:hover {
+  background: #0d9488;
+}
+
+section {
+  margin-bottom: 3rem;
+}
