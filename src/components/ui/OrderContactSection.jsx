@@ -2,7 +2,7 @@ import React from 'react';
 
 const OrderContactSection = ({ onShareDetails, onDownloadReceipt }) => {
   return (
-    <div className="m-[15px] flex justify-between w-[65%] border bg-white border-gray-200">
+    <div className="m-[15px] flex justify-between w-[50%] border bg-white border-gray-200">
       {/* Contact Customer Care */}
       <div className="pt-4 mt-4">
         <p

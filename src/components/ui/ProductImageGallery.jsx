@@ -1,5 +1,4 @@
 import React from 'react';
-import { motion } from 'framer-motion';
 import { ChevronUp, ChevronDown } from 'lucide-react';
 
 const ProductImageGallery = ({ images, selectedImage, onImageSelect, onScroll }) => {

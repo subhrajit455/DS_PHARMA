@@ -102,7 +102,7 @@ const OrderDetails = () => {
           </div>
 
           {/* Contact Section */}
-          <Card className="mt-6">
+          <Card className="mt-6 w-[65%]">
             <div className="flex flex-col gap-4 p-4 sm:flex-row sm:items-center sm:justify-between">
               <p
                 className="font-medium text-gray-600"

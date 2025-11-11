@@ -1,19 +1,23 @@
 import React from 'react';
 
 const OrderTimeline = ({ timeline, deliveryPartner }) => {
+  // Filter to show only 4 main steps (remove 'Expected Delivery' middle step)
+  const filteredTimeline = timeline.filter((_, index) => index !== 2);
+
   return (
     <div>
       {/* Progress Bar */}
       <div className="flex items-center justify-between mb-2">
-        {timeline.map((step, index) => (
-          <TimelineStep key={index} step={step} isLast={index === timeline.length - 1} />
+        {filteredTimeline.map((step, index) => (
+          <TimelineStep key={index} step={step} isLast={index === filteredTimeline.length - 1} />
         ))}
       </div>
+      
 
       {/* Delivery Partner Message */}
       <p
         className="mt-8 text-sm font-medium text-center text-green-700"
-        style={{ fontFamily: 'Gyrotrope' }}
+        style={{ fontFamily: 'Gyrotrope', margin: '14px 0px' }}
       >
         Delivery Partner: {deliveryPartner}
       </p>
@@ -23,6 +27,7 @@ const OrderTimeline = ({ timeline, deliveryPartner }) => {
 
 const TimelineStep = ({ step, isLast }) => (
   <div className="relative flex flex-col items-center flex-1">
+  
     {/* Connector Line */}
     {!isLast && (
       <div
@@ -55,7 +60,7 @@ const TimelineStep = ({ step, isLast }) => (
       {step.status}
     </p>
 
-    {/* Date Label */}
+    {/* Date Label - Show with step if available */}
     {step.date && (
       <p
         className="text-xs text-center text-green-700"
