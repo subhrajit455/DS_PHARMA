@@ -13,13 +13,13 @@ const ResponsiveHeroSection = () => {
       }}
     >
       {/* Main Hero Content */}
-      <div className="relative w-full flex items-center justify-center" style={{ minHeight: 'calc(100vh - 80px)', paddingBottom: '100px' }}>
+      <div className="relative flex items-center justify-center w-full" style={{ minHeight: 'calc(100vh - 80px)', paddingBottom: '100px' }}>
         {/* Mobile Title - Visible only on mobile */}
         <motion.div
           initial={{ opacity: 0, y: -20 }}
           animate={{ opacity: 1, y: 0 }}
           transition={{ duration: 0.8, delay: 0.2 }}
-          className="sm:hidden absolute top-8 left-0 right-0 z-30 px-4"
+          className="absolute left-0 right-0 z-30 px-4 sm:hidden top-8"
           style={{
             textAlign: 'center'
           }}
@@ -251,20 +251,29 @@ const ResponsiveHeroSection = () => {
             style={{
               display: 'flex',
               whiteSpace: 'nowrap',
-              animation: 'scroll-continuous 10s linear infinite',
-              fontFamily: 'Verdana, sans-serif',
-              fontSize: '25px',
-              fontWeight: 'bold',
-              color: '#e94242ff'
+              animation: 'scroll-continuous 20s linear infinite',
+              fontFamily: 'Gyrotrope, sans-serif',
+              fontSize: '18px',
+              fontWeight: '600',
+              color: '#e94242',
+              letterSpacing: '0.5px'
             }}
           >
-            <span style={{ paddingRight: '50px' }}>
-              Add at least 16px vertical margin between all form fields. Ensure input elements have sufficient horizontal padding. Balance whitespace for a clean look.
+            <span style={{ paddingRight: '80px', display: 'inline-block' }}>
+              ✓ Best Quality Medicine
             </span>
-            <span style={{ paddingRight: '50px' }}>
-              The scrolling text will now be larger and display in black color, making it more readable and prominent on the hero image!    
+            <span style={{ paddingRight: '80px', display: 'inline-block' }}>
+              ✓ Affordable Prices
             </span>
-            
+            <span style={{ paddingRight: '80px', display: 'inline-block' }}>
+              ✓ Fast Delivery
+            </span>
+            <span style={{ paddingRight: '80px', display: 'inline-block' }}>
+              ✓ 24/7 Support
+            </span>
+            <span style={{ paddingRight: '80px', display: 'inline-block' }}>
+              ✓ Best Quality Medicine
+            </span>
           </div>
         </div>
         
@@ -274,7 +283,7 @@ const ResponsiveHeroSection = () => {
               transform: translateX(0);
             }
             100% {
-              transform: translateX(-33.333%);
+              transform: translateX(-20%);
             }
           }
         `}</style>
