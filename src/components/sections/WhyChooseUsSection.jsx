@@ -57,35 +57,38 @@ const WhyChooseUsSection = () => {
         paddingBottom: '1rem'
       }}
     >
-      <div className="w-full max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 text-center">
+      <div className="w-full max-w-full mx-auto px-4 sm:px-6 lg:px-8 text-center">
         <div
           className="relative overflow-hidden"
           style={{
             background: 'linear-gradient(135deg, #D5F5ED 0%, #C1EDE3 50%, #B8E8DD 100%)',
-            borderRadius: '16px',
+            
             minHeight: '280px'
           }}
         >
           <div 
-            className="relative z-10 grid grid-cols-1 lg:grid-cols-2 items-center"
+            className="relative z-10 grid grid-cols-1 lg:grid-cols-2 items-center justify-center"
             style={{
               paddingTop: '2rem',
               paddingBottom: '2rem',
               paddingLeft: '1.5rem',
               paddingRight: '1.5rem',
-              gap: '2rem'
+              gap: '2rem',
+              margin: '0 50px'
             }}
           >
             {/* Left Content */}
             <div className="flex flex-col justify-center">
-              <motion.h2
+              <div className=''>
+              <div className='left-0 top-0 text-left'>
+                  <motion.h2
                 initial={{ opacity: 0, x: -20 }}
                 whileInView={{ opacity: 1, x: 0 }}
                 viewport={{ once: true }}
                 transition={{ duration: 0.5 }}
                 style={{ 
                   fontFamily: 'Gyrotrope',
-                  fontSize: 'clamp(24px, 5vw, 32px)',
+                  fontSize: 'clamp(20px, 3vw, 26px)',
                   fontWeight: 700,
                   lineHeight: '1.2',
                   letterSpacing: '-0.02em',
@@ -95,6 +98,7 @@ const WhyChooseUsSection = () => {
               >
                 Why Choose Us
               </motion.h2>
+              </div>
 
               <motion.div
                 variants={containerVariants}
@@ -155,7 +159,7 @@ const WhyChooseUsSection = () => {
                 ))}
               </motion.div>
             </div>
-
+            </div>
             {/* Right Images - Pixel Perfect Positioning */}
             <div className="relative hidden lg:flex items-center justify-end">
               <div 
@@ -172,8 +176,8 @@ const WhyChooseUsSection = () => {
                     right: '0px',
                     top: '55%',
                     transform: 'translateY(-50%)',
-                    width: '310px',
-                    maxWidth: '310px',
+                    width: '280px',
+                    maxWidth: '290px',
                     height: 'auto',
                     zIndex: 14,
                     position: 'absolute'
@@ -201,10 +205,10 @@ const WhyChooseUsSection = () => {
                   transition={{ duration: 0.6, ease: 'easeOut' }}
                   className="absolute"
                   style={{
-                    right: '16px',
+                    right: '2px',
                     bottom: '0px',
-                    width: '60%',
-                    maxHeight: '360px',
+                    width: '50%',
+                    maxHeight: '370px',
                     maxWidth: '280px',
                     zIndex: 15
                   }}
@@ -232,7 +236,7 @@ const WhyChooseUsSection = () => {
                   transition={{ duration: 0.55, delay: 0.15, ease: 'easeOut' }}
                   className="absolute"
                   style={{
-                    left: '245px',
+                    left: '310px',
                     top: '',
                     width: '160px',
                     zIndex: 13,

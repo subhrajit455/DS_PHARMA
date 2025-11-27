@@ -1,3 +1,4 @@
+// Generic UI Components - Reusable across features
 export { default as Button } from './Button';
 export { default as Card } from './Card';
 export { default as Badge } from './Badge';
@@ -5,17 +6,25 @@ export { default as Input } from './Input';
 export { default as Modal } from './Modal';
 export { default as Alert } from './Alert';
 export { default as Loader } from './Loader';
+export { default as LoadingSpinner } from './LoadingSpinner';
 export { default as PriceDisplay } from './PriceDisplay';
 export { default as RatingStars } from './RatingStars';
 export { default as Tabs } from './Tabs';
 export { default as Pagination } from './Pagination';
-export { default as ProductImageGallery } from './ProductImageGallery';
-export { default as ProductPriceSection } from './ProductPriceSection';
-export { default as ProductActionButtons } from './ProductActionButtons';
-export { default as ProductDescription } from './ProductDescription';
-export { default as OrderProductCard } from './OrderProductCard';
-export { default as DeliveryAddressCard } from './DeliveryAddressCard';
-export { default as AppliedCouponCard } from './AppliedCouponCard';
-export { default as PaymentBreakdownCard } from './PaymentBreakdownCard';
-export { default as OrderContactSection } from './OrderContactSection';
-export { default as OrderTimeline } from './OrderTimeline';
+export { default as ErrorBoundary } from './ErrorBoundary';
+export { default as CategoryIcon } from './CategoryIcon';
+
+// Layout & Navigation Support
+export { default as Navigation } from './Navigation';
+export { default as ScrollToTop } from './ScrollToTop';
+
+// Data & Mock Files
+export { default as mockData } from './mockData';
+
+// ⚠️ NOTE: Feature-specific components have been moved to /components/features/
+// - ProductImageGallery, ProductPriceSection, ProductActionButtons, ProductDescription → /components/features/product/components/
+// - OrderProductCard, OrderTimeline, OrderSummary, OrderCard, OrderContactSection → /components/features/order/components/
+// - DeliveryAddressCard, PaymentBreakdownCard → /components/features/order/components/
+// - CartItem → /components/features/cart/components/
+// - AppliedCouponCard → /components/features/payment/components/
+// - MedicineCard → /components/features/product/components/

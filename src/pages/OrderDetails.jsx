@@ -1,17 +1,17 @@
 import React from "react";
 import { useNavigate, useParams } from "react-router-dom";
+import { Card, Button } from "@/components/common";
 import {
-  Card,
-  Button,
   OrderProductCard,
   DeliveryAddressCard,
-  AppliedCouponCard,
   PaymentBreakdownCard,
-} from "../components/ui";
+  OrderContactSection
+} from "@/components/features/order";
+import { AppliedCouponCard } from "@/components/features/payment";
 
 const OrderDetails = () => {
   const navigate = useNavigate();
-  const { id } = useParams();
+  useParams();
 
   const order = {
     id: "964368966",
@@ -89,9 +89,9 @@ const OrderDetails = () => {
             </div>
 
             {/* Right Section */}
-            <div className="lg:col-span-1">
-              <div className="sticky space-y-4 top-32">
-                <DeliveryAddressCard
+            <div className="py-2 lg:col-span-1">
+              <div className="sticky space-y-4 top-32 min-h-[355px]">
+                <DeliveryAddressCard 
                   address={order.customerAddress}
                   onChangeAddress={handleChangeAddress}
                 />
@@ -102,8 +102,8 @@ const OrderDetails = () => {
           </div>
 
           {/* Contact Section */}
-          <Card className="mt-6 w-[65%]">
-            <div className="flex flex-col gap-4 p-4 sm:flex-row sm:items-center sm:justify-between">
+          <Card className="mt-6 w-[66%]">
+            <div className="flex flex-col gap-4 p-4 sm:flex-row sm:items-center sm:justify-between" style={{ padding: '8px'}}>
               <p
                 className="font-medium text-gray-600"
                 style={{ fontFamily: "Gyrotrope" }}
@@ -113,15 +113,17 @@ const OrderDetails = () => {
               <div className="flex gap-3">
                 <Button
                   variant="success"
-                  size="md"
+                  size="lg"
                   onClick={handleShareDetails}
+                  style={{ padding: '4px'}}
                 >
                   Share Order Details
                 </Button>
                 <Button
                   variant="primary"
-                  size="md"
+                  size="lg"
                   onClick={handleDownloadReceipt}
+                  style={{ padding: '4px'}}
                 >
                   Download Receipt
                 </Button>

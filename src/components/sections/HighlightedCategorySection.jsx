@@ -1,6 +1,6 @@
 import React from 'react';
 import { motion } from 'framer-motion';
-import PharmacyProductCard from '../ui/PharmacyProductCard';
+import { PharmacyProductCard } from '@/components/features/product';
 
 const HighlightedCategorySection = () => {
   // Sample products data
@@ -103,23 +103,23 @@ const HighlightedCategorySection = () => {
   };
 
   return (
-    <section 
+    <section
       className="w-full py-16 min-h-[350px] lg:py-24 mb-8 flex justify-center items-center"
-      style={{ 
+      style={{
         width: '100%',
         backgroundColor: '#F5E6D3'
       }}
     >
       <div className="w-full max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 ">
-        
+
         {/* Section Header - Compact Spacing */}
         <div className="w-full flex flex-col sm:flex-row items-center justify-between mb-4 lg:mb-6 gap-3 sm:gap-4">
-          <h2 
+          <h2
             className="text-center sm:text-left flex-1"
             style={{
               fontFamily: 'Gyrotrope',
               fontWeight: 600,
-              fontSize: '24px',
+              fontSize: '22px',
               lineHeight: '100%',
               letterSpacing: '0%',
               color: '#111827',
@@ -130,8 +130,11 @@ const HighlightedCategorySection = () => {
           >
             <span
               style={{
-                borderBottom: '2px solid #111827',
-                paddingBottom: '1px',
+                textDecoration: 'underline',
+                textDecorationSkipInk: 'auto',
+                textUnderlineOffset: '4px',
+                textDecorationThickness: '2px',
+                textDecorationColor: '#111827',
                 display: 'inline-block',
                 lineHeight: '1.2',
               }}
@@ -170,7 +173,7 @@ const HighlightedCategorySection = () => {
               <motion.div
                 key={product.id}
                 variants={itemVariants}
-                transition={{ 
+                transition={{
                   delay: index * 0.08,
                   duration: 0.5,
                   ease: "easeOut"
@@ -186,7 +189,7 @@ const HighlightedCategorySection = () => {
               </motion.div>
             ))}
           </motion.div>
-          
+
           {/* View All Button - Bottom Right Corner (Small Devices Only) */}
           <button
             onClick={handleViewAll}

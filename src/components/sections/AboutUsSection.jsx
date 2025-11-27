@@ -8,12 +8,12 @@ const AboutUsSection = () => {
       className="w-full flex justify-center items-center" 
       style={{ 
         width: '100%',
-        paddingTop: '2rem',
+        paddingTop: '1rem',
         paddingBottom: '2rem',
         marginBottom: '1.5rem'
       }}
     >
-      <div className="w-full max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 text-center">
+      <div className="w-full max-w-7xl mx-auto px-2 sm:px-3 lg:px-4 text-center">
         {/* About Us Container */}
         <div className="relative">
           {/* Main Content Box */}
@@ -22,9 +22,9 @@ const AboutUsSection = () => {
             style={{
               background: 'linear-gradient(to right, #A0F0E8 0%, #85E8DC 100%)',
               borderRadius: '16px',
-              minHeight: '160px',
+              minHeight: '310px',
               height: 'auto',
-              paddingTop: '3rem',
+              paddingTop: '1rem',
               paddingBottom: '2rem',
               paddingLeft: '1.5rem',
               paddingRight: '1.5rem',
@@ -42,7 +42,7 @@ const AboutUsSection = () => {
                 top: '-12px',
                 left: '0px',
                 background: '#FFFFFF',
-                borderRadius: '8px 8px 0 0',
+                borderRadius: '8px 8px',
                 paddingTop: '0.5rem',
                 paddingBottom: '0.5rem',
                 paddingLeft: '1rem',

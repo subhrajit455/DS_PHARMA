@@ -38,8 +38,8 @@ export default {
         }
       },
       fontFamily: {
-        sans: ['Gyrotrope'],
-        gyrotrope: ['Gyrotrope'],
+        sans: ['Gyrotrope', 'sans-serif'],
+        gyrotrope: ['Gyrotrope', 'sans-serif'],
       },
       backgroundImage: {
         'gradient-medical': 'linear-gradient(135deg, #A8E6CF 0%, #88D8C0 50%, #7FCDCD 100%)',

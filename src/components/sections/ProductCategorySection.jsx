@@ -1,13 +1,13 @@
 import React from 'react';
 import { motion } from 'framer-motion';
-import PharmacyProductCard from '../ui/PharmacyProductCard';
+import { PharmacyProductCard } from '@/components/features/product';
 
 const ProductCategorySection = ({
   title = 'Product Category Title',
   products = [],
-  onViewAll = () => {},
-  onAddToCart = () => {},
-  onProductClick = () => {},
+  onViewAll = () => { },
+  onAddToCart = () => { },
+  onProductClick = () => { },
   className = ''
 }) => {
   const handleViewAll = () => {
@@ -32,16 +32,16 @@ const ProductCategorySection = ({
   return (
     <section className={`w-full py-6 lg:py-8 bg-gray-50 mb-6 ${className}`} style={{ width: '100%' }}>
       {/* Full-width Container with Centered Content */}
-      <div className="w-full max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
-        
+      <div className="w-full px-4 mx-auto max-w-7xl sm:px-6 lg:px-8">
+
         {/* Section Header - Compact Spacing */}
-        <div className="w-full flex flex-col sm:flex-row items-center justify-between mb-4 lg:mb-6 gap-3 sm:gap-4">
-          <h2 
-            className="text-center sm:text-left flex-1"
+        <div className="flex flex-col items-center justify-between w-full gap-3 mb-4 sm:flex-row lg:mb-6 sm:gap-4">
+          <h2
+            className="flex-1 text-center sm:text-left"
             style={{
               fontFamily: 'Gyrotrope',
               fontWeight: 600,
-              fontSize: '24px',
+              fontSize: '22px',
               lineHeight: '100%',
               letterSpacing: '0%',
               color: '#111827',
@@ -52,8 +52,11 @@ const ProductCategorySection = ({
           >
             <span
               style={{
-                borderBottom: '2px solid #111827',
-                paddingBottom: '1px',
+                textDecoration: 'underline',
+                textDecorationSkipInk: 'auto',
+                textUnderlineOffset: '4px',
+                textDecorationThickness: '2px',
+                textDecorationColor: '#111827',
                 display: 'inline-block',
                 lineHeight: '1.2',
               }}
@@ -79,9 +82,9 @@ const ProductCategorySection = ({
         </div>
 
         {/* Products Grid - Compact Responsive Layout */}
-        <div className="w-full flex justify-center relative">
+        <div className="relative flex justify-center w-full">
           <motion.div
-            className="grid grid-cols-2 sm:grid-cols-3 md:grid-cols-4 lg:grid-cols-5 gap-6 sm:gap-6 lg:gap-8 w-full max-w-7xl justify-items-center"
+            className="grid w-full grid-cols-2 gap-6 sm:grid-cols-3 md:grid-cols-4 lg:grid-cols-5 sm:gap-6 lg:gap-8 max-w-7xl justify-items-center"
             variants={containerVariants}
             initial="hidden"
             whileInView="visible"
@@ -92,27 +95,27 @@ const ProductCategorySection = ({
               <motion.div
                 key={product.id}
                 variants={itemVariants}
-                transition={{ 
+                transition={{
                   delay: index * 0.08,
                   duration: 0.5,
                   ease: "easeOut"
                 }}
-                className={`w-full max-w-[240px] ${index === 5 ? 'sm:hidden' : ''}`}
+                className={`w-full max-w-60 ${index === 5 ? 'sm:hidden' : ''}`}
               >
                 <PharmacyProductCard
                   {...product}
                   onAddToCart={onAddToCart}
                   onCardClick={onProductClick}
-                  className="h-full w-full"
+                  className="w-full h-full"
                 />
               </motion.div>
             ))}
           </motion.div>
-          
+
           {/* View All Button - Bottom Right Corner (Small Devices Only) */}
           <button
             onClick={handleViewAll}
-            className="sm:hidden absolute -bottom-3 right-2 bg-gradient-to-r from-orange-500 to-orange-600 hover:from-orange-600 hover:to-orange-700 text-white px-6 py-2 rounded-full shadow-lg hover:shadow-xl transition-all duration-200 transform hover:scale-105 focus:outline-none focus:ring-2 focus:ring-orange-500 focus:ring-offset-2 z-10"
+            className="absolute z-10 px-6 py-2 text-white transition-all duration-200 transform rounded-full shadow-lg sm:hidden -bottom-3 right-2 bg-gradient-to-r from-orange-500 to-orange-600 hover:from-orange-600 hover:to-orange-700 hover:shadow-xl hover:scale-105 focus:outline-none focus:ring-2 focus:ring-orange-500 focus:ring-offset-2"
             aria-label={`View all products in ${title}`}
             style={{
               fontFamily: 'Gyrotrope',
@@ -126,9 +129,9 @@ const ProductCategorySection = ({
 
         {/* Additional Products for Medium Screens (if needed) */}
         {products.length > 6 && (
-          <div className="w-full flex justify-center mt-6 lg:hidden">
+          <div className="flex justify-center w-full mt-6 lg:hidden">
             <motion.div
-              className="grid grid-cols-2 sm:grid-cols-3 md:grid-cols-4 gap-6 sm:gap-6 w-full max-w-7xl justify-items-center"
+              className="grid w-full grid-cols-2 gap-6 sm:grid-cols-3 md:grid-cols-4 sm:gap-6 max-w-7xl justify-items-center"
               variants={containerVariants}
               initial="hidden"
               whileInView="visible"
@@ -145,7 +148,7 @@ const ProductCategorySection = ({
                     {...product}
                     onAddToCart={onAddToCart}
                     onCardClick={onProductClick}
-                    className="h-full w-full"
+                    className="w-full h-full"
                   />
                 </motion.div>
               ))}

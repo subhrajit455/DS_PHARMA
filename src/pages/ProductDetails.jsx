@@ -1,15 +1,17 @@
 import React, { useState } from 'react';
 import { ArrowLeft } from 'lucide-react';
 import { useNavigate, useParams } from 'react-router-dom';
-import PharmacyProductCard from '../components/ui/PharmacyProductCard';
-import ProductImageGallery from '../components/ui/ProductImageGallery';
-import ProductPriceSection from '../components/ui/ProductPriceSection';
-import ProductActionButtons from '../components/ui/ProductActionButtons';
-import ProductDescription from '../components/ui/ProductDescription';
+import {
+  PharmacyProductCard,
+  ProductImageGallery,
+  ProductPriceSection,
+  ProductActionButtons,
+  ProductDescription
+} from '@/components/features/product';
 
 const ProductDetails = () => {
   const navigate = useNavigate();
-  const { id } = useParams();
+  useParams();
   const [selectedImage, setSelectedImage] = useState(0);
 
   const product = {
@@ -50,7 +52,7 @@ const ProductDetails = () => {
 
   return (
     <div className="flex flex-col min-h-screen bg-gray-50">
-      <main className="flex-grow" style={{ paddingTop: '140px' }}>
+      <main className="grow" style={{ paddingTop: '140px' }}>
         <div className="flex flex-col items-center w-full px-6 lg:px-12">
           <div className="mx-auto max-w-7xl">
             {/* Back Button */}
@@ -116,7 +118,19 @@ const ProductDetails = () => {
                   marginBottom: '1.5rem'
                 }}
               >
-                Suggested Medicine
+                <span
+                  style={{
+                    textDecoration: 'underline',
+                    textDecorationSkipInk: 'auto',
+                    textUnderlineOffset: '4px',
+                    textDecorationThickness: '2px',
+                    textDecorationColor: '#111827',
+                    display: 'inline-block',
+                    lineHeight: '1.2',
+                  }}
+                >
+                  Suggested Medicine
+                </span>
               </h2>
               <div className="grid grid-cols-2 gap-4 sm:grid-cols-3 md:grid-cols-4 lg:grid-cols-5 sm:gap-6 lg:gap-8" style={{ paddingBottom: '25px' }}>
                 {suggestedItems.map((item) => (

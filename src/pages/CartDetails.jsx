@@ -1,7 +1,7 @@
 import React, { useState } from 'react';
-import PharmacyProductCard from '../components/ui/PharmacyProductCard';
-import CartItem from '../components/ui/CartItem';
-import OrderSummary from '../components/ui/OrderSummary';
+import { PharmacyProductCard } from '@/components/features/product';
+import { CartItem } from '@/components/features/cart';
+import { OrderSummary } from '@/components/features/order';
 
 const CartDetails = () => {
   const [cartItems, setCartItems] = useState([
@@ -17,7 +17,7 @@ const CartDetails = () => {
   ]);
 
   const [couponCode, setCouponCode] = useState('');
-  const [deliveryAddress, setDeliveryAddress] = useState({
+  const [deliveryAddress] = useState({
     name: 'Bikram Dumriya',
     phone: '9999999999',
     address: 'A/B, Section Lane, Odisha, Noida, 744115'
@@ -151,16 +151,19 @@ const CartDetails = () => {
                 <h2
                   style={{
                     fontFamily: 'Gyrotrope',
-                    fontSize: '23px',
+                    fontSize: '22px',
                     fontWeight: 600,
                     color: '#000000',
                     marginBottom: '1rem'
                   }}
                 >
                 <span
-              style={{
-                borderBottom: '2px solid #111827',
-                paddingBottom: '1px',
+               style={{
+                textDecoration: 'underline',
+                textDecorationSkipInk: 'auto',
+                textUnderlineOffset: '4px',
+                textDecorationThickness: '2px',
+                textDecorationColor: '#111827',
                 display: 'inline-block',
                 lineHeight: '1.2',
               }}

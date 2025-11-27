@@ -1,13 +1,14 @@
-
+/* eslint-disable-next-line no-unused-vars */
+import { motion } from 'framer-motion';
 
 const ResponsiveHeroSection = () => {
 
   return (
-    <div 
+    <div
       className="relative w-full overflow-hidden"
       style={{
         minHeight: '100vh',
-        background: 'linear-gradient(135deg, #E8D5F0 0%, #A5E8DC 100%)',
+        background: 'linear-gradient(108deg, #E6D4F1 0%, #C4EBF5 50%, #A8EEDF 100%)',
         paddingBottom: '0',
         marginBottom: '3rem'
       }}
@@ -61,8 +62,8 @@ const ResponsiveHeroSection = () => {
           className="hidden sm:block"
           style={{
             position: 'absolute',
-            top: '25%',
-            left: '12%',
+            top: '30%',
+            left: '8%',
             transform: 'translate(-50%, -50%)',
             zIndex: 1,
             pointerEvents: 'none',
@@ -74,11 +75,11 @@ const ResponsiveHeroSection = () => {
             style={{
               fontFamily: 'Gyrotrope',
               fontWeight: 700,
-              fontSize: '200px',
+              fontSize: '160px',
               lineHeight: '100%',
               letterSpacing: '0%',
               textAlign: 'center',
-              color: 'rgba(255, 255, 255, 0.25)',
+              color: '#FFFFFF',
               whiteSpace: 'nowrap',
               userSelect: 'none',
               WebkitFontSmoothing: 'antialiased',
@@ -86,11 +87,7 @@ const ResponsiveHeroSection = () => {
               textRendering: 'optimizeLegibility',
               margin: 0,
               padding: 0,
-              textShadow: '0 2px 4px rgba(255, 255, 255, 0.1)',
-              background: 'linear-gradient(180deg, rgba(255, 255, 255, 0.18) 0%, rgba(255, 255, 255, 0.12) 100%)',
-              WebkitBackgroundClip: 'text',
-              WebkitTextFillColor: 'transparent',
-              backgroundClip: 'text'
+              textShadow: '0 2px 4px rgba(0, 0, 0, 0.1)'
             }}
           >
             DS Pharma
@@ -105,10 +102,10 @@ const ResponsiveHeroSection = () => {
           className="bottom-30 sm:bottom-10 md:bottom-10 lg:bottom-10"
           style={{
             position: 'absolute',
-            left: '25%',
+            left: '26%',
             transform: 'translateX(-50%)',
             zIndex: 20,
-            maxWidth: '410px',
+            maxWidth: '385px',
             width: '65%'
           }}
         >
@@ -154,8 +151,8 @@ const ResponsiveHeroSection = () => {
           }}
         >
           {/* Mascot Image */}
-          <div style={{ 
-            marginBottom: '16px',
+          <div style={{
+            marginBottom: '36px',
             display: 'flex',
             justifyContent: 'center',
             alignItems: 'center'
@@ -189,16 +186,16 @@ const ResponsiveHeroSection = () => {
                 letterSpacing: '0.01em'
               }}
             >
-              <span style={{ 
-                color: '#4FD1C7', 
+              <span style={{
+                color: '#4FD1C7',
                 fontWeight: 700,
                 fontSize: '17px'
               }}>DS Pharma</span>
               <span style={{ color: '#2D3748' }}> provides the best</span>
               <br />
               <span style={{ color: '#2D3748' }}>Price For best </span>
-              <span style={{ 
-                color: '#4FD1C7', 
+              <span style={{
+                color: '#4FD1C7',
                 fontWeight: 700,
                 fontSize: '17px'
               }}>Quality Medicine</span>
@@ -232,7 +229,7 @@ const ResponsiveHeroSection = () => {
             objectFit: 'contain'
           }}
         />
-        
+
         {/* Scrolling Text Effect */}
         <div
           style={{
@@ -251,7 +248,8 @@ const ResponsiveHeroSection = () => {
             style={{
               display: 'flex',
               whiteSpace: 'nowrap',
-              animation: 'scroll-continuous 20s linear infinite',
+              animation: 'scroll-marquee 30s linear infinite',
+              transform: 'translateX(100%)',
               fontFamily: 'Gyrotrope, sans-serif',
               fontSize: '18px',
               fontWeight: '600',
@@ -260,30 +258,30 @@ const ResponsiveHeroSection = () => {
             }}
           >
             <span style={{ paddingRight: '80px', display: 'inline-block' }}>
-              ✓ Best Quality Medicine
+              ✓ 100% Genuine Medicines
             </span>
             <span style={{ paddingRight: '80px', display: 'inline-block' }}>
-              ✓ Affordable Prices
+              ✓ Expert Pharmacist Support
             </span>
             <span style={{ paddingRight: '80px', display: 'inline-block' }}>
-              ✓ Fast Delivery
+              ✓ Express Home Delivery
             </span>
             <span style={{ paddingRight: '80px', display: 'inline-block' }}>
-              ✓ 24/7 Support
+              ✓ Secure & Safe Payments
             </span>
             <span style={{ paddingRight: '80px', display: 'inline-block' }}>
-              ✓ Best Quality Medicine
+              ✓ Trusted Healthcare Partner
             </span>
           </div>
         </div>
-        
+
         <style>{`
-          @keyframes scroll-continuous {
+          @keyframes scroll-marquee {
             0% {
-              transform: translateX(0);
+              transform: translateX(100%);
             }
             100% {
-              transform: translateX(-20%);
+              transform: translateX(-100%);
             }
           }
         `}</style>

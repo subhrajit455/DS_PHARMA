@@ -1,7 +1,7 @@
 import React, { useState } from 'react';
 import { Search } from 'lucide-react';
-import PharmacyProductCard from '../components/ui/PharmacyProductCard';
-import OrderCard from '../components/ui/OrderCard';
+import { PharmacyProductCard } from '@/components/features/product';
+import { OrderCard } from '@/components/features/order';
 
 const Orders = () => {
   const [searchQuery, setSearchQuery] = useState('');
@@ -136,7 +136,7 @@ const Orders = () => {
               <h1
                 style={{
                   fontFamily: 'Gyrotrope',
-                  fontSize: '32px',
+                  fontSize: '22px',
                   fontWeight: 700,
                   color: '#000000',
                   letterSpacing: '-0.02em',
@@ -144,7 +144,7 @@ const Orders = () => {
                   lineHeight: '1.2',
                   display: 'flex',
                   alignItems: 'center',
-                  marginBottom: '28px'
+                  justifyContent: 'center'
                 }}
               >
                 Orders
@@ -161,19 +161,19 @@ const Orders = () => {
                     className="w-full pr-12 focus:outline-none transition-all"
                     style={{
                       fontFamily: 'Gyrotrope',
-                      fontSize: '14px',
+                      fontSize: '12px',
                       fontWeight: 400,
                       color: '#000000',
                       backgroundColor: '#FFFFFF',
-                      border: '1px solid #D1D5DB',
+                      border: '1px solid #A5E8DC',
                       borderRadius: '8px',
                       padding: '10px 16px',
-                      width: '280px',
-                      height: '42px'
+                      width: '260px',
+                      height: '32px'
                     }}
                   />
                   <button
-                    className="absolute right-2 top-1/2 -translate-y-1/2 transition-all duration-200 hover:opacity-80 cursor-pointer"
+                    className="absolute right-0 top-1/2 -translate-y-1/2 transition-all duration-200 hover:opacity-80 cursor-pointer"
                     style={{
                       backgroundColor: '#A5E8DC',
                       borderRadius: '6px',
@@ -199,7 +199,7 @@ const Orders = () => {
                     border: 'none',
                     borderRadius: '8px',
                     padding: '10px 20px',
-                    height: '42px',
+                    height: '32px',
                     boxShadow: '0 2px 4px rgba(0, 0, 0, 0.06)'
                   }}
                 >
@@ -224,7 +224,7 @@ const Orders = () => {
             <h2
               style={{
                 fontFamily: 'Gyrotrope',
-                fontSize: '26px',
+                fontSize: '24px',
                 fontWeight: 700,
                 color: '#1F2937',
                 marginBottom: '20px',
@@ -232,7 +232,20 @@ const Orders = () => {
                 letterSpacing: '-0.02em'
               }}
             >
+            <span
+               style={{
+                textDecoration: 'underline',
+                textDecorationSkipInk: 'auto',
+                textUnderlineOffset: '4px',
+                textDecorationThickness: '2px',
+                textDecorationColor: '#111827',
+                display: 'inline-block',
+                lineHeight: '1.2',
+              }}
+            >
               Suggested Items
+            </span>
+              
             </h2>
             <div className="grid grid-cols-2 sm:grid-cols-3 md:grid-cols-4 lg:grid-cols-5 gap-4 sm:gap-6 lg:gap-8" style={{ marginBottom: '20px' }}>
               {suggestedItems.map((item) => (

@@ -1,0 +1,59 @@
+
+
+const LoadingSpinner = () => {
+  return (
+    <div className="flex items-center justify-center min-h-screen bg-linear-to-br from-teal-100 to-blue-100">
+      <div className="text-center">
+        {/* Animated DS Pharma Logo */}
+        <motion.div
+          initial={{ scale: 0.8, opacity: 0 }}
+          animate={{ scale: 1, opacity: 1 }}
+          transition={{ duration: 0.5 }}
+          className="mb-8"
+        >
+          <h1 className="text-4xl font-bold text-transparent bg-linear-to-r from-teal-600 via-cyan-600 to-blue-600 bg-clip-text">
+            DS Pharma
+          </h1>
+        </motion.div>
+
+        {/* Loading Spinner */}
+        <motion.div
+          animate={{ rotate: 360 }}
+          transition={{ duration: 1, repeat: Infinity, ease: "linear" }}
+          className="w-12 h-12 mx-auto mb-4 border-4 border-teal-200 rounded-full border-t-teal-600"
+        ></motion.div>
+
+        {/* Loading Text */}
+        <motion.p
+          initial={{ opacity: 0 }}
+          animate={{ opacity: 1 }}
+          transition={{ delay: 0.3 }}
+          className="text-lg text-gray-600"
+        >
+          Loading your healthcare solutions...
+        </motion.p>
+
+        {/* Animated Dots */}
+        <div className="flex justify-center mt-4 space-x-1">
+          {[0, 1, 2].map((index) => (
+            <motion.div
+              key={index}
+              animate={{
+                scale: [1, 1.2, 1],
+                opacity: [0.5, 1, 0.5]
+              }}
+              transition={{
+                duration: 1.5,
+                repeat: Infinity,
+                delay: index * 0.2
+              }}
+              className="w-2 h-2 bg-teal-500 rounded-full"
+            ></motion.div>
+          ))}
+        </div>
+      </div>
+    </div>
+  );
+};
+
+export default LoadingSpinner;
