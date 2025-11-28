@@ -30,7 +30,7 @@ const ProductCategorySection = ({
   };
 
   return (
-    <section className={`w-full py-6 lg:py-8 bg-gray-50 mb-6 ${className}`} style={{ width: '100%' }}>
+    <section className={`w-full py-6 lg:py-8 bg-gray-50 mb-6 ${className}`} style={{ width: '100%', marginBottom: '3rem' }}>
       {/* Full-width Container with Centered Content */}
       <div className="w-full px-4 mx-auto max-w-7xl sm:px-6 lg:px-8">
 

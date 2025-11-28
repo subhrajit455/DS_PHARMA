@@ -2,6 +2,7 @@ import React, { useState } from 'react';
 import { PharmacyProductCard } from '@/components/features/product';
 import { CartItem } from '@/components/features/cart';
 import { OrderSummary } from '@/components/features/order';
+import SuggestedItemsSection from '@/components/sections/SuggestedItemsSection';
 
 const CartDetails = () => {
   const [cartItems, setCartItems] = useState([
@@ -95,98 +96,71 @@ const CartDetails = () => {
 
   return (
     <div style={{ paddingTop: '140px', paddingBottom: '60px', width: '100%' }}>
-        <div className="w-full" style={{ maxWidth: '1200px', margin: '0 auto' }}>
-            <div className="grid grid-cols-1 lg:grid-cols-3 gap-8">
-              {/* Left Section - Cart Items */}
-              <div className="lg:col-span-2">
-                {/* Cart Items Header */}
-                <div className="mb-5">
-                  <h1
-                    style={{
-                      fontFamily: 'Gyrotrope',
-                      fontSize: '20px',
-                      fontWeight: 700,
-                      color: '#000000',
-                      marginBottom: '0',
-                      letterSpacing: '-0.01em'
-                    }}
-                  >
-                    Cart Items
-                  </h1>
-                </div>
-
-              {/* Cart Items List */}
-              <div className="space-y-3">
-                {cartItems.map((item) => (
-                  <CartItem
-                    key={item.id}
-                    item={item}
-                    onUpdateQuantity={updateQuantity}
-                    onRemove={removeItem}
-                  />
-                ))}
-              </div>
-
-              
+      <div className="w-full" style={{ maxWidth: '1200px', margin: '0 auto' }}>
+        <div className="grid grid-cols-1 lg:grid-cols-3 gap-8">
+          {/* Left Section - Cart Items */}
+          <div className="lg:col-span-2">
+            {/* Cart Items Header */}
+            <div className="mb-5">
+              <h1
+                style={{
+                  fontFamily: 'Gyrotrope',
+                  fontSize: '20px',
+                  fontWeight: 700,
+                  color: '#000000',
+                  marginBottom: '0',
+                  letterSpacing: '-0.01em'
+                }}
+              >
+                Cart Items
+              </h1>
             </div>
 
-            {/* Right Section - Order Summary */}
-            <div className="lg:col-span-1">
-              <OrderSummary
-                deliveryAddress={deliveryAddress}
-                couponCode={couponCode}
-                onCouponChange={(e) => setCouponCode(e.target.value)}
-                onApplyCoupon={() => console.log('Apply coupon:', couponCode)}
-                totals={totals}
-                onOrderNow={() => console.log('Order placed')}
-                onAddNewAddress={() => console.log('Add new address')}
-                onChangeAddress={() => console.log('Change address')}
-              />
+            {/* Cart Items List */}
+            <div className="space-y-3">
+              {cartItems.map((item) => (
+                <CartItem
+                  key={item.id}
+                  item={item}
+                  onUpdateQuantity={updateQuantity}
+                  onRemove={removeItem}
+                />
+              ))}
             </div>
+
+
+          </div>
+
+          {/* Right Section - Order Summary */}
+          <div className="lg:col-span-1">
+            <OrderSummary
+              deliveryAddress={deliveryAddress}
+              couponCode={couponCode}
+              onCouponChange={(e) => setCouponCode(e.target.value)}
+              onApplyCoupon={() => console.log('Apply coupon:', couponCode)}
+              totals={totals}
+              onOrderNow={() => console.log('Order placed')}
+              onAddNewAddress={() => console.log('Add new address')}
+              onChangeAddress={() => console.log('Change address')}
+            />
           </div>
         </div>
-      
+      </div>
+
       {/* Suggested Items */}
-      <div className="w-full" style={{ paddingRight: '6rem',paddingLeft: '6rem', paddingTop: '4rem' }}>
-                <h2
-                  style={{
-                    fontFamily: 'Gyrotrope',
-                    fontSize: '22px',
-                    fontWeight: 600,
-                    color: '#000000',
-                    marginBottom: '1rem'
-                  }}
-                >
-                <span
-               style={{
-                textDecoration: 'underline',
-                textDecorationSkipInk: 'auto',
-                textUnderlineOffset: '4px',
-                textDecorationThickness: '2px',
-                textDecorationColor: '#111827',
-                display: 'inline-block',
-                lineHeight: '1.2',
-              }}
-            >
-              Suggested Items
-            </span>
-                  
-                </h2>
-                <div className="grid grid-cols-2 sm:grid-cols-3 md:grid-cols-4 lg:grid-cols-5 gap-4 sm:gap-6 lg:gap-8">
-                  {suggestedItems.map((item) => (
-                    <PharmacyProductCard
-                      key={item.id}
-                      id={item.id}
-                      name={item.name}
-                      price={item.price}
-                      originalPrice={item.originalPrice}
-                      discount={item.discount}
-                      quantity="1 piece"
-                      imageUrl={item.image}
-                    />
-                  ))}
-                </div>
-              </div>
+      <SuggestedItemsSection
+        title="Suggested Items"
+        items={suggestedItems}
+        className="w-full"
+        titleStyle={{
+          fontSize: '22px',
+          marginBottom: '1rem',
+          textDecorationThickness: '2px',
+          textDecorationColor: '#111827',
+          lineHeight: '1.2'
+        }}
+        containerStyle={{ paddingRight: '6rem', paddingLeft: '6rem', paddingTop: '4rem' }}
+      />
     </div>
   );
 };

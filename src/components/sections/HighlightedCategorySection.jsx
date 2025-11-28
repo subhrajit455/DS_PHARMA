@@ -107,7 +107,8 @@ const HighlightedCategorySection = () => {
       className="w-full py-16 min-h-[350px] lg:py-24 mb-8 flex justify-center items-center"
       style={{
         width: '100%',
-        backgroundColor: '#F5E6D3'
+        backgroundColor: '#F5E6D3',
+        marginBottom: '3rem'
       }}
     >
       <div className="w-full max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 ">

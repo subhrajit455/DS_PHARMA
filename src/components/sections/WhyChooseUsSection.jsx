@@ -54,7 +54,8 @@ const WhyChooseUsSection = () => {
       style={{ 
         width: '100%',
         paddingTop: '1rem',
-        paddingBottom: '1rem'
+        paddingBottom: '1rem',
+        marginBottom: '2rem'
       }}
     >
       <div className="w-full max-w-full mx-auto px-4 sm:px-6 lg:px-8 text-center">

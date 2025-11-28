@@ -6,8 +6,8 @@ const ProductDescription = () => {
       <h2
         style={{
           fontFamily: 'Gyrotrope',
-          fontSize: '22px',
-          fontWeight: 700,
+          fontSize: '18px',
+          fontWeight: 600,
           color: '#111827',
           margin: '.5rem',
           letterSpacing: '0.01em'
@@ -15,7 +15,7 @@ const ProductDescription = () => {
       >
         Description
       </h2>
-      <div className="space-y-1 text-gray-800" style={{ fontFamily: 'Gyrotrope', fontSize: '15px', lineHeight: '1.8' }}>
+      <div className="space-y-1 text-gray-800" style={{ fontFamily: 'Gyrotrope', fontSize: '12px', lineHeight: '1.6' }}>
         <p>
           Fish Oil is an essential health supplement that serves many benefits. Our everyday diet is often unable to provide us with the right quantities of all vital nutrients. The result is nutritional deficiencies that can cause a number of health problems.
         </p>

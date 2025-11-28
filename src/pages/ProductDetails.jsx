@@ -8,6 +8,7 @@ import {
   ProductActionButtons,
   ProductDescription
 } from '@/components/features/product';
+import SuggestedItemsSection from '@/components/sections/SuggestedItemsSection';
 
 const ProductDetails = () => {
   const navigate = useNavigate();
@@ -51,22 +52,30 @@ const ProductDetails = () => {
   };
 
   return (
-    <div className="flex flex-col min-h-screen bg-gray-50">
-      <main className="grow" style={{ paddingTop: '140px' }}>
+    <div className="flex flex-col min-h-screen bg-gray-50 ">
+      <main className="grow " style={{ paddingTop: '110px' }}>
         <div className="flex flex-col items-center w-full px-6 lg:px-12">
           <div className="mx-auto max-w-7xl">
             {/* Back Button */}
             <button
               onClick={() => navigate(-1)}
               className="flex items-center gap-2 mb-6 text-gray-700 transition-colors cursor-pointer hover:text-gray-900"
-              style={{ fontFamily: 'Gyrotrope', fontSize: '16px', fontWeight: 500 }}
+              style={{ fontFamily: 'Gyrotrope', fontSize: '16px', fontWeight: 500, marginBottom: '2rem' }}
             >
               <ArrowLeft size={20} />
-              <span>Back</span>
+              <span></span>
             </button>
 
             {/* Product Section */}
-            <div className="grid grid-cols-1 gap-8 mb-12 lg:grid-cols-2">
+            <div className="grid grid-cols-1 gap-8 mb-12" style={{ gridTemplateColumns: 'repeat(1, minmax(0, 1fr))', marginBottom: '2rem' }}
+              data-lg-grid="true">
+              <style>{`
+                @media (min-width: 1024px) {
+                  [data-lg-grid="true"] {
+                    grid-template-columns: 2fr 3fr !important;
+                  }
+                }
+              `}</style>
               <ProductImageGallery
                 images={product.images}
                 selectedImage={selectedImage}
@@ -79,10 +88,10 @@ const ProductDetails = () => {
                 <h1
                   style={{
                     fontFamily: 'Gyrotrope',
-                    fontSize: '24px',
+                    fontSize: '18px',
                     fontWeight: 600,
                     color: '#000000',
-                    marginBottom: '16px',
+                    marginBottom: '10px',
                     lineHeight: '1.4'
                   }}
                 >
@@ -108,45 +117,17 @@ const ProductDetails = () => {
             <ProductDescription />
 
             {/* Suggested Medicine Section */}
-            <div className="mb-10">
-              <h2
-                style={{
-                  fontFamily: 'Gyrotrope',
-                  fontSize: '24px',
-                  fontWeight: 600,
-                  color: '#000000',
-                  marginBottom: '1.5rem'
-                }}
-              >
-                <span
-                  style={{
-                    textDecoration: 'underline',
-                    textDecorationSkipInk: 'auto',
-                    textUnderlineOffset: '4px',
-                    textDecorationThickness: '2px',
-                    textDecorationColor: '#111827',
-                    display: 'inline-block',
-                    lineHeight: '1.2',
-                  }}
-                >
-                  Suggested Medicine
-                </span>
-              </h2>
-              <div className="grid grid-cols-2 gap-4 sm:grid-cols-3 md:grid-cols-4 lg:grid-cols-5 sm:gap-6 lg:gap-8" style={{ paddingBottom: '25px' }}>
-                {suggestedItems.map((item) => (
-                  <PharmacyProductCard
-                    key={item.id}
-                    id={item.id}
-                    name={item.name}
-                    price={item.price}
-                    originalPrice={item.originalPrice}
-                    discount={item.discount}
-                    quantity="1 piece"
-                    imageUrl={item.image}
-                  />
-                ))}
-              </div>
-            </div>
+            <SuggestedItemsSection
+              title="Suggested Medicine"
+              items={suggestedItems}
+              className="mb-10"
+              titleStyle={{
+                textDecorationThickness: '2px',
+                textDecorationColor: '#111827',
+                lineHeight: '1.2'
+              }}
+              containerStyle={{ paddingBottom: '25px' }}
+            />
           </div>
         </div>
       </main>

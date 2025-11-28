@@ -45,7 +45,7 @@ const Navigation = () => {
         role="navigation"
         aria-label="Main navigation"
         className="hidden md:block absolute top-12 left-1/2 transform -translate-x-1/2 z-50 mx-10"
-        style={{ width: 'calc(100% - 160px)', maxWidth: '1180px' }}
+        style={{ width: 'calc(100% - 80px)', maxWidth: '1280px' }}
       >
         <div
           className="bg-[rgba(165,232,220,0.9)] backdrop-blur-md rounded-[48px] px-7 flex items-center justify-between shadow-[0_4px_24px_rgba(0,0,0,0.08),0_2px_8px_rgba(0,0,0,0.04)] border border-white/20"

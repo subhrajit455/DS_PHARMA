@@ -67,6 +67,7 @@ const PopularCategoriesSection = ({
       style={{
         background: 'linear-gradient(135deg, #A5E8DC 0%, #B8F0E8 100%)',
         minHeight: '180px',
+        marginBottom: '3rem'
 
       }}
       aria-labelledby="popular-categories-heading"

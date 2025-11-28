@@ -15,112 +15,31 @@
   font-family: 'Gyrotrope';
 }
 
-
 /* Custom scrollbar */
 ::-webkit-scrollbar {
-  @font-face {
-    font-family: 'Gyrotrope';
-    src: url('/fonts/variable/GyrotropeVF.ttf') format('truetype');
-    font-weight: 100 900;
-    font-style: normal;
-    font-display: swap;
-  }
+  width: 6px;
+}
 
-  @import "tailwindcss";
+::-webkit-scrollbar-track {
+  background: #f1f1f1;
+}
 
-  * {
-    margin: 0;
-    padding: 0;
-    box-sizing: border-box;
-    font-family: 'Gyrotrope';
-  }
+::-webkit-scrollbar-thumb {
+  background: #14b8a6;
+  border-radius: 3px;
+}
 
+::-webkit-scrollbar-thumb:hover {
+  background: #0d9488;
+}
 
-  /* Custom scrollbar */
-  ::-webkit-scrollbar {
-    width: 6px;
-  }
-
-  ::-webkit-scrollbar-track {
-    background: #f1f1f1;
-  }
-
-  ::-webkit-scrollbar-thumb {
-    background: #14b8a6;
-    border-radius: 3px;
-  }
-
-  ::-webkit-scrollbar-thumb:hover {
-    background: #0d9488;
-
-    @font-face {
-      font-family: 'Gyrotrope';
-      src: url('/fonts/variable/GyrotropeVF.ttf') format('truetype');
-      font-weight: 100 900;
-      font-style: normal;
-      font-display: swap;
-    }
-
-    @import "tailwindcss";
-
-    * {
-      margin: 0;
-      padding: 0;
-      box-sizing: border-box;
-      font-family: 'Gyrotrope';
-    }
-
-
-    /* Custom scrollbar */
-    ::-webkit-scrollbar {
-      @font-face {
-        font-family: 'Gyrotrope';
-        src: url('/fonts/variable/GyrotropeVF.ttf') format('truetype');
-        font-weight: 100 900;
-        font-style: normal;
-        font-display: swap;
-      }
-
-      @import "tailwindcss";
-
-      * {
-        margin: 0;
-        padding: 0;
-        box-sizing: border-box;
-        font-family: 'Gyrotrope';
-      }
-
-
-      /* Custom scrollbar */
-      ::-webkit-scrollbar {
-        width: 6px;
-      }
-
-      ::-webkit-scrollbar-track {
-        background: #f1f1f1;
-      }
-
-      ::-webkit-scrollbar-thumb {
-        background: #14b8a6;
-        border-radius: 3px;
-      }
-
-      ::-webkit-scrollbar-thumb:hover {
-        background: #0d9488;
-      }
-
-      section {
-        margin-bottom: 3rem;
-      }
-
-      /* Global underline styles */
-      a:hover,
-      .underline,
-      .custom-underline {
-        text-decoration: underline;
-        text-decoration-skip-ink: auto;
-        text-underline-offset: 4px;
-        text-decoration-thickness: 2px;
-        text-decoration-color: #111827;
-      }
-    }
+/* Global underline styles */
+a:hover,
+.underline,
+.custom-underline {
+  text-decoration: underline;
+  text-decoration-skip-ink: auto;
+  text-underline-offset: 4px;
+  text-decoration-thickness: 2px;
+  text-decoration-color: #111827;
+}

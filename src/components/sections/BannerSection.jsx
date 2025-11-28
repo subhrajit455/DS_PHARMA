@@ -80,7 +80,7 @@ const BannerSection = () => {
   };
 
   return (
-    <section className="w-full py-6 lg:py-8 bg-white mb-6 flex justify-center items-center" style={{ width: '100%' }}>
+    <section className="w-full py-6 lg:py-8 bg-white mb-6 flex justify-center items-center" style={{ width: '100%', marginBottom: '3rem' }}>
       <div className="w-full max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
         
         {/* Mobile Carousel - Single row, one at a time */}

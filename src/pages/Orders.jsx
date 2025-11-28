@@ -2,6 +2,7 @@ import React, { useState } from 'react';
 import { Search } from 'lucide-react';
 import { PharmacyProductCard } from '@/components/features/product';
 import { OrderCard } from '@/components/features/order';
+import SuggestedItemsSection from '@/components/sections/SuggestedItemsSection';
 
 const Orders = () => {
   const [searchQuery, setSearchQuery] = useState('');
@@ -128,8 +129,8 @@ const Orders = () => {
 
   return (
     <div style={{ paddingTop: '140px' }}>
-        <div className="w-full px-6 lg:px-12 flex flex-col items-center" style={{ marginBottom: '30px' }}>
-          <div className="max-w-7xl mx-auto">
+      <div className="w-full px-6 lg:px-12 flex flex-col items-center" style={{ marginBottom: '30px' }}>
+        <div className="max-w-7xl mx-auto">
           {/* Header Section */}
           <div className="mb-20">
             <div className="flex items-center justify-between mb-16">
@@ -137,9 +138,8 @@ const Orders = () => {
                 style={{
                   fontFamily: 'Gyrotrope',
                   fontSize: '22px',
-                  fontWeight: 700,
+                  fontWeight: 600,
                   color: '#000000',
-                  letterSpacing: '-0.02em',
                   margin: 0,
                   lineHeight: '1.2',
                   display: 'flex',
@@ -205,7 +205,7 @@ const Orders = () => {
                 >
                   Filter
                   <svg width="16" height="16" viewBox="0 0 16 16" fill="none" xmlns="http://www.w3.org/2000/svg">
-                    <path d="M2 4h12M4 8h8M6 12h4" stroke="currentColor" strokeWidth="2" strokeLinecap="round"/>
+                    <path d="M2 4h12M4 8h8M6 12h4" stroke="currentColor" strokeWidth="2" strokeLinecap="round" />
                   </svg>
                 </button>
               </div>
@@ -220,50 +220,18 @@ const Orders = () => {
           </div>
 
           {/* Suggested Items Section */}
-          <div>
-            <h2
-              style={{
-                fontFamily: 'Gyrotrope',
-                fontSize: '24px',
-                fontWeight: 700,
-                color: '#1F2937',
-                marginBottom: '20px',
-                marginTop: '20px',
-                letterSpacing: '-0.02em'
-              }}
-            >
-            <span
-               style={{
-                textDecoration: 'underline',
-                textDecorationSkipInk: 'auto',
-                textUnderlineOffset: '4px',
-                textDecorationThickness: '2px',
-                textDecorationColor: '#111827',
-                display: 'inline-block',
-                lineHeight: '1.2',
-              }}
-            >
-              Suggested Items
-            </span>
-              
-            </h2>
-            <div className="grid grid-cols-2 sm:grid-cols-3 md:grid-cols-4 lg:grid-cols-5 gap-4 sm:gap-6 lg:gap-8" style={{ marginBottom: '20px' }}>
-              {suggestedItems.map((item) => (
-                <PharmacyProductCard
-                  key={item.id}
-                  id={item.id}
-                  name={item.name}
-                  price={item.price}
-                  originalPrice={item.originalPrice}
-                  discount={item.discount}
-                  quantity="1 piece"
-                  imageUrl={item.image}
-                />
-              ))}
-            </div>
-          </div>
+          <SuggestedItemsSection
+            title="Suggested Items"
+            items={suggestedItems}
+            titleStyle={{
+              color: '#1F2937',
+              marginBottom: '20px',
+              marginTop: '20px'
+            }}
+            containerStyle={{ marginBottom: '20px' }}
+          />
         </div>
-        </div>
+      </div>
     </div>
   );
 };

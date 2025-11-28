@@ -3,11 +3,11 @@ import { Card } from '@/components/common';
 
 const PaymentBreakdownCard = ({ breakdown }) => {
   return (
-    <Card className="p-4 ">
-      <h3 className="mb-3 text-base font-semibold text-gray-900" style={{ fontFamily: 'Gyrotrope' }}>
+    <Card className="p-4" style={{ padding: '15px' }}>
+      <h3 className="mb-3 text-base font-semibold text-gray-900" style={{ fontFamily: 'Gyrotrope', marginBottom: '12px' }}>
         Payment Breakdown
       </h3>
-      <div className="space-y-2">
+      <div className="space-y-2 text-xs p-3">
         <BreakdownRow label="Total Cart Value" value={breakdown.totalCartValue} />
         <BreakdownRow label="Discount" value={breakdown.discount} isDeduction />
         <BreakdownRow label="Coupon" value={breakdown.coupon} isDeduction />

@@ -16,7 +16,7 @@ const ProductImageGallery = ({ images, selectedImage, onImageSelect, onScroll })
           <ChevronUp size={20} />
         </button>
 
-        <div className="flex flex-col gap-3 overflow-hidden" style={{ maxHeight: '400px' }}>
+        <div className="flex flex-col gap-3 overflow-hidden" style={{ maxHeight: '350px' }}>
           {images.map((image, index) => (
             <motion.button
               key={index}
@@ -58,7 +58,7 @@ const ProductImageGallery = ({ images, selectedImage, onImageSelect, onScroll })
           initial={{ opacity: 0 }}
           animate={{ opacity: 1 }}
           transition={{ duration: 0.3 }}
-          style={{ minHeight: '400px', maxHeight: '500px' }}
+          style={{ minHeight: '350px', maxHeight: '420px' }}
         />
       </div>
     </div>

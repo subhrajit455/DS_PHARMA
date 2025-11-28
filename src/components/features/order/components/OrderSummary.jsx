@@ -18,7 +18,8 @@ const OrderSummary = ({
         borderRadius: '12px',
         padding: '16px',
         boxShadow: '0 1px 2px rgba(0, 0, 0, 0.06)',
-        border: '1px solid #E5E7EB'
+        border: '1px solid #E5E7EB',
+        marginBottom: '5px'
       }}>
         <h3
           style={{
@@ -35,7 +36,7 @@ const OrderSummary = ({
         <div
           style={{
             fontFamily: 'Gyrotrope',
-            fontSize: '13px',
+            fontSize: '12px',
             fontWeight: 400,
             color: '#374151',
             lineHeight: '1.5',
@@ -53,14 +54,14 @@ const OrderSummary = ({
             className="flex-1 transition-colors cursor-pointer hover:opacity-90"
             style={{
               fontFamily: 'Gyrotrope',
-              fontSize: '12px',
+              fontSize: '11px',
               fontWeight: 600,
               backgroundColor: '#A5E8DC',
               color: '#000000',
               border: 'none',
               borderRadius: '8px',
-              padding: '8px 12px',
-              height: '36px'
+              padding: '6px 10px',
+              height: '30px'
             }}
           >
             + Add New Address
@@ -70,13 +71,13 @@ const OrderSummary = ({
             className="transition-colors cursor-pointer hover:bg-gray-50"
             style={{
               fontFamily: 'Gyrotrope',
-              fontSize: '12px',
+              fontSize: '11px',
               fontWeight: 600,
               color: '#000000',
               border: '1px solid #D1D5DB',
               borderRadius: '8px',
-              padding: '8px 12px',
-              height: '36px',
+              padding: '6px 10px',
+              height: '30px',
               backgroundColor: 'transparent'
             }}
           >
@@ -91,12 +92,13 @@ const OrderSummary = ({
         borderRadius: '12px',
         padding: '16px',
         boxShadow: '0 1px 2px rgba(0, 0, 0, 0.06)',
-        border: '1px solid #E5E7EB'
+        border: '1px solid #E5E7EB',
+        marginBottom: '5px'
       }}>
         <h3
           style={{
             fontFamily: 'Gyrotrope',
-            fontSize: '14px',
+            fontSize: '13px',
             fontWeight: 600,
             color: '#F97316',
             marginBottom: '10px',
@@ -114,11 +116,11 @@ const OrderSummary = ({
             className="flex-1 focus:outline-none focus:ring-2 focus:ring-orange-400"
             style={{
               fontFamily: 'Gyrotrope',
-              fontSize: '13px',
-              padding: '8px 12px',
+              fontSize: '11px',
+              padding: '6px 10px',
               border: '1px solid #D1D5DB',
               borderRadius: '8px',
-              height: '36px'
+              height: '30px'
             }}
           />
           <button
@@ -126,12 +128,12 @@ const OrderSummary = ({
             className="transition-colors cursor-pointer hover:opacity-90"
             style={{
               fontFamily: 'Gyrotrope',
-              fontSize: '12px',
+              fontSize: '11px',
               fontWeight: 600,
               backgroundColor: '#F97316',
               borderRadius: '8px',
-              padding: '8px 16px',
-              height: '36px',
+              padding: '6px 10px',
+              height: '30px',
               border: 'none',
               color: '#FFFFFF',
             }}
@@ -152,7 +154,7 @@ const OrderSummary = ({
         <h3
           style={{
             fontFamily: 'Gyrotrope',
-            fontSize: '14px',
+            fontSize: '13px',
             fontWeight: 600,
             color: '#000000',
             marginBottom: '12px',
@@ -166,7 +168,7 @@ const OrderSummary = ({
             <span
               style={{
                 fontFamily: 'Gyrotrope',
-                fontSize: '13px',
+                fontSize: '11px',
                 fontWeight: 400,
                 color: '#6B7280'
               }}
@@ -176,7 +178,7 @@ const OrderSummary = ({
             <span
               style={{
                 fontFamily: 'Gyrotrope',
-                fontSize: '13px',
+                fontSize: '11px',
                 fontWeight: 600,
                 color: '#000000'
               }}
@@ -188,7 +190,7 @@ const OrderSummary = ({
             <span
               style={{
                 fontFamily: 'Gyrotrope',
-                fontSize: '13px',
+                fontSize: '11px',
                 fontWeight: 400,
                 color: '#6B7280'
               }}
@@ -198,7 +200,7 @@ const OrderSummary = ({
             <span
               style={{
                 fontFamily: 'Gyrotrope',
-                fontSize: '13px',
+                fontSize: '11px',
                 fontWeight: 600,
                 color: '#10B981'
               }}
@@ -210,7 +212,7 @@ const OrderSummary = ({
             <span
               style={{
                 fontFamily: 'Gyrotrope',
-                fontSize: '13px',
+                fontSize: '11px',
                 fontWeight: 400,
                 color: '#6B7280'
               }}
@@ -220,7 +222,7 @@ const OrderSummary = ({
             <span
               style={{
                 fontFamily: 'Gyrotrope',
-                fontSize: '13px',
+                fontSize: '11px',
                 fontWeight: 600,
                 color: '#10B981'
               }}
@@ -232,7 +234,7 @@ const OrderSummary = ({
             <span
               style={{
                 fontFamily: 'Gyrotrope',
-                fontSize: '13px',
+                fontSize: '11px',
                 fontWeight: 400,
                 color: '#6B7280'
               }}
@@ -242,7 +244,7 @@ const OrderSummary = ({
             <span
               style={{
                 fontFamily: 'Gyrotrope',
-                fontSize: '13px',
+                fontSize: '11px',
                 fontWeight: 600,
                 color: '#000000'
               }}
@@ -254,7 +256,7 @@ const OrderSummary = ({
             <span
               style={{
                 fontFamily: 'Gyrotrope',
-                fontSize: '13px',
+                fontSize: '11px',
                 fontWeight: 400,
                 color: '#6B7280'
               }}
@@ -264,7 +266,7 @@ const OrderSummary = ({
             <span
               style={{
                 fontFamily: 'Gyrotrope',
-                fontSize: '13px',
+                fontSize: '11px',
                 fontWeight: 600,
                 color: '#000000'
               }}
@@ -277,7 +279,7 @@ const OrderSummary = ({
               <span
                 style={{
                   fontFamily: 'Gyrotrope',
-                  fontSize: '14px',
+                  fontSize: '13px',
                   fontWeight: 700,
                   color: '#000000'
                 }}
@@ -287,7 +289,7 @@ const OrderSummary = ({
               <span
                 style={{
                   fontFamily: 'Gyrotrope',
-                  fontSize: '14px',
+                  fontSize: '13px',
                   fontWeight: 700,
                   color: '#000000'
                 }}
@@ -310,7 +312,7 @@ const OrderSummary = ({
             color: '#FFFFFF',
             border: 'none',
             borderRadius: '10px',
-            padding: '12px',
+            padding: '8px',
             marginTop: '16px',
             boxShadow: '0 2px 4px rgba(0, 0, 0, 0.08)'
           }}

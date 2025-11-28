@@ -16,8 +16,8 @@ const OrderTimeline = ({ timeline, deliveryPartner }) => {
 
       {/* Delivery Partner Message */}
       <p
-        className="mt-8 text-sm font-medium text-center text-green-700"
-        style={{ fontFamily: 'Gyrotrope', margin: '14px 0px' }}
+        className="mt-8 text-xs font-medium text-center text-green-700"
+        style={{ fontFamily: 'Gyrotrope', margin: '14px 0px', marginBottom:'20px' }}
       >
         Delivery Partner: {deliveryPartner}
       </p>
@@ -31,7 +31,7 @@ const TimelineStep = ({ step, isLast }) => (
     {/* Connector Line */}
     {!isLast && (
       <div
-        className="absolute top-3 left-1/2 w-full h-0.5"
+        className="absolute top-2 left-1/2 w-full h-0.5"
         style={{
           backgroundColor: step.completed ? '#10B981' : '#D1D5DB',
           zIndex: 0,
@@ -41,7 +41,7 @@ const TimelineStep = ({ step, isLast }) => (
 
     {/* Status Dot */}
     <div
-      className="relative z-10 w-6 h-6 mb-2 rounded-full"
+      className="relative z-10 w-5 h-5 mb-2 rounded-full"
       style={{
         backgroundColor: step.completed ? '#10B981' : '#D1D5DB',
         border: step.active ? '3px solid #059669' : 'none',
@@ -50,7 +50,7 @@ const TimelineStep = ({ step, isLast }) => (
 
     {/* Status Label */}
     <p
-      className="text-xs font-medium text-center max-w-[100px] my-1"
+      className="text-[9px] font-medium text-center max-w-[100px] my-1"
       style={{
         fontFamily: 'Gyrotrope',
         color: step.completed || step.active ? '#000000' : '#9CA3AF',

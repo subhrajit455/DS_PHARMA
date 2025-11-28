@@ -8,6 +8,7 @@ import {
   OrderContactSection
 } from "@/components/features/order";
 import { AppliedCouponCard } from "@/components/features/payment";
+import SuggestedItemsSection from "@/components/sections/SuggestedItemsSection";
 
 const OrderDetails = () => {
   const navigate = useNavigate();
@@ -50,6 +51,14 @@ const OrderDetails = () => {
     ],
   };
 
+  const suggestedItems = [
+    { id: 1, name: 'Paracetamol', price: 12, originalPrice: 15, discount: 5, image: '/src/assets/images/medicine.jpeg' },
+    { id: 2, name: 'Paracetamol', price: 12, originalPrice: 15, discount: 5, image: '/src/assets/images/medicine.jpeg' },
+    { id: 3, name: 'Paracetamol', price: 12, originalPrice: 15, discount: 5, image: '/src/assets/images/medicine.jpeg' },
+    { id: 4, name: 'Paracetamol', price: 12, originalPrice: 15, discount: 5, image: '/src/assets/images/medicine.jpeg' },
+    { id: 5, name: 'Paracetamol', price: 12, originalPrice: 15, discount: 5, image: '/src/assets/images/medicine.jpeg' }
+  ];
+
   const handleCancelOrder = () => navigate("/orders");
   const handleChangeAddress = () => console.log("Change address");
   const handleShareDetails = () => console.log("Share details");
@@ -63,8 +72,8 @@ const OrderDetails = () => {
         style={{ paddingTop: "140px", paddingBottom: "60px" }}
       >
         <div
-          className="w-full max-w-6xl px-4 mx-auto"
-          style={{ maxWidth: "1200px", margin: "0 auto" }}
+          className="w-full px-4 mx-auto max-w-7xl"
+          style={{ maxWidth: "1240px", margin: "0 auto" }}
         >
           {/* Header */}
           <div className="mb-6">
@@ -72,9 +81,10 @@ const OrderDetails = () => {
               className="mb-6 text-2xl font-bold text-gray-900"
               style={{
                 fontFamily: "Gyrotrope",
-                fontSize: "24px",
+                fontSize: "22px",
                 fontWeight: 600,
                 color: "#000000",
+                marginBottom: "10px"
               }}
             >
               Order Details
@@ -82,16 +92,53 @@ const OrderDetails = () => {
           </div>
 
           {/* Main Grid */}
-          <div className="grid grid-cols-1 gap-6 lg:grid-cols-3">
+          <div className="grid grid-cols-1 gap-6" style={{ gridTemplateColumns: 'repeat(1, minmax(0, 1fr))' }}
+            data-lg-grid="true">
+            <style>{`
+              @media (min-width: 1024px) {
+                [data-lg-grid="true"] {
+                  grid-template-columns: 70% 30% !important;
+                }
+              }
+            `}</style>
             {/* Left Section */}
-            <div className="lg:col-span-2">
+            <div>
               <OrderProductCard order={order} onCancel={handleCancelOrder} />
+              {/* Contact Section */}
+          <Card className="mt-6 w-full" style={{marginTop: '12px' }}>
+            <div className="flex flex-col gap-4 p-4 sm:flex-row sm:items-center sm:justify-between" style={{ padding: '8px', }}>
+              <p
+                className="font-medium text-gray-600 text-md"
+                style={{ fontFamily: "Gyrotrope"}}
+              >
+                Contact Customer Care
+              </p>
+              <div className="flex gap-3">
+                <Button
+                  variant="success"
+                  size="md"
+                  onClick={handleShareDetails}
+                  style={{ padding: '4px' }}
+                >
+                  Share Order Details
+                </Button>
+                <Button
+                  variant="primary"
+                  size="md"
+                  onClick={handleDownloadReceipt}
+                  style={{ padding: '4px' }}
+                >
+                  Download Receipt
+                </Button>
+              </div>
+            </div>
+          </Card>
             </div>
 
             {/* Right Section */}
-            <div className="py-2 lg:col-span-1">
-              <div className="sticky space-y-4 top-32 min-h-[355px]">
-                <DeliveryAddressCard 
+            <div className="py-2" >
+              <div className="sticky space-y-4 top-30 min-h-[300px]">
+                <DeliveryAddressCard
                   address={order.customerAddress}
                   onChangeAddress={handleChangeAddress}
                 />
@@ -101,35 +148,18 @@ const OrderDetails = () => {
             </div>
           </div>
 
-          {/* Contact Section */}
-          <Card className="mt-6 w-[66%]">
-            <div className="flex flex-col gap-4 p-4 sm:flex-row sm:items-center sm:justify-between" style={{ padding: '8px'}}>
-              <p
-                className="font-medium text-gray-600"
-                style={{ fontFamily: "Gyrotrope" }}
-              >
-                Contact Customer Care
-              </p>
-              <div className="flex gap-3">
-                <Button
-                  variant="success"
-                  size="lg"
-                  onClick={handleShareDetails}
-                  style={{ padding: '4px'}}
-                >
-                  Share Order Details
-                </Button>
-                <Button
-                  variant="primary"
-                  size="lg"
-                  onClick={handleDownloadReceipt}
-                  style={{ padding: '4px'}}
-                >
-                  Download Receipt
-                </Button>
-              </div>
-            </div>
-          </Card>
+          
+
+          {/* Suggested Items Section */}
+          <SuggestedItemsSection
+            title="Suggested Items"
+            items={suggestedItems}
+            titleStyle={{
+              marginBottom: '20px',
+              marginTop: '40px'
+            }}
+            containerStyle={{ marginBottom: '20px' }}
+          />
         </div>
       </main>
     </div>

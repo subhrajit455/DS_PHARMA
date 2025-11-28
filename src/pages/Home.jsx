@@ -10,31 +10,49 @@ const Home = () => {
   return (
     <>
       {/* Hero Section */}
-      <ResponsiveHeroSection />
-      
+      <section className="py-12 my-8">
+        <ResponsiveHeroSection />
+      </section>
+
       {/* Popular Categories Section */}
-      <PopularCategoriesSection />
-      
+      <section className="py-12 my-8">
+        <PopularCategoriesSection />
+      </section>
+
       {/* Pharmacy Products Showcase */}
-      <PharmacyProductsShowcase />
+      <section className="py-12 my-8">
+        <PharmacyProductsShowcase />
+      </section>
 
       {/* Banner Section */}
-      <BannerSection />
+      <section className="py-12 my-8">
+        <BannerSection />
+      </section>
 
       {/* Highlighted Category Section */}
-      <HighlightedCategorySection />
+      <section className="py-12 my-8">
+        <HighlightedCategorySection />
+      </section>
 
-       {/* Pharmacy Products Showcase */}
-      <PharmacyProductsShowcase />
+      {/* Pharmacy Products Showcase */}
+      <section className="py-12 my-8">
+        <PharmacyProductsShowcase />
+      </section>
 
       {/* Banner Section */}
-      <BannerSection />
+      <section className="py-12 my-8">
+        <BannerSection />
+      </section>
 
       {/* Why Choose Us Section */}
-      <WhyChooseUsSection />
+      <section className="py-12 my-8">
+        <WhyChooseUsSection />
+      </section>
 
       {/* About Us Section */}
-      <AboutUsSection />
+      <section className="py-12 my-8">
+        <AboutUsSection />
+      </section>
     </>
   );
 };
