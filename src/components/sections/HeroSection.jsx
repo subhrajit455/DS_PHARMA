@@ -241,35 +241,39 @@ const ResponsiveHeroSection = () => {
             backgroundColor: 'transparent',
             padding: '8px 0',
             overflow: 'hidden',
-            zIndex: 1
+            zIndex: 1,
+            maskImage: 'linear-gradient(to right, transparent, black 1%, black 99%, transparent)',
+            WebkitMaskImage: 'linear-gradient(to right, transparent, black 1%, black 99%, transparent)'
           }}
         >
           <div
+            className="marquee-content"
             style={{
               display: 'flex',
               whiteSpace: 'nowrap',
-              animation: 'scroll-marquee 30s linear infinite',
-              transform: 'translateX(100%)',
+              animation: 'scroll-marquee 25s linear infinite',
               fontFamily: 'Gyrotrope, sans-serif',
               fontSize: '18px',
               fontWeight: '600',
               color: '#e94242',
-              letterSpacing: '0.5px'
+              letterSpacing: '0.5px',
+              width: 'max-content',
+              paddingLeft: '100%'
             }}
           >
-            <span style={{ paddingRight: '80px', display: 'inline-block' }}>
+            <span style={{ paddingRight: '50px', display: 'inline-block' }}>
               ✓ 100% Genuine Medicines
             </span>
-            <span style={{ paddingRight: '80px', display: 'inline-block' }}>
+            <span style={{ paddingRight: '50px', display: 'inline-block' }}>
               ✓ Expert Pharmacist Support
             </span>
-            <span style={{ paddingRight: '80px', display: 'inline-block' }}>
+            <span style={{ paddingRight: '50px', display: 'inline-block' }}>
               ✓ Express Home Delivery
             </span>
-            <span style={{ paddingRight: '80px', display: 'inline-block' }}>
+            <span style={{ paddingRight: '50px', display: 'inline-block' }}>
               ✓ Secure & Safe Payments
             </span>
-            <span style={{ paddingRight: '80px', display: 'inline-block' }}>
+            <span style={{ paddingRight: '50px', display: 'inline-block' }}>
               ✓ Trusted Healthcare Partner
             </span>
           </div>
@@ -278,7 +282,7 @@ const ResponsiveHeroSection = () => {
         <style>{`
           @keyframes scroll-marquee {
             0% {
-              transform: translateX(100%);
+              transform: translateX(0);
             }
             100% {
               transform: translateX(-100%);
