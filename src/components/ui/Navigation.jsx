@@ -347,6 +347,43 @@ const Navigation = () => {
         </div>
       </motion.nav>
 
+      {/* Mobile Top Bar - Logo and Cart */}
+      <div className="md:hidden fixed top-0 left-0 right-0 z-50 bg-[rgba(165,232,220,0.95)] backdrop-blur-md border-b border-white/20 shadow-sm px-4 py-3 flex items-center justify-between">
+        <span
+          style={{
+            fontFamily: 'Gyrotrope',
+            fontSize: '20px',
+            fontWeight: 700,
+            color: '#000000',
+            letterSpacing: '0.05em'
+          }}
+        >
+          DS Pharma
+        </span>
+        <div className="flex items-center gap-3">
+          <button
+            aria-label="Shopping cart"
+            type="button"
+            onClick={() => navigate('/cart')}
+            className="w-8 h-8 rounded-full bg-white flex items-center justify-center shadow-sm"
+          >
+            <img
+              src={CartIcon}
+              alt="Cart"
+              className="w-4 h-4 object-contain"
+            />
+          </button>
+          <button
+            aria-label="User profile"
+            type="button"
+            onClick={() => navigate('/profile')}
+            className="w-8 h-8 rounded-full bg-white flex items-center justify-center shadow-sm"
+          >
+            <User size={16} color="#000000" />
+          </button>
+        </div>
+      </div>
+
       {/* Mobile Navigation - Bottom (React Native Style) */}
       <motion.nav
         initial={{ y: 20, opacity: 0 }}
@@ -362,8 +399,8 @@ const Navigation = () => {
         <div
           className="bg-[rgba(165,232,220,0.95)] backdrop-blur-md border-t border-white/20 shadow-[0_-4px_24px_rgba(0,0,0,0.08)]"
           style={{
-            paddingTop: '0.75rem',
-            paddingBottom: '0.75rem',
+            paddingTop: '0.5rem',
+            paddingBottom: '0.5rem',
             paddingLeft: '1rem',
             paddingRight: '1rem'
           }}
@@ -387,7 +424,7 @@ const Navigation = () => {
                   onKeyDown={(e) => handleKeyDown(e, item.name, item.href)}
                   className={`
                     flex flex-col items-center justify-center gap-1
-                    px-3 py-2 rounded-lg
+                    px-2 py-1 rounded-lg
                     transition-all duration-200 ease-out
                     ${isActive
                       ? 'text-black'
@@ -397,18 +434,18 @@ const Navigation = () => {
                     focus:outline-2 focus:outline-black/30 focus:outline-offset-1
                   `}
                   style={{
-                    minWidth: '60px'
+                    minWidth: '50px'
                   }}
                 >
                   <IconComponent
-                    size={22}
+                    size={20}
                     strokeWidth={isActive ? 2.5 : 2}
                     color={isActive ? '#000000' : '#4B5563'}
                   />
                   <span
                     style={{
                       fontFamily: 'Gyrotrope',
-                      fontSize: '11px',
+                      fontSize: '10px',
                       fontWeight: isActive ? 600 : 500,
                       lineHeight: '1',
                     }}
@@ -419,11 +456,11 @@ const Navigation = () => {
                     <div
                       className="absolute bottom-0 left-1/2 transform -translate-x-1/2"
                       style={{
-                        width: '4px',
-                        height: '4px',
+                        width: '3px',
+                        height: '3px',
                         borderRadius: '50%',
                         backgroundColor: '#000000',
-                        marginTop: '2px'
+                        marginTop: '1px'
                       }}
                     />
                   )}
@@ -431,39 +468,29 @@ const Navigation = () => {
               );
             })}
 
-            {/* Search and Cart Icons on Mobile */}
-            <div className="flex items-center gap-2 ml-2">
-              <button
-                aria-label="Search"
-                tabIndex={0}
-                type="button"
-                onClick={() => {
-                  // On mobile, could open a modal or navigate to search page
-                  setIsSearchOpen(!isSearchOpen);
+            {/* Search Icon on Mobile */}
+            <button
+              aria-label="Search"
+              tabIndex={0}
+              type="button"
+              onClick={() => {
+                setIsSearchOpen(!isSearchOpen);
+              }}
+              className="flex flex-col items-center justify-center gap-1 px-2 py-1 rounded-lg text-gray-700 active:scale-95"
+              style={{ minWidth: '50px' }}
+            >
+              <Search size={20} strokeWidth={2} color="#4B5563" />
+              <span
+                style={{
+                  fontFamily: 'Gyrotrope',
+                  fontSize: '10px',
+                  fontWeight: 500,
+                  lineHeight: '1',
                 }}
-                className="w-10 h-10 rounded-full bg-white flex items-center justify-center border-none cursor-pointer transition-all duration-200 ease-out shadow-sm outline-none active:scale-95 focus:outline-2 focus:outline-black/30 focus:outline-offset-1"
               >
-                <Search size={18} strokeWidth={2.5} color="#000000" />
-              </button>
-
-              <button
-                aria-label="Shopping cart"
-                tabIndex={0}
-                type="button"
-                onClick={() => navigate('/cartDetails')}
-                className="w-10 h-10 rounded-full bg-white flex items-center justify-center border-none cursor-pointer transition-all duration-200 ease-out shadow-md outline-none active:scale-95 focus:outline-2 focus:outline-black/30 focus:outline-offset-1"
-              >
-                <img
-                  src={CartIcon}
-                  alt="Cart"
-                  style={{
-                    width: '20px',
-                    height: '20px',
-                    objectFit: 'contain'
-                  }}
-                />
-              </button>
-            </div>
+                Search
+              </span>
+            </button>
           </div>
         </div>
       </motion.nav>

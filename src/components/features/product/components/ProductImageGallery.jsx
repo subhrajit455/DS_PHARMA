@@ -4,28 +4,27 @@ import { ChevronUp, ChevronDown } from 'lucide-react';
 
 const ProductImageGallery = ({ images, selectedImage, onImageSelect, onScroll }) => {
   return (
-    <div className="flex gap-4">
+    <div className="flex flex-col-reverse gap-4 md:flex-row">
       {/* Thumbnail Navigation */}
-      <div className="flex flex-col items-center gap-2">
+      <div className="flex flex-row items-center gap-2 overflow-x-auto md:flex-col md:overflow-visible">
         <button
           onClick={() => onScroll('up')}
           disabled={selectedImage === 0}
-          className="p-1 transition-colors rounded-md cursor-pointer hover:bg-gray-100 disabled:opacity-30 disabled:cursor-not-allowed"
+          className="hidden p-1 transition-colors rounded-md cursor-pointer md:block hover:bg-gray-100 disabled:opacity-30 disabled:cursor-not-allowed"
           aria-label="Scroll up"
         >
           <ChevronUp size={20} />
         </button>
 
-        <div className="flex flex-col gap-3 overflow-hidden" style={{ maxHeight: '350px' }}>
+        <div className="flex flex-row gap-3 overflow-x-auto md:flex-col md:overflow-hidden" style={{ maxHeight: '350px' }}>
           {images.map((image, index) => (
             <motion.button
               key={index}
               onClick={() => onImageSelect(index)}
-              className={`w-20 h-20 rounded-lg overflow-hidden border-2 transition-all ${
-                selectedImage === index
+              className={`w-16 h-16 md:w-20 md:h-20 rounded-lg overflow-hidden border-2 transition-all shrink-0 ${selectedImage === index
                   ? 'border-orange-500 shadow-md'
                   : 'border-gray-200 hover:border-gray-300'
-              }`}
+                }`}
               whileHover={{ scale: 1.05 }}
               whileTap={{ scale: 0.95 }}
             >
@@ -41,7 +40,7 @@ const ProductImageGallery = ({ images, selectedImage, onImageSelect, onScroll })
         <button
           onClick={() => onScroll('down')}
           disabled={selectedImage === images.length - 1}
-          className="p-1 transition-colors rounded-md cursor-pointer hover:bg-gray-100 disabled:opacity-30 disabled:cursor-not-allowed"
+          className="hidden p-1 transition-colors rounded-md cursor-pointer md:block hover:bg-gray-100 disabled:opacity-30 disabled:cursor-not-allowed"
           aria-label="Scroll down"
         >
           <ChevronDown size={20} />
@@ -58,7 +57,7 @@ const ProductImageGallery = ({ images, selectedImage, onImageSelect, onScroll })
           initial={{ opacity: 0 }}
           animate={{ opacity: 1 }}
           transition={{ duration: 0.3 }}
-          style={{ minHeight: '350px', maxHeight: '420px' }}
+          style={{ minHeight: '300px', maxHeight: '420px' }}
         />
       </div>
     </div>

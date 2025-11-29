@@ -117,13 +117,21 @@ const PopularCategoriesSection = ({
           initial="hidden"
           whileInView="visible"
           viewport={{ once: true }}
-          className="grid grid-cols-2 sm:grid-cols-3 md:grid-cols-4 lg:grid-cols-5 xl:grid-cols-6 gap-0.5 sm:gap-0.5 md:gap-1 max-w-2xl xl:max-w-3xl w-full ml-8 sm:ml-12 lg:ml-16"
+          className="flex overflow-x-auto pb-4 hide-scrollbar w-full sm:grid sm:grid-cols-3 md:grid-cols-4 lg:grid-cols-5 xl:grid-cols-6 sm:gap-0.5 md:gap-1 sm:max-w-2xl sm:xl:max-w-3xl sm:ml-12 lg:ml-16 sm:overflow-visible sm:pb-0"
+          style={{
+            scrollbarWidth: 'none',
+            msOverflowStyle: 'none',
+            gap: '1rem' // Gap for mobile flex layout
+          }}
         >
           {displayCategories.map((category, index) => (
             <motion.div
               key={category.id}
               variants={itemVariants}
-              className="flex flex-col items-center group cursor-pointer"
+              className="flex flex-col items-center group cursor-pointer shrink-0 sm:shrink sm:w-auto"
+              style={{
+                // Mobile width handled by class or default behavior
+              }}
               onMouseEnter={() => setHoveredCategory(category.id)}
               onMouseLeave={() => setHoveredCategory(null)}
               role="button"
@@ -137,6 +145,9 @@ const PopularCategoriesSection = ({
                 }
               }}
             >
+              {/* Mobile Width Controller */}
+              <div className="sm:hidden" style={{ width: '22vw', minWidth: '80px', height: '0' }}></div>
+
               {/* Category Image */}
               <motion.div
                 className="relative mb-1"

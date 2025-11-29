@@ -84,7 +84,7 @@ const ProductCategorySection = ({
         {/* Products Grid - Compact Responsive Layout */}
         <div className="relative flex justify-center w-full">
           <motion.div
-            className="grid w-full grid-cols-2 gap-6 sm:grid-cols-3 md:grid-cols-4 lg:grid-cols-5 sm:gap-6 lg:gap-8 max-w-7xl justify-items-center"
+            className="grid w-full grid-cols-2 gap-3 sm:grid-cols-3 md:grid-cols-4 lg:grid-cols-5 sm:gap-6 lg:gap-8 max-w-7xl justify-items-center"
             variants={containerVariants}
             initial="hidden"
             whileInView="visible"

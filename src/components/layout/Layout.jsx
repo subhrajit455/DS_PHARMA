@@ -9,15 +9,15 @@ const Layout = () => {
     <div className="flex flex-col min-h-screen bg-gray-50">
       {/* Navigation */}
       <Navigation />
-      
+
       {/* Main Content Area - Pages render here via Outlet */}
-      <main className="flex-1 w-full">
+      <main className="flex-1 w-full pt-[60px] pb-[70px] md:pt-0 md:pb-0">
         <Outlet />
       </main>
-      
+
       {/* Footer */}
       <Footer />
-      
+
       {/* Scroll to Top Button */}
       <ScrollToTop />
     </div>

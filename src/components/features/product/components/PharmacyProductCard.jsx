@@ -36,7 +36,7 @@ const PharmacyProductCard = ({
 
   return (
     <motion.div
-      className={`bg-transparent overflow-hidden rounded-lg cursor-pointer transition-all duration-300 hover:shadow-lg w-full min-w-60 ${className}`}
+      className={`bg-transparent overflow-hidden rounded-lg cursor-pointer transition-all duration-300 hover:shadow-lg w-full ${className}`}
       style={{ maxWidth: '320px', padding: '10px' }}
       initial={{ opacity: 0, y: 20 }}
       animate={{ opacity: 1, y: 0 }}

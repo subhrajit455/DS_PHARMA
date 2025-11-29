@@ -5,16 +5,15 @@ const ResponsiveHeroSection = () => {
 
   return (
     <div
-      className="relative w-full overflow-hidden"
+      className="hero relative w-full overflow-hidden min-h-[75vh] sm:min-h-screen mb-0 sm:mb-8"
       style={{
-        minHeight: '100vh',
         background: 'linear-gradient(108deg, #E6D4F1 0%, #C4EBF5 50%, #A8EEDF 100%)',
         paddingBottom: '0',
         marginBottom: '3rem'
       }}
     >
       {/* Main Hero Content */}
-      <div className="relative flex items-center justify-center w-full" style={{ minHeight: 'calc(100vh - 80px)', paddingBottom: '100px' }}>
+      <div className="relative flex items-center justify-center w-full min-h-[50vh] sm:min-h-[calc(100vh-140px)]" style={{ paddingBottom: '80px', marginTop: '50px' }}>
         {/* Mobile Title - Visible only on mobile */}
         <motion.div
           initial={{ opacity: 0, y: -20 }}
@@ -62,7 +61,7 @@ const ResponsiveHeroSection = () => {
           className="hidden sm:block"
           style={{
             position: 'absolute',
-            top: '30%',
+            top: '27%',
             left: '8%',
             transform: 'translate(-50%, -50%)',
             zIndex: 1,
@@ -99,10 +98,10 @@ const ResponsiveHeroSection = () => {
           initial={{ opacity: 0, y: 30 }}
           animate={{ opacity: 1, y: 0 }}
           transition={{ duration: 0.8, delay: 0.5 }}
-          className="bottom-30 sm:bottom-10 md:bottom-10 lg:bottom-10"
+          className="bottom sm:bottom-10 md:bottom-10 lg:bottom-10"
           style={{
             position: 'absolute',
-            left: '26%',
+            left: '36%',
             transform: 'translateX(-50%)',
             zIndex: 20,
             maxWidth: '385px',
@@ -110,9 +109,10 @@ const ResponsiveHeroSection = () => {
           }}
         >
           <style>{`
-            @media (min-width: 640px) {
+            @media (max-width: 640px) {
               .doctor-image-container {
-                left: 35% !important;
+                left: -30% !important;
+                padding-top: 140px;
               }
             }
           `}</style>
@@ -202,7 +202,62 @@ const ResponsiveHeroSection = () => {
             </p>
           </div>
         </motion.div>
+
+
       </div>
+
+
+
+      {/* Mobile Scrolling Text */}
+      <motion.div
+        initial={{ opacity: 0, y: 20 }}
+        animate={{ opacity: 1, y: 0 }}
+        transition={{ duration: 0.8, delay: 0.8 }}
+        className="absolute bottom-0 left-0 right-0 z-10 w-full flex items-center overflow-hidden sm:hidden"
+        style={{
+          height: '40px',
+          background: 'rgba(255,255,255,0.3)',
+          backdropFilter: 'blur(2px)'
+        }}
+      >
+        <div
+          className="marquee-content"
+          style={{
+            display: 'flex',
+            whiteSpace: 'nowrap',
+            animation: 'scroll-marquee 20s linear infinite',
+            fontFamily: 'Gyrotrope, sans-serif',
+            fontSize: '14px',
+            fontWeight: '600',
+            color: '#e94242',
+            letterSpacing: '0.5px',
+            width: 'max-content',
+            paddingLeft: '100%'
+          }}
+        >
+          <span style={{ paddingRight: '30px', display: 'inline-block' }}>
+            ✓ 100% Genuine Medicines
+          </span>
+          <span style={{ paddingRight: '30px', display: 'inline-block' }}>
+            ✓ Expert Pharmacist Support
+          </span>
+          <span style={{ paddingRight: '30px', display: 'inline-block' }}>
+            ✓ Express Home Delivery
+          </span>
+          <span style={{ paddingRight: '30px', display: 'inline-block' }}>
+            ✓ Secure & Safe Payments
+          </span>
+          <span style={{ paddingRight: '30px', display: 'inline-block' }}>
+            ✓ Trusted Healthcare Partner
+          </span>
+        </div>
+        <style>{`
+          @keyframes scroll-marquee {
+            0% { transform: translateX(0); }
+            100% { transform: translateX(-100%); }
+          }
+        `}</style>
+      </motion.div>
 
       {/* Bottom Right Image - Hero Add */}
       <motion.div

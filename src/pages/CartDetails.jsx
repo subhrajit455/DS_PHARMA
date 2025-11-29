@@ -95,7 +95,7 @@ const CartDetails = () => {
   const totals = calculateTotals();
 
   return (
-    <div style={{ paddingTop: '140px', paddingBottom: '60px', width: '100%' }}>
+    <div className="w-full pt-4 pb-16 lg:pt-32 lg:pb-16">
       <div className="w-full" style={{ maxWidth: '1200px', margin: '0 auto' }}>
         <div className="grid grid-cols-1 lg:grid-cols-3 gap-8">
           {/* Left Section - Cart Items */}
@@ -159,7 +159,7 @@ const CartDetails = () => {
           textDecorationColor: '#111827',
           lineHeight: '1.2'
         }}
-        containerStyle={{ paddingRight: '6rem', paddingLeft: '6rem', paddingTop: '4rem' }}
+        containerStyle={{ paddingRight: '1rem', paddingLeft: '1rem', paddingTop: '2rem' }}
       />
     </div>
   );

@@ -53,7 +53,7 @@ const ProductDetails = () => {
 
   return (
     <div className="flex flex-col min-h-screen bg-gray-50 ">
-      <main className="grow " style={{ paddingTop: '110px' }}>
+      <main className="grow">
         <div className="flex flex-col items-center w-full px-6 lg:px-12">
           <div className="mx-auto max-w-7xl">
             {/* Back Button */}
