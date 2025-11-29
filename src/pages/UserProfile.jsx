@@ -10,9 +10,9 @@ const UserProfile = () => {
   const [activeTab, setActiveTab] = useState('profile');
 
   const [profileData, setProfileData] = useState({
-    firstName: 'Bikram',
-    lastName: 'Dumriya',
-    email: 'bikram.dumriya@example.com',
+    firstName: 'Gourav',
+    lastName: 'Gupta',
+    email: 'gourav.gupta@example.com',
     phone: '+91 9999999999',
     dateOfBirth: '1995-05-15',
     gender: 'Male',
@@ -153,8 +153,8 @@ const UserProfile = () => {
                     key={tab.id}
                     onClick={() => setActiveTab(tab.id)}
                     className={`flex items-center gap-2 px-6 py-4 font-medium transition-colors cursor-pointer whitespace-nowrap ${activeTab === tab.id
-                        ? 'bg-teal-50 text-teal-600 border-b-2 border-teal-600'
-                        : 'text-gray-600 hover:bg-gray-50'
+                      ? 'bg-teal-50 text-teal-600 border-b-2 border-teal-600'
+                      : 'text-gray-600 hover:bg-gray-50'
                       }`}
                     style={{ fontFamily: 'Gyrotrope', fontSize: '16px', margin: '5px 10px' }}
                   >

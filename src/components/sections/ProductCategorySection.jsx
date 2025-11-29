@@ -35,9 +35,9 @@ const ProductCategorySection = ({
       <div className="w-full px-4 mx-auto max-w-7xl sm:px-6 lg:px-8">
 
         {/* Section Header - Compact Spacing */}
-        <div className="flex flex-col items-center justify-between w-full gap-3 mb-4 sm:flex-row lg:mb-6 sm:gap-4">
+        <div className="flex flex-row items-start justify-between w-full gap-3 mb-4 sm:flex-row sm:items-center lg:mb-6 sm:gap-4">
           <h2
-            className="flex-1 text-center sm:text-left"
+            className="flex-1 text-left sm:text-left"
             style={{
               fontFamily: 'Gyrotrope',
               fontWeight: 600,
@@ -66,15 +66,15 @@ const ProductCategorySection = ({
           </h2>
           <button
             onClick={handleViewAll}
-            className="hidden sm:block bg-linear-to-r from-orange-500 to-orange-600 hover:from-orange-600 hover:to-orange-700 text-white px-10 py-3 lg:px-12 lg:py-3.5 rounded-md shadow-md hover:shadow-lg transition-all duration-200 transform hover:scale-105 focus:outline-none focus:ring-2 focus:ring-orange-500 focus:ring-offset-2 whitespace-nowrap"
+            className="bg-linear-to-r from-orange-500 to-orange-600 hover:from-orange-600 hover:to-orange-700 text-white px-6 py-2 sm:px-10 sm:py-3 lg:px-12 lg:py-3.5 rounded-md shadow-md hover:shadow-lg transition-all duration-200 transform hover:scale-105 focus:outline-none focus:ring-2 focus:ring-orange-500 focus:ring-offset-2 whitespace-nowrap"
             aria-label={`View all products in ${title}`}
             style={{
               fontFamily: 'Gyrotrope',
               fontWeight: 600,
-              fontSize: '16px',
+              fontSize: '12px',
               lineHeight: '100%',
               letterSpacing: '0%',
-              padding: '4px 8px'
+              padding: '6px 12px'
             }}
           >
             View All
@@ -84,14 +84,19 @@ const ProductCategorySection = ({
         {/* Products Grid - Compact Responsive Layout */}
         <div className="relative flex justify-center w-full">
           <motion.div
-            className="grid w-full grid-cols-2 gap-3 sm:grid-cols-3 md:grid-cols-4 lg:grid-cols-5 sm:gap-6 lg:gap-8 max-w-7xl justify-items-center"
+            className="flex w-full overflow-x-auto pb-4 hide-scrollbar sm:grid sm:grid-cols-3 md:grid-cols-4 lg:grid-cols-5 sm:gap-6 lg:gap-8 max-w-7xl sm:justify-items-center sm:pb-0"
+            style={{
+              scrollbarWidth: 'none',
+              msOverflowStyle: 'none',
+              gap: '1rem'
+            }}
             variants={containerVariants}
             initial="hidden"
             whileInView="visible"
             viewport={{ once: true, margin: "-20px" }}
           >
-            {/* Show 6 products on mobile (3 pairs), 5 on larger screens */}
-            {products.slice(0, 6).map((product, index) => (
+            {/* Show all products */}
+            {products.map((product, index) => (
               <motion.div
                 key={product.id}
                 variants={itemVariants}
@@ -100,7 +105,7 @@ const ProductCategorySection = ({
                   duration: 0.5,
                   ease: "easeOut"
                 }}
-                className={`w-full max-w-60 ${index === 5 ? 'sm:hidden' : ''}`}
+                className="w-[calc(50%-0.5rem)] min-w-[160px] shrink-0 sm:w-auto sm:min-w-0 sm:shrink sm:max-w-60"
               >
                 <PharmacyProductCard
                   {...product}
@@ -112,49 +117,10 @@ const ProductCategorySection = ({
             ))}
           </motion.div>
 
-          {/* View All Button - Bottom Right Corner (Small Devices Only) */}
-          <button
-            onClick={handleViewAll}
-            className="absolute z-10 px-6 py-2 text-white transition-all duration-200 transform rounded-full shadow-lg sm:hidden -bottom-3 right-2 bg-gradient-to-r from-orange-500 to-orange-600 hover:from-orange-600 hover:to-orange-700 hover:shadow-xl hover:scale-105 focus:outline-none focus:ring-2 focus:ring-orange-500 focus:ring-offset-2"
-            aria-label={`View all products in ${title}`}
-            style={{
-              fontFamily: 'Gyrotrope',
-              fontWeight: 600,
-              fontSize: '14px',
-            }}
-          >
-            View All
-          </button>
+
         </div>
 
-        {/* Additional Products for Medium Screens (if needed) */}
-        {products.length > 6 && (
-          <div className="flex justify-center w-full mt-6 lg:hidden">
-            <motion.div
-              className="grid w-full grid-cols-2 gap-6 sm:grid-cols-3 md:grid-cols-4 sm:gap-6 max-w-7xl justify-items-center"
-              variants={containerVariants}
-              initial="hidden"
-              whileInView="visible"
-              viewport={{ once: true, margin: "-20px" }}
-            >
-              {products.slice(6).map((product, index) => (
-                <motion.div
-                  key={`additional-${product.id}`}
-                  variants={itemVariants}
-                  transition={{ delay: index * 0.08 }}
-                  className="w-full max-w-[240px]"
-                >
-                  <PharmacyProductCard
-                    {...product}
-                    onAddToCart={onAddToCart}
-                    onCardClick={onProductClick}
-                    className="w-full h-full"
-                  />
-                </motion.div>
-              ))}
-            </motion.div>
-          </div>
-        )}
+
       </div>
     </section>
   );

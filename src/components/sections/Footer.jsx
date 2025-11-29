@@ -40,12 +40,12 @@ const Footer = () => {
       style={{
         width: '100%',
         backgroundColor: '#D1F5EB', // Light green color from image
-        paddingTop: '3rem',
-        paddingBottom: '3rem'
+        paddingTop: '2rem',
+        paddingBottom: '4rem'
       }}
     >
       <div className="w-full px-4 mx-auto max-w-7xl sm:px-6 lg:px-8">
-        <div className="grid items-start grid-cols-1 gap-8 md:grid-cols-12">
+        <div className="grid items-start grid-cols-2 gap-8 md:grid-cols-12">
 
           {/* Logo Section */}
           <motion.div
@@ -53,7 +53,7 @@ const Footer = () => {
             whileInView={{ opacity: 1, y: 0 }}
             viewport={{ once: true }}
             transition={{ duration: 0.5 }}
-            className="flex items-start justify-start md:col-span-4"
+            className="flex items-start justify-center col-span-2 md:justify-start md:col-span-4"
           >
             <div
               style={{
@@ -86,9 +86,9 @@ const Footer = () => {
             whileInView={{ opacity: 1, y: 0 }}
             viewport={{ once: true }}
             transition={{ duration: 0.5, delay: 0.1 }}
-            className="flex flex-col items-center md:col-span-4"
+            className="flex flex-col items-center md:items-center col-span-1 md:col-span-4 " 
           >
-            <div className="flex flex-col items-start">
+            <div className="flex flex-col items-center md:text-start">
               <h3
                 style={{
                   fontFamily: 'Gyrotrope',
@@ -131,7 +131,7 @@ const Footer = () => {
             whileInView={{ opacity: 1, y: 0 }}
             viewport={{ once: true }}
             transition={{ duration: 0.5, delay: 0.2 }}
-            className="flex flex-col items-start md:col-span-4 md:pl-12"
+            className="flex flex-col items-start col-span-1 md:col-span-4 md:pl-12"
           >
             <h3
               style={{

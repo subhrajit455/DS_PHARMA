@@ -43,7 +43,7 @@ const BannerSection = () => {
 
   const startAutoSlide = () => {
     if (intervalRef.current) clearInterval(intervalRef.current);
-    
+
     intervalRef.current = setInterval(() => {
       if (!isHovered) {
         setCurrentIndex((prevIndex) => (prevIndex + 1) % banners.length);
@@ -82,17 +82,17 @@ const BannerSection = () => {
   return (
     <section className="w-full py-6 lg:py-8 bg-white mb-6 flex justify-center items-center" style={{ width: '100%', marginBottom: '3rem' }}>
       <div className="w-full max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
-        
+
         {/* Mobile Carousel - Single row, one at a time */}
         <div className="sm:hidden">
-          <div 
+          <div
             className="relative overflow-hidden rounded-2xl"
             onMouseEnter={() => setIsHovered(true)}
             onMouseLeave={() => setIsHovered(false)}
           >
             {/* Banner Container */}
             <div className="flex transition-transform duration-500 ease-in-out"
-                 style={{ transform: `translateX(-${currentIndex * 100}%)` }}>
+              style={{ transform: `translateX(-${currentIndex * 100}%)` }}>
               {banners.map((banner) => (
                 <div key={banner.id} className="w-full flex-shrink-0">
                   <motion.div
@@ -120,10 +120,10 @@ const BannerSection = () => {
                           className="w-full h-full object-cover transition-transform duration-500 group-hover:scale-110"
                           loading="lazy"
                         />
-                        
+
                         {/* Overlay for better text readability */}
                         <div className="absolute inset-0 bg-black/20 group-hover:bg-black/30 transition-colors duration-300" />
-                        
+
                         {/* Content Overlay */}
                         <div className="absolute inset-0 flex items-center justify-center">
                           <div className="text-center text-white">
@@ -156,7 +156,7 @@ const BannerSection = () => {
                 <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M15 19l-7-7 7-7" />
               </svg>
             </button>
-            
+
             <button
               onClick={goToNext}
               className="absolute right-2 top-1/2 transform -translate-y-1/2 bg-white/80 hover:bg-white text-gray-800 p-2 rounded-full shadow-lg transition-all duration-200 z-10"
@@ -173,9 +173,8 @@ const BannerSection = () => {
                 <button
                   key={index}
                   onClick={() => goToSlide(index)}
-                  className={`w-2 h-2 rounded-full transition-all duration-200 ${
-                    index === currentIndex ? 'bg-white' : 'bg-white/50'
-                  }`}
+                  className={`w-2 h-2 rounded-full transition-all duration-200 ${index === currentIndex ? 'bg-white' : 'bg-white/50'
+                    }`}
                   aria-label={`Go to banner ${index + 1}`}
                 />
               ))}
@@ -208,8 +207,8 @@ const BannerSection = () => {
                   key={banner.id}
                   variants={{
                     hidden: { opacity: 0, y: 30 },
-                    visible: { 
-                      opacity: 1, 
+                    visible: {
+                      opacity: 1,
                       y: 0,
                       transition: {
                         duration: 0.6,
@@ -217,7 +216,7 @@ const BannerSection = () => {
                       }
                     }
                   }}
-                  whileHover={{ 
+                  whileHover={{
                     scale: 1.05,
                     y: -8,
                     transition: { duration: 0.3, ease: "easeOut" }
@@ -245,10 +244,10 @@ const BannerSection = () => {
                         className="w-full h-full object-cover transition-transform duration-500 group-hover:scale-110"
                         loading="lazy"
                       />
-                      
+
                       {/* Overlay for better text readability */}
                       <div className="absolute inset-0 bg-black/20 group-hover:bg-black/30 transition-colors duration-300" />
-                      
+
                       {/* Content Overlay */}
                       <div className="absolute inset-0 flex items-center justify-center">
                         <div className="text-center text-white">

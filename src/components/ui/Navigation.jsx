@@ -329,7 +329,7 @@ const Navigation = () => {
 
             {/* User Profile */}
             <button
-              aria-label="User profile - Bikram"
+              aria-label="User profile - Gourav"
               tabIndex={0}
               type="button"
               onClick={() => navigate('/profile')}
@@ -340,47 +340,120 @@ const Navigation = () => {
               </div>
               <span className="font-sans text-sm font-medium text-black tracking-[0.01em]"
                 style={{ paddingRight: '1rem' }}>
-                Hi, Bikram
+                Hi, Gourav
               </span>
             </button>
           </div>
         </div>
       </motion.nav>
 
-      {/* Mobile Top Bar - Logo and Cart */}
-      <div className="md:hidden fixed top-0 left-0 right-0 z-50 bg-[rgba(165,232,220,0.95)] backdrop-blur-md border-b border-white/20 shadow-sm px-4 py-3 flex items-center justify-between">
-        <span
-          style={{
-            fontFamily: 'Gyrotrope',
-            fontSize: '20px',
-            fontWeight: 700,
-            color: '#000000',
-            letterSpacing: '0.05em'
-          }}
-        >
-          DS Pharma
-        </span>
-        <div className="flex items-center gap-3">
-          <button
-            aria-label="Shopping cart"
-            type="button"
-            onClick={() => navigate('/cart')}
-            className="w-8 h-8 rounded-full bg-white flex items-center justify-center shadow-sm"
+      {/* Mobile Top Bar - Logo, Search, Cart, Profile */}
+      <div className="md:hidden fixed top-0 left-0 right-0 z-50 bg-[rgba(165,232,220,0.95)] backdrop-blur-md border-b border-white/20 shadow-sm px-4 py-5 mt-5">
+        <div className="flex items-center justify-between">
+          <span
+            style={{
+              fontFamily: 'Gyrotrope',
+              fontSize: '20px',
+              fontWeight: 700,
+              color: '#000000',
+              letterSpacing: '0.05em'
+            }}
           >
-            <img
-              src={CartIcon}
-              alt="Cart"
-              className="w-4 h-4 object-contain"
-            />
-          </button>
-          <button
-            aria-label="User profile"
-            type="button"
-            onClick={() => navigate('/profile')}
-            className="w-8 h-8 rounded-full bg-white flex items-center justify-center shadow-sm"
-          >
-            <User size={16} color="#000000" />
-          </button>
+            DS Pharma
+          </span>
+          <div className="flex items-center gap-3">
+            {/* Search Icon/Bar for Mobile */}
+            <div className="relative" ref={searchRef}>
+              {!isSearchOpen ? (
+                <button
+                  onClick={() => {
+                    setIsSearchOpen(true);
+                    setTimeout(() => searchInputRef.current?.focus(), 100);
+                  }}
+                  aria-label="Open search"
+                  type="button"
+                  className="w-8 h-8 rounded-full bg-white flex items-center justify-center shadow-sm"
+                >
+                  <Search size={16} strokeWidth={2.5} color="#000000" />
+                </button>
+              ) : (
+                <div className="absolute right-0 top-1/2 -translate-y-1/2 flex items-center gap-2 bg-white rounded-full px-3 py-2 shadow-md z-50 w-[200px]">
+                  <input
+                    ref={searchInputRef}
+                    type="text"
+                    value={searchQuery}
+                    onChange={(e) => {
+                      setSearchQuery(e.target.value);
+                      setSelectedIndex(-1);
+                    }}
+                    onKeyDown={handleSearchKeyDown}
+                    placeholder="Search..."
+                    className="outline-none text-xs flex-1 bg-transparent min-w-0"
+                    style={{ fontFamily: 'Gyrotrope', padding: '0.25rem' }}
+                    role="combobox"
+                    aria-label="Search products"
+                    aria-expanded={searchResults.length > 0}
+                    aria-controls="search-results"
+                    aria-activedescendant={selectedIndex >= 0 ? `search-option-${selectedIndex}` : undefined}
+                    aria-autocomplete="list"
+                  />
+                  {searchQuery && (
+                    <button
+                      onClick={() => {
+                        setSearchQuery('');
+                        setSearchResults([]);
+                      }}
+                      className="hover:opacity-70 transition-opacity"
+                      aria-label="Clear search"
+                    >
+                      <X size={12} strokeWidth={2.5} color="#666" />
+                    </button>
+                  )}
+                  <button
+                    onClick={() => {
+                      if (!searchQuery) {
+                        setIsSearchOpen(false);
+                      }
+                    }}
+                    className="hover:opacity-70 transition-opacity"
+                    aria-label="Search"
+                  >
+                    <Search size={16} strokeWidth={2.5} color="#000000" />
+                  </button>
+
+                  {/* Dropdown for mobile search */}
+                  <div className="absolute top-full left-0 right-0 mt-2">
+                    <SearchDropdown
+                      results={searchResults}
+                      selectedIndex={selectedIndex}
+                      onSelect={handleProductSelect}
+                    />
+                  </div>
+                </div>
+              )}
+            </div>
+
+            <button
+              aria-label="Shopping cart"
+              type="button"
+              onClick={() => navigate('/cart')}
+              className="w-8 h-8 rounded-full bg-white flex items-center justify-center shadow-sm"
+            >
+              <img
+                src={CartIcon}
+                alt="Cart"
+                className="w-4 h-4 object-contain"
+              />
+            </button>
+            <button
+              aria-label="User profile"
+              type="button"
+              onClick={() => navigate('/profile')}
+              className="w-8 h-8 rounded-full bg-white flex items-center justify-center shadow-sm"
+            >
+              <User size={16} color="#000000" />
+            </button>
+          </div>
         </div>
       </div>
 
@@ -468,29 +541,7 @@ const Navigation = () => {
               );
             })}
 
-            {/* Search Icon on Mobile */}
-            <button
-              aria-label="Search"
-              tabIndex={0}
-              type="button"
-              onClick={() => {
-                setIsSearchOpen(!isSearchOpen);
-              }}
-              className="flex flex-col items-center justify-center gap-1 px-2 py-1 rounded-lg text-gray-700 active:scale-95"
-              style={{ minWidth: '50px' }}
-            >
-              <Search size={20} strokeWidth={2} color="#4B5563" />
-              <span
-                style={{
-                  fontFamily: 'Gyrotrope',
-                  fontSize: '10px',
-                  fontWeight: 500,
-                  lineHeight: '1',
-                }}
-              >
-                Search
-              </span>
-            </button>
+
           </div>
         </div>
       </motion.nav>

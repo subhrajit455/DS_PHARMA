@@ -21,19 +21,6 @@ const OrderDetails = () => {
     productName: "Pharmeasy Fish Oil 1000mg Soft Gelatin 60 Capsules",
     price: 1500,
     quantity: 1,
-    image: "/src/assets/images/medicine.jpeg",
-    deliveryPartner: "Pickup Up Your Courier. Will Be Delivered Soon.",
-    contactAgent: "_",
-    pin: "_",
-    otp: "_",
-    customerAddress: {
-      name: "Bikram Dumriya",
-      phone: "9999999999",
-      address: "A/B, Section Lane, Odisha, Noida, 744115",
-    },
-    appliedCoupon: {
-      address: "A/B, Section Lane, Odisha, Noida, 744115",
-    },
     paymentBreakdown: {
       totalCartValue: 1500,
       discount: 1000,
@@ -105,34 +92,34 @@ const OrderDetails = () => {
             <div>
               <OrderProductCard order={order} onCancel={handleCancelOrder} />
               {/* Contact Section */}
-          <Card className="mt-6 w-full" style={{marginTop: '12px' }}>
-            <div className="flex flex-col gap-4 p-4 sm:flex-row sm:items-center sm:justify-between" style={{ padding: '8px', }}>
-              <p
-                className="font-medium text-gray-600 text-md"
-                style={{ fontFamily: "Gyrotrope"}}
-              >
-                Contact Customer Care
-              </p>
-              <div className="flex gap-3">
-                <Button
-                  variant="success"
-                  size="md"
-                  onClick={handleShareDetails}
-                  style={{ padding: '4px' }}
-                >
-                  Share Order Details
-                </Button>
-                <Button
-                  variant="primary"
-                  size="md"
-                  onClick={handleDownloadReceipt}
-                  style={{ padding: '4px' }}
-                >
-                  Download Receipt
-                </Button>
-              </div>
-            </div>
-          </Card>
+              <Card className="mt-6 w-full" style={{ marginTop: '12px' }}>
+                <div className="flex flex-col gap-4 p-4 sm:flex-row sm:items-center sm:justify-between" style={{ padding: '8px', }}>
+                  <p
+                    className="font-medium text-gray-600 text-md"
+                    style={{ fontFamily: "Gyrotrope" }}
+                  >
+                    Contact Customer Care
+                  </p>
+                  <div className="flex gap-3">
+                    <Button
+                      variant="success"
+                      size="md"
+                      onClick={handleShareDetails}
+                      style={{ padding: '4px' }}
+                    >
+                      Share Order Details
+                    </Button>
+                    <Button
+                      variant="primary"
+                      size="md"
+                      onClick={handleDownloadReceipt}
+                      style={{ padding: '4px' }}
+                    >
+                      Download Receipt
+                    </Button>
+                  </div>
+                </div>
+              </Card>
             </div>
 
             {/* Right Section */}
@@ -148,7 +135,7 @@ const OrderDetails = () => {
             </div>
           </div>
 
-          
+
 
           {/* Suggested Items Section */}
           <SuggestedItemsSection

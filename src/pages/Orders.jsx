@@ -11,7 +11,7 @@ const Orders = () => {
     {
       id: '964368966',
       productName: 'Pharmeasy Fish Oil 1000mg Soft Gelatin 60 Capsules',
-      customerName: 'Bikram Dumriya',
+      customerName: 'Gourav Gupta',
       phone: '4664938723',
       address: 'A/B, Section Lane, Odisha, Noida, 744115',
       status: 'In Process',
@@ -23,7 +23,7 @@ const Orders = () => {
     {
       id: '964368967',
       productName: 'Pharmeasy Fish Oil 1000mg Soft Gelatin 60 Capsules',
-      customerName: 'Bikram Dumriya',
+      customerName: 'Gourav Gupta',
       phone: '4664938723',
       address: 'A/B, Section Lane, Odisha, Noida, 744115',
       status: 'Waiting For Pick Up',
@@ -35,7 +35,7 @@ const Orders = () => {
     {
       id: '964368968',
       productName: 'Pharmeasy Fish Oil 1000mg Soft Gelatin 60 Capsules',
-      customerName: 'Bikram Dumriya',
+      customerName: 'Gourav Gupta',
       phone: '4664938723',
       address: 'A/B, Section Lane, Odisha, Noida, 744115',
       status: 'On the Way',
@@ -47,7 +47,7 @@ const Orders = () => {
     {
       id: '964368969',
       productName: 'Pharmeasy Fish Oil 1000mg Soft Gelatin 60 Capsules',
-      customerName: 'Bikram Dumriya',
+      customerName: 'Gourav Gupta',
       phone: '4664938723',
       address: 'A/B, Section Lane, Odisha, Noida, 744115',
       status: 'Out For Delivery',
@@ -60,7 +60,7 @@ const Orders = () => {
     {
       id: '964368970',
       productName: 'Pharmeasy Fish Oil 1000mg Soft Gelatin 60 Capsules',
-      customerName: 'Bikram Dumriya',
+      customerName: 'Gourav Gupta',
       phone: '4664938723',
       address: 'A/B, Section Lane, Odisha, Noida, 744115',
       status: 'Delivered',
@@ -72,7 +72,7 @@ const Orders = () => {
     {
       id: '964368971',
       productName: 'Pharmeasy Fish Oil 1000mg Soft Gelatin 60 Capsules',
-      customerName: 'Bikram Dumriya',
+      customerName: 'Gourav Gupta',
       phone: '4664938723',
       address: 'A/B, Section Lane, Odisha, Noida, 744115',
       status: 'Returned',

@@ -10,47 +10,47 @@ const Home = () => {
   return (
     <>
       {/* Hero Section */}
-      <section className="py-12 my-8">
+      <section className="py-2 my-2 sm:py-12 sm:my-8">
         <ResponsiveHeroSection />
       </section>
 
       {/* Popular Categories Section */}
-      <section className="py-12 my-8">
+      <section className="py-2 my-2 sm:py-12 sm:my-8">
         <PopularCategoriesSection />
       </section>
 
       {/* Pharmacy Products Showcase */}
-      <section className="py-12 my-8">
+      <section className="py-2 my-2 sm:py-12 sm:my-8">
         <PharmacyProductsShowcase />
       </section>
 
       {/* Banner Section */}
-      <section className="py-12 my-8">
+      <section className="py-2 my-2 sm:py-12 sm:my-8">
         <BannerSection />
       </section>
 
       {/* Highlighted Category Section */}
-      <section className="py-12 my-8">
+      <section className="py-2 my-2 sm:py-12 sm:my-8">
         <HighlightedCategorySection />
       </section>
 
       {/* Pharmacy Products Showcase */}
-      <section className="py-12 my-8">
+      <section className="py-2 my-2 sm:py-12 sm:my-8">
         <PharmacyProductsShowcase />
       </section>
 
       {/* Banner Section */}
-      <section className="py-12 my-8">
+      <section className="py-2 my-2 sm:py-12 sm:my-8">
         <BannerSection />
       </section>
 
       {/* Why Choose Us Section */}
-      <section className="py-12 my-8">
+      <section className="py-2 my-2 sm:py-12 sm:my-8">
         <WhyChooseUsSection />
       </section>
 
       {/* About Us Section */}
-      <section className="py-12 my-8">
+      <section className="py-2 my-2 sm:py-12 sm:my-8">
         <AboutUsSection />
       </section>
     </>

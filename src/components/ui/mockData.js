@@ -19,13 +19,10 @@ export const SAMPLE_ORDER_DATA = {
   originalPrice: 1800,
   quantity: 1,
   image: '/src/assets/images/medicine.jpeg',
-  status: 'On the Way',import { SAMPLE_TIMELINE_DATA, SAMPLE_ORDER_DATA, SAMPLE_ORDERS_LIST } from '../components/ui/mockData';
-
-// In your component
-<OrderTimeline {...SAMPLE_TIMELINE_DATA} />
+  status: 'On the Way',
   statusBg: '#10B981',
   expectedDelivery: '18th Dec, 2025',
-  customerName: 'Bikram Dumriya',
+  customerName: 'Gourav Gupta',
   phone: '9999999999',
   address: 'A/B, Section Lane, Odisha, Noida, 744115'
 };
@@ -34,7 +31,7 @@ export const SAMPLE_ORDERS_LIST = [
   {
     id: 1,
     productName: 'Pharmeasy Fish Oil 1000mg',
-    customerName: 'Bikram Dumriya',
+    customerName: 'Gourav Gupta',
     phone: '9999999999',
     address: 'A/B, Section Lane, Odisha, Noida, 744115',
     status: 'On The Way',

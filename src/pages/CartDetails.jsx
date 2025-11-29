@@ -19,7 +19,7 @@ const CartDetails = () => {
 
   const [couponCode, setCouponCode] = useState('');
   const [deliveryAddress] = useState({
-    name: 'Bikram Dumriya',
+    name: 'Gourav Gupta',
     phone: '9999999999',
     address: 'A/B, Section Lane, Odisha, Noida, 744115'
   });

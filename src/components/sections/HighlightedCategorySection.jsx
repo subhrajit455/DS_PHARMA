@@ -54,16 +54,6 @@ const HighlightedCategorySection = () => {
       originalPrice: 200,
       discount: 25,
       imageUrl: '/src/assets/images/medicine.jpeg'
-    },
-    {
-      id: 6,
-      name: 'Paracetamol',
-      quantity: '12',
-      unit: 'piece',
-      price: 150,
-      originalPrice: 200,
-      discount: 25,
-      imageUrl: '/src/assets/images/medicine.jpeg'
     }
   ];
 
@@ -104,19 +94,19 @@ const HighlightedCategorySection = () => {
 
   return (
     <section
-      className="w-full py-16 min-h-[350px] lg:py-24 mb-8 flex justify-center items-center"
+      className="w-full sm:py-16 min-h-[300px] sm:min-h-[350px] lg:py-24 mb-8 flex justify-center items-center"
       style={{
         width: '100%',
         backgroundColor: '#F5E6D3',
         marginBottom: '3rem'
       }}
     >
-      <div className="w-full max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 ">
+      <div className="w-full max-w-7xl mx-auto px-2 sm:px-6 lg:px-8 ">
 
         {/* Section Header - Compact Spacing */}
-        <div className="w-full flex flex-col sm:flex-row items-center justify-between mb-4 lg:mb-6 gap-3 sm:gap-4">
+        <div className="w-full flex flex-row items-start justify-between sm:flex-row sm:items-center mb-4 lg:mb-6 gap-3 sm:gap-4">
           <h2
-            className="text-center sm:text-left flex-1"
+            className="text-left sm:text-left flex-1"
             style={{
               fontFamily: 'Gyrotrope',
               fontWeight: 600,
@@ -145,15 +135,15 @@ const HighlightedCategorySection = () => {
           </h2>
           <button
             onClick={handleViewAll}
-            className="hidden sm:block bg-linear-to-r from-orange-500 to-orange-600 hover:from-orange-600 hover:to-orange-700 text-white px-10 py-3 lg:px-12 lg:py-3.5 rounded-md shadow-md hover:shadow-lg transition-all duration-200 transform hover:scale-105 focus:outline-none focus:ring-2 focus:ring-orange-500 focus:ring-offset-2 whitespace-nowrap"
+            className="bg-linear-to-r from-orange-500 to-orange-600 hover:from-orange-600 hover:to-orange-700 text-white px-6 py-2 sm:px-10 sm:py-3 lg:px-12 lg:py-3.5 rounded-md shadow-md hover:shadow-lg transition-all duration-200 transform hover:scale-105 focus:outline-none focus:ring-2 focus:ring-orange-500 focus:ring-offset-2 whitespace-nowrap"
             aria-label="View all products"
             style={{
               fontFamily: 'Gyrotrope',
               fontWeight: 600,
-              fontSize: '16px',
+              fontSize: '12px',
               lineHeight: '100%',
               letterSpacing: '0%',
-              padding: '4px 8px'
+              padding: '6px 12px'
             }}
           >
             View All
@@ -163,13 +153,18 @@ const HighlightedCategorySection = () => {
         {/* Products Grid - Compact Responsive Layout */}
         <div className="w-full flex justify-center relative">
           <motion.div
-            className="grid grid-cols-2 sm:grid-cols-3 md:grid-cols-4 lg:grid-cols-5 gap-6 sm:gap-6 lg:gap-8 w-full max-w-7xl justify-items-center"
+            className="flex w-full overflow-x-auto pb-4 hide-scrollbar sm:grid sm:grid-cols-3 md:grid-cols-4 lg:grid-cols-5 sm:gap-6 lg:gap-8 max-w-7xl sm:justify-items-center sm:pb-0"
+            style={{
+              scrollbarWidth: 'none',
+              msOverflowStyle: 'none',
+              gap: '1rem'
+            }}
             variants={containerVariants}
             initial="hidden"
             whileInView="visible"
             viewport={{ once: true, margin: "-20px" }}
           >
-            {/* Show 6 products on mobile (3 pairs), 5 on larger screens */}
+            {/* Show all products */}
             {products.map((product, index) => (
               <motion.div
                 key={product.id}
@@ -179,7 +174,7 @@ const HighlightedCategorySection = () => {
                   duration: 0.5,
                   ease: "easeOut"
                 }}
-                className={`w-full max-w-[240px] ${index === 5 ? 'sm:hidden' : ''}`}
+                className="w-[calc(50%-0.5rem)] min-w-[160px] shrink-0 sm:w-auto sm:min-w-0 sm:shrink sm:max-w-[240px]"
               >
                 <PharmacyProductCard
                   {...product}
@@ -191,19 +186,7 @@ const HighlightedCategorySection = () => {
             ))}
           </motion.div>
 
-          {/* View All Button - Bottom Right Corner (Small Devices Only) */}
-          <button
-            onClick={handleViewAll}
-            className="sm:hidden absolute -bottom-3 right-2 bg-gradient-to-r from-orange-500 to-orange-600 hover:from-orange-600 hover:to-orange-700 text-white px-6 py-2 rounded-full shadow-lg hover:shadow-xl transition-all duration-200 transform hover:scale-105 focus:outline-none focus:ring-2 focus:ring-orange-500 focus:ring-offset-2 z-10"
-            aria-label="View all products"
-            style={{
-              fontFamily: 'Gyrotrope',
-              fontWeight: 600,
-              fontSize: '14px',
-            }}
-          >
-            View All
-          </button>
+
         </div>
       </div>
     </section>

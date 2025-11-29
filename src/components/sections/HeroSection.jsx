@@ -13,7 +13,7 @@ const ResponsiveHeroSection = () => {
       }}
     >
       {/* Main Hero Content */}
-      <div className="relative flex items-center justify-center w-full min-h-[50vh] sm:min-h-[calc(100vh-140px)]" style={{ paddingBottom: '80px', marginTop: '50px' }}>
+      <div className="relative flex items-center justify-center w-full min-h-[60vh] sm:min-h-[calc(100vh-140px)]" style={{ paddingBottom: '80px', marginTop: '50px' }}>
         {/* Mobile Title - Visible only on mobile */}
         <motion.div
           initial={{ opacity: 0, y: -20 }}

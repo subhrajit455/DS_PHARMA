@@ -40,7 +40,7 @@ const ScrollToTop = () => {
           whileHover={{ scale: 1.1 }}
           whileTap={{ scale: 0.9 }}
           onClick={scrollToTop}
-          className="fixed z-50 shadow-lg"
+          className="fixed z-50 shadow-lg hidden md:flex"
           style={{
             bottom: '100px',
             right: '30px',
@@ -50,7 +50,6 @@ const ScrollToTop = () => {
             background: 'linear-gradient(135deg, #A5E8DC 0%, #85D8CC 100%)',
             border: 'none',
             cursor: 'pointer',
-            display: 'flex',
             alignItems: 'center',
             justifyContent: 'center',
             boxShadow: '0 4px 20px rgba(165, 232, 220, 0.4), 0 2px 8px rgba(0, 0, 0, 0.1)',

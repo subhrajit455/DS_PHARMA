@@ -33,18 +33,30 @@ const SuggestedItemsSection = ({
                     {title}
                 </span>
             </h2>
-            <div className="grid grid-cols-2 gap-4 sm:grid-cols-3 md:grid-cols-4 lg:grid-cols-5 sm:gap-6 lg:gap-8">
+            <div
+                className="flex w-full overflow-x-auto pb-4 hide-scrollbar sm:grid sm:grid-cols-3 md:grid-cols-4 lg:grid-cols-5 sm:gap-6 lg:gap-8 sm:pb-0"
+                style={{
+                    scrollbarWidth: 'none',
+                    msOverflowStyle: 'none',
+                    gap: '1rem'
+                }}
+            >
                 {items.map((item) => (
-                    <PharmacyProductCard
+                    <div
                         key={item.id}
-                        id={item.id}
-                        name={item.name}
-                        price={item.price}
-                        originalPrice={item.originalPrice}
-                        discount={item.discount}
-                        quantity="1 piece"
-                        imageUrl={item.image}
-                    />
+                        className="w-[calc(50%-0.5rem)] min-w-[160px] shrink-0 sm:w-auto sm:min-w-0 sm:shrink"
+                    >
+                        <PharmacyProductCard
+                            id={item.id}
+                            name={item.name}
+                            price={item.price}
+                            originalPrice={item.originalPrice}
+                            discount={item.discount}
+                            quantity="1 piece"
+                            imageUrl={item.image}
+                            className="w-full h-full"
+                        />
+                    </div>
                 ))}
             </div>
         </div>

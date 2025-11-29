@@ -11,7 +11,7 @@ const Layout = () => {
       <Navigation />
 
       {/* Main Content Area - Pages render here via Outlet */}
-      <main className="flex-1 w-full pt-[60px] pb-[70px] md:pt-0 md:pb-0">
+      <main className="flex-1 w-full pt-[70px] pb-[70px] md:pt-0 md:pb-0">
         <Outlet />
       </main>
 

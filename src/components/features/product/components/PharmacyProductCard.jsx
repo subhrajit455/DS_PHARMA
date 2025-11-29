@@ -79,15 +79,15 @@ const PharmacyProductCard = ({
         </h3>
 
         {/* Price and Discount Row */}
-        <div className="flex items-center gap-2 mb-2">
-          <span className="text-[12px] font-bold text-gray-900" title={`₹${price}`}>
+        <div className="flex items-center gap-1 sm:gap-2 mb-2 pr-8 sm:pr-0">
+          <span className="text-[10px] sm:text-[12px] font-bold text-gray-900" title={`₹${price}`}>
             ₹{price}
           </span>
-          <span className="text-[10px] text-gray-500">
+          <span className="text-[8px] sm:text-[10px] text-gray-500">
             /{unit}
           </span>
           {discountPercentage > 0 && (
-            <span className="text-[10px] font-medium text-green-600">
+            <span className="text-[8px] sm:text-[10px] font-medium text-green-600 truncate">
               ({discountPercentage}% off)
             </span>
           )}
@@ -96,11 +96,9 @@ const PharmacyProductCard = ({
         {/* Cart Icon - Positioned absolutely */}
         <button
           onClick={handleAddToCart}
-          className="absolute flex items-center justify-center transition-all duration-200 -translate-y-1/2 rounded-full shadow-md cursor-pointer right-0 top-1/2 hover:scale-110 focus:outline-none"
+          className="absolute flex items-center justify-center transition-all duration-200 -translate-y-1/2 rounded-full shadow-md cursor-pointer right-0 top-1/2 hover:scale-110 focus:outline-none w-7 h-7 sm:w-[35px] sm:h-[35px]"
           aria-label={`Add ${name} to cart`}
           style={{
-            width: '35px',
-            height: '35px',
             backgroundColor: '#f5f5f5',
             border: '1px solid #e8e8e8',
             display: 'flex',

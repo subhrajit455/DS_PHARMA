@@ -3,10 +3,10 @@ import { motion } from 'framer-motion';
 
 const AboutUsSection = () => {
   return (
-    <section 
+    <section
       id="about"
-      className="w-full flex justify-center items-center" 
-      style={{ 
+      className="w-full flex justify-center items-center"
+      style={{
         width: '100%',
         paddingTop: '1rem',
         paddingBottom: '2rem',
@@ -74,13 +74,146 @@ const AboutUsSection = () => {
               viewport={{ once: true }}
               transition={{ duration: 0.5, delay: 0.15 }}
               style={{
-                paddingTop: '0px',
+                paddingTop: '2.5rem',
+                paddingBottom: '1rem',
                 height: '100%',
                 display: 'flex',
-                alignItems: 'center'
+                flexDirection: 'column',
+                alignItems: 'flex-start',
+                textAlign: 'left',
+                gap: '1.5rem',
+                maxWidth: '900px'
               }}
             >
-              {/* Content placeholder - can add description text here */}
+              {/* Main Description */}
+              <div style={{ display: 'flex', flexDirection: 'column', gap: '1rem' }}>
+                <p
+                  style={{
+                    fontFamily: 'Inter, sans-serif',
+                    fontSize: 'clamp(15px, 2.8vw, 17px)',
+                    lineHeight: '1.7',
+                    color: '#111827',
+                    margin: 0,
+                    fontWeight: 500
+                  }}
+                >
+                  Welcome to <span style={{
+                    fontWeight: 700,
+                    color: '#059669',
+                    fontSize: 'clamp(16px, 3vw, 18px)'
+                  }}>DS Pharma</span>, your trusted partner in health and wellness.
+                </p>
+
+                <p
+                  style={{
+                    fontFamily: 'Inter, sans-serif',
+                    fontSize: 'clamp(14px, 2.5vw, 16px)',
+                    lineHeight: '1.7',
+                    color: '#374151',
+                    margin: 0
+                  }}
+                >
+                  We are committed to providing high-quality medicines, healthcare products, and professional
+                  pharmaceutical services to our community with care and compassion.
+                </p>
+              </div>
+
+              {/* Mission Statement with Icon */}
+              <div
+                style={{
+                  background: 'rgba(255, 255, 255, 0.6)',
+                  borderRadius: '12px',
+                  padding: '1.25rem',
+                  backdropFilter: 'blur(10px)',
+                  border: '1px solid rgba(255, 255, 255, 0.8)',
+                  boxShadow: '0 2px 8px rgba(0, 0, 0, 0.05)'
+                }}
+              >
+                <p
+                  style={{
+                    fontFamily: 'Inter, sans-serif',
+                    fontSize: 'clamp(14px, 2.5vw, 15px)',
+                    lineHeight: '1.7',
+                    color: '#1F2937',
+                    margin: 0,
+                    fontStyle: 'italic'
+                  }}
+                >
+                  <span style={{
+                    fontSize: 'clamp(16px, 3vw, 18px)',
+                    marginRight: '0.5rem',
+                    color: '#059669'
+                  }}>💊</span>
+                  With years of experience in the pharmaceutical industry, we understand the importance of
+                  accessible and affordable healthcare. Our mission is to ensure that every customer receives
+                  genuine medications, expert advice, and compassionate care.
+                </p>
+              </div>
+
+              {/* Values Grid */}
+              <div
+                style={{
+                  marginTop: '0.5rem',
+                  display: 'grid',
+                  gridTemplateColumns: 'repeat(auto-fit, minmax(180px, 1fr))',
+                  gap: '1rem',
+                  width: '100%'
+                }}
+              >
+                {[
+                  { icon: '✓', title: 'Quality & Authenticity', color: '#10B981' },
+                  { icon: '♥', title: 'Customer-Centric', color: '#EF4444' },
+                  { icon: '⚕', title: 'Expert Care', color: '#3B82F6' },
+                  { icon: '₹', title: 'Affordable Prices', color: '#F59E0B' }
+                ].map((value, index) => (
+                  <motion.div
+                    key={index}
+                    initial={{ opacity: 0, y: 10 }}
+                    whileInView={{ opacity: 1, y: 0 }}
+                    viewport={{ once: true }}
+                    transition={{ duration: 0.4, delay: 0.3 + index * 0.1 }}
+                    style={{
+                      background: 'rgba(255, 255, 255, 0.7)',
+                      borderRadius: '10px',
+                      padding: '1rem',
+                      display: 'flex',
+                      alignItems: 'center',
+                      gap: '0.75rem',
+                      border: '1px solid rgba(255, 255, 255, 0.9)',
+                      boxShadow: '0 2px 6px rgba(0, 0, 0, 0.04)',
+                      transition: 'transform 0.2s ease, box-shadow 0.2s ease',
+                      cursor: 'default'
+                    }}
+                    whileHover={{
+                      transform: 'translateY(-2px)',
+                      boxShadow: '0 4px 12px rgba(0, 0, 0, 0.08)'
+                    }}
+                  >
+                    <div
+                      style={{
+                        fontSize: '1.5rem',
+                        color: value.color,
+                        fontWeight: 'bold',
+                        minWidth: '24px',
+                        textAlign: 'center'
+                      }}
+                    >
+                      {value.icon}
+                    </div>
+                    <span
+                      style={{
+                        fontFamily: 'Inter, sans-serif',
+                        fontSize: 'clamp(13px, 2.3vw, 14px)',
+                        fontWeight: 600,
+                        color: '#1F2937',
+                        lineHeight: '1.3'
+                      }}
+                    >
+                      {value.title}
+                    </span>
+                  </motion.div>
+                ))}
+              </div>
             </motion.div>
           </div>
 
@@ -130,7 +263,7 @@ const AboutUsSection = () => {
           </motion.div>
         </div>
       </div>
-    </section>
+    </section >
   );
 };
 
