@@ -32,24 +32,27 @@ const OrderProductCard = ({ order, onCancel }) => {
         </div>
         {/* Product Image */}
         <div>
-          <div className="overflow-hidden rounded-lg w-28 h-28 bg-linear-to-br from-sky-100 to-sky-200 shrink-0">
+          <div className="overflow-hidden rounded-lg w-28 h-28 bg-linear-to-br from-sky-100 to-sky-200 shrink-0 " style={{ margin:'10px' }}>
             <img
               src={order.image}
               alt={order.productName}
               className="object-cover w-full h-full"
+              
             />
           </div>
           <p
-            className="mt-4 text-sm text-center text-gray-600"
-            style={{ fontFamily: 'Gyrotrope', marginBottom:'10px' }}
+            className="mt-4 text-xs text-center text-gray-600"
+            style={{ fontFamily: 'Gyrotrope', marginBottom:'10px',}}
           >
             Qty: {order.quantity}
           </p>
 
           {/* Action Buttons */}
-        <div className="flex justify-start pt-4" style={{ marginTop:'15px' }}>
-        <Button variant="outline" size="sm" onClick={onCancel}>
+        <div className="flex justify-center pt-4 " style={{ marginTop:'15px', }}>
+        <Button variant="outline" size="sm" onClick={onCancel} style={{ padding:'2px'}}>
+        <span style={{ fontFamily: 'Gyrotrope',fontSize:'10px' }}>
           Cancel Order
+        </span>
         </Button>
       </div>
         </div>
