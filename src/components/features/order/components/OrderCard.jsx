@@ -7,62 +7,59 @@ const OrderCard = ({ order, index }) => {
 
   const  getStatusButton = (order) => {
     return (
-      <div className="flex flex-col items-end w-full gap-1 sm:w-auto">
+      <div className="flex flex-col items-end w-auto gap-1">
         <button
-          className="cursor-pointer transition-all duration-200 hover:opacity-90 active:scale-[0.98] w-full sm:w-auto"
+          className="cursor-pointer transition-all duration-200 hover:opacity-90 active:scale-[0.98] w-auto h-[32px] sm:h-[40px] px-3 py-1.5 sm:px-5 sm:py-2.5 text-[10px] sm:text-[13px] min-w-[100px] sm:min-w-[160px]"
           style={{
             fontFamily: 'Gyrotrope',
-            fontSize: '13px',
             fontWeight: 600,
-            padding: '10px 20px',
             borderRadius: '8px',
             border: 'none',
             color: '#FFFFFF',
             backgroundColor: order.statusBg,
-            minWidth: '160px',
-            height: '40px',
             textAlign: 'center',
             boxShadow: 'none',
-            letterSpacing: '0.01em'
+            letterSpacing: '0.01em',
+            padding: '0px 12px'
           }}
         >
           {order.status}
         </button>
         {order.expectedDelivery && (
-          <p style={{ 
+          <p 
+            className="text-right text-[8px] sm:text-[12px]"
+            style={{ 
             fontFamily: 'Gyrotrope', 
-            fontSize: '12px',
             color: '#10B981', 
             fontWeight: 500,
-            textAlign: 'right',
-            lineHeight: '1.4',
+            lineHeight: '1.2',
             marginTop: '2px'
           }}>
             Expected Delivery: {order.expectedDelivery}
           </p>
         )}
         {order.deliveredDate && (
-          <p style={{ 
+          <p 
+            className="text-right text-[8px] sm:text-[12px]"
+            style={{ 
             fontFamily: 'Gyrotrope', 
-            fontSize: '12px',
             color: '#10B981', 
             fontWeight: 500,
-            textAlign: 'right',
-            lineHeight: '1.4',
+            lineHeight: '1.2',
             marginTop: '2px'
           }}>
             Delivered on {order.deliveredDate}
           </p>
         )}
         {order.phone && (
-          <p style={{ 
+          <p 
+            className="text-right text-[8px] sm:text-[12px]"
+            style={{ 
             fontFamily: 'Gyrotrope', 
-            fontSize: '12px',
             color: '#000000', 
             fontWeight: 500,
-            textAlign: 'right',
-            lineHeight: '1.4',
-            marginTop: '4px'
+            lineHeight: '1.2',
+            marginTop: '2px'
           }}>
             {order.phone}
           </p>
@@ -78,24 +75,22 @@ const OrderCard = ({ order, index }) => {
       animate={{ opacity: 1, y: 0 }}
       transition={{ delay: index * 0.08, duration: 0.4 }}
       onClick={() => navigate(`/order/${order.id}`)}
-      className="bg-white cursor-pointer transition-all duration-200 hover:shadow-md active:scale-[0.995]"
+      className="bg-white cursor-pointer transition-all duration-200 hover:shadow-md active:scale-[0.995] p-3 sm:p-5"
       style={{
-        borderRadius: '12px',
-        padding: '7px 20px',
-        margin: '10px 0px',
+        borderRadius: '8px',
+        margin: '8px 0px',
         boxShadow: '0 1px 2px rgba(0, 0, 0, 0.06)',
         border: '1px solid #E5E7EB',
-        fontFamily: 'Gyrotrope'
+        fontFamily: 'Gyrotrope',
+        padding: '10px'
       }}
     >
-      <div className="flex flex-col items-start gap-4 sm:flex-row">
+      <div className="flex flex-row items-center gap-3 sm:gap-4">
         {/* Product Image */}
         <div
-          className="overflow-hidden shrink-0"
+          className="overflow-hidden shrink-0 w-[60px] h-[60px] sm:w-[80px] sm:h-[80px]"
           style={{ 
-            width: '80px', 
-            height: '80px',
-            borderRadius: '10px',
+            borderRadius: '8px',
             backgroundColor: '#F3F4F6',
             flexShrink: 0
           }}
@@ -109,30 +104,33 @@ const OrderCard = ({ order, index }) => {
         </div>
 
         {/* Order Details */}
-        <div className="flex flex-row items-start justify-between flex-1 min-w-0 gap-4">
+        <div className="flex flex-row items-center justify-between flex-1 min-w-0 gap-2">
           <div className="flex-1 min-w-0">
             <h3
+              className="text-[10px] sm:text-[15px]"
               style={{
                 fontFamily: 'Gyrotrope',
-                fontSize: '15px',
                 fontWeight: 600,
                 color: '#000000',
-                marginBottom: '8px',
-                lineHeight: '1.4',
-                letterSpacing: '-0.01em'
+                marginBottom: '4px',
+                lineHeight: '1.3',
+                letterSpacing: '-0.01em',
+                overflow: 'hidden',
+                textOverflow: 'ellipsis',
+                whiteSpace: 'nowrap'
               }}
             >
               {order.productName}
             </h3>
             <div
+              className="text-[8px] sm:text-[13px]"
               style={{
                 fontFamily: 'Gyrotrope',
-                fontSize: '13px',
                 color: '#6B7280',
-                lineHeight: '1.5'
+                lineHeight: '1.3'
               }}
             >
-              <p style={{ marginBottom: '4px' }}>
+              <p style={{ marginBottom: '2px', overflow: 'hidden', textOverflow: 'ellipsis', whiteSpace: 'nowrap' }}>
                 <span style={{ fontWeight: 600, color: '#000000' }}>
                   {order.customerName} - {order.phone}
                 </span>
@@ -140,9 +138,7 @@ const OrderCard = ({ order, index }) => {
               <p style={{ 
                 overflow: 'hidden',
                 textOverflow: 'ellipsis',
-                display: '-webkit-box',
-                WebkitLineClamp: 2,
-                WebkitBoxOrient: 'vertical',
+                whiteSpace: 'nowrap',
                 maxWidth: '100%'
               }}>
                 {order.address}

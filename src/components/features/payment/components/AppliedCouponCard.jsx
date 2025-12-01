@@ -1,28 +1,22 @@
 import React from 'react';
 
-const AppliedCouponCard = ({ coupon }) => {
+const AppliedCouponCard = ({ coupon, className }) => {
   if (!coupon) return null;
 
   return (
-    <div className="p-4 bg-white border border-gray-200 rounded-lg shadow-sm" style={{ marginBottom: '5px' }}>
+    <div className={`p-3 sm:p-4 bg-white border border-gray-200 rounded-lg shadow-sm mb-[15px] lg:mb-0 ${className || ''}`} style={{ padding: '10px 5px' }}>
       <h3
+        className="text-xs sm:text-sm font-semibold text-orange-500 px-2 pt-2 sm:px-3 sm:pt-3"
         style={{
           fontFamily: 'Gyrotrope',
-          fontSize: '14px',
-          fontWeight: 600,
-          color: '#F97316',
-          padding: '12px 12px 0px 12px',
         }}
       >
         Applied Coupon
       </h3>
       <p
+        className="text-[10px] sm:text-xs text-gray-700 px-2 pb-2 sm:px-3 sm:pb-3 mb-2 sm:mb-3"
         style={{
           fontFamily: 'Gyrotrope',
-          fontSize: '12px',
-          color: '#374151',
-          marginBottom: '12px',
-          padding: '0px 12px 12px 12px',
         }}
       >
         {coupon.code}

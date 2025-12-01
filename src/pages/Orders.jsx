@@ -128,48 +128,50 @@ const Orders = () => {
 
 
   return (
-    <div style={{ paddingTop: '140px' }}>
-      <div className="w-full px-6 lg:px-12 flex flex-col items-center" style={{ marginBottom: '30px' }}>
-        <div className="max-w-7xl mx-auto">
+    <div style={{ paddingTop: '50px' }}>
+      <style>{`
+        @media (min-width: 768px) {
+          .orders-container {
+            padding-top: 80px !important;
+          }
+        }
+      `}</style>
+      <div className="orders-container w-full px-4 md:px-6 lg:px-12 flex flex-col items-center mb-8">
+        <div className="w-full max-w-7xl mx-auto">
           {/* Header Section */}
-          <div className="mb-20">
-            <div className="flex items-center justify-between mb-16">
+          <div className="mb-8 md:mb-12 lg:mb-20">
+            <div className="flex flex-col md:flex-row items-start md:items-center justify-between gap-4 mb-8 md:mb-12 lg:mb-16">
               <h1
+                className="text-xl md:text-2xl font-semibold"
                 style={{
                   fontFamily: 'Gyrotrope',
-                  fontSize: '22px',
-                  fontWeight: 600,
                   color: '#000000',
                   margin: 0,
-                  lineHeight: '1.2',
-                  display: 'flex',
-                  alignItems: 'center',
-                  justifyContent: 'center'
+                  lineHeight: '1.2'
                 }}
               >
                 Orders
               </h1>
 
-              {/* Search and Filter Bar - Right Side */}
-              <div className="flex gap-3 items-center">
-                <div className="relative">
+              {/* Search and Filter Bar */}
+              <div className="flex gap-2 md:gap-3 items-center w-full md:w-auto">
+                <div className="relative flex-1 md:flex-initial">
                   <input
                     type="text"
                     placeholder="Search Your Order"
                     value={searchQuery}
                     onChange={(e) => setSearchQuery(e.target.value)}
-                    className="w-full pr-12 focus:outline-none transition-all"
+                    className="w-full pr-10 md:pr-12 focus:outline-none transition-all text-xs md:text-sm"
                     style={{
                       fontFamily: 'Gyrotrope',
-                      fontSize: '12px',
-                      fontWeight: 400,
                       color: '#000000',
                       backgroundColor: '#FFFFFF',
                       border: '1px solid #A5E8DC',
                       borderRadius: '8px',
-                      padding: '10px 16px',
-                      width: '260px',
-                      height: '32px'
+                      padding: '8px 12px',
+                      minWidth: '180px',
+                      maxWidth: '100%',
+                      height: '36px'
                     }}
                   />
                   <button
@@ -177,7 +179,7 @@ const Orders = () => {
                     style={{
                       backgroundColor: '#A5E8DC',
                       borderRadius: '6px',
-                      padding: '6px 8px',
+                      padding: '6px',
                       border: 'none',
                       display: 'flex',
                       alignItems: 'center',
@@ -185,21 +187,20 @@ const Orders = () => {
                     }}
                     aria-label="Search"
                   >
-                    <Search size={18} color="#000000" strokeWidth={2.5} />
+                    <Search className="w-4 h-4 md:w-5 md:h-5" color="#000000" strokeWidth={2.5} />
                   </button>
                 </div>
                 <button
-                  className="transition-all duration-200 hover:opacity-90 whitespace-nowrap cursor-pointer flex items-center gap-2"
+                  className="transition-all duration-200 hover:opacity-90 whitespace-nowrap cursor-pointer flex items-center gap-1 md:gap-2 text-xs md:text-sm"
                   style={{
                     fontFamily: 'Gyrotrope',
-                    fontSize: '14px',
                     fontWeight: 600,
                     backgroundColor: '#A5E8DC',
                     color: '#000000',
                     border: 'none',
                     borderRadius: '8px',
-                    padding: '10px 20px',
-                    height: '32px',
+                    padding: '8px 12px',
+                    height: '36px',
                     boxShadow: '0 2px 4px rgba(0, 0, 0, 0.06)'
                   }}
                 >
@@ -213,7 +214,7 @@ const Orders = () => {
           </div>
 
           {/* Orders List */}
-          <div className="space-y-3 mb-16 mt-20">
+          <div className="space-y-3 mb-8 md:mb-12 lg:mb-16 mt-4 md:mt-8 lg:mt-12">
             {orders.map((order, index) => (
               <OrderCard key={order.id} order={order} index={index} />
             ))}

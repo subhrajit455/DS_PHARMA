@@ -17,7 +17,7 @@ const OrderTimeline = ({ timeline, deliveryPartner }) => {
       {/* Delivery Partner Message */}
       <p
         className="mt-8 text-xs font-medium text-center text-green-700"
-        style={{ fontFamily: 'Gyrotrope', margin: '14px 0px', marginBottom:'20px' }}
+        style={{ fontFamily: 'Gyrotrope', margin: '14px 0px',}}
       >
         Delivery Partner: {deliveryPartner}
       </p>

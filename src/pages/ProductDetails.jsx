@@ -54,85 +54,94 @@ const ProductDetails = () => {
   };
 
   return (
-    <div className="flex flex-col min-h-screen bg-gray-50 " style={{ marginTop: '8rem' }}>
-      <main className="grow">
-        <div className="flex flex-col items-center w-full px-6 lg:px-12">
-          <div className="mx-auto max-w-7xl">
-            {/* Back Button */}
-            <button
-              onClick={() => navigate(-1)}
-              className="flex items-center gap-2 mb-6 text-gray-700 transition-colors cursor-pointer hover:text-gray-900"
-              style={{ fontFamily: 'Gyrotrope', fontSize: '16px', fontWeight: 500, marginBottom: '2rem' }}
-            >
-              <ArrowLeft size={20} />
-              <span></span>
-            </button>
+    <div style={{ paddingTop: '50px' }}>
+      <style>{` 
+         @media (min-width: 768px) { 
+           .orders-container { 
+             padding-top: 80px !important; 
+           } 
+         } 
+       `}</style>
+      <div className="orders-container flex flex-col min-h-screen bg-gray-50 ">
+        <main className="grow">
+          <div className="flex flex-col items-center w-full px-4 sm:px-6 lg:px-12">
+            <div className="mx-auto max-w-7xl w-full">
+              {/* Back Button */}
+              <button
+                onClick={() => navigate(-1)}
+                className="flex items-center gap-2 mb-4 sm:mb-6 text-gray-700 transition-colors cursor-pointer hover:text-gray-900"
+                style={{ fontFamily: 'Gyrotrope', fontSize: '14px', fontWeight: 500, marginBottom: '1.5rem' }}
+              >
+                <ArrowLeft size={18} className="sm:w-5 sm:h-5" />
+                <span></span>
+              </button>
 
-            {/* Product Section */}
-            <div className="grid grid-cols-1 gap-8 mb-12" style={{ gridTemplateColumns: 'repeat(1, minmax(0, 1fr))', marginBottom: '2rem' }}
-              data-lg-grid="true">
-              <style>{`
+              {/* Product Section */}
+              <div className="grid grid-cols-1 gap-6 sm:gap-8 mb-8 sm:mb-12" style={{ gridTemplateColumns: 'repeat(1, minmax(0, 1fr))', marginBottom: '1.5rem' }}
+                data-lg-grid="true">
+                <style>{`
                 @media (min-width: 1024px) {
                   [data-lg-grid="true"] {
                     grid-template-columns: 2fr 3fr !important;
                   }
                 }
               `}</style>
-              <ProductImageGallery
-                images={product.images}
-                selectedImage={selectedImage}
-                onImageSelect={setSelectedImage}
-                onScroll={scrollThumbnails}
-              />
-
-              {/* Right - Product Info */}
-              <div className="flex flex-col">
-                <h1
-                  style={{
-                    fontFamily: 'Gyrotrope',
-                    fontSize: '18px',
-                    fontWeight: 600,
-                    color: '#000000',
-                    marginBottom: '10px',
-                    lineHeight: '1.4'
-                  }}
-                >
-                  {product.name}
-                </h1>
-
-                <ProductPriceSection
-                  price={product.price}
-                  originalPrice={product.originalPrice}
-                  discount={product.discount}
-                  stock={product.stock}
-                  specialOffer={product.specialOffer}
+                <ProductImageGallery
+                  images={product.images}
+                  selectedImage={selectedImage}
+                  onImageSelect={setSelectedImage}
+                  onScroll={scrollThumbnails}
                 />
 
-                <ProductActionButtons
-                  onAddToCart={() => navigate('/cart')}
-                  onViewCart={() => navigate('/cart')}
-                />
+                {/* Right - Product Info */}
+                <div className="flex flex-col">
+                  <h1
+                    style={{
+                      fontFamily: 'Gyrotrope',
+                      fontSize: '18px',
+                      fontWeight: 600,
+                      color: '#000000',
+                      marginBottom: '10px',
+                      lineHeight: '1.4'
+                    }}
+                  >
+                    {product.name}
+                  </h1>
+
+                  <ProductPriceSection
+                    price={product.price}
+                    originalPrice={product.originalPrice}
+                    discount={product.discount}
+                    stock={product.stock}
+                    specialOffer={product.specialOffer}
+                  />
+
+                  <ProductActionButtons
+                    onAddToCart={() => navigate('/cart')}
+                    onViewCart={() => navigate('/cart')}
+                  />
+                </div>
               </div>
+
+              {/* Description Section */}
+              <ProductDescription />
+
+              {/* Suggested Medicine Section */}
+              <SuggestedItemsSection
+                title="Suggested Medicine"
+                items={suggestedItems}
+                className="mb-5"
+                titleStyle={{
+                  textDecorationThickness: '2px',
+                  textDecorationColor: '#111827',
+                  lineHeight: '1.2'
+                }}
+                containerStyle={{}}
+              />
             </div>
-
-            {/* Description Section */}
-            <ProductDescription />
-
-            {/* Suggested Medicine Section */}
-            <SuggestedItemsSection
-              title="Suggested Medicine"
-              items={suggestedItems}
-              className="mb-5"
-              titleStyle={{
-                textDecorationThickness: '2px',
-                textDecorationColor: '#111827',
-                lineHeight: '1.2'
-              }}
-              containerStyle={{  }}
-            />
           </div>
-        </div>
-      </main>
+        </main>
+      </div>
     </div>
   );
 };

@@ -97,8 +97,16 @@ const CartDetails = () => {
   const totals = calculateTotals();
 
   return (
-    <div className="w-full pt-4 pb-16 lg:pt-32 lg:pb-16">
-      <div className="w-full" style={{ maxWidth: '1200px', margin: '0 auto' }}>
+    <div style={{ paddingTop: '50px' }}>
+      <style>{` 
+         @media (min-width: 768px) { 
+           .orders-container { 
+             padding-top: 80px !important; 
+           } 
+         } 
+       `}</style>
+    <div className="orders-container w-full pt-4 pb-16 lg:pt-32 lg:pb-16">
+      <div className="w-full" style={{ maxWidth: '1200px', margin: '10px auto' }}>
         <div className="grid grid-cols-1 lg:grid-cols-3 gap-8">
           {/* Left Section - Cart Items */}
           <div className="lg:col-span-2">
@@ -147,13 +155,13 @@ const CartDetails = () => {
             />
           </div>
         </div>
-      </div>
+      
 
       {/* Suggested Items */}
       <SuggestedItemsSection
         title="Suggested Items"
         items={suggestedItems}
-        className="w-full"
+        className="w-full" 
         titleStyle={{
           fontSize: '22px',
           marginBottom: '1rem',
@@ -161,8 +169,10 @@ const CartDetails = () => {
           textDecorationColor: '#111827',
           lineHeight: '1.2'
         }}
-        containerStyle={{ paddingRight: '1rem', paddingLeft: '1rem', paddingTop: '2rem' }}
+        containerStyle={{ paddingTop: '1rem' }}
       />
+      </div>
+    </div>
     </div>
   );
 };
