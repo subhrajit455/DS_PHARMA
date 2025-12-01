@@ -10,6 +10,8 @@ import {
 import { AppliedCouponCard } from "@/components/features/payment";
 import SuggestedItemsSection from "@/components/sections/SuggestedItemsSection";
 
+import medicineImage from '../assets/images/medicine.jpeg';
+
 const OrderDetails = () => {
   const navigate = useNavigate();
   useParams();
@@ -21,6 +23,7 @@ const OrderDetails = () => {
     productName: "Pharmeasy Fish Oil 1000mg Soft Gelatin 60 Capsules",
     price: 1500,
     quantity: 1,
+    image: medicineImage, // Added image property to order if needed, or just for consistency
     paymentBreakdown: {
       totalCartValue: 1500,
       discount: 1000,
@@ -36,14 +39,23 @@ const OrderDetails = () => {
       { status: "Out For Delivery", completed: false },
       { status: "Delivered", completed: false },
     ],
+    customerAddress: {
+      name: 'Gourav Gupta',
+      phone: '9999999999',
+      address: 'A/B, Section Lane, Odisha, Noida, 744115'
+    },
+    appliedCoupon: {
+      code: 'SAVE200',
+      discount: 200
+    }
   };
 
   const suggestedItems = [
-    { id: 1, name: 'Paracetamol', price: 12, originalPrice: 15, discount: 5, image: '/src/assets/images/medicine.jpeg' },
-    { id: 2, name: 'Paracetamol', price: 12, originalPrice: 15, discount: 5, image: '/src/assets/images/medicine.jpeg' },
-    { id: 3, name: 'Paracetamol', price: 12, originalPrice: 15, discount: 5, image: '/src/assets/images/medicine.jpeg' },
-    { id: 4, name: 'Paracetamol', price: 12, originalPrice: 15, discount: 5, image: '/src/assets/images/medicine.jpeg' },
-    { id: 5, name: 'Paracetamol', price: 12, originalPrice: 15, discount: 5, image: '/src/assets/images/medicine.jpeg' }
+    { id: 1, name: 'Paracetamol', price: 12, originalPrice: 15, discount: 5, image: medicineImage },
+    { id: 2, name: 'Paracetamol', price: 12, originalPrice: 15, discount: 5, image: medicineImage },
+    { id: 3, name: 'Paracetamol', price: 12, originalPrice: 15, discount: 5, image: medicineImage },
+    { id: 4, name: 'Paracetamol', price: 12, originalPrice: 15, discount: 5, image: medicineImage },
+    { id: 5, name: 'Paracetamol', price: 12, originalPrice: 15, discount: 5, image: medicineImage }
   ];
 
   const handleCancelOrder = () => navigate("/orders");

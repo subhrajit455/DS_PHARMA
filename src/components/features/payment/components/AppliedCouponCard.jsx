@@ -1,6 +1,8 @@
 import React from 'react';
 
 const AppliedCouponCard = ({ coupon }) => {
+  if (!coupon) return null;
+
   return (
     <div className="p-4 bg-white border border-gray-200 rounded-lg shadow-sm" style={{ marginBottom: '5px' }}>
       <h3
@@ -23,7 +25,7 @@ const AppliedCouponCard = ({ coupon }) => {
           padding: '0px 12px 12px 12px',
         }}
       >
-        {coupon.address}
+        {coupon.code}
       </p>
     </div>
   );

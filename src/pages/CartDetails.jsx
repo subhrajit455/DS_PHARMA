@@ -4,6 +4,8 @@ import { CartItem } from '@/components/features/cart';
 import { OrderSummary } from '@/components/features/order';
 import SuggestedItemsSection from '@/components/sections/SuggestedItemsSection';
 
+import medicineImage from '../assets/images/medicine.jpeg';
+
 const CartDetails = () => {
   const [cartItems, setCartItems] = useState([
     {
@@ -13,7 +15,7 @@ const CartDetails = () => {
       originalPrice: 1800,
       discount: 25,
       quantity: 1,
-      image: '/src/assets/images/medicine.jpeg'
+      image: medicineImage
     }
   ]);
 
@@ -31,7 +33,7 @@ const CartDetails = () => {
       price: 12,
       originalPrice: 15,
       discount: 5,
-      image: '/src/assets/images/medicine.jpeg'
+      image: medicineImage
     },
     {
       id: 2,
@@ -39,7 +41,7 @@ const CartDetails = () => {
       price: 12,
       originalPrice: 15,
       discount: 5,
-      image: '/src/assets/images/medicine.jpeg'
+      image: medicineImage
     },
     {
       id: 3,
@@ -47,7 +49,7 @@ const CartDetails = () => {
       price: 12,
       originalPrice: 15,
       discount: 5,
-      image: '/src/assets/images/medicine.jpeg'
+      image: medicineImage
     },
     {
       id: 4,
@@ -55,7 +57,7 @@ const CartDetails = () => {
       price: 12,
       originalPrice: 15,
       discount: 5,
-      image: '/src/assets/images/medicine.jpeg'
+      image: medicineImage
     },
     {
       id: 5,
@@ -63,7 +65,7 @@ const CartDetails = () => {
       price: 12,
       originalPrice: 15,
       discount: 5,
-      image: '/src/assets/images/medicine.jpeg'
+      image: medicineImage
     }
   ];
 

@@ -10,6 +10,8 @@ import {
 } from '@/components/features/product';
 import SuggestedItemsSection from '@/components/sections/SuggestedItemsSection';
 
+import medicineImage from '../assets/images/medicine.jpeg';
+
 const ProductDetails = () => {
   const navigate = useNavigate();
   useParams();
@@ -23,11 +25,11 @@ const ProductDetails = () => {
     discount: 25,
     stock: 15,
     images: [
-      '/src/assets/images/medicine.jpeg',
-      '/src/assets/images/medicine.jpeg',
-      '/src/assets/images/medicine.jpeg',
-      '/src/assets/images/medicine.jpeg',
-      '/src/assets/images/medicine.jpeg'
+      medicineImage,
+      medicineImage,
+      medicineImage,
+      medicineImage,
+      medicineImage
     ],
     specialOffer: {
       title: '15% off on SBI Cards',
@@ -36,11 +38,11 @@ const ProductDetails = () => {
   };
 
   const suggestedItems = [
-    { id: 1, name: 'Paracetamol', price: 12, originalPrice: 15, discount: 5, image: '/src/assets/images/medicine.jpeg' },
-    { id: 2, name: 'Paracetamol', price: 12, originalPrice: 15, discount: 5, image: '/src/assets/images/medicine.jpeg' },
-    { id: 3, name: 'Paracetamol', price: 12, originalPrice: 15, discount: 5, image: '/src/assets/images/medicine.jpeg' },
-    { id: 4, name: 'Paracetamol', price: 12, originalPrice: 15, discount: 5, image: '/src/assets/images/medicine.jpeg' },
-    { id: 5, name: 'Paracetamol', price: 12, originalPrice: 15, discount: 5, image: '/src/assets/images/medicine.jpeg' }
+    { id: 1, name: 'Paracetamol', price: 12, originalPrice: 15, discount: 5, image: medicineImage },
+    { id: 2, name: 'Paracetamol', price: 12, originalPrice: 15, discount: 5, image: medicineImage },
+    { id: 3, name: 'Paracetamol', price: 12, originalPrice: 15, discount: 5, image: medicineImage },
+    { id: 4, name: 'Paracetamol', price: 12, originalPrice: 15, discount: 5, image: medicineImage },
+    { id: 5, name: 'Paracetamol', price: 12, originalPrice: 15, discount: 5, image: medicineImage }
   ];
 
   const scrollThumbnails = (direction) => {
@@ -120,13 +122,13 @@ const ProductDetails = () => {
             <SuggestedItemsSection
               title="Suggested Medicine"
               items={suggestedItems}
-              className="mb-10"
+              className="mb-5"
               titleStyle={{
                 textDecorationThickness: '2px',
                 textDecorationColor: '#111827',
                 lineHeight: '1.2'
               }}
-              containerStyle={{ paddingBottom: '25px' }}
+              containerStyle={{  }}
             />
           </div>
         </div>

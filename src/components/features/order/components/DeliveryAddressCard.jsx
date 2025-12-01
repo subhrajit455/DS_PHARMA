@@ -2,6 +2,8 @@ import React from 'react';
 import { Card, Button } from '@/components/common';
 
 const DeliveryAddressCard = ({ address, onChangeAddress }) => {
+  if (!address) return null;
+
   return (
     <Card className="p-4" style={{ marginBottom: '5px' }}>
       <div className="flex flex-col h-full">
@@ -22,7 +24,7 @@ const DeliveryAddressCard = ({ address, onChangeAddress }) => {
             size="sm"
             onClick={onChangeAddress}
             className='text-xs'
-            style={{ padding: '4px 12px', width: 'auto', margin:'12px' }}
+            style={{ padding: '4px 12px', width: 'auto', margin: '12px' }}
           >
             Change Address
           </Button>
