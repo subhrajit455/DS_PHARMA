@@ -61,7 +61,7 @@ const OrderSummary = ({
         borderRadius: '12px',
         padding: '16px',
         boxShadow: '0 1px 2px rgba(0, 0, 0, 0.06)',
-        border: '1px solid #E5E7EB',
+        border: '1px solid #64E5B8',
         marginBottom: '5px'
       }}>
         <div className="flex justify-between items-center mb-3">
@@ -180,12 +180,11 @@ const OrderSummary = ({
       </div>
 
       {/* Apply Coupon */}
-      <div style={{
-        backgroundColor: '#FFFFFF',
+      <div className='bg-orange-100' style={{
         borderRadius: '12px',
         padding: '16px',
         boxShadow: '0 1px 2px rgba(0, 0, 0, 0.06)',
-        border: '1px solid #E5E7EB',
+        border: '1px solid #F97316',
         marginBottom: '5px'
       }}>
         <h3
@@ -211,9 +210,10 @@ const OrderSummary = ({
               fontFamily: 'Gyrotrope',
               fontSize: '11px',
               padding: '6px 10px',
-              border: '1px solid #D1D5DB',
+              border: '1px solid #F97316',
               borderRadius: '8px',
-              height: '30px'
+              height: '30px',
+              background: '#FFFFFF',
             }}
           />
           <button
@@ -223,12 +223,12 @@ const OrderSummary = ({
               fontFamily: 'Gyrotrope',
               fontSize: '11px',
               fontWeight: 600,
-              backgroundColor: '#F97316',
+              backgroundColor: '#FFFFFF',
               borderRadius: '8px',
               padding: '6px 10px',
               height: '30px',
-              border: 'none',
-              color: '#FFFFFF',
+              border: '1px solid #F97316',
+              color: 'black',
             }}
           >
             Apply
@@ -242,7 +242,7 @@ const OrderSummary = ({
         borderRadius: '12px',
         padding: '16px',
         boxShadow: '0 1px 2px rgba(0, 0, 0, 0.06)',
-        border: '1px solid #E5E7EB'
+        border: '1px solid #64E5B8'
       }}>
         <h3
           style={{

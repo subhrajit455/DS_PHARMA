@@ -13,7 +13,7 @@ const CartItem = ({ item, onUpdateQuantity, onRemove }) => {
         borderRadius: '12px',
         padding: '10px',
         boxShadow: '0 1px 2px rgba(0, 0, 0, 0.06)',
-        border: '1px solid #E5E7EB'
+        border: '1px solid #64E5B8'
       }}
     >
       <div className="flex gap-4">
@@ -64,7 +64,7 @@ const CartItem = ({ item, onUpdateQuantity, onRemove }) => {
                 marginBottom: '12px'
               }}
               >
-                <Trash2 size={16} color="#EF4444" strokeWidth={2} />
+                <Trash2 size={16} color="black" strokeWidth={2} />
               </button>
 
               {/* Quantity Controls */}
