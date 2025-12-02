@@ -79,15 +79,15 @@ const PharmacyProductCard = ({
         </h3>
 
         {/* Price and Discount Row */}
-        <div className="flex items-center gap-1 sm:gap-2 mb-2 pr-8 sm:pr-0">
+        <div className="flex items-center gap-1 sm:gap-1 mb-2 pr-8 sm:pr-0">
           <span className="text-[10px] sm:text-[12px] font-bold text-gray-900" title={`₹${price}`}>
             ₹{price}
           </span>
-          <span className="text-[8px] sm:text-[10px] text-gray-500">
+          <span className="text-[8px] sm:text-[10px] text-gray-900 font-medium">
             /{unit}
           </span>
           {discountPercentage > 0 && (
-            <span className="text-[8px] sm:text-[10px] font-medium text-green-600 truncate">
+            <span className="text-[6px] sm:text-[8px] font-medium text-green-600 truncate">
               ({discountPercentage}% off)
             </span>
           )}

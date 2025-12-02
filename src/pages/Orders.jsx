@@ -128,7 +128,7 @@ const Orders = () => {
 
 
   return (
-    <div style={{ paddingTop: '50px' }}>
+    <div style={{ paddingTop: '60px' }}>
       <style>{`
         @media (min-width: 768px) {
           .orders-container {
@@ -183,7 +183,8 @@ const Orders = () => {
                       border: 'none',
                       display: 'flex',
                       alignItems: 'center',
-                      justifyContent: 'center'
+                      justifyContent: 'center',
+                      marginRight: '3px'
                     }}
                     aria-label="Search"
                   >

@@ -4,7 +4,7 @@ import { Card } from '@/components/common';
 const PaymentBreakdownCard = ({ breakdown, className }) => {
   return (
     <Card className={`p-3 sm:p-4 mb-[5px] lg:mb-0 ${className || ''}`} style={{ padding: '10px' }}>
-      <h3 className="mb-2 sm:mb-3 text-sm sm:text-base font-semibold text-gray-900" style={{ fontFamily: 'Gyrotrope', marginBottom: '10px' }}>
+      <h3 className="mb-2 sm:mb-3 text-sm sm:text-base font-semibold text-[#34B485]" style={{ fontFamily: 'Gyrotrope', marginBottom: '10px' }}>
         Payment Breakdown
       </h3>
       <div className="space-y-1 sm:space-y-2 text-[10px] sm:text-xs p-2 sm:p-3">
@@ -13,7 +13,7 @@ const PaymentBreakdownCard = ({ breakdown, className }) => {
         <BreakdownRow label="Coupon" value={breakdown.coupon} isDeduction />
         <BreakdownRow label="GST" value={breakdown.gst} />
         <BreakdownRow label="Delivery Charges" value={breakdown.deliveryCharges} style={{ marginBottom: '5px' }} />
-        <div className="pt-2 mt-2 border-t border-gray-200" style={{ paddingTop: '10px' }}>
+        <div className="pt-2 mt-2 border-t border-[#64E5B8]" style={{ paddingTop: '10px' }}>
           <BreakdownRow label="Total" value={breakdown.total} isTotal />
         </div>
       </div>

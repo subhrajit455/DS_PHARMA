@@ -80,7 +80,7 @@ const OrderCard = ({ order, index }) => {
         borderRadius: '8px',
         margin: '8px 0px',
         boxShadow: '0 1px 2px rgba(0, 0, 0, 0.06)',
-        border: '1px solid #E5E7EB',
+        border: '1px solid #64E5B8',
         fontFamily: 'Gyrotrope',
         padding: '10px'
       }}

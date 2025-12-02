@@ -4,9 +4,9 @@ import OrderTimeline from './OrderTimeline';
 
 const OrderProductCard = ({ order, onCancel }) => {
   return (
-    <Card className="min-h-[330px]" style={{ padding: '12px' }}>
+    <Card className="min-h-[330px] ">
       {/* Product Info */}
-      <div className="flex flex-col sm:flex-row gap-4 mb-6">
+      <div className="flex flex-col sm:flex-row gap-4 mb-6 border-[#64E5B8]" style={{ padding:'10px' }}>
         
         {/* Mobile Layout Container */}
         <div className="flex flex-row sm:hidden w-full gap-3">
@@ -53,7 +53,7 @@ const OrderProductCard = ({ order, onCancel }) => {
 
 
         {/* Desktop Product Details */}
-        <div className="hidden sm:block flex-1">
+        <div className="hidden sm:block flex-1" style={{ padding:'10px' }}>
           <h3
             className="mb-3 text-lg font-semibold text-gray-900"
             style={{ fontFamily: 'Gyrotrope', marginBottom:'10px' }}
@@ -112,7 +112,7 @@ const OrderProductCard = ({ order, onCancel }) => {
       </div>
 
       {/* Order Details Grid */}
-      <div className="grid grid-cols-1 sm:grid-cols-2 sm:gap-4 pt-4 sm:mb-4" style={{ marginTop:'10px' }}>
+      <div className="grid grid-cols-1 sm:grid-cols-2 sm:gap-4 pt-4 sm:mb-4" style={{ marginTop:'10px', padding:'10px' }}>
         <OrderDetail label="Order ID" value={order.id} />
         <OrderDetail label="Contact Agent" value={order.contactAgent} />
         <OrderDetail label="Tracking ID" value={order.trackingId} />

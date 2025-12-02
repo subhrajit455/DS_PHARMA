@@ -64,7 +64,7 @@ const OrderDetails = () => {
   const handleDownloadReceipt = () => console.log("Download receipt");
 
   return (
-    <div style={{ paddingTop: '50px' }}>
+    <div style={{ paddingTop: '60px' }}>
       <style>{` 
          @media (min-width: 768px) { 
            .orders-container { 

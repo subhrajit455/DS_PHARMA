@@ -183,7 +183,7 @@ const Navigation = () => {
         transition={{ duration: 0.6, ease: [0.25, 0.1, 0.25, 1] }}
         role="navigation"
         aria-label="Main navigation"
-        className="hidden md:block absolute top-12 left-1/2 transform -translate-x-1/2 z-50 mx-10"
+        className="hidden md:block absolute top-8 left-1/2 transform -translate-x-1/2 z-50 mx-10"
         style={{ width: 'calc(100% - 80px)', maxWidth: '1280px' }}
       >
         <div
@@ -208,17 +208,15 @@ const Navigation = () => {
                   fontSize: '16px',
                   lineHeight: '100%',
                   letterSpacing: '0%',
-                  color: '#000000'
+                  color: '#000000',
+                  paddingBottom: '8px'
                 }}
                 className={`
                 cursor-pointer relative outline-none
                 transition-all duration-200 ease-out
-                ${activeItem === item.name
-                    ? 'underline decoration-2'
-                    : 'hover:underline hover:decoration-2'
-                  }
                 hover:opacity-70
                 focus:outline-2 focus:outline-black/30 focus:outline-offset-1
+                !no-underline !hover:no-underline
               `}
                 onClick={(e) => {
                   e.preventDefault();
@@ -227,6 +225,19 @@ const Navigation = () => {
                 onKeyDown={(e) => handleKeyDown(e, item.name, item.href)}
               >
                 {item.name}
+                {activeItem === item.name && (
+                  <motion.div
+                    layoutId="activeNavUnderline"
+                    className="absolute bottom-[1px] left-1/2 -translate-x-1/2 w-[120%] flex items-center justify-center"
+                    initial={{ opacity: 0 }}
+                    animate={{ opacity: 1 }}
+                    transition={{ duration: 0.3 }}
+                  >
+                    <div className="w-1 h-1 rounded-full bg-black shrink-0" />
+                    <div className="h-[2px] bg-black flex-1" />
+                    <div className="w-1 h-1 rounded-full bg-black shrink-0" />
+                  </motion.div>
+                )}
               </a>
             ))}
           </div>
@@ -348,7 +359,7 @@ const Navigation = () => {
       </motion.nav>
 
       {/* Mobile Top Bar - Logo, Search, Cart, Profile */}
-      <div className="md:hidden fixed top-0 left-0 right-0 z-50 bg-[rgba(165,232,220,0.95)] backdrop-blur-md border-b border-white/20 shadow-sm px-4 py-5 mt-5">
+      <div className="md:hidden fixed top-0 left-0 right-0 z-50 bg-[rgba(165,232,220,0.95)] backdrop-blur-md border-b border-white/20 shadow-sm px-4 py-5 mt-5" style={{ padding: '10px 5px' }}>
         <div className="flex items-center justify-between">
           <span
             style={{
@@ -540,8 +551,6 @@ const Navigation = () => {
                 </a>
               );
             })}
-
-
           </div>
         </div>
       </motion.nav>

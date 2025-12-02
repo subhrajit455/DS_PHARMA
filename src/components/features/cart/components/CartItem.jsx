@@ -19,13 +19,7 @@ const CartItem = ({ item, onUpdateQuantity, onRemove }) => {
       <div className="flex gap-4">
         {/* Product Image */}
         <div
-          className="shrink-0 overflow-hidden"
-          style={{ 
-            width: '72px', 
-            height: '72px',
-            borderRadius: '8px',
-            backgroundColor: '#F3F4F6'
-          }}
+          className="shrink-0 overflow-hidden w-16 h-16 md:w-[72px] md:h-[72px] rounded-lg bg-gray-100"
         >
           <img
             src={item.image}
@@ -39,117 +33,66 @@ const CartItem = ({ item, onUpdateQuantity, onRemove }) => {
           <div className="flex justify-between items-start">
             <div className="flex-1 pr-4 text-bottom">
               <h3
-                style={{
-                  fontFamily: 'Gyrotrope',
-                  fontSize: '16px',
-                  fontWeight: 600,
-                  color: '#000000',
-                  marginBottom: '26px',
-                  lineHeight: '1.4',
-                  letterSpacing: '-0.01em'
-                }}
+                className="font-gyrotrope text-xs md:text-[16px] font-semibold text-black mb-5 leading-relaxed tracking-tight pt-2"
               >
                 {item.name}
               </h3>
-              <div className="flex items-center gap-2 mt-10">
-                <span
-                  style={{
-                    fontFamily: 'Gyrotrope',
-                    fontSize: '16px',
-                    fontWeight: 700,
-                    color: '#000000',
-
-                  }}
-                >
+              <div className="flex items-center gap-2 mt-15" style={{
+                paddingTop: '8px'
+              }}>
+                <span className="font-gyrotrope text-xs md:text-[16px] font-bold text-black">
                   ₹{item.price}
                 </span>
-                <span
-                  style={{
-                    fontFamily: 'Gyrotrope',
-                    fontSize: '13px',
-                    fontWeight: 400,
-                    color: '#9CA3AF',
-                    textDecoration: 'line-through'
-                  }}
-                >
+                <span className="font-gyrotrope text-xs md:text-[13px] font-normal text-gray-400 line-through">
                   ₹{item.originalPrice}
                 </span>
-                <span
-                  style={{
-                    fontFamily: 'Gyrotrope',
-                    fontSize: '11px',
-                    fontWeight: 600,
-                    color: '#10B981',
-                    backgroundColor: '#D1FAE5',
-                    padding: '2px 6px',
-                    borderRadius: '4px'
-                  }}
-                >
+                <span className="font-gyrotrope text-[10px] md:text-[11px] font-semibold text-emerald-500 bg-emerald-100 px-1.5 py-0.5 rounded">
                   {item.discount}% Off
                 </span>
               </div>
-          
-          </div>
-          <div className='flex flex-col items-end'>
 
-          {/* Delete Button */}
-            <button
-              onClick={() => onRemove(item.id)}
-              className="p-1.5 hover:bg-gray-100 rounded-md transition-colors cursor-pointer"
-              aria-label="Remove item"
+            </div>
+            <div className='flex flex-col items-end'>
+
+              {/* Delete Button */}
+              <button
+                onClick={() => onRemove(item.id)}
+                className="p-1.5 hover:bg-gray-100 rounded-md transition-colors cursor-pointer self-end mb-3"
+                aria-label="Remove item"
               style={{
                 alignSelf: 'flex-end',
                 marginBottom: '12px'
               }}
-            >
-              <Trash2 size={16} color="#EF4444" strokeWidth={2} />
-            </button>
+              >
+                <Trash2 size={16} color="#EF4444" strokeWidth={2} />
+              </button>
 
-          {/* Quantity Controls */}
-          
-          <div className="flex items-center justify-end">
-            <button
-              onClick={() => onUpdateQuantity(item.id, -1)}
-              className="flex items-center justify-center border hover:bg-gray-50 transition-colors cursor-pointer"
-              aria-label="Decrease quantity"
-              style={{
-                width: '28px',
-                height: '28px',
-                borderRadius: '6px',
-                border: '1px solid #D1D5DB'
-              }}
-            >
-              <Minus size={14} strokeWidth={2.5} />
-            </button>
-            <span
-              style={{
-                fontFamily: 'Gyrotrope',
-                fontSize: '14px',
-                fontWeight: 600,
-                color: '#000000',
-                minWidth: '24px',
-                textAlign: 'center'
-              }}
-            >
-              {item.quantity}
-            </span>
-            <button
-              onClick={() => onUpdateQuantity(item.id, 1)}
-              className="flex items-center justify-center border hover:bg-gray-50 transition-colors cursor-pointer"
-              aria-label="Increase quantity"
-              style={{
-                width: '28px',
-                height: '28px',
-                borderRadius: '6px',
-                border: '1px solid #D1D5DB'
-              }}
-            >
-              <Plus size={14} strokeWidth={2.5} />
-            </button>
-          
-          </div>
-            
-          </div>
+              {/* Quantity Controls */}
+
+              <div className="flex items-center justify-end" style={{
+                paddingTop: '8px'
+              }}>
+                <button
+                  onClick={() => onUpdateQuantity(item.id, -1)}
+                  className="flex items-center justify-center border hover:bg-gray-50 transition-colors cursor-pointer w-6 h-6 md:w-7 md:h-7 rounded-md border-gray-300"
+                  aria-label="Decrease quantity"
+                >
+                  <Minus size={14} strokeWidth={2.5} />
+                </button>
+                <span className="font-gyrotrope text-xs md:text-sm font-semibold text-black min-w-[24px] text-center">
+                  {item.quantity}
+                </span>
+                <button
+                  onClick={() => onUpdateQuantity(item.id, 1)}
+                  className="flex items-center justify-center border hover:bg-gray-50 transition-colors cursor-pointer w-6 h-6 md:w-7 md:h-7 rounded-md border-gray-300"
+                  aria-label="Increase quantity"
+                >
+                  <Plus size={14} strokeWidth={2.5} />
+                </button>
+
+              </div>
+
+            </div>
           </div>
         </div>
       </div>

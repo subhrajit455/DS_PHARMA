@@ -10,10 +10,10 @@ const ProductImageGallery = ({ images, selectedImage, onImageSelect, onScroll })
         <button
           onClick={() => onScroll('up')}
           disabled={selectedImage === 0}
-          className="hidden p-1 transition-colors rounded-md cursor-pointer md:block hover:bg-gray-100 disabled:opacity-30 disabled:cursor-not-allowed"
+          className="hidden p-5 border border-[#64E5B8] transition-colors rounded-sm cursor-pointer md:block hover:bg-gray-100 disabled:opacity-30 disabled:cursor-not-allowed"
           aria-label="Scroll up"
         >
-          <ChevronUp size={20} />
+          <ChevronUp size={25} />
         </button>
 
         <div className="flex flex-row gap-3 overflow-x-auto md:flex-col md:overflow-hidden" style={{ maxHeight: '350px' }}>
@@ -40,10 +40,10 @@ const ProductImageGallery = ({ images, selectedImage, onImageSelect, onScroll })
         <button
           onClick={() => onScroll('down')}
           disabled={selectedImage === images.length - 1}
-          className="hidden p-1 transition-colors rounded-md cursor-pointer md:block hover:bg-gray-100 disabled:opacity-30 disabled:cursor-not-allowed"
+          className="hidden p-5 border border-[#64E5B8] transition-colors rounded-sm cursor-pointer md:block hover:bg-gray-100 disabled:opacity-30 disabled:cursor-not-allowed"
           aria-label="Scroll down"
         >
-          <ChevronDown size={20} />
+          <ChevronDown size={25} />
         </button>
       </div>
 

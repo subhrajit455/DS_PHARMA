@@ -32,6 +32,14 @@ const ProductDescription = () => {
           <li>It may support the health of the eyes.</li>
           <li>Fish oil pills may help to reduce some risk factors of heart diseases.</li>
         </ul>
+
+        <h3 className="mt-4 mb-2 text-base font-bold" style={{ color: '#111827' }}>How to take PharmEasy Fish Oil 1000 mg</h3>
+        <ul className="pl-4 space-y-2 list-disc list-inside">
+          <li>Take one capsule daily with water, preferably after a meal.</li>
+          <li>Swallow the capsule whole; do not chew or crush it.</li>
+          <li>For best results, take it at the same time every day.</li>
+          <li>Consult your physician for the appropriate dosage based on your health condition.</li>
+        </ul>
       </div>
     </div>
   );

@@ -54,7 +54,7 @@ const ProductDetails = () => {
   };
 
   return (
-    <div style={{ paddingTop: '50px' }}>
+    <div style={{ paddingTop: '60px' }}>
       <style>{` 
          @media (min-width: 768px) { 
            .orders-container { 
