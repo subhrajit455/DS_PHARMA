@@ -103,10 +103,22 @@ const CartDetails = () => {
            .orders-container { 
              padding-top: 80px !important; 
            } 
-         } 
+         }
+         @media (max-width: 639px) {
+           .cart-details-container {
+             padding-left: 5px !important;
+             padding-right: 5px !important;
+           }
+         }
+         @media (min-width: 640px) and (max-width: 1290px) {
+           .cart-details-container {
+             padding-left: 5px !important;
+             padding-right: 5px !important;
+           }
+         }
        `}</style>
     <div className="orders-container w-full pt-4 pb-16 lg:pt-32 lg:pb-16">
-      <div className="w-full" style={{ maxWidth: '1200px', margin: '10px auto' }}>
+      <div className="cart-details-container w-full" style={{ maxWidth: '1200px', margin: '10px auto' }}>
         <div className="grid grid-cols-1 lg:grid-cols-3 gap-8">
           {/* Left Section - Cart Items */}
           <div className="lg:col-span-2">

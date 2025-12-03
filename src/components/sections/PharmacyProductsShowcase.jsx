@@ -125,7 +125,22 @@ const PharmacyProductsShowcase = () => {
   };
 
   return (
-    <section className="w-full bg-gray-50 py-16 lg:py-20 mb-25 flex justify-center items-center" style={{ width: '100%' }}>
+    <>
+      <style>{`
+        @media (max-width: 639px) {
+          .pharmacy-products-showcase {
+            padding-left: 5px !important;
+            padding-right: 5px !important;
+          }
+        }
+        @media (min-width: 640px) and (max-width: 1290px) {
+          .pharmacy-products-showcase {
+            padding-left: 5px !important;
+            padding-right: 5px !important;
+          }
+        }
+      `}</style>
+      <section className="pharmacy-products-showcase w-full bg-gray-50 py-16 lg:py-20 mb-25 flex justify-center items-center" style={{ width: '100%' }}>
       <div className="w-full max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 text-center">
         {/* Pain Relief Category */}
         <div className="mb-12 lg:mb-16">
@@ -150,6 +165,7 @@ const PharmacyProductsShowcase = () => {
         />
       </div>
     </section>
+    </>
   );
 };
 

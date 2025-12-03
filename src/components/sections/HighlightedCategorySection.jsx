@@ -93,14 +93,29 @@ const HighlightedCategorySection = () => {
   };
 
   return (
-    <section
-      className="w-full sm:py-16 min-h-[300px] sm:min-h-[350px] lg:py-24 mb-8 flex justify-center items-center"
-      style={{
-        width: '100%',
-        backgroundColor: '#FFF6D3',
-        marginBottom: '3rem'
-      }}
-    >
+    <>
+      <style>{`
+        @media (max-width: 639px) {
+          .highlighted-category-section {
+            padding-left: 5px !important;
+            padding-right: 5px !important;
+          }
+        }
+        @media (min-width: 640px) and (max-width: 1290px) {
+          .highlighted-category-section {
+            padding-left: 5px !important;
+            padding-right: 5px !important;
+          }
+        }
+      `}</style>
+      <section
+        className="highlighted-category-section w-full sm:py-16 min-h-[300px] sm:min-h-[350px] lg:py-24 mb-8 flex justify-center items-center"
+        style={{
+          width: '100%',
+          backgroundColor: '#FFF6D3',
+          marginBottom: '3rem'
+        }}
+      >
       <div className="w-full max-w-7xl mx-auto px-2 sm:px-6 lg:px-8 ">
 
         {/* Section Header - Compact Spacing */}
@@ -190,6 +205,7 @@ const HighlightedCategorySection = () => {
         </div>
       </div>
     </section>
+    </>
   );
 };
 

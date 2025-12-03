@@ -70,7 +70,19 @@ const OrderDetails = () => {
            .orders-container { 
              padding-top: 80px !important; 
            } 
-         } 
+         }
+         @media (max-width: 639px) {
+           .order-details-container {
+             padding-left: 5px !important;
+             padding-right: 5px !important;
+           }
+         }
+         @media (min-width: 640px) and (max-width: 1290px) {
+           .order-details-container {
+             padding-left: 5px !important;
+             padding-right: 5px !important;
+           }
+         }
        `}</style>
       <div className="orders-container flex flex-col min-h-screen bg-gray-50">
         {/* Main Content */}
@@ -79,7 +91,7 @@ const OrderDetails = () => {
           style={{ paddingBottom: "20px" }}
         >
           <div
-            className="w-full px-4 mx-auto max-w-7xl"
+            className="order-details-container w-full px-4 mx-auto max-w-7xl"
             style={{ maxWidth: "1240px", margin: "0 auto" }}
           >
             {/* Header */}

@@ -135,6 +135,18 @@ const Orders = () => {
             padding-top: 80px !important;
           }
         }
+        @media (max-width: 639px) {
+          .orders-container {
+            padding-left: 5px !important;
+            padding-right: 5px !important;
+          }
+        }
+        @media (min-width: 640px) and (max-width: 1290px) {
+          .orders-container {
+            padding-left: 5px !important;
+            padding-right: 5px !important;
+          }
+        }
       `}</style>
       <div className="orders-container w-full px-4 md:px-6 lg:px-12 flex flex-col items-center mb-8">
         <div className="w-full max-w-7xl mx-auto">

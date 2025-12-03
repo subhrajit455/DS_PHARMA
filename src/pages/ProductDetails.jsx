@@ -60,11 +60,23 @@ const ProductDetails = () => {
            .orders-container { 
              padding-top: 80px !important; 
            } 
-         } 
+         }
+         @media (max-width: 639px) {
+           .product-details-container {
+             padding-left: 5px !important;
+             padding-right: 5px !important;
+           }
+         }
+         @media (min-width: 640px) and (max-width: 1290px) {
+           .product-details-container {
+             padding-left: 5px !important;
+             padding-right: 5px !important;
+           }
+         }
        `}</style>
       <div className="orders-container flex flex-col min-h-screen bg-gray-50 ">
         <main className="grow">
-          <div className="flex flex-col items-center w-full px-4 sm:px-6 lg:px-12">
+          <div className="product-details-container flex flex-col items-center w-full px-4 md:px-6 lg:px-12">
             <div className="mx-auto max-w-7xl w-full">
               {/* Back Button */}
               <button
