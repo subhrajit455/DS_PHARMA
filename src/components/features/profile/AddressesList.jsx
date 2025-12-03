@@ -1,5 +1,5 @@
 import React from 'react';
-import { motion } from 'framer-motion';
+import { motion as Motion } from 'framer-motion';
 import { MapPin, Edit2 } from 'lucide-react';
 
 const AddressesList = () => {
@@ -9,7 +9,7 @@ const AddressesList = () => {
     ];
 
     return (
-        <motion.div
+        <Motion.div
             initial={{ opacity: 0, y: 20 }}
             animate={{ opacity: 1, y: 0 }}
             className="bg-white rounded-xl shadow-sm p-4 md:p-8"
@@ -18,18 +18,18 @@ const AddressesList = () => {
                 <h2 className="text-xl md:text-2xl font-bold" style={{ fontFamily: 'Gyrotrope', color: '#1F2937' }}>
                     Saved Addresses
                 </h2>
-                <motion.button
+                <Motion.button
                     whileHover={{ scale: 1.05 }}
                     whileTap={{ scale: 0.95 }}
                     className="flex items-center gap-2 px-4 py-2.5 bg-gradient-to-r from-teal-500 to-teal-600 text-white rounded-lg hover:from-teal-600 hover:to-teal-700 transition-all shadow-md text-sm font-semibold"
                 >
                     <MapPin className="w-4 h-4" />
                     Add New Address
-                </motion.button>
+                </Motion.button>
             </div>
             <div className="grid grid-cols-1 lg:grid-cols-2 gap-4">
                 {addresses.map((addr, index) => (
-                    <motion.div
+                    <Motion.div
                         key={index}
                         whileHover={{ scale: 1.02, boxShadow: '0 10px 25px rgba(0,0,0,0.1)' }}
                         className="border-2 border-gray-200 rounded-xl p-5 hover:border-teal-400 transition-all bg-gradient-to-br from-white to-gray-50 relative"
@@ -72,10 +72,10 @@ const AddressesList = () => {
                                 </button>
                             )}
                         </div>
-                    </motion.div>
+                    </Motion.div>
                 ))}
             </div>
-        </motion.div>
+        </Motion.div>
     );
 };
 

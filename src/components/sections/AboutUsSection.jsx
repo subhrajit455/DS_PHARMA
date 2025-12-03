@@ -1,5 +1,5 @@
 import React from 'react';
-import { motion } from 'framer-motion';
+import { motion as Motion } from 'framer-motion';
 import Exclude from '../../assets/images/Exclude.png';
 import Frame5 from '../../assets/images/Frame 5.png';
 
@@ -34,7 +34,7 @@ const AboutUsSection = () => {
             }}
           >
             {/* About Us Title Badge */}
-            <motion.div
+            <Motion.div
               initial={{ opacity: 0, y: -10 }}
               whileInView={{ opacity: 1, y: 0 }}
               viewport={{ once: true }}
@@ -61,10 +61,10 @@ const AboutUsSection = () => {
               >
                 About Us
               </h2>
-            </motion.div>
+            </Motion.div>
 
             {/* Content Area - Minimal Layout */}
-            <motion.div
+            <Motion.div
               initial={{ opacity: 0 }}
               whileInView={{ opacity: 1 }}
               viewport={{ once: true }}
@@ -77,11 +77,11 @@ const AboutUsSection = () => {
               }}
             >
               {/* Empty content area - Design shows minimal layout */}
-            </motion.div>
+            </Motion.div>
           </div>
 
           {/* Frame 5 Background - Bottom Right */}
-          <motion.div
+          <Motion.div
             initial={{ opacity: 0, scale: 0.95 }}
             whileInView={{ opacity: 1, scale: 1 }}
             viewport={{ once: true }}
@@ -103,10 +103,10 @@ const AboutUsSection = () => {
                 imageRendering: '-webkit-optimize-contrast'
               }}
             />
-          </motion.div>
+          </Motion.div>
 
           {/* Mascot Character - Positioned on Top of Frame 5 */}
-          <motion.div
+          <Motion.div
             initial={{ opacity: 0, x: 15, scale: 0.96 }}
             whileInView={{ opacity: 1, x: 0, scale: 1 }}
             viewport={{ once: true }}
@@ -129,7 +129,7 @@ const AboutUsSection = () => {
                 filter: 'contrast(1.02) saturate(1.05) drop-shadow(0 4px 8px rgba(0, 0, 0, 0.1))'
               }}
             />
-          </motion.div>
+          </Motion.div>
         </div>
       </div>
     </section>

@@ -1,4 +1,4 @@
-import { motion } from 'framer-motion';
+import { motion as Motion } from 'framer-motion';
 import { useState } from 'react';
 
 const PopularCategoriesSection = ({
@@ -112,7 +112,7 @@ const PopularCategoriesSection = ({
         </div>
 
         {/* Categories Grid - Responsive & Dynamic */}
-        <motion.div
+        <Motion.div
           variants={containerVariants}
           initial="hidden"
           whileInView="visible"
@@ -125,7 +125,7 @@ const PopularCategoriesSection = ({
           }}
         >
           {displayCategories.map((category, index) => (
-            <motion.div
+            <Motion.div
               key={category.id}
               variants={itemVariants}
               className="flex flex-col items-center group cursor-pointer shrink-0 sm:shrink sm:w-auto"
@@ -149,7 +149,7 @@ const PopularCategoriesSection = ({
               <div className="sm:hidden" style={{ width: '22vw', minWidth: '80px', height: '0' }}></div>
 
               {/* Category Image */}
-              <motion.div
+              <Motion.div
                 className="relative mb-1"
                 whileHover={{ scale: 1.05 }}
                 whileTap={{ scale: 0.98 }}
@@ -172,7 +172,7 @@ const PopularCategoriesSection = ({
                     loading="lazy"
                   />
                 </div>
-              </motion.div>
+              </Motion.div>
 
               {/* Category Name */}
               <h3
@@ -195,9 +195,9 @@ const PopularCategoriesSection = ({
               >
                 {category.name}
               </h3>
-            </motion.div>
+            </Motion.div>
           ))}
-        </motion.div>
+        </Motion.div>
       </div>
     </section>
   );

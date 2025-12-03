@@ -1,10 +1,10 @@
 import React from 'react';
-import { motion } from 'framer-motion';
+import { motion as Motion } from 'framer-motion';
 import { Trash2, Plus, Minus } from 'lucide-react';
 
 const CartItem = ({ item, onUpdateQuantity, onRemove }) => {
   return (
-    <motion.div
+    <Motion.div
       key={item.id}
       initial={{ opacity: 0, y: 20 }}
       animate={{ opacity: 1, y: 0 }}
@@ -59,10 +59,10 @@ const CartItem = ({ item, onUpdateQuantity, onRemove }) => {
                 onClick={() => onRemove(item.id)}
                 className="p-1.5 hover:bg-gray-100 rounded-md transition-colors cursor-pointer self-end mb-3"
                 aria-label="Remove item"
-              style={{
-                alignSelf: 'flex-end',
-                marginBottom: '12px'
-              }}
+                style={{
+                  alignSelf: 'flex-end',
+                  marginBottom: '12px'
+                }}
               >
                 <Trash2 size={16} color="black" strokeWidth={2} />
               </button>
@@ -96,7 +96,7 @@ const CartItem = ({ item, onUpdateQuantity, onRemove }) => {
           </div>
         </div>
       </div>
-    </motion.div>
+    </Motion.div>
   );
 };
 

@@ -1,5 +1,5 @@
 import React from 'react';
-import { motion } from 'framer-motion';
+import { motion as Motion } from 'framer-motion';
 import { Package } from 'lucide-react';
 
 const OrdersList = () => {
@@ -10,7 +10,7 @@ const OrdersList = () => {
     ];
 
     return (
-        <motion.div
+        <Motion.div
             initial={{ opacity: 0, y: 20 }}
             animate={{ opacity: 1, y: 0 }}
             className="bg-white rounded-xl shadow-sm p-4 md:p-8"
@@ -26,7 +26,7 @@ const OrdersList = () => {
             </div>
             <div className="space-y-4">
                 {orders.map((order) => (
-                    <motion.div
+                    <Motion.div
                         key={order.id}
                         whileHover={{ scale: 1.01, boxShadow: '0 10px 25px rgba(0,0,0,0.1)' }}
                         className="border border-gray-200 rounded-xl p-5 transition-all cursor-pointer bg-gradient-to-r from-white to-gray-50"
@@ -66,10 +66,10 @@ const OrdersList = () => {
                                 </button>
                             </div>
                         </div>
-                    </motion.div>
+                    </Motion.div>
                 ))}
             </div>
-        </motion.div>
+        </Motion.div>
     );
 };
 

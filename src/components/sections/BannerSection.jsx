@@ -1,5 +1,5 @@
-import React, { useState, useEffect, useRef } from 'react';
-import { motion, AnimatePresence } from 'framer-motion';
+import React, { useState, useEffect, useRef, useCallback } from 'react';
+import { motion as Motion, AnimatePresence } from 'framer-motion';
 
 const BannerSection = () => {
   const [currentIndex, setCurrentIndex] = useState(0);
@@ -41,7 +41,7 @@ const BannerSection = () => {
     }
   ];
 
-  const startAutoSlide = () => {
+  const startAutoSlide = useCallback(() => {
     if (intervalRef.current) clearInterval(intervalRef.current);
 
     intervalRef.current = setInterval(() => {
@@ -49,7 +49,7 @@ const BannerSection = () => {
         setCurrentIndex((prevIndex) => (prevIndex + 1) % banners.length);
       }
     }, 3000); // Change slide every 3 seconds
-  };
+  }, [isHovered, banners.length]);
 
   const stopAutoSlide = () => {
     if (intervalRef.current) {
@@ -60,7 +60,7 @@ const BannerSection = () => {
   useEffect(() => {
     startAutoSlide();
     return () => stopAutoSlide();
-  }, [isHovered]);
+  }, [isHovered, startAutoSlide]);
 
   const handleBannerClick = (link) => {
     console.log(`Navigate to: ${link}`);
@@ -95,7 +95,7 @@ const BannerSection = () => {
               style={{ transform: `translateX(-${currentIndex * 100}%)` }}>
               {banners.map((banner) => (
                 <div key={banner.id} className="w-full flex-shrink-0">
-                  <motion.div
+                  <Motion.div
                     className="group cursor-pointer w-full"
                     onClick={() => handleBannerClick(banner.link)}
                     role="button"
@@ -141,7 +141,7 @@ const BannerSection = () => {
                       {/* Fallback Background Color (if image fails to load) */}
                       <div className={`absolute inset-0 ${banner.bgColor} -z-10`} />
                     </div>
-                  </motion.div>
+                  </Motion.div>
                 </div>
               ))}
             </div>
@@ -186,7 +186,7 @@ const BannerSection = () => {
         <div className="hidden sm:block">
           {/* Banner Grid - Compact Layout */}
           <div className="w-full flex justify-center">
-            <motion.div
+            <Motion.div
               className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-6 sm:gap-6 lg:gap-8 w-full max-w-7xl justify-items-center"
               initial="hidden"
               whileInView="visible"
@@ -202,8 +202,8 @@ const BannerSection = () => {
                 }
               }}
             >
-              {banners.map((banner, index) => (
-                <motion.div
+              {banners.map((banner) => (
+                <Motion.div
                   key={banner.id}
                   variants={{
                     hidden: { opacity: 0, y: 30 },
@@ -265,9 +265,9 @@ const BannerSection = () => {
                     {/* Fallback Background Color (if image fails to load) */}
                     <div className={`absolute inset-0 ${banner.bgColor} -z-10`} />
                   </div>
-                </motion.div>
+                </Motion.div>
               ))}
-            </motion.div>
+            </Motion.div>
           </div>
         </div>
       </div>

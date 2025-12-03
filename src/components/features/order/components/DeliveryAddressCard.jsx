@@ -1,5 +1,5 @@
 import React, { useState, useRef, useEffect } from 'react';
-import { Card, Button } from '@/components/common';
+import { Card, Button } from '@/components/ui';
 import { ChevronDown, MapPin, Check } from 'lucide-react';
 
 const SAMPLE_ADDRESSES = [

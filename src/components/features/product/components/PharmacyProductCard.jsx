@@ -1,6 +1,6 @@
 import React from 'react';
 /* eslint-disable-next-line no-unused-vars */
-import { motion } from 'framer-motion';
+import { motion as Motion } from 'framer-motion';
 import { Heart } from 'lucide-react';
 import { useNavigate } from 'react-router-dom';
 import CartIcon from '../../../../assets/icons/Cart.png';
@@ -35,7 +35,7 @@ const PharmacyProductCard = ({
   };
 
   return (
-    <motion.div
+    <Motion.div
       className={`bg-transparent overflow-hidden rounded-lg cursor-pointer transition-all duration-300 hover:shadow-lg w-full ${className}`}
       style={{ maxWidth: '320px', padding: '10px' }}
       initial={{ opacity: 0, y: 20 }}
@@ -117,7 +117,7 @@ const PharmacyProductCard = ({
           />
         </button>
       </div>
-    </motion.div>
+    </Motion.div>
   );
 };
 

@@ -1,5 +1,5 @@
 import React, { useState, useEffect } from 'react';
-import { motion, AnimatePresence } from 'framer-motion';
+import { motion as Motion, AnimatePresence } from 'framer-motion';
 import { ArrowUp } from 'lucide-react';
 
 const ScrollToTop = () => {
@@ -33,7 +33,7 @@ const ScrollToTop = () => {
   return (
     <AnimatePresence>
       {isVisible && (
-        <motion.button
+        <Motion.button
           initial={{ opacity: 0, scale: 0.5, y: 20 }}
           animate={{ opacity: 1, scale: 1, y: 0 }}
           exit={{ opacity: 0, scale: 0.5, y: 20 }}
@@ -58,7 +58,7 @@ const ScrollToTop = () => {
           aria-label="Scroll to top"
         >
           <ArrowUp size={24} color="#000000" strokeWidth={2.5} />
-        </motion.button>
+        </Motion.button>
       )}
     </AnimatePresence>
   );

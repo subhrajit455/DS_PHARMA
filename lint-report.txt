@@ -1,0 +1,29 @@
+﻿
+> frontend@0.0.0 lint
+> eslint .
+
+
+D:\Gourav\DS Pharma Project\DSPharma\frontend\src\components\features\order\components\OrderSummary.jsx
+  46:6  warning  React Hook useEffect has a missing dependency: 'currentAddress'. Either include it or remove the dependency array  react-hooks/exhaustive-deps
+
+D:\Gourav\DS Pharma Project\DSPharma\frontend\src\components\features\product\components\PharmacyProductCard.jsx
+  2:1  warning  Unused eslint-disable directive (no problems were reported from 'no-unused-vars')
+
+D:\Gourav\DS Pharma Project\DSPharma\frontend\src\components\sections\BannerSection.jsx
+    2:10  error    'motion' is defined but never used. Allowed unused vars must match /^[A-Z_]/u                                      no-unused-vars
+   63:6   warning  React Hook useEffect has a missing dependency: 'startAutoSlide'. Either include it or remove the dependency array  react-hooks/exhaustive-deps
+  205:37  error    'index' is defined but never used                                                                                  no-unused-vars
+
+D:\Gourav\DS Pharma Project\DSPharma\frontend\src\components\sections\HeroSection.jsx
+  1:1  warning  Unused eslint-disable directive (no problems were reported from 'no-unused-vars')
+
+D:\Gourav\DS Pharma Project\DSPharma\frontend\src\components\sections\PopularCategoriesSection.jsx
+    8:10  error  'hoveredCategory' is assigned a value but never used. Allowed unused vars must match /^[A-Z_]/u  no-unused-vars
+  127:45  error  'index' is defined but never used                                                                no-unused-vars
+
+D:\Gourav\DS Pharma Project\DSPharma\frontend\src\components\ui\Navigation.jsx
+  198:34  error  'index' is defined but never used  no-unused-vars
+
+Γ£û 9 problems (5 errors, 4 warnings)
+  0 errors and 2 warnings potentially fixable with the `--fix` option.
+

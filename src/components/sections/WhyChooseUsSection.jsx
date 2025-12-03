@@ -1,5 +1,5 @@
 import React from 'react';
-import { motion } from 'framer-motion';
+import { motion as Motion } from 'framer-motion';
 
 import Vector from '../../assets/images/Vector.png';
 
@@ -84,7 +84,7 @@ const WhyChooseUsSection = () => {
           <div className="flex flex-col justify-center">
             <div className=''>
               <div className='left-0 top-0 text-left'>
-                <motion.h2
+                <Motion.h2
                   initial={{ opacity: 0, x: -20 }}
                   whileInView={{ opacity: 1, x: 0 }}
                   viewport={{ once: true }}
@@ -100,10 +100,10 @@ const WhyChooseUsSection = () => {
                   }}
                 >
                   Why Choose Us
-                </motion.h2>
+                </Motion.h2>
               </div>
 
-              <motion.div
+              <Motion.div
                 variants={containerVariants}
                 initial="hidden"
                 whileInView="visible"
@@ -115,7 +115,7 @@ const WhyChooseUsSection = () => {
                 }}
               >
                 {features.map((feature) => (
-                  <motion.div
+                  <Motion.div
                     key={feature.id}
                     variants={itemVariants}
                     className="flex items-center group"
@@ -158,9 +158,9 @@ const WhyChooseUsSection = () => {
                     >
                       {feature.text}
                     </span>
-                  </motion.div>
+                  </Motion.div>
                 ))}
-              </motion.div>
+              </Motion.div>
             </div>
           </div>
           {/* Right Images - Pixel Perfect Positioning */}
@@ -201,7 +201,7 @@ const WhyChooseUsSection = () => {
               </div>
 
               {/* Doctor Image - Exact Positioning */}
-              <motion.div
+              <Motion.div
                 initial={{ opacity: 0, scale: 0.95 }}
                 whileInView={{ opacity: 1, scale: 1 }}
                 viewport={{ once: true }}
@@ -229,10 +229,10 @@ const WhyChooseUsSection = () => {
                     imageRendering: '-webkit-optimize-contrast'
                   }}
                 />
-              </motion.div>
+              </Motion.div>
 
               {/* Objects Image - Positioned on Upper Left of Doctor */}
-              <motion.div
+              <Motion.div
                 initial={{ opacity: 0, scale: 0.9 }}
                 whileInView={{ opacity: 1, scale: 1 }}
                 viewport={{ once: true }}
@@ -259,7 +259,7 @@ const WhyChooseUsSection = () => {
                     transform: 'translateZ(0)'
                   }}
                 />
-              </motion.div>
+              </Motion.div>
             </div>
           </div>
         </div>

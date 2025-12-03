@@ -1,5 +1,5 @@
 import React from 'react';
-import { Card } from '@/components/common';
+import { Card } from '@/components/ui';
 
 const PaymentBreakdownCard = ({ breakdown, className }) => {
   return (

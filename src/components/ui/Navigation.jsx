@@ -1,4 +1,4 @@
-import { motion } from 'framer-motion';
+import { motion as Motion } from 'framer-motion';
 import { Search, User, Home, Package, Info, Phone, X } from 'lucide-react';
 import { useState, useEffect, useRef } from 'react';
 import { useNavigate, useLocation } from 'react-router-dom';
@@ -177,7 +177,7 @@ const Navigation = () => {
   return (
     <>
       {/* Desktop Navigation - Top */}
-      <motion.nav
+      <Motion.nav
         initial={{ y: -20, opacity: 0 }}
         animate={{ y: 0, opacity: 1 }}
         transition={{ duration: 0.6, ease: [0.25, 0.1, 0.25, 1] }}
@@ -226,7 +226,7 @@ const Navigation = () => {
               >
                 {item.name}
                 {activeItem === item.name && (
-                  <motion.div
+                  <Motion.div
                     layoutId="activeNavUnderline"
                     className="absolute bottom-[1px] left-1/2 -translate-x-1/2 w-[120%] flex items-center justify-center"
                     initial={{ opacity: 0 }}
@@ -236,7 +236,7 @@ const Navigation = () => {
                     <div className="w-1 h-1 rounded-full bg-black shrink-0" />
                     <div className="h-[2px] bg-black flex-1" />
                     <div className="w-1 h-1 rounded-full bg-black shrink-0" />
-                  </motion.div>
+                  </Motion.div>
                 )}
               </a>
             ))}
@@ -356,7 +356,7 @@ const Navigation = () => {
             </button>
           </div>
         </div>
-      </motion.nav>
+      </Motion.nav>
 
       {/* Mobile Top Bar - Logo, Search, Cart, Profile */}
       <div className="md:hidden fixed top-0 left-0 right-0 z-50 bg-[rgba(165,232,220,0.95)] backdrop-blur-md border-b border-white/20 shadow-sm px-4 py-5 mt-5" style={{ padding: '10px 5px' }}>
@@ -469,7 +469,7 @@ const Navigation = () => {
       </div>
 
       {/* Mobile Navigation - Bottom (React Native Style) */}
-      <motion.nav
+      <Motion.nav
         initial={{ y: 20, opacity: 0 }}
         animate={{ y: 0, opacity: 1 }}
         transition={{ duration: 0.6, ease: [0.25, 0.1, 0.25, 1] }}
@@ -553,7 +553,7 @@ const Navigation = () => {
             })}
           </div>
         </div>
-      </motion.nav>
+      </Motion.nav>
     </>
   );
 };

@@ -1,5 +1,5 @@
 import React from 'react';
-import { motion } from 'framer-motion';
+import { motion as Motion } from 'framer-motion';
 
 const FacebookIcon = () => (
   <svg width="24" height="24" viewBox="0 0 24 24" fill="currentColor" xmlns="http://www.w3.org/2000/svg">
@@ -48,7 +48,7 @@ const Footer = () => {
         <div className="grid items-start grid-cols-2 gap-8 md:grid-cols-12">
 
           {/* Logo Section */}
-          <motion.div
+          <Motion.div
             initial={{ opacity: 0, y: 20 }}
             whileInView={{ opacity: 1, y: 0 }}
             viewport={{ once: true }}
@@ -78,10 +78,10 @@ const Footer = () => {
                 Logo
               </span>
             </div>
-          </motion.div>
+          </Motion.div>
 
           {/* Quick Links Section */}
-          <motion.div
+          <Motion.div
             initial={{ opacity: 0, y: 20 }}
             whileInView={{ opacity: 1, y: 0 }}
             viewport={{ once: true }}
@@ -123,10 +123,10 @@ const Footer = () => {
                 ))}
               </nav>
             </div>
-          </motion.div>
+          </Motion.div>
 
           {/* Contact Info Section */}
-          <motion.div
+          <Motion.div
             initial={{ opacity: 0, y: 20 }}
             whileInView={{ opacity: 1, y: 0 }}
             viewport={{ once: true }}
@@ -231,7 +231,7 @@ const Footer = () => {
                 })}
               </div>
             </div>
-          </motion.div>
+          </Motion.div>
         </div>
       </div>
     </footer>

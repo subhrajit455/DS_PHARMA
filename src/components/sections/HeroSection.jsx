@@ -1,5 +1,5 @@
 /* eslint-disable-next-line no-unused-vars */
-import { motion } from 'framer-motion';
+import { motion as Motion } from 'framer-motion';
 
 const ResponsiveHeroSection = () => {
 
@@ -15,7 +15,7 @@ const ResponsiveHeroSection = () => {
       {/* Main Hero Content */}
       <div className="relative flex items-center justify-center w-full min-h-[60vh] sm:min-h-[calc(100vh-140px)]" style={{ paddingBottom: '80px', marginTop: '50px' }}>
         {/* Mobile Title - Visible only on mobile */}
-        <motion.div
+        <Motion.div
           initial={{ opacity: 0, y: -20 }}
           animate={{ opacity: 1, y: 0 }}
           transition={{ duration: 0.8, delay: 0.2 }}
@@ -51,10 +51,10 @@ const ResponsiveHeroSection = () => {
           >
             Best Price For Quality Medicine
           </p>
-        </motion.div>
+        </Motion.div>
 
         {/* Large Background Text "DS Pharma" - Enhanced Typography - Desktop Only */}
-        <motion.div
+        <Motion.div
           initial={{ opacity: 0, scale: 0.95 }}
           animate={{ opacity: 1, scale: 1 }}
           transition={{ duration: 1, delay: 0.3, ease: [0.25, 0.1, 0.25, 1] }}
@@ -91,10 +91,10 @@ const ResponsiveHeroSection = () => {
           >
             DS Pharma
           </h1>
-        </motion.div>
+        </Motion.div>
 
         {/* Doctor Image - Center */}
-        <motion.div
+        <Motion.div
           initial={{ opacity: 0, y: 30 }}
           animate={{ opacity: 1, y: 0 }}
           transition={{ duration: 0.8, delay: 0.5 }}
@@ -129,10 +129,10 @@ const ResponsiveHeroSection = () => {
               }}
             />
           </div>
-        </motion.div>
+        </Motion.div>
 
         {/* Mascot Card - Bottom Left */}
-        <motion.div
+        <Motion.div
           initial={{ opacity: 0, x: -30, y: 20 }}
           animate={{ opacity: 1, x: 0, y: 0 }}
           transition={{ duration: 0.8, delay: 0.7 }}
@@ -201,7 +201,7 @@ const ResponsiveHeroSection = () => {
               }}>Quality Medicine</span>
             </p>
           </div>
-        </motion.div>
+        </Motion.div>
 
 
       </div>
@@ -209,7 +209,7 @@ const ResponsiveHeroSection = () => {
 
 
       {/* Mobile Scrolling Text */}
-      <motion.div
+      <Motion.div
         initial={{ opacity: 0, y: 20 }}
         animate={{ opacity: 1, y: 0 }}
         transition={{ duration: 0.8, delay: 0.8 }}
@@ -257,10 +257,10 @@ const ResponsiveHeroSection = () => {
             100% { transform: translateX(-100%); }
           }
         `}</style>
-      </motion.div>
+      </Motion.div>
 
       {/* Bottom Right Image - Hero Add */}
-      <motion.div
+      <Motion.div
         initial={{ opacity: 0, x: 20, y: 20 }}
         animate={{ opacity: 1, x: 0, y: 0 }}
         transition={{ duration: 0.8, delay: 0.8 }}
@@ -306,7 +306,7 @@ const ResponsiveHeroSection = () => {
             style={{
               display: 'flex',
               whiteSpace: 'nowrap',
-              animation: 'scroll-marquee 25s linear infinite',
+              animation: 'scroll-marquee 22s linear infinite',
               fontFamily: 'Gyrotrope, sans-serif',
               fontSize: '18px',
               fontWeight: '600',
@@ -344,10 +344,10 @@ const ResponsiveHeroSection = () => {
             }
           }
         `}</style>
-      </motion.div>
+      </Motion.div>
 
       {/* Bottom Right Decorative Stripes - Pixel Perfect */}
-      <motion.div
+      <Motion.div
         initial={{ opacity: 0, x: 20 }}
         animate={{ opacity: 1, x: 0 }}
         transition={{ duration: 0.8, delay: 0.9 }}
@@ -383,7 +383,7 @@ const ResponsiveHeroSection = () => {
             borderRadius: '2px 2px 0 0'
           }}
         />
-      </motion.div>
+      </Motion.div>
     </div>
   );
 };

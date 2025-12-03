@@ -1,7 +1,7 @@
 
 const MedicineCard = () => {
   return (
-    <motion.div
+    <Motion.div
       initial={{ x: -100, opacity: 0 }}
       animate={{ x: 0, opacity: 1 }}
       transition={{ duration: 0.8, ease: "easeOut" }}
@@ -11,7 +11,7 @@ const MedicineCard = () => {
       <div className="flex justify-center mb-6">
         <div className="relative">
           {/* Using the actual medicine character image */}
-          <motion.img
+          <Motion.img
             src="/src/assets/images/medicine-character.png"
             alt="Medicine Character"
             animate={{ 
@@ -27,7 +27,7 @@ const MedicineCard = () => {
           />
 
           {/* Sparkle effects around the character */}
-          <motion.div
+          <Motion.div
             animate={{ 
               scale: [1, 1.3, 1],
               opacity: [0.4, 1, 0.4]
@@ -38,8 +38,8 @@ const MedicineCard = () => {
               ease: "easeInOut"
             }}
             className="absolute w-2 h-2 rounded-full -top-2 -left-2 bg-cyan-400"
-          ></motion.div>
-          <motion.div
+          ></Motion.div>
+          <Motion.div
             animate={{ 
               scale: [1, 1.2, 1],
               opacity: [0.3, 0.8, 0.3]
@@ -51,8 +51,8 @@ const MedicineCard = () => {
               delay: 0.8
             }}
             className="absolute -top-1 -right-3 w-1.5 h-1.5 bg-teal-300 rounded-full"
-          ></motion.div>
-          <motion.div
+          ></Motion.div>
+          <Motion.div
             animate={{ 
               scale: [1, 1.1, 1],
               opacity: [0.4, 0.9, 0.4]
@@ -64,8 +64,8 @@ const MedicineCard = () => {
               delay: 1.2
             }}
             className="absolute w-1 h-1 bg-blue-300 rounded-full -bottom-1 -left-3"
-          ></motion.div>
-          <motion.div
+          ></Motion.div>
+          <Motion.div
             animate={{ 
               scale: [1, 1.4, 1],
               opacity: [0.2, 0.7, 0.2]
@@ -77,12 +77,12 @@ const MedicineCard = () => {
               delay: 1.8
             }}
             className="absolute w-1 h-1 bg-purple-300 rounded-full top-4 -right-4"
-          ></motion.div>
+          ></Motion.div>
         </div>
       </div>
 
       {/* Text Content */}
-      <motion.div
+      <Motion.div
         initial={{ opacity: 0, y: 20 }}
         animate={{ opacity: 1, y: 0 }}
         transition={{ delay: 0.5, duration: 0.6 }}
@@ -94,8 +94,8 @@ const MedicineCard = () => {
         <p className="text-sm leading-relaxed text-gray-700">
           Price For best <span className="text-[#4ECDC4] font-semibold">Quality Medicine</span>
         </p>
-      </motion.div>
-    </motion.div>
+      </Motion.div>
+    </Motion.div>
   );
 };
 

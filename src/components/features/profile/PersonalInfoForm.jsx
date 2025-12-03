@@ -1,20 +1,18 @@
 import React from 'react';
-import { motion } from 'framer-motion';
+import { motion as Motion } from 'framer-motion';
 import { Edit2, Save, X } from 'lucide-react';
 
 const PersonalInfoForm = ({
     profileData,
     tempData,
     isEditing,
-    setIsEditing,
-    setTempData,
-    handleEdit,
+        handleEdit,
     handleSave,
     handleCancel,
     handleInputChange
 }) => {
     return (
-        <motion.div
+        <Motion.div
             initial={{ opacity: 0, y: 20 }}
             animate={{ opacity: 1, y: 0 }}
             className="bg-white rounded-xl shadow-sm p-6"
@@ -222,7 +220,7 @@ const PersonalInfoForm = ({
                     />
                 </div>
             </div>
-        </motion.div>
+        </Motion.div>
     );
 };
 

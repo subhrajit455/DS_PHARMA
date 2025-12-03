@@ -1,5 +1,5 @@
 import React from 'react';
-import { motion } from 'framer-motion';
+import { motion as Motion } from 'framer-motion';
 import { ChevronUp, ChevronDown, ChevronLeft, ChevronRight } from 'lucide-react';
 
 const ProductImageGallery = ({ images, selectedImage, onImageSelect, onScroll }) => {
@@ -18,7 +18,7 @@ const ProductImageGallery = ({ images, selectedImage, onImageSelect, onScroll })
 
         <div className="flex flex-row gap-3 overflow-x-auto md:flex-col md:overflow-hidden" style={{ maxHeight: '350px' }}>
           {images.map((image, index) => (
-            <motion.button
+            <Motion.button
               key={index}
               onClick={() => onImageSelect(index)}
               className={`w-16 h-16 md:w-20 md:h-20 rounded-lg overflow-hidden border-2 transition-all shrink-0 ${selectedImage === index
@@ -33,7 +33,7 @@ const ProductImageGallery = ({ images, selectedImage, onImageSelect, onScroll })
                 alt={`Product view ${index + 1}`}
                 className="object-cover w-full h-full"
               />
-            </motion.button>
+            </Motion.button>
           ))}
         </div>
 
@@ -49,7 +49,7 @@ const ProductImageGallery = ({ images, selectedImage, onImageSelect, onScroll })
 
       {/* Main Image */}
       <div className="relative flex-1 overflow-hidden bg-white border border-gray-200 rounded-lg shadow-sm group">
-        <motion.img
+        <Motion.img
           key={selectedImage}
           src={images[selectedImage]}
           alt="Product"

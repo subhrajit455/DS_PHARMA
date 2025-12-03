@@ -1,5 +1,5 @@
 import React from 'react';
-import { motion } from 'framer-motion';
+import { motion as Motion } from 'framer-motion';
 import { PharmacyProductCard } from '@/components/features/product';
 
 const ProductCategorySection = ({
@@ -83,7 +83,7 @@ const ProductCategorySection = ({
 
         {/* Products Grid - Compact Responsive Layout */}
         <div className="relative flex justify-center w-full">
-          <motion.div
+          <Motion.div
             className="flex w-full overflow-x-auto pb-4 hide-scrollbar sm:grid sm:grid-cols-3 md:grid-cols-4 lg:grid-cols-5 sm:gap-6 lg:gap-8 max-w-7xl sm:justify-items-center sm:pb-0"
             style={{
               scrollbarWidth: 'none',
@@ -96,12 +96,12 @@ const ProductCategorySection = ({
             viewport={{ once: true, margin: "-20px" }}
           >
             {/* Show all products */}
-            {products.map((product, index) => (
-              <motion.div
+            {products.map((product, _index) => (
+              <Motion.div
                 key={product.id}
                 variants={itemVariants}
                 transition={{
-                  delay: index * 0.08,
+                  delay: _index * 0.08,
                   duration: 0.5,
                   ease: "easeOut"
                 }}
@@ -113,9 +113,9 @@ const ProductCategorySection = ({
                   onCardClick={onProductClick}
                   className="w-full h-full"
                 />
-              </motion.div>
+              </Motion.div>
             ))}
-          </motion.div>
+          </Motion.div>
 
 
         </div>

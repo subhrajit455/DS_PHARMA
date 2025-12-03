@@ -1,6 +1,6 @@
 import React from "react";
 import { useNavigate, useParams } from "react-router-dom";
-import { Card, Button } from "@/components/common";
+import { Card, Button } from "@/components/ui";
 import {
   OrderProductCard,
   DeliveryAddressCard,

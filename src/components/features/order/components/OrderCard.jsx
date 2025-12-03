@@ -1,5 +1,5 @@
 import React from 'react';
-import { motion } from 'framer-motion';
+import { motion as Motion } from 'framer-motion';
 import { useNavigate } from 'react-router-dom';
 
 const OrderCard = ({ order, index }) => {
@@ -69,7 +69,7 @@ const OrderCard = ({ order, index }) => {
   };
 
   return (
-    <motion.div
+    <Motion.div
       key={order.id}
       initial={{ opacity: 0, y: 15 }}
       animate={{ opacity: 1, y: 0 }}
@@ -152,7 +152,7 @@ const OrderCard = ({ order, index }) => {
           </div>
         </div>
       </div>
-    </motion.div>
+    </Motion.div>
   );
 };
 

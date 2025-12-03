@@ -1,5 +1,5 @@
 import React from 'react';
-import { motion } from 'framer-motion';
+import { motion as Motion } from 'framer-motion';
 import { Lock, Phone } from 'lucide-react';
 
 const SecuritySettings = () => {
@@ -10,7 +10,7 @@ const SecuritySettings = () => {
     ];
 
     return (
-        <motion.div
+        <Motion.div
             initial={{ opacity: 0, y: 20 }}
             animate={{ opacity: 1, y: 0 }}
             className="bg-white rounded-xl shadow-sm p-4 md:p-8"
@@ -20,7 +20,7 @@ const SecuritySettings = () => {
             </h2>
             <div className="space-y-5">
                 {/* Change Password */}
-                <motion.div
+                <Motion.div
                     whileHover={{ scale: 1.01 }}
                     className="border-2 border-gray-200 rounded-xl p-5 hover:border-teal-400 transition-all bg-gradient-to-r from-white to-gray-50"
                 >
@@ -39,18 +39,18 @@ const SecuritySettings = () => {
                                 <p className="text-xs text-gray-500 mt-1">Keep your account secure with a strong password</p>
                             </div>
                         </div>
-                        <motion.button
+                        <Motion.button
                             whileHover={{ scale: 1.05 }}
                             whileTap={{ scale: 0.95 }}
                             className="px-5 py-2.5 text-sm font-semibold text-teal-600 border-2 border-teal-600 rounded-lg hover:bg-teal-50 transition-colors"
                         >
                             Update Password
-                        </motion.button>
+                        </Motion.button>
                     </div>
-                </motion.div>
+                </Motion.div>
 
                 {/* Two-Factor Authentication */}
-                <motion.div
+                <Motion.div
                     whileHover={{ scale: 1.01 }}
                     className="border-2 border-gray-200 rounded-xl p-5 hover:border-teal-400 transition-all bg-gradient-to-r from-white to-gray-50"
                 >
@@ -69,18 +69,18 @@ const SecuritySettings = () => {
                                 <p className="text-xs text-gray-500 mt-1">Add an extra layer of security to your account</p>
                             </div>
                         </div>
-                        <motion.button
+                        <Motion.button
                             whileHover={{ scale: 1.05 }}
                             whileTap={{ scale: 0.95 }}
                             className="px-5 py-2.5 text-sm font-semibold text-white bg-gradient-to-r from-purple-500 to-purple-600 rounded-lg hover:from-purple-600 hover:to-purple-700 transition-all shadow-md"
                         >
                             Enable 2FA
-                        </motion.button>
+                        </Motion.button>
                     </div>
-                </motion.div>
+                </Motion.div>
 
                 {/* Login Activity */}
-                <motion.div
+                <Motion.div
                     whileHover={{ scale: 1.01 }}
                     className="border-2 border-gray-200 rounded-xl p-5 hover:border-teal-400 transition-all bg-gradient-to-r from-white to-gray-50"
                 >
@@ -119,9 +119,9 @@ const SecuritySettings = () => {
                             </div>
                         ))}
                     </div>
-                </motion.div>
+                </Motion.div>
             </div>
-        </motion.div>
+        </Motion.div>
     );
 };
 

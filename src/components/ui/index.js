@@ -18,8 +18,8 @@ export { default as CategoryIcon } from './CategoryIcon';
 export { default as Navigation } from './Navigation';
 export { default as ScrollToTop } from './ScrollToTop';
 
-// Data & Mock Files
-export { default as mockData } from './mockData';
+// Note: mockData.js uses named exports (SAMPLE_TIMELINE_DATA, SAMPLE_ORDER_DATA, etc.)
+// Import these directly from '@/components/ui/mockData' where needed
 
 // ⚠️ NOTE: Feature-specific components have been moved to /components/features/
 // - ProductImageGallery, ProductPriceSection, ProductActionButtons, ProductDescription → /components/features/product/components/
