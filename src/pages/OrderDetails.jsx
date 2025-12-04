@@ -9,14 +9,19 @@ import {
 } from "@/components/features/order";
 import { AppliedCouponCard } from "@/components/features/payment";
 import SuggestedItemsSection from "@/components/sections/SuggestedItemsSection";
+import { useOrderDetails } from "@/hooks/queries/useOrders";
 
 import medicineImage from '../assets/images/medicine.jpeg';
 
 const OrderDetails = () => {
   const navigate = useNavigate();
-  useParams();
+  const { id } = useParams();
+  
+  // Fetch order details using React Query
+  const { data: orderData } = useOrderDetails(id);
 
-  const order = {
+  // Mock data as fallback
+  const mockOrder = {
     id: "964368966",
     trackingId: "EKFC9469943995",
     courierName: "EKART",
@@ -49,6 +54,9 @@ const OrderDetails = () => {
       discount: 200
     }
   };
+
+  // Use real data if available, otherwise mock
+  const order = orderData || mockOrder;
 
   const suggestedItems = [
     { id: 1, name: 'Paracetamol', price: 12, originalPrice: 15, discount: 5, image: medicineImage },

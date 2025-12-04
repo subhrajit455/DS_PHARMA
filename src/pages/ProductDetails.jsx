@@ -9,15 +9,23 @@ import {
   ProductDescription
 } from '@/components/features/product';
 import SuggestedItemsSection from '@/components/sections/SuggestedItemsSection';
+import { useProductDetails } from '@/hooks/queries/useProductDetails';
+import { useAddToCart } from '@/hooks/mutations/useAddToCart';
+
 
 import medicineImage from '../assets/images/medicine.jpeg';
 
 const ProductDetails = () => {
   const navigate = useNavigate();
-  useParams();
+  const { id } = useParams();
   const [selectedImage, setSelectedImage] = useState(0);
-
-  const product = {
+  
+  // Queries and Mutations
+  const { data: productData } = useProductDetails(id);
+  const { mutate: addToCart, isPending: isAddingToCart } = useAddToCart();
+  
+  // Mock data as fallback (since backend might not be ready)
+  const mockProduct = {
     id: 1,
     name: 'Pharmeasy Fish Oil 1000mg Soft Gelatin 60 Capsules',
     price: 1500,
@@ -37,6 +45,9 @@ const ProductDetails = () => {
     }
   };
 
+  // Use real data if available, otherwise mock
+  const product = productData || mockProduct;
+
   const suggestedItems = [
     { id: 1, name: 'Paracetamol', price: 12, originalPrice: 15, discount: 5, image: medicineImage },
     { id: 2, name: 'Paracetamol', price: 12, originalPrice: 15, discount: 5, image: medicineImage },
@@ -51,6 +62,20 @@ const ProductDetails = () => {
     } else if (direction === 'down' && selectedImage < product.images.length - 1) {
       setSelectedImage(selectedImage + 1);
     }
+  };
+
+  const handleAddToCart = () => {
+    addToCart({
+      product: {
+        id: product.id,
+        name: product.name,
+        price: product.price,
+        originalPrice: product.originalPrice || product.price,
+        discount: product.discount || 0,
+        image: product.images[0],
+      },
+      quantity: 1
+    });
   };
 
   return (
@@ -129,8 +154,9 @@ const ProductDetails = () => {
                   />
 
                   <ProductActionButtons
-                    onAddToCart={() => navigate('/cart')}
+                    onAddToCart={handleAddToCart}
                     onViewCart={() => navigate('/cart')}
+                    isAdding={isAddingToCart}
                   />
                 </div>
               </div>

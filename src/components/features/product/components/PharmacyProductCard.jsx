@@ -1,8 +1,7 @@
 import React from 'react';
-/* eslint-disable-next-line no-unused-vars */
 import { motion as Motion } from 'framer-motion';
-import { Heart } from 'lucide-react';
 import { useNavigate } from 'react-router-dom';
+import { useAddToCart } from '../../../../hooks/mutations/useAddToCart';
 import CartIcon from '../../../../assets/icons/Cart.png';
 
 const PharmacyProductCard = ({
@@ -14,11 +13,11 @@ const PharmacyProductCard = ({
   quantity,
   unit = 'piece',
   imageUrl,
-  onAddToCart = () => { },
   onCardClick = () => { },
   className = ''
 }) => {
   const navigate = useNavigate();
+  const { mutate: addToCart, isPending } = useAddToCart();
 
   const discountPercentage = originalPrice && price
     ? Math.round(((originalPrice - price) / originalPrice) * 100)
@@ -26,7 +25,19 @@ const PharmacyProductCard = ({
 
   const handleAddToCart = (e) => {
     e.stopPropagation();
-    onAddToCart({ id, name, price, quantity, unit });
+    addToCart({
+      product: { 
+        id, 
+        name, 
+        price, 
+        originalPrice: originalPrice || price,
+        discount: discountPercentage || 0,
+        quantity, 
+        unit, 
+        image: imageUrl 
+      },
+      quantity: 1
+    });
   };
 
   const handleCardClick = () => {
@@ -96,7 +107,8 @@ const PharmacyProductCard = ({
         {/* Cart Icon - Positioned absolutely */}
         <button
           onClick={handleAddToCart}
-          className="absolute flex items-center justify-center transition-all duration-200 -translate-y-1/2 rounded-full shadow-md cursor-pointer right-0 top-1/2 hover:scale-110 focus:outline-none w-7 h-7 sm:w-[35px] sm:h-[35px]"
+          disabled={isPending}
+          className={`absolute flex items-center justify-center transition-all duration-200 -translate-y-1/2 rounded-full shadow-md cursor-pointer right-0 top-1/2 hover:scale-110 focus:outline-none w-7 h-7 sm:w-[35px] sm:h-[35px] ${isPending ? 'opacity-50' : ''}`}
           aria-label={`Add ${name} to cart`}
           style={{
             backgroundColor: '#f5f5f5',

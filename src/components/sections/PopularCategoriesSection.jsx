@@ -5,7 +5,7 @@ const PopularCategoriesSection = ({
   categories = [], // Accept categories from backend
   onCategoryClick = () => { } // Callback for category click
 }) => {
-  const [hoveredCategory, setHoveredCategory] = useState(null);
+  const [, setHoveredCategory] = useState(null);
 
   // Default/fallback categories if none provided
   const defaultCategories = [
@@ -124,7 +124,7 @@ const PopularCategoriesSection = ({
             gap: '1rem' // Gap for mobile flex layout
           }}
         >
-          {displayCategories.map((category, index) => (
+          {displayCategories.map((category) => (
             <Motion.div
               key={category.id}
               variants={itemVariants}

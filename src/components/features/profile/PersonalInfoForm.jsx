@@ -9,7 +9,8 @@ const PersonalInfoForm = ({
         handleEdit,
     handleSave,
     handleCancel,
-    handleInputChange
+    handleInputChange,
+    isSaving
 }) => {
     return (
         <Motion.div
@@ -41,12 +42,17 @@ const PersonalInfoForm = ({
                     <div className="gap-1 md:gap-2" style={{ padding: '5px 0px' }}>
                         <button
                             onClick={handleSave}
-                            className="flex items-center gap-1 md:gap-2 px-2 py-1 md:px-4 md:py-2 text-xs md:text-sm font-semibold text-white transition-colors bg-green-500 rounded-lg cursor-pointer hover:bg-green-600"
+                            disabled={isSaving}
+                            className={`flex items-center gap-1 md:gap-2 px-2 py-1 md:px-4 md:py-2 text-xs md:text-sm font-semibold text-white transition-colors bg-green-500 rounded-lg cursor-pointer hover:bg-green-600 ${isSaving ? 'opacity-50 cursor-not-allowed' : ''}`}
                             style={{ fontFamily: 'Gyrotrope', padding: '2px 5px' }}
                         >
-                            <Save className="w-3 h-3 md:w-4 md:h-4" />
-                            <span className="hidden sm:inline">Save</span>
-                            <span className="sm:hidden">Save</span>
+                            {isSaving ? (
+                                <div className="w-3 h-3 md:w-4 md:h-4 border-2 border-white border-t-transparent rounded-full animate-spin"></div>
+                            ) : (
+                                <Save className="w-3 h-3 md:w-4 md:h-4" />
+                            )}
+                            <span className="hidden sm:inline">{isSaving ? 'Saving...' : 'Save'}</span>
+                            <span className="sm:hidden">{isSaving ? '...' : 'Save'}</span>
                         </button>
                         <button
                             onClick={handleCancel}

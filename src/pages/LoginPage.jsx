@@ -1,17 +1,17 @@
 import React, { useState } from 'react';
-import { Link, useNavigate } from 'react-router-dom';
+import { Link } from 'react-router-dom';
 import { AuthCard, InputField, SocialLogin } from '@/components/features/auth';
 import Button from '@/components/ui/Button';
+import { useLogin } from '@/hooks/mutations/useLogin';
 
 const LoginPage = () => {
-    const navigate = useNavigate();
+    const { mutate: login, isPending } = useLogin();
     const [formData, setFormData] = useState({
         email: '',
         password: '',
         rememberMe: false
     });
     const [errors, setErrors] = useState({});
-    const [isLoading, setIsLoading] = useState(false);
 
     const validateForm = () => {
         const newErrors = {};
@@ -34,18 +34,11 @@ const LoginPage = () => {
     const handleSubmit = async (e) => {
         e.preventDefault();
         if (validateForm()) {
-            setIsLoading(true);
-            try {
-                // Simulate API call
-                await new Promise(resolve => setTimeout(resolve, 1000));
-                console.log('Login successful', formData);
-                navigate('/'); // Redirect to home after login
-            } catch (err) {
-                console.error(err);
-                setErrors({ submit: 'Failed to sign in. Please try again.' });
-            } finally {
-                setIsLoading(false);
-            }
+            login({
+                email: formData.email,
+                password: formData.password,
+                rememberMe: formData.rememberMe
+            });
         }
     };
 
@@ -116,19 +109,13 @@ const LoginPage = () => {
                     </div>
                 </div>
 
-                {errors.submit && (
-                    <div className="text-sm text-red-600 text-center bg-red-50 p-2 rounded">
-                        {errors.submit}
-                    </div>
-                )}
-
                 <Button
                     type="submit"
                     variant="primary"
                     size="full"
-                    disabled={isLoading}
+                    disabled={isPending}
                 >
-                    {isLoading ? 'Signing in...' : 'Sign In'}
+                    {isPending ? 'Signing in...' : 'Sign In'}
                 </Button>
             </form>
 

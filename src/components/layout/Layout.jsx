@@ -1,6 +1,6 @@
 import React from 'react';
 import { Outlet } from 'react-router-dom';
-import Navigation from '../ui/Navigation';
+import Navigation from '../navigation';
 import Footer from '../sections/Footer';
 import ScrollToTop from '../ui/ScrollToTop';
 

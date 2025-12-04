@@ -1,10 +1,11 @@
 import React, { useState } from 'react';
-import { Link, useNavigate } from 'react-router-dom';
+import { Link } from 'react-router-dom';
 import { AuthCard, InputField, SocialLogin, TermsModal } from '@/components/features/auth';
 import Button from '@/components/ui/Button';
+import { useSignup } from '@/hooks/mutations/useSignup';
 
 const SignupPage = () => {
-    const navigate = useNavigate();
+    const { mutate: signup, isPending } = useSignup();
     const [formData, setFormData] = useState({
         fullName: '',
         email: '',
@@ -14,7 +15,6 @@ const SignupPage = () => {
         agreeToTerms: false
     });
     const [errors, setErrors] = useState({});
-    const [isLoading, setIsLoading] = useState(false);
     const [showTerms, setShowTerms] = useState(false);
 
     const validateForm = () => {
@@ -57,18 +57,12 @@ const SignupPage = () => {
     const handleSubmit = async (e) => {
         e.preventDefault();
         if (validateForm()) {
-            setIsLoading(true);
-            try {
-                // Simulate API call
-                await new Promise(resolve => setTimeout(resolve, 1000));
-                console.log('Signup successful', formData);
-                navigate('/login'); // Redirect to login after signup
-            } catch (err) {
-                console.error(err);
-                setErrors({ submit: 'Failed to create account. Please try again.' });
-            } finally {
-                setIsLoading(false);
-            }
+            signup({
+                fullName: formData.fullName,
+                email: formData.email,
+                phone: formData.phone,
+                password: formData.password
+            });
         }
     };
 
@@ -161,19 +155,13 @@ const SignupPage = () => {
                         </div>
                     </div>
 
-                    {errors.submit && (
-                        <div className="text-sm text-red-600 text-center bg-red-50 p-2 rounded">
-                            {errors.submit}
-                        </div>
-                    )}
-
                     <Button
                         type="submit"
                         variant="primary"
                         size="full"
-                        disabled={isLoading}
+                        disabled={isPending}
                     >
-                        {isLoading ? 'Creating Account...' : 'Sign Up'}
+                        {isPending ? 'Creating Account...' : 'Sign Up'}
                     </Button>
                 </form>
 

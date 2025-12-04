@@ -3,11 +3,16 @@ import { Search } from 'lucide-react';
 import { PharmacyProductCard } from '@/components/features/product';
 import { OrderCard } from '@/components/features/order';
 import SuggestedItemsSection from '@/components/sections/SuggestedItemsSection';
+import { useOrders } from '@/hooks/queries/useOrders';
 
 const Orders = () => {
   const [searchQuery, setSearchQuery] = useState('');
+  
+  // Fetch orders using React Query
+  const { data: ordersData } = useOrders();
 
-  const orders = [
+  // Mock data as fallback
+  const mockOrders = [
     {
       id: '964368966',
       productName: 'Pharmeasy Fish Oil 1000mg Soft Gelatin 60 Capsules',
@@ -82,6 +87,9 @@ const Orders = () => {
       image: '/src/assets/images/medicine.jpeg'
     }
   ];
+
+  // Use real data if available, otherwise mock
+  const orders = ordersData || mockOrders;
 
   const suggestedItems = [
     {
@@ -227,7 +235,21 @@ const Orders = () => {
           </div>
 
           {/* Orders List */}
-          <div className="space-y-3 mb-8 md:mb-12 lg:mb-16 mt-4 md:mt-8 lg:mt-12">
+          <div 
+            className="space-y-3 mb-8 md:mb-12 lg:mb-16 mt-4 md:mt-8 lg:mt-12"
+            style={{
+              maxHeight: '600px',
+              overflowY: 'auto',
+              paddingRight: '5px',
+              scrollbarWidth: 'none', // Firefox
+              msOverflowStyle: 'none', // IE and Edge
+            }}
+          >
+            <style>{`
+              .space-y-3::-webkit-scrollbar {
+                display: none; /* Chrome, Safari, Opera */
+              }
+            `}</style>
             {orders.map((order, index) => (
               <OrderCard key={order.id} order={order} index={index} />
             ))}
@@ -251,3 +273,6 @@ const Orders = () => {
 };
 
 export default Orders;
+
+
+

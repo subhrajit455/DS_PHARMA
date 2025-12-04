@@ -13,7 +13,8 @@ const CartItem = ({ item, onUpdateQuantity, onRemove }) => {
         borderRadius: '12px',
         padding: '10px',
         boxShadow: '0 1px 2px rgba(0, 0, 0, 0.06)',
-        border: '1px solid #64E5B8'
+        border: '1px solid #64E5B8',
+        marginBottom: '10px'
       }}
     >
       <div className="flex gap-4">
@@ -41,14 +42,18 @@ const CartItem = ({ item, onUpdateQuantity, onRemove }) => {
                 paddingTop: '8px'
               }}>
                 <span className="font-gyrotrope text-xs md:text-[16px] font-bold text-black">
-                  ₹{item.price}
+                  ₹{item.price || 0}
                 </span>
-                <span className="font-gyrotrope text-xs md:text-[13px] font-normal text-gray-400 line-through">
-                  ₹{item.originalPrice}
-                </span>
-                <span className="font-gyrotrope text-[10px] md:text-[11px] font-semibold text-emerald-500 bg-emerald-100 px-1.5 py-0.5 rounded">
-                  {item.discount}% Off
-                </span>
+                {item.originalPrice && item.originalPrice !== item.price && (
+                  <span className="font-gyrotrope text-xs md:text-[13px] font-normal text-gray-400 line-through">
+                    ₹{item.originalPrice}
+                  </span>
+                )}
+                {item.discount > 0 && (
+                  <span className="font-gyrotrope text-[10px] md:text-[11px] font-semibold text-emerald-500 bg-emerald-100 px-1.5 py-0.5 rounded">
+                    {item.discount}% Off
+                  </span>
+                )}
               </div>
 
             </div>
@@ -80,7 +85,7 @@ const CartItem = ({ item, onUpdateQuantity, onRemove }) => {
                   <Minus size={14} strokeWidth={2.5} />
                 </button>
                 <span className="font-gyrotrope text-xs md:text-sm font-semibold text-black min-w-[24px] text-center">
-                  {item.quantity}
+                  {item.quantity || 1}
                 </span>
                 <button
                   onClick={() => onUpdateQuantity(item.id, 1)}

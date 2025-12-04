@@ -3,21 +3,12 @@ import { PharmacyProductCard } from '@/components/features/product';
 import { CartItem } from '@/components/features/cart';
 import { OrderSummary } from '@/components/features/order';
 import SuggestedItemsSection from '@/components/sections/SuggestedItemsSection';
+import { useCartStore } from '@/store/useCartStore';
 
 import medicineImage from '../assets/images/medicine.jpeg';
 
 const CartDetails = () => {
-  const [cartItems, setCartItems] = useState([
-    {
-      id: 1,
-      name: 'Pharmeasy Fish Oil 1000mg Soft Gelatin 60 Capsules',
-      price: 1500,
-      originalPrice: 1800,
-      discount: 25,
-      quantity: 1,
-      image: medicineImage
-    }
-  ]);
+  const { items: cartItems, updateQuantity: updateCartQuantity, removeItem: removeCartItem } = useCartStore();
 
   const [couponCode, setCouponCode] = useState('');
   const [deliveryAddress] = useState({
@@ -70,23 +61,25 @@ const CartDetails = () => {
   ];
 
   const updateQuantity = (id, delta) => {
-    setCartItems(items =>
-      items.map(item =>
-        item.id === id
-          ? { ...item, quantity: Math.max(1, item.quantity + delta) }
-          : item
-      )
-    );
+    const item = cartItems.find(i => i.id === id);
+    if (item) {
+      updateCartQuantity(id, Math.max(1, item.quantity + delta));
+    }
   };
 
   const removeItem = (id) => {
-    setCartItems(items => items.filter(item => item.id !== id));
+    removeCartItem(id);
   };
 
   const calculateTotals = () => {
     const totalCartValue = cartItems.reduce((sum, item) => sum + (item.price * item.quantity), 0);
-    const discount = cartItems.reduce((sum, item) => sum + ((item.originalPrice - item.price) * item.quantity), 0);
-    const coupon = 0;
+    // Assuming originalPrice is available in the item object, otherwise default to price
+    const discount = cartItems.reduce((sum, item) => {
+      const originalPrice = item.originalPrice || item.price;
+      return sum + ((originalPrice - item.price) * item.quantity);
+    }, 0);
+    
+    const coupon = 0; // Implement coupon logic if needed
     const gst = Math.round(totalCartValue * 0.18);
     const deliveryCharges = 40;
     const total = totalCartValue - discount - coupon + gst + deliveryCharges;
@@ -139,15 +132,36 @@ const CartDetails = () => {
             </div>
 
             {/* Cart Items List */}
-            <div className="space-y-3">
-              {cartItems.map((item) => (
-                <CartItem
-                  key={item.id}
-                  item={item}
-                  onUpdateQuantity={updateQuantity}
-                  onRemove={removeItem}
-                />
-              ))}
+            <div 
+              className="space-y-3" 
+              style={{
+                maxHeight: '500px',
+                overflowY: 'auto',
+                paddingRight: '5px',
+                scrollbarWidth: 'none', // Firefox
+                msOverflowStyle: 'none', // IE and Edge
+              }}
+            >
+              <style>{`
+                .space-y-3::-webkit-scrollbar {
+                  display: none; /* Chrome, Safari, Opera */
+                }
+              `}</style>
+              {cartItems.length > 0 ? (
+                cartItems.map((item) => (
+                  <CartItem
+                    key={item.id}
+                    item={item}
+                    onUpdateQuantity={updateQuantity}
+                    onRemove={removeItem}
+                    
+                  />
+                ))
+              ) : (
+                <div className="p-8 text-center bg-white rounded-lg shadow-sm">
+                  <p className="text-gray-500" style={{ fontFamily: 'Gyrotrope', padding: '10px', marginTop: '10px' }}>Your cart is empty</p>
+                </div>
+              )}
             </div>
 
 

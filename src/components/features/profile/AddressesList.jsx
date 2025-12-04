@@ -1,12 +1,33 @@
 import React from 'react';
 import { motion as Motion } from 'framer-motion';
 import { MapPin, Edit2 } from 'lucide-react';
+import { useAddresses, useUpdateAddress } from '@/hooks/queries/useAddresses';
 
 const AddressesList = () => {
-    const addresses = [
-        { type: 'Home', name: 'Gourav Gupta', address: 'A/B, Section Lane, Odisha, Noida', pincode: '744115', phone: '+91 9999999999', isDefault: true },
-        { type: 'Work', name: 'Gourav Gupta', address: '123 Business Park, Sector 62', pincode: '201301', phone: '+91 9999999999', isDefault: false }
+    // Fetch addresses using React Query
+    const { data: addressesData, isLoading } = useAddresses();
+    const { mutate: updateAddress } = useUpdateAddress();
+
+    // Mock data as fallback
+    const mockAddresses = [
+        { id: 1, type: 'Home', name: 'Gourav Gupta', address: 'A/B, Section Lane, Odisha, Noida', pincode: '744115', phone: '+91 9999999999', isDefault: true },
+        { id: 2, type: 'Work', name: 'Gourav Gupta', address: '123 Business Park, Sector 62', pincode: '201301', phone: '+91 9999999999', isDefault: false }
     ];
+
+    const addresses = addressesData?.data || mockAddresses;
+
+    const handleSetDefault = (id) => {
+        // Optimistically update or just call API
+        updateAddress({ id, data: { isDefault: true } });
+    };
+
+    if (isLoading) {
+        return (
+            <div className="flex justify-center p-8">
+                <div className="w-8 h-8 border-4 border-teal-500 rounded-full border-t-transparent animate-spin"></div>
+            </div>
+        );
+    }
 
     return (
         <Motion.div
@@ -30,7 +51,7 @@ const AddressesList = () => {
             <div className="grid grid-cols-1 lg:grid-cols-2 gap-4">
                 {addresses.map((addr, index) => (
                     <Motion.div
-                        key={index}
+                        key={addr.id || index}
                         whileHover={{ scale: 1.02, boxShadow: '0 10px 25px rgba(0,0,0,0.1)' }}
                         className="border-2 border-gray-200 rounded-xl p-5 hover:border-teal-400 transition-all bg-gradient-to-br from-white to-gray-50 relative"
                     >
@@ -67,7 +88,10 @@ const AddressesList = () => {
                                 Edit
                             </button>
                             {!addr.isDefault && (
-                                <button className="flex-1 px-3 py-2 text-sm font-medium text-gray-600 border border-gray-300 rounded-lg hover:bg-gray-50 transition-colors">
+                                <button 
+                                    onClick={() => handleSetDefault(addr.id)}
+                                    className="flex-1 px-3 py-2 text-sm font-medium text-gray-600 border border-gray-300 rounded-lg hover:bg-gray-50 transition-colors"
+                                >
                                     Set Default
                                 </button>
                             )}

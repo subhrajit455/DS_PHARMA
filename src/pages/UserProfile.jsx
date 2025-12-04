@@ -1,4 +1,4 @@
-import React, { useState } from 'react';
+import React, { useState, useEffect } from 'react';
 import { useNavigate } from 'react-router-dom';
 import { Heart, ShoppingBag, Package, CreditCard, MapPin, Lock, User, ArrowLeft } from 'lucide-react';
 import Footer from '@/components/sections/Footer';
@@ -9,13 +9,28 @@ import PersonalInfoForm from '@/components/features/profile/PersonalInfoForm';
 import OrdersList from '@/components/features/profile/OrdersList';
 import AddressesList from '@/components/features/profile/AddressesList';
 import SecuritySettings from '@/components/features/profile/SecuritySettings';
+import { useProfile, useUpdateProfile } from '@/hooks/queries/useProfile';
+import { useAuthStore } from '@/store/useAuthStore';
 
 const UserProfile = () => {
   const navigate = useNavigate();
+  const { isAuthenticated } = useAuthStore();
   const [isEditing, setIsEditing] = useState(false);
   const [activeTab, setActiveTab] = useState('profile');
 
-  const [profileData, setProfileData] = useState({
+  // Redirect if not authenticated
+  useEffect(() => {
+    if (!isAuthenticated) {
+      navigate('/login');
+    }
+  }, [isAuthenticated, navigate]);
+
+  // Fetch profile data
+  const { data: profileDataResponse, isLoading } = useProfile();
+  const { mutate: updateProfile, isPending: isUpdating } = useUpdateProfile();
+
+  // Mock data as fallback
+  const mockProfileData = {
     firstName: 'Gourav',
     lastName: 'Gupta',
     email: 'gourav.gupta@example.com',
@@ -29,9 +44,18 @@ const UserProfile = () => {
       pincode: '744115',
       country: 'India'
     }
-  });
+  };
+
+  const profileData = profileDataResponse?.data || mockProfileData;
 
   const [tempData, setTempData] = useState({ ...profileData });
+
+  // Update tempData when profileData changes (e.g. after fetch)
+  useEffect(() => {
+    if (profileData) {
+      setTempData({ ...profileData });
+    }
+  }, [profileData]);
 
   const stats = [
     { icon: ShoppingBag, label: 'Total Orders', value: '24' },
@@ -53,8 +77,11 @@ const UserProfile = () => {
   };
 
   const handleSave = () => {
-    setProfileData({ ...tempData });
-    setIsEditing(false);
+    updateProfile(tempData, {
+      onSuccess: () => {
+        setIsEditing(false);
+      }
+    });
   };
 
   const handleCancel = () => {
@@ -79,6 +106,14 @@ const UserProfile = () => {
       }));
     }
   };
+
+  if (isLoading) {
+    return (
+      <div className="flex items-center justify-center min-h-screen">
+        <div className="w-12 h-12 border-4 border-orange-500 rounded-full border-t-transparent animate-spin"></div>
+      </div>
+    );
+  }
 
   return (
     <div className="flex flex-col w-full min-h-screen bg-gray-50">
@@ -130,6 +165,7 @@ const UserProfile = () => {
                 handleSave={handleSave}
                 handleCancel={handleCancel}
                 handleInputChange={handleInputChange}
+                isSaving={isUpdating}
               />
             )}
 
