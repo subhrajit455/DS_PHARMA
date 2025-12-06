@@ -20,12 +20,8 @@ const AboutUsSection = () => {
         <div className="relative">
           {/* Main Content Box */}
           <div
-            className="relative overflow-visible pr-6 lg:pr-[240px] min-h-[200px] lg:min-h-[310px]"
+            className="relative overflow-visible pr-6 lg:pr-[240px] min-h-[200px] lg:min-h-[310px] bg-[#68F2EC80] lg:bg-transparent rounded-2xl"
             style={{
-              backgroundImage: `url(${Exclude})`,
-              backgroundSize: 'cover',
-              backgroundPosition: 'center',
-              borderRadius: '16px',
               height: 'auto',
               paddingTop: '1rem',
               paddingBottom: '1.5rem',
@@ -33,6 +29,19 @@ const AboutUsSection = () => {
               position: 'relative'
             }}
           >
+            {/* Background Image - Visible only on LG screens */}
+            <div 
+              className="absolute inset-0 hidden lg:block rounded-2xl"
+              style={{
+                backgroundImage: `url(${Exclude})`,
+                backgroundSize: 'cover',
+                backgroundPosition: 'center',
+                zIndex: 0
+              }}
+            />
+            
+            {/* Content Wrapper to ensure z-index above background */}
+            <div className="relative z-10">
             {/* About Us Title Badge */}
             <Motion.div
               initial={{ opacity: 0, y: -10 }}
@@ -41,8 +50,8 @@ const AboutUsSection = () => {
               transition={{ duration: 0.4 }}
               className="absolute"
               style={{
-                top: '6px',
-                left: '10px',
+                top: '4px',
+                left: '-15px',
                 boxShadow: 'none',
                 borderBottom: 'none'
               }}
@@ -50,9 +59,9 @@ const AboutUsSection = () => {
               <h2
                 style={{
                   fontFamily: 'Gyrotrope',
-                  fontSize: 'clamp(18px, 4vw, 20px)',
+                  fontSize: 'clamp(22px, 4vw, 20px)',
                   fontWeight: 600,
-                  lineHeight: '1.3',
+                  lineHeight: '0.1',
                   letterSpacing: '0em',
                   color: '#000000',
                   margin: 0,
@@ -63,21 +72,31 @@ const AboutUsSection = () => {
               </h2>
             </Motion.div>
 
-            {/* Content Area - Minimal Layout */}
+            {/* Content Area */}
             <Motion.div
               initial={{ opacity: 0 }}
               whileInView={{ opacity: 1 }}
               viewport={{ once: true }}
               transition={{ duration: 0.5, delay: 0.15 }}
+              className="text-left mt-12 sm:mt-14 lg:mt-16 max-w-full sm:max-w-[85%] lg:max-w-[75%]"
               style={{
-                paddingTop: '2rem',
-                paddingBottom: '0.5rem',
+                padding: '2rem 0rem',
                 height: '100%',
-                minHeight: '220px'
               }}
             >
-              {/* Empty content area - Design shows minimal layout */}
+              <p className="text-xs sm:text-md lg:text-base text-gray-700 leading-relaxed font-medium">
+                At <span className="font-bold text-emerald-600">DS Pharma</span>, we are committed to providing high-quality healthcare products and services. 
+                Our mission is to make health and wellness accessible to everyone. 
+                With a wide range of medicines, personal care items, and medical equipment, we are your trusted partner in health.
+              </p>
+              
+              <div className="text-left mt-4 lg:mt-6">
+                <button className="text-xs sm:text-sm font-bold text-emerald-700 hover:text-emerald-800 underline underline-offset-4 transition-colors">
+                  Learn more about our journey →
+                </button>
+              </div>
             </Motion.div>
+            </div>
           </div>
 
           {/* Frame 5 Background - Bottom Right */}
@@ -86,7 +105,7 @@ const AboutUsSection = () => {
             whileInView={{ opacity: 1, scale: 1 }}
             viewport={{ once: true }}
             transition={{ duration: 0.5, delay: 0.2 }}
-            className="absolute block right-0 -bottom-5 w-[140px] h-[100px] lg:w-[240px] lg:h-[160px] lg:-bottom-[35px]"
+            className="hidden absolute lg:block right-0 -bottom-5 w-[140px] h-[100px] lg:w-[240px] lg:h-[160px] lg:-bottom-[35px]"
             style={{
               zIndex: 5
             }}
@@ -111,7 +130,7 @@ const AboutUsSection = () => {
             whileInView={{ opacity: 1, x: 0, scale: 1 }}
             viewport={{ once: true }}
             transition={{ duration: 0.5, delay: 0.35, ease: [0.25, 0.1, 0.25, 1] }}
-            className="absolute block -right-[10px] bottom-[10px] w-[140px] h-[140px] lg:-right-[20px] lg:bottom-[20px] lg:w-[240px] lg:h-[240px]"
+            className="absolute hidden md:block -right-[10px] bottom-[10px] w-[140px] h-[140px] lg:-right-[20px] lg:bottom-[20px] lg:w-[240px] lg:h-[240px]"
             style={{
               zIndex: 10
             }}

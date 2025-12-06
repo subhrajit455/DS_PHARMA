@@ -1,37 +1,33 @@
 // Mock Authentication Service using localStorage
 // This provides fully functional login/signup without a backend
 
+import { USERS } from "@/data/userData";
+
 const USERS_KEY = "ds-pharma-users";
-const DEMO_USER = {
-  id: 1,
-  name: "Gourav Gupta",
-  email: "demo@dspharma.com",
-  password: "demo123", // In production, passwords should be hashed
-  phone: "+91 9999999999",
-  dateOfBirth: "1995-05-15",
-  gender: "Male",
-  address: {
-    street: "A/B, Section Lane",
-    city: "Odisha",
-    state: "Noida",
-    pincode: "744115",
-    country: "India",
-  },
-};
 
-// Initialize demo user in localStorage
-const initializeDemoUser = () => {
-  const users = JSON.parse(localStorage.getItem(USERS_KEY) || "[]");
-  const demoExists = users.find((u) => u.email === DEMO_USER.email);
+// Initialize demo users in localStorage
+const initializeDemoUsers = () => {
+  const existingUsers = JSON.parse(localStorage.getItem(USERS_KEY) || "[]");
 
-  if (!demoExists) {
-    users.push(DEMO_USER);
-    localStorage.setItem(USERS_KEY, JSON.stringify(users));
+  if (existingUsers.length === 0) {
+    localStorage.setItem(USERS_KEY, JSON.stringify(USERS));
+  } else {
+    // Optional: Merge new mock users if they don't exist
+    let updated = false;
+    USERS.forEach((mockUser) => {
+      if (!existingUsers.find((u) => u.email === mockUser.email)) {
+        existingUsers.push(mockUser);
+        updated = true;
+      }
+    });
+    if (updated) {
+      localStorage.setItem(USERS_KEY, JSON.stringify(existingUsers));
+    }
   }
 };
 
 // Initialize on module load
-initializeDemoUser();
+initializeDemoUsers();
 
 export const mockAuthService = {
   /**
@@ -173,7 +169,7 @@ export const mockAuthService = {
               },
             });
           }
-        // eslint-disable-next-line no-unused-vars
+          // eslint-disable-next-line no-unused-vars
         } catch (_error) {
           reject({
             response: {
@@ -216,7 +212,7 @@ export const mockAuthService = {
               },
             });
           }
-        // eslint-disable-next-line no-unused-vars
+          // eslint-disable-next-line no-unused-vars
         } catch (_error) {
           reject({
             response: {

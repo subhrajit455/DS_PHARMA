@@ -1,45 +1,14 @@
 import React, { useState, useEffect, useRef, useCallback } from 'react';
 import { motion as Motion, AnimatePresence } from 'framer-motion';
 
+import { BANNERS } from '@/data/sampleData';
+
 const BannerSection = () => {
   const [currentIndex, setCurrentIndex] = useState(0);
   const [isHovered, setIsHovered] = useState(false);
   const intervalRef = useRef(null);
 
-  const banners = [
-    {
-      id: 1,
-      image: '/src/assets/images/Rectangle 10.png',
-      alt: 'Health & Wellness Banner',
-      title: 'Health & Wellness',
-      bgColor: 'bg-emerald-300',
-      link: '/health-wellness'
-    },
-    {
-      id: 2,
-      image: '/src/assets/images/Rectangle 11.png',
-      alt: 'Medical Equipment Banner',
-      title: 'Medical Equipment',
-      bgColor: 'bg-red-800',
-      link: '/medical-equipment'
-    },
-    {
-      id: 3,
-      image: '/src/assets/images/Rectangle 12.png',
-      alt: 'Prescription Medicines Banner',
-      title: 'Prescription Medicines',
-      bgColor: 'bg-cyan-300',
-      link: '/prescription-medicines'
-    },
-    {
-      id: 4,
-      image: '/src/assets/images/Rectangle 13.png',
-      alt: 'Personal Care Banner',
-      title: 'Personal Care',
-      bgColor: 'bg-orange-400',
-      link: '/personal-care'
-    }
-  ];
+  const banners = BANNERS;
 
   const startAutoSlide = useCallback(() => {
     if (intervalRef.current) clearInterval(intervalRef.current);
@@ -119,6 +88,10 @@ const BannerSection = () => {
                           alt={banner.alt}
                           className="w-full h-full object-cover transition-transform duration-500 group-hover:scale-110"
                           loading="lazy"
+                          onError={(e) => {
+                            e.target.onerror = null;
+                            e.target.src = '/src/assets/images/medicine.jpeg';
+                          }}
                         />
 
                         {/* Overlay for better text readability */}
@@ -187,7 +160,7 @@ const BannerSection = () => {
           {/* Banner Grid - Compact Layout */}
           <div className="w-full flex justify-center">
             <Motion.div
-              className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-6 sm:gap-6 lg:gap-8 w-full max-w-7xl justify-items-center"
+              className="grid grid-cols-1 sm:grid-cols-4 lg:grid-cols-4 gap-6 sm:gap-6 lg:gap-8 w-full max-w-7xl justify-items-center"
               initial="hidden"
               whileInView="visible"
               viewport={{ once: true, margin: "-30px" }}
@@ -243,6 +216,10 @@ const BannerSection = () => {
                         alt={banner.alt}
                         className="w-full h-full object-cover transition-transform duration-500 group-hover:scale-110"
                         loading="lazy"
+                        onError={(e) => {
+                          e.target.onerror = null;
+                          e.target.src = '/src/assets/images/medicine.jpeg';
+                        }}
                       />
 
                       {/* Overlay for better text readability */}

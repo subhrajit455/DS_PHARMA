@@ -1,7 +1,6 @@
 import { useNavigate } from 'react-router-dom';
 import { useAuthStore } from '../../store/useAuthStore';
 import { useCartStore } from '../../store/useCartStore';
-import { useNavigationSearch } from './hooks/useNavigationSearch';
 import { useActiveNavItem } from './hooks/useActiveNavItem';
 import { DesktopNavigation } from './DesktopNavigation';
 import { MobileTopBar } from './MobileTopBar';
@@ -15,8 +14,6 @@ const Navigation = () => {
   const { user, isAuthenticated } = useAuthStore();
   const totalCartItems = useCartStore((state) => state.getTotalItems());
   const activeItem = useActiveNavItem();
-  
-  const searchProps = useNavigationSearch();
 
   const handleNavClick = (itemName, href) => {
     if (href.startsWith('/')) {
@@ -29,12 +26,7 @@ const Navigation = () => {
     }
   };
 
-  const handleProductSelect = (product) => {
-    navigate(`/product/${product.id}`);
-    searchProps.setSearchQuery('');
-    searchProps.setIsSearchOpen(false);
-    searchProps.setSelectedIndex(-1);
-  };
+
 
   return (
     <>
@@ -120,8 +112,6 @@ const Navigation = () => {
       <DesktopNavigation
         activeItem={activeItem}
         onNavClick={handleNavClick}
-        onProductSelect={handleProductSelect}
-        searchProps={searchProps}
         totalCartItems={totalCartItems}
         isAuthenticated={isAuthenticated}
         user={user}

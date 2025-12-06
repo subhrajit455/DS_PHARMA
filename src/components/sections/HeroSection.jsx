@@ -18,6 +18,7 @@ const ResponsiveHeroSection = () => {
     >
       {/* Main Hero Content */}
       <div className="relative flex flex-col items-center justify-center max-w-7xl mx-auto min-h-[60vh] sm:min-h-[calc(100vh-140px)] pb-0 mt-[50px]"
+      style={{ width: '100%', maxWidth: '1280px', margin: '0 auto' }}
       >
         <MobileTitle />
         <BackgroundText />

@@ -58,7 +58,7 @@ const ForgotPasswordPage = () => {
                         Did not receive the email? Check your spam filter, or
                         <button
                             onClick={() => setIsSubmitted(false)}
-                            className="text-orange-600 hover:text-orange-500 font-medium ml-1"
+                            className="text-emerald-600 hover:text-emerald-500 font-medium ml-1"
                         >
                             try another email address
                         </button>

@@ -1,5 +1,6 @@
 import { motion as Motion } from 'framer-motion';
 import { useState } from 'react';
+import { CATEGORY_DETAILS } from '@/data/sampleData';
 
 const PopularCategoriesSection = ({
   categories = [], // Accept categories from backend
@@ -7,36 +8,8 @@ const PopularCategoriesSection = ({
 }) => {
   const [, setHoveredCategory] = useState(null);
 
-  // Default/fallback categories if none provided
-  const defaultCategories = [
-    {
-      id: 1,
-      name: 'Diabetes',
-      image: '/src/assets/images/medicine.jpeg',
-      alt: 'Diabetes care products and medications'
-    },
-    {
-      id: 2,
-      name: 'Heart Care',
-      image: '/src/assets/images/medicine.jpeg',
-      alt: 'Heart care products'
-    },
-    {
-      id: 3,
-      name: 'Vitamins',
-      image: '/src/assets/images/medicine.jpeg',
-      alt: 'Vitamins and supplements'
-    },
-    {
-      id: 4,
-      name: 'Pain Relief',
-      image: '/src/assets/images/medicine.jpeg',
-      alt: 'Pain relief medications'
-    }
-  ];
-
-  // Use provided categories or fallback to default
-  const displayCategories = categories.length > 0 ? categories : defaultCategories;
+  // Use provided categories or fallback to mock data
+  const displayCategories = categories.length > 0 ? categories : CATEGORY_DETAILS;
 
   const containerVariants = {
     hidden: { opacity: 0 },
@@ -117,7 +90,7 @@ const PopularCategoriesSection = ({
           initial="hidden"
           whileInView="visible"
           viewport={{ once: true }}
-          className="flex overflow-x-auto pb-4 hide-scrollbar w-full sm:grid sm:grid-cols-3 md:grid-cols-4 lg:grid-cols-5 xl:grid-cols-6 sm:gap-0.5 md:gap-1 sm:max-w-2xl sm:xl:max-w-3xl sm:ml-12 lg:ml-16 sm:overflow-visible sm:pb-0"
+          className="flex overflow-x-auto pb-4 hide-scrollbar w-full grid-col sm:gap-0.5 md:gap-1 sm:max-w-2xl sm:xl:max-w-3xl sm:ml-12 lg:ml-16 sm:overflow-visible sm:pb-0"
           style={{
             scrollbarWidth: 'none',
             msOverflowStyle: 'none',
@@ -128,7 +101,7 @@ const PopularCategoriesSection = ({
             <Motion.div
               key={category.id}
               variants={itemVariants}
-              className="flex flex-col items-center group cursor-pointer shrink-0 sm:shrink sm:w-auto"
+              className="flex flex-col items-center group cursor-pointer shrink-0 sm:shrink sm:w-auto max-w-[100px]"
               style={{
                 // Mobile width handled by class or default behavior
               }}
@@ -170,6 +143,10 @@ const PopularCategoriesSection = ({
                     alt={category.alt}
                     className="w-full h-full object-cover object-center transition-transform duration-300 group-hover:scale-110"
                     loading="lazy"
+                    onError={(e) => {
+                      e.target.onerror = null;
+                      e.target.src = '/src/assets/images/medicine.jpeg';
+                    }}
                   />
                 </div>
               </Motion.div>

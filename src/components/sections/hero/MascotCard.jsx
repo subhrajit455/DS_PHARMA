@@ -6,12 +6,14 @@ export const MascotCard = () => {
       initial={{ opacity: 0, x: -30, y: 20 }}
       animate={{ opacity: 1, x: 0, y: 0 }}
       transition={{ duration: 0.8, delay: 0.7 }}
-      className="hidden md:block absolute bottom-0 left-8  lg:left-12 z-30 "
+      className="hidden md:block absolute bottom-0 left-2  z-30 md:w-[240px] lg:w-[420px] gap-1"
+      style={{padding: '20px'}}
     >
+    <div className="flex flex-col items-center justify-center md:gap-14 lg:gap-19">
       {/* Mascot Image */}
       <div className="mb-5 flex justify-center items-center"
       style={{
-        marginBottom: '100px',
+        
       }}>
         <img
           src="/src/assets/images/medicine-character.png"
@@ -21,7 +23,10 @@ export const MascotCard = () => {
       </div>
 
       {/* Text Content */}
-      <div className="text-center bg-white rounded-[20px] p-5 shadow-[0_10px_40px_rgba(0,0,0,0.15)] max-w-[340px] lg:max-w-[360px]">
+      <div className="text-center bg-white rounded-[20px] p-5 shadow-[0_10px_40px_rgba(0,0,0,0.15)] max-w-[340px] lg:max-w-[400px]"
+      style={{
+        padding: '10px 20px',
+      }}>
         <p
           className="text-base font-medium text-[#2D3748] leading-normal m-0 tracking-[0.01em] md:text-xs lg:text-base"
           style={{
@@ -34,6 +39,7 @@ export const MascotCard = () => {
           <span className="text-[#2D3748]">Price For best </span>
           <span className="text-[#4FD1C7] font-bold text-[17px] md:text-[13px] lg:text-[17px]">Quality Medicine</span>
         </p>
+      </div>
       </div>
     </Motion.div>
   );

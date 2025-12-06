@@ -12,8 +12,7 @@ import SuggestedItemsSection from '@/components/sections/SuggestedItemsSection';
 import { useProductDetails } from '@/hooks/queries/useProductDetails';
 import { useAddToCart } from '@/hooks/mutations/useAddToCart';
 
-
-import medicineImage from '../assets/images/medicine.jpeg';
+import { PRODUCTS } from '@/data/sampleData';
 
 const ProductDetails = () => {
   const navigate = useNavigate();
@@ -24,37 +23,26 @@ const ProductDetails = () => {
   const { data: productData } = useProductDetails(id);
   const { mutate: addToCart, isPending: isAddingToCart } = useAddToCart();
   
-  // Mock data as fallback (since backend might not be ready)
+  // Find product from mock data
+  const mockProductRaw = PRODUCTS.find(p => p.id === id) || PRODUCTS[0];
+  
+  // Enhance mock product with extra details expected by the UI if missing
   const mockProduct = {
-    id: 1,
-    name: 'Pharmeasy Fish Oil 1000mg Soft Gelatin 60 Capsules',
-    price: 1500,
-    originalPrice: 1800,
-    discount: 25,
-    stock: 15,
-    images: [
-      medicineImage,
-      medicineImage,
-      medicineImage,
-      medicineImage,
-      medicineImage
-    ],
+    ...mockProductRaw,
+    images: mockProductRaw.image ? [mockProductRaw.image, mockProductRaw.image, mockProductRaw.image] : [],
+    stock: mockProductRaw.inStock ? 50 : 0,
+    originalPrice: mockProductRaw.mrp,
+    discount: Math.round(((mockProductRaw.mrp - mockProductRaw.price) / mockProductRaw.mrp) * 100) || 0,
     specialOffer: {
-      title: '15% off on SBI Cards',
-      code: 'T&C Applied'
+        title: 'Bank Offer: 10% instant discount',
+        code: 'SBI10'
     }
   };
 
   // Use real data if available, otherwise mock
   const product = productData || mockProduct;
 
-  const suggestedItems = [
-    { id: 1, name: 'Paracetamol', price: 12, originalPrice: 15, discount: 5, image: medicineImage },
-    { id: 2, name: 'Paracetamol', price: 12, originalPrice: 15, discount: 5, image: medicineImage },
-    { id: 3, name: 'Paracetamol', price: 12, originalPrice: 15, discount: 5, image: medicineImage },
-    { id: 4, name: 'Paracetamol', price: 12, originalPrice: 15, discount: 5, image: medicineImage },
-    { id: 5, name: 'Paracetamol', price: 12, originalPrice: 15, discount: 5, image: medicineImage }
-  ];
+  const suggestedItems = PRODUCTS.filter(p => p.category === product.category && p.id !== product.id).slice(0, 5);
 
   const scrollThumbnails = (direction) => {
     if (direction === 'up' && selectedImage > 0) {

@@ -13,11 +13,15 @@ const PharmacyProductCard = ({
   quantity,
   unit = 'piece',
   imageUrl,
+  image,
   onCardClick = () => { },
   className = ''
 }) => {
   const navigate = useNavigate();
   const { mutate: addToCart, isPending } = useAddToCart();
+
+  // Handle image prop variation (image vs imageUrl)
+  const displayImage = imageUrl || image || '/src/assets/images/medicine.jpeg';
 
   const discountPercentage = originalPrice && price
     ? Math.round(((originalPrice - price) / originalPrice) * 100)
@@ -34,7 +38,7 @@ const PharmacyProductCard = ({
         discount: discountPercentage || 0,
         quantity, 
         unit, 
-        image: imageUrl 
+        image: displayImage 
       },
       quantity: 1
     });
@@ -67,10 +71,14 @@ const PharmacyProductCard = ({
       {/* Product Image */}
       <div className="relative overflow-hidden aspect-4/3 bg-linear-to-br from-sky-100 to-sky-200">
         <img
-          src={imageUrl}
+          src={displayImage}
           alt={name}
           className="object-cover w-full h-full px-2 py-2"
           loading="lazy"
+          onError={(e) => {
+            e.target.onerror = null; 
+            e.target.src = '/src/assets/images/medicine.jpeg';
+          }}
         />
         {/* Dark shadow gradient on upper half */}
         <div

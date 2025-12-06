@@ -5,7 +5,7 @@ import { OrderSummary } from '@/components/features/order';
 import SuggestedItemsSection from '@/components/sections/SuggestedItemsSection';
 import { useCartStore } from '@/store/useCartStore';
 
-import medicineImage from '../assets/images/medicine.jpeg';
+import { PRODUCTS } from '@/data/sampleData';
 
 const CartDetails = () => {
   const { items: cartItems, updateQuantity: updateCartQuantity, removeItem: removeCartItem } = useCartStore();
@@ -17,48 +17,12 @@ const CartDetails = () => {
     address: 'A/B, Section Lane, Odisha, Noida, 744115'
   });
 
-  const suggestedItems = [
-    {
-      id: 1,
-      name: 'Paracetamol',
-      price: 12,
-      originalPrice: 15,
-      discount: 5,
-      image: medicineImage
-    },
-    {
-      id: 2,
-      name: 'Paracetamol',
-      price: 12,
-      originalPrice: 15,
-      discount: 5,
-      image: medicineImage
-    },
-    {
-      id: 3,
-      name: 'Paracetamol',
-      price: 12,
-      originalPrice: 15,
-      discount: 5,
-      image: medicineImage
-    },
-    {
-      id: 4,
-      name: 'Paracetamol',
-      price: 12,
-      originalPrice: 15,
-      discount: 5,
-      image: medicineImage
-    },
-    {
-      id: 5,
-      name: 'Paracetamol',
-      price: 12,
-      originalPrice: 15,
-      discount: 5,
-      image: medicineImage
-    }
-  ];
+  // Use products from sampleData for suggestions
+  const suggestedItems = PRODUCTS.slice(0, 5).map(p => ({
+    ...p,
+    // Ensure properties match what SuggestedItemsSection expects
+    image: p.image || p.imageUrl 
+  }));
 
   const updateQuantity = (id, delta) => {
     const item = cartItems.find(i => i.id === id);

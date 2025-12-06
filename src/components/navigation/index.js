@@ -6,7 +6,6 @@ export { DesktopNavigation } from "./DesktopNavigation";
 export { MobileTopBar } from "./MobileTopBar";
 export { MobileBottomNav } from "./MobileBottomNav";
 export { SearchBar } from "./SearchBar";
-export { SearchDropdown } from "./SearchDropdown";
 export { CartButton } from "./CartButton";
 export { UserProfileButton } from "./UserProfileButton";
 

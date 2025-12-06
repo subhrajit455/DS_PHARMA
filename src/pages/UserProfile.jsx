@@ -12,6 +12,8 @@ import SecuritySettings from '@/components/features/profile/SecuritySettings';
 import { useProfile, useUpdateProfile } from '@/hooks/queries/useProfile';
 import { useAuthStore } from '@/store/useAuthStore';
 
+import { USERS } from '@/data/userData';
+
 const UserProfile = () => {
   const navigate = useNavigate();
   const { isAuthenticated } = useAuthStore();
@@ -30,21 +32,7 @@ const UserProfile = () => {
   const { mutate: updateProfile, isPending: isUpdating } = useUpdateProfile();
 
   // Mock data as fallback
-  const mockProfileData = {
-    firstName: 'Gourav',
-    lastName: 'Gupta',
-    email: 'gourav.gupta@example.com',
-    phone: '+91 9999999999',
-    dateOfBirth: '1995-05-15',
-    gender: 'Male',
-    address: {
-      street: 'A/B, Section Lane',
-      city: 'Odisha',
-      state: 'Noida',
-      pincode: '744115',
-      country: 'India'
-    }
-  };
+  const mockProfileData = USERS[0];
 
   const profileData = profileDataResponse?.data || mockProfileData;
 
@@ -110,19 +98,22 @@ const UserProfile = () => {
   if (isLoading) {
     return (
       <div className="flex items-center justify-center min-h-screen">
-        <div className="w-12 h-12 border-4 border-orange-500 rounded-full border-t-transparent animate-spin"></div>
+        <div className="w-12 h-12 border-4 border-emerald-500 rounded-full border-t-transparent animate-spin"></div>
       </div>
     );
   }
 
   return (
     <div className="flex flex-col w-full min-h-screen bg-gray-50">
-      <main className="grow w-full mx-auto mt-8">
+      <main className="grow w-full max-w-7xl mx-auto mt-8"
+      style={{ width: '100%', maxWidth: '1280px', margin: '0 auto' }}
+      >
         <style>{`
           @media (max-width: 639px) {
             .user-profile-container {
               padding-left: 5px !important;
               padding-right: 5px !important;
+              padding-bottom: 80px !important;
             }
           }
           @media (min-width: 640px) and (max-width: 1290px) {
@@ -132,8 +123,8 @@ const UserProfile = () => {
             }
           }
         `}</style>
-        <div className="user-profile-container w-full px-4 pt-4 pb-20 lg:px-16 lg:py-16" style={{ padding: '10px' }}>
-          <div className="mx-auto">
+        <div className="user-profile-container w-full min-h-[800px] px-4 pt-4 pb-20 lg:px-16 lg:py-16" style={{ padding: '10px' }}>
+          <div className="mx-auto ">
             {/* Back Button */}
             <button
               onClick={() => navigate(-1)}
@@ -145,7 +136,7 @@ const UserProfile = () => {
             </button>
 
             {/* Header Section */}
-            <div className="p-4 mb-6 shadow-lg bg-linear-to-r from-teal-400 to-cyan-400 rounded-2xl md:p-8" style={{ padding: '10px' }}>
+            <div className="p-4 mb-6 shadow-lg bg-linear-to-r from-emerald-500 to-teal-500 rounded-2xl md:p-8" style={{ padding: '10px' }}>
               <ProfileHeader profileData={profileData} />
               <ProfileStats stats={stats} />
             </div>

@@ -84,11 +84,10 @@ const ProductCategorySection = ({
         {/* Products Grid - Compact Responsive Layout */}
         <div className="relative flex justify-center w-full">
           <Motion.div
-            className="flex w-full overflow-x-auto pb-4 hide-scrollbar sm:grid sm:grid-cols-3 md:grid-cols-4 lg:grid-cols-5 sm:gap-6 lg:gap-8 max-w-7xl sm:justify-items-center sm:pb-0"
+            className="flex w-full overflow-x-auto pb-4 hide-scrollbar gap-4 px-4 sm:gap-6 lg:gap-8"
             style={{
               scrollbarWidth: 'none',
               msOverflowStyle: 'none',
-              gap: '1rem'
             }}
             variants={containerVariants}
             initial="hidden"
@@ -105,7 +104,7 @@ const ProductCategorySection = ({
                   duration: 0.5,
                   ease: "easeOut"
                 }}
-                className="w-[calc(50%-0.5rem)] min-w-[160px] shrink-0 sm:w-auto sm:min-w-0 sm:shrink sm:max-w-60"
+                className="w-[160px] shrink-0 sm:w-[220px]"
               >
                 <PharmacyProductCard
                   {...product}

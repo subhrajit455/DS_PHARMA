@@ -4,6 +4,8 @@ import { PharmacyProductCard } from '@/components/features/product';
 import { OrderCard } from '@/components/features/order';
 import SuggestedItemsSection from '@/components/sections/SuggestedItemsSection';
 import { useOrders } from '@/hooks/queries/useOrders';
+import { PRODUCTS } from '@/data/sampleData';
+import { MOCK_ORDERS } from '@/data/userData';
 
 const Orders = () => {
   const [searchQuery, setSearchQuery] = useState('');
@@ -12,127 +14,16 @@ const Orders = () => {
   const { data: ordersData } = useOrders();
 
   // Mock data as fallback
-  const mockOrders = [
-    {
-      id: '964368966',
-      productName: 'Pharmeasy Fish Oil 1000mg Soft Gelatin 60 Capsules',
-      customerName: 'Gourav Gupta',
-      phone: '4664938723',
-      address: 'A/B, Section Lane, Odisha, Noida, 744115',
-      status: 'In Process',
-      statusColor: '#FF7A59',
-      statusBg: '#FF7A59',
-      expectedDelivery: '18th Dec, 2025',
-      image: '/src/assets/images/medicine.jpeg'
-    },
-    {
-      id: '964368967',
-      productName: 'Pharmeasy Fish Oil 1000mg Soft Gelatin 60 Capsules',
-      customerName: 'Gourav Gupta',
-      phone: '4664938723',
-      address: 'A/B, Section Lane, Odisha, Noida, 744115',
-      status: 'Waiting For Pick Up',
-      statusColor: '#FF8C6B',
-      statusBg: '#FF8C6B',
-      expectedDelivery: '18th Dec, 2025',
-      image: '/src/assets/images/medicine.jpeg'
-    },
-    {
-      id: '964368968',
-      productName: 'Pharmeasy Fish Oil 1000mg Soft Gelatin 60 Capsules',
-      customerName: 'Gourav Gupta',
-      phone: '4664938723',
-      address: 'A/B, Section Lane, Odisha, Noida, 744115',
-      status: 'On the Way',
-      statusColor: '#FF9E7D',
-      statusBg: '#FF9E7D',
-      expectedDelivery: '18th Dec, 2025',
-      image: '/src/assets/images/medicine.jpeg'
-    },
-    {
-      id: '964368969',
-      productName: 'Pharmeasy Fish Oil 1000mg Soft Gelatin 60 Capsules',
-      customerName: 'Gourav Gupta',
-      phone: '4664938723',
-      address: 'A/B, Section Lane, Odisha, Noida, 744115',
-      status: 'Out For Delivery',
-      statusColor: '#5FD4A0',
-      statusBg: '#5FD4A0',
-      phoneNumber: '+919999999999 Ext. 121',
-      expectedDelivery: '18th Dec, 2025',
-      image: '/src/assets/images/medicine.jpeg'
-    },
-    {
-      id: '964368970',
-      productName: 'Pharmeasy Fish Oil 1000mg Soft Gelatin 60 Capsules',
-      customerName: 'Gourav Gupta',
-      phone: '4664938723',
-      address: 'A/B, Section Lane, Odisha, Noida, 744115',
-      status: 'Delivered',
-      statusColor: '#059669',
-      statusBg: '#059669',
-      deliveredDate: '17 Dec, 2025',
-      image: '/src/assets/images/medicine.jpeg'
-    },
-    {
-      id: '964368971',
-      productName: 'Pharmeasy Fish Oil 1000mg Soft Gelatin 60 Capsules',
-      customerName: 'Gourav Gupta',
-      phone: '4664938723',
-      address: 'A/B, Section Lane, Odisha, Noida, 744115',
-      status: 'Returned',
-      statusColor: '#FF6B6B',
-      statusBg: '#FF6B6B',
-      deliveredDate: '17 Dec, 2025',
-      image: '/src/assets/images/medicine.jpeg'
-    }
-  ];
+  const mockOrders = MOCK_ORDERS;
 
   // Use real data if available, otherwise mock
   const orders = ordersData || mockOrders;
 
-  const suggestedItems = [
-    {
-      id: 1,
-      name: 'Paracetamol',
-      price: 12,
-      originalPrice: 15,
-      discount: 5,
-      image: '/src/assets/images/medicine.jpeg'
-    },
-    {
-      id: 2,
-      name: 'Paracetamol',
-      price: 12,
-      originalPrice: 15,
-      discount: 5,
-      image: '/src/assets/images/medicine.jpeg'
-    },
-    {
-      id: 3,
-      name: 'Paracetamol',
-      price: 12,
-      originalPrice: 15,
-      discount: 5,
-      image: '/src/assets/images/medicine.jpeg'
-    },
-    {
-      id: 4,
-      name: 'Paracetamol',
-      price: 12,
-      originalPrice: 15,
-      discount: 5,
-      image: '/src/assets/images/medicine.jpeg'
-    },
-    {
-      id: 5,
-      name: 'Paracetamol',
-      price: 12,
-      originalPrice: 15,
-      discount: 5,
-      image: '/src/assets/images/medicine.jpeg'
-    }
-  ];
+  // Use products from sampleData for suggestions
+  const suggestedItems = PRODUCTS.slice(0, 5).map(p => ({
+    ...p,
+    image: p.image || p.imageUrl 
+  }));
 
 
   return (

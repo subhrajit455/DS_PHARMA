@@ -4,6 +4,9 @@ import { NAV_ITEMS } from './constants';
 import { SearchBar } from './SearchBar';
 import { CartButton } from './CartButton';
 import { UserProfileButton } from './UserProfileButton';
+import SearchInput from '@/components/features/search/SearchInput';
+import { useState, useRef, useEffect } from 'react';
+import { AnimatePresence } from 'framer-motion';
 
 /**
  * Desktop navigation bar component
@@ -11,12 +14,34 @@ import { UserProfileButton } from './UserProfileButton';
 export const DesktopNavigation = ({
   activeItem,
   onNavClick,
-  onProductSelect,
-  searchProps,
   totalCartItems,
   isAuthenticated,
   user
 }) => {
+  const [isSearchOpen, setIsSearchOpen] = useState(false);
+  const searchContainerRef = useRef(null);
+
+  useEffect(() => {
+    const handleClickOutside = (event) => {
+      // Close if clicking outside the nav (search container is inside nav, so this might be tricky if nav has gaps)
+      // Actually, we want to close if clicking outside the search container AND the toggle button.
+      // Since SearchBar is inside the nav, and search container is inside the nav, clicking anywhere inside nav is "safe"?
+      // But nav has transparency/gaps.
+      // Better: Close if click target is not within searchContainerRef AND not within the toggle button.
+      // NOTE: We'll rely on checking if click is inside the nav container for simplicity, or specific refs.
+      
+      const navElement = document.querySelector('.navigation-desktop');
+      if (navElement && !navElement.contains(event.target)) {
+         setIsSearchOpen(false);
+      }
+    };
+
+    if (isSearchOpen) {
+      document.addEventListener('mousedown', handleClickOutside);
+    }
+    return () => document.removeEventListener('mousedown', handleClickOutside);
+  }, [isSearchOpen]);
+
   const handleKeyDown = (event, itemName, href) => {
     if (event.key === 'Enter' || event.key === ' ') {
       event.preventDefault();
@@ -87,9 +112,9 @@ export const DesktopNavigation = ({
         {/* Right Side Icons */}
         <div className="nav-icons-container flex gap-3 items-center flex-1 justify-end">
           <SearchBar
-            {...searchProps}
-            onProductSelect={onProductSelect}
             className="nav-search-icon relative w-[30px] h-[28px] lg:w-[38px] lg:h-[35px] flex items-center justify-center"
+            onClick={() => setIsSearchOpen(!isSearchOpen)}
+            isOpen={isSearchOpen}
           />
           <CartButton totalCartItems={totalCartItems} className="nav-cart-icon w-9 h-9" />
           <UserProfileButton
@@ -100,6 +125,27 @@ export const DesktopNavigation = ({
           />
         </div>
       </div>
+
+      {/* Search Container - Absolute Positioned Below Navbar */}
+      <AnimatePresence>
+        {isSearchOpen && (
+          <Motion.div
+            initial={{ opacity: 0, y: -10 }}
+            animate={{ opacity: 1, y: 0 }}
+            exit={{ opacity: 0, y: -10 }}
+            transition={{ duration: 0.3 }}
+            className="absolute left-0 right-0 z-40 mx-auto flex justify-center"
+            style={{ 
+              top: 'calc(100% + 20px)', 
+              width: '100%', 
+              maxWidth: '600px'
+            }}
+            ref={searchContainerRef}
+          >
+            <SearchInput className="w-full shadow-2xl border border-gray-100/50 backdrop-blur-sm" autoFocus />
+          </Motion.div>
+        )}
+      </AnimatePresence>
     </Motion.nav>
   );
 };

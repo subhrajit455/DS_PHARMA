@@ -142,12 +142,12 @@ const SignupPage = () => {
                                 type="checkbox"
                                 checked={formData.agreeToTerms}
                                 onChange={handleChange}
-                                className="h-4 w-4 text-orange-600 focus:ring-orange-500 border-gray-300 rounded cursor-pointer"
+                                className="h-4 w-4 text-emerald-600 focus:ring-emerald-500 border-gray-300 rounded cursor-pointer"
                             />
                         </div>
                         <div className="ml-2 text-sm" style={{ padding: '2px' }}>
                             <label htmlFor="agree-terms" className="font-medium text-gray-700">
-                                I agree to the <button type="button" onClick={() => setShowTerms(true)} className="text-orange-600 hover:text-orange-400 cursor-pointer" style={{ textDecoration: 'none' }}>Terms and Conditions</button>
+                                I agree to the <button type="button" onClick={() => setShowTerms(true)} className="text-emerald-600 hover:text-emerald-400 cursor-pointer" style={{ textDecoration: 'none' }}>Terms and Conditions</button>
                             </label>
                             {errors.agreeToTerms && (
                                 <p className="text-red-500 text-xs mt-1">{errors.agreeToTerms}</p>
@@ -171,7 +171,7 @@ const SignupPage = () => {
                     <span className="text-gray-600">Already have an account? </span>
                     <Link
                         to="/login"
-                        className="font-medium text-orange-600 hover:text-orange-400"
+                        className="font-medium text-emerald-600 hover:text-emerald-400"
                         style={{ textDecoration: 'none' }}
                     >
                         Sign In

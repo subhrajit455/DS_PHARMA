@@ -6,7 +6,7 @@ export const BackgroundText = () => {
       initial={{ opacity: 0, scale: 0.95 }}
       animate={{ opacity: 1, scale: 1 }}
       transition={{ duration: 1, delay: 0.3, ease: [0.25, 0.1, 0.25, 1] }}
-      className="hidden sm:block absolute top-[20%] lg:top-[42%] md:left-[50%] lg:left-[55%] -translate-x-1/2 -translate-y-1/2 z-1 pointer-events-none text-center"
+      className="hidden sm:block absolute top-[20%] lg:top-[42%] md:left-[50%]  -translate-x-1/2 -translate-y-1/2 z-1 pointer-events-none text-center"
     >
       <h1
         aria-hidden="true"

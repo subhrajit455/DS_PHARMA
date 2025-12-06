@@ -32,6 +32,10 @@ const ProductImageGallery = ({ images, selectedImage, onImageSelect, onScroll })
                 src={image}
                 alt={`Product view ${index + 1}`}
                 className="object-cover w-full h-full"
+                onError={(e) => {
+                  e.target.onerror = null;
+                  e.target.src = '/src/assets/images/medicine.jpeg';
+                }}
               />
             </Motion.button>
           ))}
@@ -51,13 +55,17 @@ const ProductImageGallery = ({ images, selectedImage, onImageSelect, onScroll })
       <div className="relative flex-1 overflow-hidden bg-white border border-gray-200 rounded-lg shadow-sm group">
         <Motion.img
           key={selectedImage}
-          src={images[selectedImage]}
+          src={images && images.length > 0 ? images[selectedImage] : '/src/assets/images/medicine.jpeg'}
           alt="Product"
           className="object-cover w-full h-full"
           initial={{ opacity: 0 }}
           animate={{ opacity: 1 }}
           transition={{ duration: 0.3 }}
           style={{ minHeight: '300px', maxHeight: '420px' }}
+          onError={(e) => {
+            e.target.onerror = null;
+            e.target.src = '/src/assets/images/medicine.jpeg';
+          }}
         />
 
         {/* Mobile Navigation Buttons */}

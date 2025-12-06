@@ -1,61 +1,18 @@
 import React from 'react';
 import { motion as Motion } from 'framer-motion';
 import { PharmacyProductCard } from '@/components/features/product';
+import { PRODUCTS } from '@/data/sampleData';
 
 const HighlightedCategorySection = () => {
-  // Sample products data
-  const products = [
-    {
-      id: 1,
-      name: 'Paracetamol',
-      quantity: '12',
-      unit: 'piece',
-      price: 150,
-      originalPrice: 200,
-      discount: 25,
-      imageUrl: '/src/assets/images/medicine.jpeg'
-    },
-    {
-      id: 2,
-      name: 'Paracetamol',
-      quantity: '12',
-      unit: 'piece',
-      price: 150,
-      originalPrice: 200,
-      discount: 25,
-      imageUrl: '/src/assets/images/medicine.jpeg'
-    },
-    {
-      id: 3,
-      name: 'Paracetamol',
-      quantity: '12',
-      unit: 'piece',
-      price: 150,
-      originalPrice: 200,
-      discount: 25,
-      imageUrl: '/src/assets/images/medicine.jpeg'
-    },
-    {
-      id: 4,
-      name: 'Paracetamol',
-      quantity: '12',
-      unit: 'piece',
-      price: 150,
-      originalPrice: 200,
-      discount: 25,
-      imageUrl: '/src/assets/images/medicine.jpeg'
-    },
-    {
-      id: 5,
-      name: 'Paracetamol',
-      quantity: '12',
-      unit: 'piece',
-      price: 150,
-      originalPrice: 200,
-      discount: 25,
-      imageUrl: '/src/assets/images/medicine.jpeg'
-    }
-  ];
+  // Sample products data from mock
+  // Let's highlight Diabetes Care products
+  const products = PRODUCTS.filter(p => p.category === "Diabetes Care").slice(0, 5).map(p => ({
+     ...p,
+     quantity: '1',
+     unit: 'box',
+     imageUrl: p.image, // Map image to imageUrl if card expects it
+     discount: 10 // Default discount if missing
+  }));
 
   const containerVariants = {
     hidden: { opacity: 0 },
@@ -145,7 +102,7 @@ const HighlightedCategorySection = () => {
                 lineHeight: '1.2',
               }}
             >
-              High-lighted Category Title
+              Diabetes Care Bundle
             </span>
           </h2>
           <button
@@ -168,11 +125,10 @@ const HighlightedCategorySection = () => {
         {/* Products Grid - Compact Responsive Layout */}
         <div className="w-full flex justify-center relative">
           <Motion.div
-            className="flex w-full overflow-x-auto pb-4 hide-scrollbar sm:grid sm:grid-cols-3 md:grid-cols-4 lg:grid-cols-5 sm:gap-6 lg:gap-8 max-w-7xl sm:justify-items-center sm:pb-0"
+            className="flex w-full overflow-x-auto pb-4 hide-scrollbar gap-4 px-4 sm:gap-6 lg:gap-8"
             style={{
               scrollbarWidth: 'none',
               msOverflowStyle: 'none',
-              gap: '1rem'
             }}
             variants={containerVariants}
             initial="hidden"
@@ -189,7 +145,7 @@ const HighlightedCategorySection = () => {
                   duration: 0.5,
                   ease: "easeOut"
                 }}
-                className="w-[calc(50%-0.5rem)] min-w-[160px] shrink-0 sm:w-auto sm:min-w-0 sm:shrink sm:max-w-[240px]"
+                className="w-[160px] shrink-0 sm:w-[220px]"
               >
                 <PharmacyProductCard
                   {...product}

@@ -11,7 +11,8 @@ import { AppliedCouponCard } from "@/components/features/payment";
 import SuggestedItemsSection from "@/components/sections/SuggestedItemsSection";
 import { useOrderDetails } from "@/hooks/queries/useOrders";
 
-import medicineImage from '../assets/images/medicine.jpeg';
+import { PRODUCTS } from '@/data/sampleData';
+import { MOCK_ORDERS } from '@/data/userData';
 
 const OrderDetails = () => {
   const navigate = useNavigate();
@@ -21,50 +22,15 @@ const OrderDetails = () => {
   const { data: orderData } = useOrderDetails(id);
 
   // Mock data as fallback
-  const mockOrder = {
-    id: "964368966",
-    trackingId: "EKFC9469943995",
-    courierName: "EKART",
-    productName: "Pharmeasy Fish Oil 1000mg Soft Gelatin 60 Capsules",
-    price: 1500,
-    quantity: 1,
-    image: medicineImage, // Added image property to order if needed, or just for consistency
-    paymentBreakdown: {
-      totalCartValue: 1500,
-      discount: 1000,
-      coupon: 200,
-      gst: 94,
-      deliveryCharges: 40,
-      total: 1364,
-    },
-    timeline: [
-      { status: "Order Placed", completed: true },
-      { status: "On The Way", completed: true, active: true },
-      { status: "Expected Delivery", date: "18th Dec, 2025", completed: false },
-      { status: "Out For Delivery", completed: false },
-      { status: "Delivered", completed: false },
-    ],
-    customerAddress: {
-      name: 'Gourav Gupta',
-      phone: '9999999999',
-      address: 'A/B, Section Lane, Odisha, Noida, 744115'
-    },
-    appliedCoupon: {
-      code: 'SAVE200',
-      discount: 200
-    }
-  };
+  const mockOrder = MOCK_ORDERS.find(o => o.id === id) || MOCK_ORDERS[0];
 
   // Use real data if available, otherwise mock
   const order = orderData || mockOrder;
 
-  const suggestedItems = [
-    { id: 1, name: 'Paracetamol', price: 12, originalPrice: 15, discount: 5, image: medicineImage },
-    { id: 2, name: 'Paracetamol', price: 12, originalPrice: 15, discount: 5, image: medicineImage },
-    { id: 3, name: 'Paracetamol', price: 12, originalPrice: 15, discount: 5, image: medicineImage },
-    { id: 4, name: 'Paracetamol', price: 12, originalPrice: 15, discount: 5, image: medicineImage },
-    { id: 5, name: 'Paracetamol', price: 12, originalPrice: 15, discount: 5, image: medicineImage }
-  ];
+  const suggestedItems = PRODUCTS.slice(0, 5).map(p => ({
+    ...p,
+    image: p.image || p.imageUrl 
+  }));
 
   const handleCancelOrder = () => navigate("/orders");
   const handleChangeAddress = () => console.log("Change address");

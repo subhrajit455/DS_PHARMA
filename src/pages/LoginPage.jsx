@@ -83,7 +83,7 @@ const LoginPage = () => {
                     <div className="flex justify-end">
                         <Link
                             to="/forgot-password"
-                            className="text-sm font-medium text-orange-600 hover:text-orange-500"
+                            className="text-sm font-medium text-emerald-600 hover:text-emerald-500"
                             style={{ textDecoration: 'none' }}
                         >
                             Forgot password?
@@ -99,7 +99,7 @@ const LoginPage = () => {
                             type="checkbox"
                             checked={formData.rememberMe}
                             onChange={handleChange}
-                            className="h-4 w-4 text-orange-600 focus:ring-orange-500 border-gray-300 rounded"
+                            className="h-4 w-4 text-emerald-600 focus:ring-emerald-500 border-gray-300 rounded"
                         />
                     </div>
                     <div className="ml-2 text-sm" style={{ padding: '2px', marginTop: '3px' }}>
@@ -125,7 +125,7 @@ const LoginPage = () => {
                 <span className="text-gray-600">Don't have an account? </span>
                 <Link
                     to="/signup"
-                    className="font-medium text-orange-600 hover:text-orange-500"
+                    className="font-medium text-emerald-600 hover:text-emerald-500"
                     style={{ textDecoration: 'none' }}
                 >
                     Sign Up
