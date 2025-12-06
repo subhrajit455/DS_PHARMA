@@ -102,7 +102,7 @@ const LoginPage = () => {
                             className="h-4 w-4 text-emerald-600 focus:ring-emerald-500 border-gray-300 rounded"
                         />
                     </div>
-                    <div className="ml-2 text-sm" style={{ padding: '2px', marginTop: '3px' }}>
+                    <div className="ml-2 text-base" style={{ padding: '2px', marginTop: '3px' }}>
                         <label htmlFor="remember-me" className="block text-gray-900">
                             Remember me
                         </label>

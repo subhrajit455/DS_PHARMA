@@ -12,7 +12,7 @@ const Input = ({
     <div className="w-full">
       {label && (
         <label
-          className="block mb-2 text-sm font-semibold text-gray-700"
+          className="block mb-2 text-lg font-semibold text-gray-700"
           style={{ fontFamily: 'Gyrotrope' }}
         >
           {label}

@@ -145,7 +145,7 @@ const SignupPage = () => {
                                 className="h-4 w-4 text-emerald-600 focus:ring-emerald-500 border-gray-300 rounded cursor-pointer"
                             />
                         </div>
-                        <div className="ml-2 text-sm" style={{ padding: '2px' }}>
+                        <div className="ml-2 text-base" style={{ padding: '2px' }}>
                             <label htmlFor="agree-terms" className="font-medium text-gray-700">
                                 I agree to the <button type="button" onClick={() => setShowTerms(true)} className="text-emerald-600 hover:text-emerald-400 cursor-pointer" style={{ textDecoration: 'none' }}>Terms and Conditions</button>
                             </label>
