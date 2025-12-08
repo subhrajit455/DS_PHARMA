@@ -6,43 +6,57 @@ import {
   ProductImageGallery,
   ProductPriceSection,
   ProductActionButtons,
-  ProductDescription
+  ProductDescription,
+  ProductReviews
 } from '@/components/features/product';
 import SuggestedItemsSection from '@/components/sections/SuggestedItemsSection';
 import { useProductDetails } from '@/hooks/queries/useProductDetails';
+import { useProducts } from '@/hooks/queries/useProducts';
+import { useReviews } from '@/hooks/queries/useReviews';
 import { useAddToCart } from '@/hooks/mutations/useAddToCart';
-
-import { PRODUCTS } from '@/data/sampleData';
 
 const ProductDetails = () => {
   const navigate = useNavigate();
   const { id } = useParams();
   const [selectedImage, setSelectedImage] = useState(0);
   
-  // Queries and Mutations
-  const { data: productData } = useProductDetails(id);
+  // Queries
+  const { data: productData, isLoading: isProductLoading } = useProductDetails(id);
+  const { data: reviewsData, isLoading: isReviewsLoading } = useReviews(id);
   const { mutate: addToCart, isPending: isAddingToCart } = useAddToCart();
   
-  // Find product from mock data
-  const mockProductRaw = PRODUCTS.find(p => p.id === id) || PRODUCTS[0];
+  const reviews = reviewsData?.data || [];
   
-  // Enhance mock product with extra details expected by the UI if missing
-  const mockProduct = {
-    ...mockProductRaw,
-    images: mockProductRaw.image ? [mockProductRaw.image, mockProductRaw.image, mockProductRaw.image] : [],
-    stock: mockProductRaw.inStock ? 50 : 0,
-    originalPrice: mockProductRaw.mrp,
-    discount: Math.round(((mockProductRaw.mrp - mockProductRaw.price) / mockProductRaw.mrp) * 100) || 0,
-    specialOffer: {
+  // Get product from data wrapper
+  const fetchedProduct = productData?.data;
+
+  // Fetch suggested items based on category of current product
+  // Only fetch if we have a category
+  const { data: suggestedData } = useProducts({ 
+      category: fetchedProduct?.category, 
+      limit: 5,
+      exclude: id 
+  });
+  
+  const suggestedItems = suggestedData?.data || [];
+
+  // If loading, show skeleton (implemented simply for now)
+  if (isProductLoading) return <div className="min-h-screen pt-32 flex justify-center"><div className="animate-spin h-8 w-8 border-4 border-emerald-500 rounded-full border-t-transparent"></div></div>;
+
+  // Use real data or fallback object structure if somehow missing (should be handled by error boundary usually)
+  const product = fetchedProduct ? {
+    ...fetchedProduct,
+    images: fetchedProduct.images && fetchedProduct.images.length > 0 ? fetchedProduct.images : (fetchedProduct.image ? [fetchedProduct.image, fetchedProduct.image, fetchedProduct.image] : []),
+    stock: fetchedProduct.inStock ? (fetchedProduct.stock || 50) : 0,
+    originalPrice: fetchedProduct.mrp || fetchedProduct.originalPrice,
+    discount: fetchedProduct.discount || (fetchedProduct.mrp > fetchedProduct.price ? Math.round(((fetchedProduct.mrp - fetchedProduct.price) / fetchedProduct.mrp) * 100) : 0),
+    specialOffer: fetchedProduct.specialOffer || {
         title: 'Bank Offer: 10% instant discount',
         code: 'SBI10'
     }
-  };
+  } : null;
 
-  // Use real data if available, otherwise mock
-  const product = productData || mockProduct;
-
-  const suggestedItems = PRODUCTS.filter(p => p.category === product.category && p.id !== product.id).slice(0, 5);
+  if (!product) return <div className="min-h-screen pt-32 text-center">Product not found</div>;
 
   const scrollThumbnails = (direction) => {
     if (direction === 'up' && selectedImage > 0) {
@@ -94,7 +108,7 @@ const ProductDetails = () => {
               {/* Back Button */}
               <button
                 onClick={() => navigate(-1)}
-                className="flex items-center gap-2 mb-4 sm:mb-6 text-gray-700 transition-colors cursor-pointer hover:text-gray-900"
+                className="sm:hidden flex items-center gap-2 mb-4 sm:mb-6 text-gray-700 transition-colors cursor-pointer hover:text-gray-900"
                 style={{ fontFamily: 'Gyrotrope', fontSize: '14px', fontWeight: 500, marginBottom: '1.5rem' }}
               >
                 <ArrowLeft size={18} className="sm:w-5 sm:h-5" />
@@ -150,7 +164,10 @@ const ProductDetails = () => {
               </div>
 
               {/* Description Section */}
-              <ProductDescription />
+              <ProductDescription product={product} />
+
+              {/* Reviews Section */}
+              <ProductReviews reviews={reviews} isLoading={isReviewsLoading} />
 
               {/* Suggested Medicine Section */}
               <SuggestedItemsSection

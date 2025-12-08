@@ -49,6 +49,18 @@ export const DesktopNavigation = ({
     }
   };
 
+  const [isScrolled, setIsScrolled] = useState(false);
+
+  useEffect(() => {
+    const handleScroll = () => {
+      setIsScrolled(window.scrollY > 20);
+    };
+    window.addEventListener('scroll', handleScroll);
+    return () => window.removeEventListener('scroll', handleScroll);
+  }, []);
+
+  // ... (handleKeyDown and other logic)
+
   return (
     <Motion.nav
       initial={{ y: -20, opacity: 0 }}
@@ -56,11 +68,13 @@ export const DesktopNavigation = ({
       transition={{ duration: 0.6, ease: [0.25, 0.1, 0.25, 1] }}
       role="navigation"
       aria-label="Main navigation"
-      className="navigation-desktop hidden md:block absolute top-8 left-1/2 transform -translate-x-1/2 z-50 mx-10"
+      className="navigation-desktop hidden md:block fixed top-8 left-1/2 transform -translate-x-1/2 z-50 mx-10"
       style={{ width: 'calc(100% - 80px)', maxWidth: '1280px' }}
     >
       <div
-        className="navigation-desktop-inner bg-[hsla(169,59%,78%,1)] backdrop-blur-md rounded-[48px] px-7 flex items-center justify-around shadow-[0_4px_24px_rgba(0,0,0,0.08),0_2px_8px_rgba(0,0,0,0.04)] border border-white/20"
+        className={`navigation-desktop-inner rounded-[48px] px-7 flex items-center justify-around shadow-[0_4px_24px_rgba(0,0,0,0.08),0_2px_8px_rgba(0,0,0,0.04)] border border-white/20 transition-all duration-300 ${
+          isScrolled ? 'bg-[hsla(169,59%,78%,0.4)] backdrop-blur-lg' : 'bg-[hsla(169,59%,78%,1)] backdrop-blur-md'
+        }`}
         style={{ padding: '0.4rem 1rem' }}
       >
         {/* Spacer */}

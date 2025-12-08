@@ -81,7 +81,7 @@ export const MOCK_ORDERS = [
     statusBg: "#FF7A59",
     expectedDelivery: "18th Dec, 2025",
     image:
-      "https://images.unsplash.com/photo-1584308666744-24d5c474f2ae?auto=format&fit=crop&w=400&q=80", // Using remote image instead of local asset
+      "https://images.unsplash.com/photo-1584308666744-24d5c474f2ae?auto=format&fit=crop&w=400&q=80",
     trackingId: "EKFC9469943995",
     courierName: "EKART",
     price: 1500,
@@ -95,11 +95,26 @@ export const MOCK_ORDERS = [
       total: 1364,
     },
     timeline: [
-      { status: "Order Placed", completed: true },
-      { status: "On The Way", completed: true, active: true },
-      { status: "Expected Delivery", date: "18th Dec, 2025", completed: false },
-      { status: "Out For Delivery", completed: false },
-      { status: "Delivered", completed: false },
+      {
+        status: "Order Placed",
+        completed: true,
+        active: false,
+        date: "15 Dec, 2025",
+      },
+      {
+        status: "Confirmed",
+        completed: true,
+        active: false,
+        date: "15 Dec, 2025",
+      },
+      {
+        status: "In Process",
+        completed: true,
+        active: true,
+        date: "16 Dec, 2025",
+      },
+      { status: "Out For Delivery", completed: false, active: false },
+      { status: "Delivered", completed: false, active: false },
     ],
     customerAddress: {
       name: "Gourav Gupta",
@@ -123,6 +138,28 @@ export const MOCK_ORDERS = [
     expectedDelivery: "18th Dec, 2025",
     image:
       "https://images.unsplash.com/photo-1584308666744-24d5c474f2ae?auto=format&fit=crop&w=400&q=80",
+    timeline: [
+      {
+        status: "Order Placed",
+        completed: true,
+        active: false,
+        date: "16 Dec, 2025",
+      },
+      {
+        status: "Confirmed",
+        completed: true,
+        active: true,
+        date: "16 Dec, 2025",
+      },
+      {
+        status: "Expected Delivery",
+        completed: false,
+        active: false,
+        date: "18 Dec, 2025",
+      },
+      { status: "Out For Delivery", completed: false, active: false },
+      { status: "Delivered", completed: false, active: false },
+    ],
   },
   {
     id: "964368968",
@@ -136,6 +173,28 @@ export const MOCK_ORDERS = [
     expectedDelivery: "18th Dec, 2025",
     image:
       "https://images.unsplash.com/photo-1584308666744-24d5c474f2ae?auto=format&fit=crop&w=400&q=80",
+    timeline: [
+      {
+        status: "Order Placed",
+        completed: true,
+        active: false,
+        date: "14 Dec, 2025",
+      },
+      {
+        status: "Confirmed",
+        completed: true,
+        active: false,
+        date: "14 Dec, 2025",
+      },
+      {
+        status: "On the Way",
+        completed: true,
+        active: true,
+        date: "15 Dec, 2025",
+      },
+      { status: "Out For Delivery", completed: false, active: false },
+      { status: "Delivered", completed: false, active: false },
+    ],
   },
   {
     id: "964368969",
@@ -150,6 +209,33 @@ export const MOCK_ORDERS = [
     expectedDelivery: "18th Dec, 2025",
     image:
       "https://images.unsplash.com/photo-1584308666744-24d5c474f2ae?auto=format&fit=crop&w=400&q=80",
+    timeline: [
+      {
+        status: "Order Placed",
+        completed: true,
+        active: false,
+        date: "13 Dec, 2025",
+      },
+      {
+        status: "Confirmed",
+        completed: true,
+        active: false,
+        date: "13 Dec, 2025",
+      },
+      {
+        status: "Expected Delivery",
+        completed: true,
+        active: false,
+        date: "18 Dec, 2025",
+      },
+      {
+        status: "Out For Delivery",
+        completed: true,
+        active: true,
+        date: "18 Dec, 2025",
+      },
+      { status: "Delivered", completed: false, active: false },
+    ],
   },
   {
     id: "964368970",
@@ -163,6 +249,38 @@ export const MOCK_ORDERS = [
     deliveredDate: "17 Dec, 2025",
     image:
       "https://images.unsplash.com/photo-1584308666744-24d5c474f2ae?auto=format&fit=crop&w=400&q=80",
+    timeline: [
+      {
+        status: "Order Placed",
+        completed: true,
+        active: false,
+        date: "12 Dec, 2025",
+      },
+      {
+        status: "Confirmed",
+        completed: true,
+        active: false,
+        date: "12 Dec, 2025",
+      },
+      {
+        status: "Expected Delivery",
+        completed: true,
+        active: false,
+        date: "17 Dec, 2025",
+      },
+      {
+        status: "Out For Delivery",
+        completed: true,
+        active: false,
+        date: "17 Dec, 2025",
+      },
+      {
+        status: "Delivered",
+        completed: true,
+        active: true,
+        date: "17 Dec, 2025",
+      },
+    ],
   },
   {
     id: "964368971",
@@ -176,6 +294,32 @@ export const MOCK_ORDERS = [
     deliveredDate: "17 Dec, 2025",
     image:
       "https://images.unsplash.com/photo-1584308666744-24d5c474f2ae?auto=format&fit=crop&w=400&q=80",
+    timeline: [
+      {
+        status: "Order Placed",
+        completed: true,
+        active: false,
+        date: "10 Dec, 2025",
+      },
+      {
+        status: "Confirmed",
+        completed: true,
+        active: false,
+        date: "10 Dec, 2025",
+      },
+      {
+        status: "Delivered",
+        completed: true,
+        active: false,
+        date: "15 Dec, 2025",
+      },
+      {
+        status: "Returned",
+        completed: true,
+        active: true,
+        date: "17 Dec, 2025",
+      },
+    ],
   },
 ];
 

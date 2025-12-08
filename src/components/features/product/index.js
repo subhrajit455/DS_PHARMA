@@ -1,2 +1,2 @@
-// Product Feature - Main Barrel Export
-export * from './components';
+// Product Feature MedicineCard, ProductReviewsrel Export
+export * from "./components";

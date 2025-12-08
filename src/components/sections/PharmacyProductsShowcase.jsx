@@ -1,28 +1,56 @@
 import React from 'react';
+import { useNavigate } from 'react-router-dom';
 import ProductCategorySection from './ProductCategorySection';
-import { PRODUCTS } from '@/data/sampleData';
+import { useProducts } from '@/hooks/queries/useProducts';
+import { useCartStore } from '@/store/useCartStore';
+
+import Loading from '@/components/common/Loading';
+import ErrorState from '@/components/common/ErrorState';
 
 const PharmacyProductsShowcase = () => {
-  // Filter products from mock data
-  const paracetamolProducts = PRODUCTS.filter(p => p.category === "Fever & Pain").slice(0, 5);
-  const antibioticProducts = PRODUCTS.filter(p => p.category === "Antibiotics").slice(0, 5);
-  // Add another category for variety if needed, e.g. Skin Care or Vitamins
-  const vitaminProducts = PRODUCTS.filter(p => p.category === "Vitamins & Supplements").slice(0, 5);
+  const navigate = useNavigate();
+  const { addItem } = useCartStore();
+  
+  // Fetch products by category
+  // In a real app, might want to use a specific "featured sections" endpoint to avoid waterfalls
+  const { data: feverData, isLoading: isFeverLoading, isError: isFeverError } = useProducts({ category: "Fever & Pain", limit: 5 });
+  const { data: antibioticData, isLoading: isAntibioticLoading, isError: isAntibioticError } = useProducts({ category: "Antibiotics", limit: 5 });
+  const { data: vitaminData, isLoading: isVitaminLoading, isError: isVitaminError } = useProducts({ category: "Vitamins & Supplements", limit: 5 });
+  const { data: stomachData, isLoading: isStomachLoading, isError: isStomachError } = useProducts({ category: "Stomach Care", limit: 5 });
+  const { data: skinData, isLoading: isSkinLoading, isError: isSkinError } = useProducts({ category: "Skin Care", limit: 5 });
+  const { data: coughData, isLoading: isCoughLoading, isError: isCoughError } = useProducts({ category: "Cough & Cold", limit: 5 });
+
+  const paracetamolProducts = feverData?.data || [];
+  const antibioticProducts = antibioticData?.data || [];
+  const vitaminProducts = vitaminData?.data || [];
+  const stomachProducts = stomachData?.data || [];
+  const skinProducts = skinData?.data || [];
+  const coughProducts = coughData?.data || [];
+
+  const isLoading = isFeverLoading || isAntibioticLoading || isVitaminLoading || isStomachLoading || isSkinLoading || isCoughLoading;
+  const isError = isFeverError || isAntibioticError || isVitaminError || isStomachError || isSkinError || isCoughError;
 
   const handleAddToCart = (product) => {
-    console.log('Added to cart:', product);
-    // Implement cart logic here
+    addItem({
+      id: product.id,
+      name: product.name,
+      productName: product.name,
+      price: product.price,
+      image: product.image,
+      quantity: 1
+    });
   };
 
   const handleProductClick = (product) => {
-    console.log('Product clicked:', product);
-    // Implement navigation to product detail page
+    navigate(`/product/${product.id}`);
   };
 
   const handleViewAll = (categoryTitle) => {
-    console.log('View all clicked for:', categoryTitle);
-    // Implement navigation to category page
+    navigate(`/category/${encodeURIComponent(categoryTitle)}`);
   };
+
+  if (isLoading) return <Loading className="py-20" />;
+  if (isError) return <ErrorState message="Failed to load product showcase" />;
 
   return (
     <>
@@ -67,9 +95,45 @@ const PharmacyProductsShowcase = () => {
         </div>
 
         {/* Vitamins Category */}
+        <div className="mb-12 lg:mb-16">
+          <ProductCategorySection
+            title="Vitamins & Supplements"
+            products={vitaminProducts}
+            onAddToCart={handleAddToCart}
+            onProductClick={handleProductClick}
+            onViewAll={handleViewAll}
+            className="py-0 bg-transparent mb-0"
+          />
+        </div>
+
+        {/* Stomach Care Category */}
+        <div className="mb-12 lg:mb-16">
+          <ProductCategorySection
+            title="Stomach Care"
+            products={stomachProducts}
+            onAddToCart={handleAddToCart}
+            onProductClick={handleProductClick}
+            onViewAll={handleViewAll}
+            className="py-0 bg-transparent mb-0"
+          />
+        </div>
+
+        {/* Skin Care Category */}
+        <div className="mb-12 lg:mb-16">
+          <ProductCategorySection
+            title="Skin Care"
+            products={skinProducts}
+            onAddToCart={handleAddToCart}
+            onProductClick={handleProductClick}
+            onViewAll={handleViewAll}
+            className="py-0 bg-transparent mb-0"
+          />
+        </div>
+
+        {/* Cough & Cold Category */}
         <ProductCategorySection
-          title="Vitamins & Supplements"
-          products={vitaminProducts}
+          title="Cough & Cold"
+          products={coughProducts}
           onAddToCart={handleAddToCart}
           onProductClick={handleProductClick}
           onViewAll={handleViewAll}

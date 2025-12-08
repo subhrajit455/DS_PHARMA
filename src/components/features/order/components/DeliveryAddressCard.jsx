@@ -27,7 +27,7 @@ const SAMPLE_ADDRESSES = [
 ];
 
 const DeliveryAddressCard = ({ address, onChangeAddress, className }) => {
-  const [currentAddress, setCurrentAddress] = useState(address);
+  const [currentAddress, setCurrentAddress] = useState(address || SAMPLE_ADDRESSES[0]);
   const [isOpen, setIsOpen] = useState(false);
   const dropdownRef = useRef(null);
 

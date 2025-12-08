@@ -1,4 +1,5 @@
 import React from 'react';
+import { useNavigate } from 'react-router-dom';
 import { PharmacyProductCard } from '@/components/features/product';
 
 const SuggestedItemsSection = ({
@@ -8,6 +9,8 @@ const SuggestedItemsSection = ({
     containerStyle = {},
     titleStyle = {}
 }) => {
+    const navigate = useNavigate();
+
     // Default styles that can be overridden
     const defaultTitleStyle = {
         fontFamily: 'Gyrotrope',
@@ -26,6 +29,10 @@ const SuggestedItemsSection = ({
         display: 'inline-block'
     };
 
+    const handleProductClick = (item) => {
+        navigate(`/product/${item.id}`);
+    };
+
     return (
         <div className={className} style={containerStyle}>
             <h2 style={defaultTitleStyle}>
@@ -38,12 +45,13 @@ const SuggestedItemsSection = ({
                 style={{
                     scrollbarWidth: 'none',
                     msOverflowStyle: 'none',
+                    marginBottom: '2rem'
                 }}
             >
                 {items.map((item) => (
                     <div
                         key={item.id}
-                        className="w-[160px] shrink-0 sm:w-[220px]"
+                        className="w-[160px] shrink-0 sm:w-[230px]"
                     >
                         <PharmacyProductCard
                             id={item.id}
@@ -53,6 +61,7 @@ const SuggestedItemsSection = ({
                             discount={item.discount}
                             quantity="1 piece"
                             imageUrl={item.image}
+                            onCardClick={() => handleProductClick(item)}
                             className="w-full h-full"
                         />
                     </div>

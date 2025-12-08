@@ -160,6 +160,7 @@ const SignupPage = () => {
                         variant="primary"
                         size="full"
                         disabled={isPending}
+                        className="!bg-emerald-600 hover:!bg-emerald-700 !shadow-emerald-200"
                     >
                         {isPending ? 'Creating Account...' : 'Sign Up'}
                     </Button>

@@ -3,7 +3,7 @@ import { SearchX } from 'lucide-react';
 import PharmacyProductCard from '@/components/features/product/components/PharmacyProductCard';
 import SearchSkeleton from './SearchSkeleton';
 
-const SearchResults = ({ products, isLoading, query }) => {
+const SearchResults = ({ products, isLoading, query, onReset }) => {
   if (isLoading) {
     return <SearchSkeleton />;
   }
@@ -19,7 +19,7 @@ const SearchResults = ({ products, isLoading, query }) => {
            We couldn't find any products matching "{query}". Try checking for typos or using broader keywords.
         </p>
         <button 
-           onClick={() => window.location.reload()} // Simple reset or could use a prop to clear filters
+           onClick={onReset} 
            className="px-6 py-2.5 bg-emerald-500 text-white font-medium rounded-full hover:bg-emerald-600 transition-all shadow-lg shadow-emerald-500/30"
            style={{ padding: '5px 10px', marginTop: '12px' }}
         >

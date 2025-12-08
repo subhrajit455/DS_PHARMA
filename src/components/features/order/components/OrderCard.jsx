@@ -1,72 +1,35 @@
 import React from 'react';
 import { motion as Motion } from 'framer-motion';
 import { useNavigate } from 'react-router-dom';
+import { Package, Calendar, MapPin, CreditCard, ChevronRight } from 'lucide-react';
 
 const OrderCard = ({ order, index }) => {
   const navigate = useNavigate();
 
-  const  getStatusButton = (order) => {
-    return (
-      <div className="flex flex-col items-end w-auto gap-1">
-        <button
-          className="cursor-pointer transition-all duration-200 hover:opacity-90 active:scale-[0.98] w-auto h-[32px] sm:h-[40px] px-3 py-1.5 sm:px-5 sm:py-2.5 text-[10px] sm:text-[13px] min-w-[100px] sm:min-w-[160px]"
-          style={{
-            fontFamily: 'Gyrotrope',
-            fontWeight: 600,
-            borderRadius: '8px',
-            border: 'none',
-            color: '#FFFFFF',
-            backgroundColor: order.statusBg,
-            textAlign: 'center',
-            boxShadow: 'none',
-            letterSpacing: '0.01em',
-            padding: '0px 12px'
-          }}
-        >
-          {order.status}
-        </button>
-        {order.expectedDelivery && (
-          <p 
-            className="text-right text-[8px] sm:text-[12px]"
-            style={{ 
-            fontFamily: 'Gyrotrope', 
-            color: '#10B981', 
-            fontWeight: 500,
-            lineHeight: '1.2',
-            marginTop: '2px'
-          }}>
-            Expected Delivery: {order.expectedDelivery}
-          </p>
-        )}
-        {order.deliveredDate && (
-          <p 
-            className="text-right text-[8px] sm:text-[12px]"
-            style={{ 
-            fontFamily: 'Gyrotrope', 
-            color: '#10B981', 
-            fontWeight: 500,
-            lineHeight: '1.2',
-            marginTop: '2px'
-          }}>
-            Delivered on {order.deliveredDate}
-          </p>
-        )}
-        {order.phone && (
-          <p 
-            className="text-right text-[8px] sm:text-[12px]"
-            style={{ 
-            fontFamily: 'Gyrotrope', 
-            color: '#000000', 
-            fontWeight: 500,
-            lineHeight: '1.2',
-            marginTop: '2px'
-          }}>
-            {order.phone}
-          </p>
-        )}
-      </div>
-    );
+  const getStatusColor = (status) => {
+    const statusColors = {
+      'Order Placed': '#10B981',
+      'Confirmed': '#3B82F6',
+      'On The Way': '#F59E0B',
+      'In Process': '#FF7A59',
+      'Out For Delivery': '#8B5CF6',
+      'Delivered': '#059669',
+      'Cancelled': '#EF4444',
+      'Returned': '#DC2626',
+    };
+    return statusColors[status] || order.statusBg || '#6B7280';
   };
+
+  const formatDate = (dateString) => {
+    if (!dateString) return '';
+    const date = new Date(dateString);
+    if (isNaN(date.getTime())) return dateString;
+    return date.toLocaleDateString('en-IN', { day: 'numeric', month: 'short', year: 'numeric' });
+  };
+
+  const orderDate = order.createdAt ? formatDate(order.createdAt) : '';
+  const itemsCount = order.items?.length || 1;
+  const totalAmount = order.totals?.total || order.paymentBreakdown?.total || 0;
 
   return (
     <Motion.div
@@ -75,80 +38,122 @@ const OrderCard = ({ order, index }) => {
       animate={{ opacity: 1, y: 0 }}
       transition={{ delay: index * 0.08, duration: 0.4 }}
       onClick={() => navigate(`/order/${order.id}`)}
-      className="bg-white cursor-pointer transition-all duration-200 hover:shadow-md active:scale-[0.995] p-3 sm:p-5"
+      className="bg-white cursor-pointer transition-all duration-200 hover:shadow-lg hover:border-emerald-400 active:scale-[0.995] group"
       style={{
         borderRadius: '8px',
-        margin: '8px 0px',
         boxShadow: '0 1px 2px rgba(0, 0, 0, 0.06)',
         border: '1px solid #64E5B8',
         fontFamily: 'Gyrotrope',
-        padding: '10px'
+        margin: '8px 0px',
       }}
     >
-      <div className="flex flex-row items-center gap-3 sm:gap-4">
-        {/* Product Image */}
-        <div
-          className="overflow-hidden shrink-0 w-[60px] h-[60px] sm:w-[80px] sm:h-[80px]"
-          style={{ 
-            borderRadius: '8px',
-            backgroundColor: '#F3F4F6',
-            flexShrink: 0
-          }}
-        >
-          <img
-            src={order.image}
-            alt={order.productName}
-            className="object-cover w-full h-full"
-            loading="lazy"
-          />
-        </div>
+      {/* Header Section */}
+      <div className="p-4 border-b border-gray-100">
+        <div className="flex items-center justify-between flex-wrap gap-2">
+          <div className="flex items-center gap-3">
+            <div className="w-10 h-10 rounded-lg bg-emerald-50 flex items-center justify-center">
+              <Package className="w-5 h-5 text-emerald-600" />
+            </div>
+            <div>
+              <div className="flex items-center gap-2">
+                <p className="text-xs text-gray-500" style={{ fontFamily: 'Gyrotrope' }}>
+                  Order ID
+                </p>
+                <p className="text-sm font-semibold text-gray-900" style={{ fontFamily: 'Gyrotrope' }}>
+                  #{order.id}
+                </p>
+              </div>
+              {orderDate && (
+                <div className="flex items-center gap-1 mt-1">
+                  <Calendar className="w-3 h-3 text-gray-400" />
+                  <p className="text-xs text-gray-500" style={{ fontFamily: 'Gyrotrope' }}>
+                    {orderDate}
+                  </p>
+                </div>
+              )}
+            </div>
+          </div>
 
-        {/* Order Details */}
-        <div className="flex flex-row items-center justify-between flex-1 min-w-0 gap-2">
-          <div className="flex-1 min-w-0">
-            <h3
-              className="text-[10px] sm:text-[15px]"
-              style={{
-                fontFamily: 'Gyrotrope',
-                fontWeight: 600,
-                color: '#000000',
-                marginBottom: '4px',
-                lineHeight: '1.3',
-                letterSpacing: '-0.01em',
-                overflow: 'hidden',
-                textOverflow: 'ellipsis',
-                whiteSpace: 'nowrap'
-              }}
-            >
-              {order.productName}
-            </h3>
-            <div
-              className="text-[8px] sm:text-[13px]"
-              style={{
-                fontFamily: 'Gyrotrope',
-                color: '#6B7280',
-                lineHeight: '1.3'
-              }}
-            >
-              <p style={{ marginBottom: '2px', overflow: 'hidden', textOverflow: 'ellipsis', whiteSpace: 'nowrap' }}>
-                <span style={{ fontWeight: 600, color: '#000000' }}>
-                  {order.customerName} - {order.phone}
-                </span>
+          {/* Status Badge */}
+          <div 
+            className="px-3 py-1.5 rounded-full text-xs font-semibold text-white"
+            style={{
+              backgroundColor: getStatusColor(order.status),
+              fontFamily: 'Gyrotrope'
+            }}
+          >
+            {order.status}
+          </div>
+        </div>
+      </div>
+
+      {/* Content Section */}
+      <div className="p-4">
+        <div className="space-y-3">
+          {/* Items Summary */}
+          <div className="flex items-start justify-between">
+            <div className="flex-1">
+              <p className="text-xs text-gray-500 mb-1" style={{ fontFamily: 'Gyrotrope' }}>
+                Items ({itemsCount})
               </p>
-              <p style={{ 
-                overflow: 'hidden',
-                textOverflow: 'ellipsis',
-                whiteSpace: 'nowrap',
-                maxWidth: '100%'
-              }}>
-                {order.address}
+              <p 
+                className="text-sm font-medium text-gray-900 line-clamp-2"
+                style={{ fontFamily: 'Gyrotrope' }}
+              >
+                {order.items 
+                  ? order.items.map(item => item.productName || item.name).join(', ')
+                  : order.productName || 'Order Items'}
+              </p>
+            </div>
+            <div className="text-right ml-4">
+              <p className="text-xs text-gray-500 mb-1" style={{ fontFamily: 'Gyrotrope' }}>
+                Total
+              </p>
+              <p className="text-lg font-bold text-emerald-600" style={{ fontFamily: 'Gyrotrope' }}>
+                ₹{totalAmount}
               </p>
             </div>
           </div>
 
-          {/* Status Button */}
-          <div className="shrink-0">
-            {getStatusButton(order)}
+          {/* Delivery Info */}
+          <div className="flex items-center gap-2 pt-2 border-t border-gray-100">
+            <MapPin className="w-4 h-4 text-gray-400 shrink-0" />
+            <p 
+              className="text-xs text-gray-600 line-clamp-1"
+              style={{ fontFamily: 'Gyrotrope' }}
+            >
+              {order.deliveryAddress?.address || order.address || order.customerAddress?.address}
+            </p>
+          </div>
+
+          {/* Expected Delivery / Delivered Date */}
+          {(order.expectedDelivery || order.deliveredDate) && (
+            <div className="flex items-center justify-between pt-2">
+              <p className="text-xs text-gray-500" style={{ fontFamily: 'Gyrotrope' }}>
+                {order.deliveredDate ? 'Delivered on' : 'Expected Delivery'}
+              </p>
+              <p className="text-xs font-semibold text-emerald-600" style={{ fontFamily: 'Gyrotrope' }}>
+                {order.deliveredDate || order.expectedDelivery}
+              </p>
+            </div>
+          )}
+        </div>
+      </div>
+
+      {/* Footer Section */}
+      <div className="px-4 py-3 bg-gray-50 border-t border-gray-100 rounded-b-xl">
+        <div className="flex items-center justify-between">
+          <div className="flex items-center gap-2">
+            <CreditCard className="w-4 h-4 text-gray-400" />
+            <p className="text-xs text-gray-600 capitalize" style={{ fontFamily: 'Gyrotrope' }}>
+              {order.paymentMethod || 'Online Payment'}
+            </p>
+          </div>
+          <div className="flex items-center gap-1 text-emerald-600 group-hover:gap-2 transition-all">
+            <p className="text-xs font-semibold" style={{ fontFamily: 'Gyrotrope' }}>
+              View Details
+            </p>
+            <ChevronRight className="w-4 h-4" />
           </div>
         </div>
       </div>
@@ -158,13 +163,3 @@ const OrderCard = ({ order, index }) => {
 
 export default OrderCard;
 
-/* Mobile Responsive Breakpoints:
- * - 320px: Small phones (iPhone SE)
- * - 375px: Standard phones (iPhone 12/13)
- * - 414px: Large phones (iPhone 12 Pro Max)
- * - 480px: Small tablets
- * 
- * Touch-friendly minimum sizes:
- * - Buttons: 44x44px (Apple HIG)
- * - Interactive elements: 48x48px (Material Design)
- */

@@ -3,69 +3,54 @@ import { motion as Motion } from 'framer-motion';
 
 const AuthCard = ({ children, title, subtitle, className = '' }) => {
     return (
-        <div className="min-h-screen flex items-center justify-center relative overflow-hidden bg-gradient-to-br from-emerald-600 via-teal-600 to-cyan-600">
-            {/* Dynamic Gradient Background - Vibrant Brand Colors */}
-            <div className="absolute inset-0 bg-[radial-gradient(circle_at_top_right,_var(--tw-gradient-stops))] from-teal-400/30 via-transparent to-transparent opacity-50" />
+        <div className="min-h-screen flex items-center justify-center relative overflow-hidden bg-slate-50">
+            {/* Background Pattern - Subtle Dot Grid */}
+            <div className="absolute inset-0 bg-[linear-gradient(to_right,#80808012_1px,transparent_1px),linear-gradient(to_bottom,#80808012_1px,transparent_1px)] bg-[size:24px_24px]" />
             
-            {/* Animated Background Layer - Subtle Texture */}
-            <div className="absolute inset-0 bg-[linear-gradient(to_right,#ffffff_1px,transparent_1px),linear-gradient(to_bottom,#ffffff_1px,transparent_1px)] bg-[size:4rem_4rem] [mask-image:radial-gradient(ellipse_60%_50%_at_50%_0%,#000_70%,transparent_100%)] opacity-10" />
-            
-            {/* Animated Gradient Orbs - Soft Light Glows */}
+            {/* Ambient Gradients - Soft & Modern */}
             <div className="absolute inset-0 overflow-hidden pointer-events-none">
-                <div className="absolute top-[10%] left-[15%] w-[600px] h-[600px] rounded-full bg-white/10 blur-[100px] animate-pulse" />
-                <div className="absolute bottom-[10%] right-[10%] w-[500px] h-[500px] rounded-full bg-teal-300/20 blur-[120px] animate-pulse" style={{ animationDelay: '1s' }} />
+                <div className="absolute -top-[20%] -left-[10%] w-[70vh] h-[70vh] rounded-full bg-emerald-100/40 blur-[100px]" />
+                <div className="absolute top-[20%] -right-[10%] w-[60vh] h-[60vh] rounded-full bg-teal-100/40 blur-[100px]" />
+                <div className="absolute -bottom-[20%] left-[20%] w-[60vh] h-[60vh] rounded-full bg-cyan-100/40 blur-[100px]" />
             </div>
 
             <Motion.div
-                initial={{ opacity: 0, scale: 0.95, y: 20 }}
+                initial={{ opacity: 0, scale: 0.98, y: 10 }}
                 animate={{ opacity: 1, scale: 1, y: 0 }}
                 transition={{ 
-                    duration: 0.6,
+                    duration: 0.4,
                     ease: "easeOut" 
                 }}
-                className="w-full max-w-2xl px-4 py-12 sm:px-6 lg:px-8 relative z-10"
+                className="w-full max-w-2xl px-4 relative z-10"
             >
-                {/* Premium White Glass Card */}
+                {/* Modern White Card */}
                 <div className={`
-                    relative
-                    bg-white/10
-                    backdrop-blur-2xl
-                    rounded-[2.5rem]
-                    p-6 sm:p-8 md:p-10 lg:p-12
-                    shadow-[0_8px_32px_0_rgba(0,0,0,0.2)]
-                    border border-white/20
-                    overflow-hidden
-                    transition-all duration-500 ease-out
-                    hover:bg-white/15
-                    hover:border-white/30
-                    hover:shadow-[0_8px_32px_0_rgba(0,0,0,0.25)]
+                    bg-white
+                    rounded-3xl
+                    shadow-[0_20px_60px_-15px_rgba(0,0,0,0.08)]
+                    border border-gray-100
+                    p-8 sm:p-10 md:p-12
                     ${className}
                 `}>
-                    {/* Top Accent Line - White to Transparent */}
-                    <div className="absolute top-0 left-0 right-0 h-1 bg-linear-to-r from-transparent via-white/50 to-transparent" />
-
-                    {/* Content */}
-                    <div className="relative z-10">
-                        <div className="text-center mb-8 md:mb-10">
-                            {/* Title */}
-                            <h2
-                                className="text-3xl sm:text-4xl md:text-[2.5rem] font-bold text-white tracking-tight mb-3 drop-shadow-md"
-                                style={{ fontFamily: 'Gyrotrope', paddingTop: '1rem' }}
+                    <div className="text-center mb-8">
+                        {/* Title */}
+                        <h2
+                            className="text-3xl font-bold text-gray-900 tracking-tight mb-2"
+                            style={{ fontFamily: 'Gyrotrope' }}
+                        >
+                            {title}
+                        </h2>
+                        {subtitle && (
+                            <p
+                                className="text-gray-500 font-medium text-base"
+                                style={{ fontFamily: 'Gyrotrope' }}
                             >
-                                {title}
-                            </h2>
-                            {subtitle && (
-                                <p
-                                    className="text-teal-50 font-medium text-sm sm:text-base lg:text-lg leading-relaxed px-4 drop-shadow-sm"
-                                    style={{ fontFamily: 'Gyrotrope' }}
-                                >
-                                    {subtitle}
-                                </p>
-                            )}
-                        </div>
-                        
-                        {children}
+                                {subtitle}
+                            </p>
+                        )}
                     </div>
+                    
+                    {children}
                 </div>
             </Motion.div>
         </div>

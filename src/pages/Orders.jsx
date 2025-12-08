@@ -4,26 +4,38 @@ import { PharmacyProductCard } from '@/components/features/product';
 import { OrderCard } from '@/components/features/order';
 import SuggestedItemsSection from '@/components/sections/SuggestedItemsSection';
 import { useOrders } from '@/hooks/queries/useOrders';
-import { PRODUCTS } from '@/data/sampleData';
-import { MOCK_ORDERS } from '@/data/userData';
+import { useProducts } from '@/hooks/queries/useProducts';
 
 const Orders = () => {
   const [searchQuery, setSearchQuery] = useState('');
   
-  // Fetch orders using React Query
+  // Fetch orders using React Query (API orders)
+  // This will return mock data if USE_MOCK is true, or real data
   const { data: ordersData } = useOrders();
 
-  // Mock data as fallback
-  const mockOrders = MOCK_ORDERS;
+  // Combine stored orders (if any local persistence still needed) with API data
+  // But strictly, we should rely on API. 
+  // For hybrid transition:
+  const apiOrders = ordersData?.data || [];
+  
+  // Use API orders as primary source
+  const allOrders = apiOrders.map(order => ({
+      ...order,
+      // Ensure image/name fallbacks
+      productName: order.items?.[0]?.productName || order.items?.[0]?.name || 'Order',
+      image: order.items?.[0]?.image || order.items?.[0]?.imageUrl || 'https://images.unsplash.com/photo-1584308666744-24d5c474f2ae?auto=format&fit=crop&w=400&q=80',
+  }));
 
-  // Use real data if available, otherwise mock
-  const orders = ordersData || mockOrders;
+  // Filter orders based on search query
+  const filteredOrders = allOrders.filter(order => 
+    order.productName?.toLowerCase().includes(searchQuery.toLowerCase()) ||
+    order.id?.toString().includes(searchQuery)
+  );
 
   // Use products from sampleData for suggestions
-  const suggestedItems = PRODUCTS.slice(0, 5).map(p => ({
-    ...p,
-    image: p.image || p.imageUrl 
-  }));
+  // Suggestions
+  const { data: suggestionsData } = useProducts({ limit: 5 });
+  const suggestedItems = suggestionsData?.data || [];
 
 
   return (
@@ -141,7 +153,7 @@ const Orders = () => {
                 display: none; /* Chrome, Safari, Opera */
               }
             `}</style>
-            {orders.map((order, index) => (
+            {filteredOrders.map((order, index) => (
               <OrderCard key={order.id} order={order} index={index} />
             ))}
           </div>

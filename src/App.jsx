@@ -7,6 +7,8 @@ import CartDetails from './pages/CartDetails';
 import ProductDetails from './pages/ProductDetails';
 import Orders from './pages/Orders';
 import OrderDetails from "./pages/OrderDetails";
+import OrderConfirmation from "./pages/OrderConfirmation";
+import CategoryProducts from "./pages/CategoryProducts";
 import UserProfile from "./pages/UserProfile";
 import LoginPage from "./pages/LoginPage";
 import SignupPage from "./pages/SignupPage";
@@ -41,12 +43,16 @@ function App() {
           
           {/* Search Page (No Layout) */}
           <Route path="/search" element={<SearchPage />} />
+          
+          {/* Order Confirmation (No Layout) */}
+          <Route path="/order-confirmation/:orderId" element={<OrderConfirmation />} />
 
           {/* Protected/Main Routes (With Layout) */}
           <Route element={<Layout />}>
             <Route path="/" element={<Home />} />
             <Route path="/cart" element={<CartDetails />} />
             <Route path="/product/:id" element={<ProductDetails />} />
+            <Route path="/category/:categoryName" element={<CategoryProducts />} />
             <Route path="/orders" element={<Orders />} />
             <Route path="/order/:id" element={<OrderDetails />} />
           </Route>

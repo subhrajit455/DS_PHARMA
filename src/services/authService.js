@@ -3,7 +3,8 @@ import { ENDPOINTS } from "../api/endpoints";
 import { mockAuthService } from "./mockAuthService";
 
 // Use mock service for local development
-const USE_MOCK = true;
+// Use mock service for local development
+const USE_MOCK = import.meta.env.VITE_USE_MOCK === "true" || true;
 
 export const authService = {
   /**

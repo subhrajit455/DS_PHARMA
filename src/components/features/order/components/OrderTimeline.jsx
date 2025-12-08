@@ -1,6 +1,6 @@
 import React from 'react';
 
-const OrderTimeline = ({ timeline, deliveryPartner }) => {
+const OrderTimeline = ({ timeline = [], deliveryPartner }) => {
   // Filter to show only 4 main steps (remove 'Expected Delivery' middle step)
   const filteredTimeline = timeline.filter((_, index) => index !== 2);
 

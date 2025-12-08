@@ -1,30 +1,43 @@
-// Cart Service
-// ============================================================
-// Handles all cart-related API calls
+import apiClient from "./api/apiClient";
+import { API_ENDPOINTS } from "./api/baseURL";
+import { mockCartService } from "./mockCartService";
 
-import apiClient from './api/apiClient';
-import { API_ENDPOINTS } from './api/baseURL';
+const USE_MOCK = import.meta.env.VITE_USE_MOCK === "true" || true;
 
 export const cartService = {
-  // Fetch cart
-  fetchCart: () =>
-    apiClient.get(API_ENDPOINTS.CART),
+  getCart: async () => {
+    if (USE_MOCK) return mockCartService.getCart();
+    return apiClient.get(API_ENDPOINTS.CART);
+  },
 
-  // Add item to cart
-  addToCart: (product) =>
-    apiClient.post(API_ENDPOINTS.CART_ADD, product),
+  addToCart: async (productId, quantity) => {
+    if (USE_MOCK) return mockCartService.addToCart({ id: productId, quantity });
+    return apiClient.post(API_ENDPOINTS.CART_ADD, { productId, quantity });
+  },
 
-  // Update cart item quantity
-  updateCartItem: (itemId, quantity) =>
-    apiClient.put(API_ENDPOINTS.CART_UPDATE, { itemId, quantity }),
+  // Method to handle full item object (common in UI currently)
+  addItem: async (item) => {
+    if (USE_MOCK) return mockCartService.addToCart(item);
+    return apiClient.post(API_ENDPOINTS.CART_ADD, {
+      productId: item.id,
+      quantity: item.quantity,
+    });
+  },
 
-  // Remove item from cart
-  removeFromCart: (itemId) =>
-    apiClient.delete(API_ENDPOINTS.CART_REMOVE, { data: { itemId } }),
+  updateItem: async (itemId, quantity) => {
+    if (USE_MOCK) return mockCartService.updateCartItem(itemId, quantity);
+    return apiClient.put(API_ENDPOINTS.CART_UPDATE, { itemId, quantity });
+  },
 
-  // Clear cart
-  clearCart: () =>
-    apiClient.delete(API_ENDPOINTS.CART),
+  removeItem: async (itemId) => {
+    if (USE_MOCK) return mockCartService.removeFromCart(itemId);
+    return apiClient.delete(API_ENDPOINTS.CART_REMOVE, { data: { itemId } });
+  },
+
+  clearCart: async () => {
+    if (USE_MOCK) return mockCartService.clearCart();
+    return apiClient.delete(API_ENDPOINTS.CART);
+  },
 };
 
 export default cartService;

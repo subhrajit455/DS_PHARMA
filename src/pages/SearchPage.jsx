@@ -61,6 +61,20 @@ const SearchPage = () => {
     setFilters(newFilters);
   };
 
+  const handleViewAll = () => {
+    // 1. Reset URL params to remove query and filters
+    setSearchParams({});
+    // 2. Clear local filter state
+    setFilters({
+      categories: [],
+      priceRangeStr: null,
+      inStock: false,
+    });
+    // 3. Clear search input (if any)
+    const searchInput = document.querySelector('input[type="search"]');
+    if (searchInput) searchInput.value = '';
+  };
+
   return (
     <div className="min-h-screen bg-gray-50/50 pt-28 pb-20">
       <div className="px-4 sm:px-6 lg:px-8" style={{ width: '100%', maxWidth: '1280px', margin: '0 auto', padding:'10px' }}>
@@ -112,6 +126,7 @@ const SearchPage = () => {
                  filters={facets} 
                  selectedFilters={filters} 
                  onFilterChange={handleFilterChange} 
+                 onViewAll={handleViewAll}
               />
            </aside>
 
@@ -164,7 +179,7 @@ const SearchPage = () => {
 
            {/* Results Grid */}
            <main className="flex-1 min-w-0">
-               <SearchResults products={products} isLoading={isLoading} query={query} />
+               <SearchResults products={products} isLoading={isLoading} query={query} onReset={handleViewAll} />
            </main>
         </div>
 

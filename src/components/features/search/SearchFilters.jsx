@@ -95,7 +95,7 @@ const FilterSection = ({ title, icon: Icon, isOpen, onToggle, children }) => {
    );
 };
 
-export const SearchFilters = ({ filters, selectedFilters, onFilterChange, className = '' }) => {
+export const SearchFilters = ({ filters, selectedFilters, onFilterChange, onViewAll, className = '' }) => {
   const [openSections, setOpenSections] = useState({
      categories: true,
      price: true,
@@ -228,6 +228,19 @@ export const SearchFilters = ({ filters, selectedFilters, onFilterChange, classN
              <span className="text-sm text-gray-600 group-hover:text-gray-900" style={{ marginTop: '5px' }}>OTC Products Only</span>
           </label>
        </FilterSection>
+       
+       {/* View All Products Button */}
+       {onViewAll && (
+         <div className="mt-4 pt-4 border-t border-gray-100" style={{ padding: '10px' }}>
+           <button
+             onClick={onViewAll}
+             className="w-full py-2.5 bg-emerald-600 hover:bg-emerald-700 text-white text-sm font-semibold rounded-xl transition-all shadow-md shadow-emerald-200 active:scale-95 flex items-center justify-center gap-2"
+           >
+             <ShoppingBag className="w-4 h-4" />
+             View All Products
+           </button>
+         </div>
+       )}
     </div>
   );
 };

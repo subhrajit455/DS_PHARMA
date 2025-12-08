@@ -1,5 +1,5 @@
 import React, { useState, useEffect } from 'react';
-import { ChevronDown, Check, MapPin } from 'lucide-react';
+import { ChevronDown, Check, MapPin, CreditCard, Banknote, Smartphone } from 'lucide-react';
 
 const sampleAddresses = [
   {
@@ -33,16 +33,20 @@ const OrderSummary = ({
   totals,
   onOrderNow,
   onAddNewAddress,
-  onChangeAddress // Keeping this prop if parent needs to know, but we'll handle selection locally for now
+  onChangeAddress,
+  isPlacingOrder = false,
+  cartItems = []
 }) => {
   const [currentAddress, setCurrentAddress] = useState(deliveryAddress);
   const [isDropdownOpen, setIsDropdownOpen] = useState(false);
+  const [paymentMethod, setPaymentMethod] = useState('online');
 
   // Sync with prop if it changes initially
   useEffect(() => {
     if (deliveryAddress && !currentAddress) {
       setCurrentAddress(deliveryAddress);
     }
+    // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [deliveryAddress]);
 
   const handleAddressSelect = (address) => {
@@ -393,24 +397,133 @@ const OrderSummary = ({
           </div>
         </div>
 
+        {/* Payment Method Selection */}
+        <div style={{ 
+          borderTop: '1px solid #E5E7EB', 
+          paddingTop: '16px', 
+          marginTop: '16px' 
+        }}>
+          <h4
+            style={{
+              fontFamily: 'Gyrotrope',
+              fontSize: '14px',
+              fontWeight: 600,
+              color: '#374151',
+              marginBottom: '12px',
+              letterSpacing: '-0.01em'
+            }}
+          >
+            Payment Method
+          </h4>
+          <div className="space-y-2">
+            {/* Online Payment */}
+            <button
+              type="button"
+              onClick={() => setPaymentMethod('online')}
+              className={`w-full p-3 rounded-xl border-2 flex items-center gap-3 transition-all duration-200 cursor-pointer text-left ${
+                paymentMethod === 'online' 
+                  ? 'border-emerald-500 bg-emerald-50' 
+                  : 'border-gray-200 bg-white hover:border-emerald-300'
+              }`}
+              style={{ fontFamily: 'Gyrotrope' }}
+            >
+              <div className={`w-9 h-9 rounded-lg flex items-center justify-center ${
+                paymentMethod === 'online' ? 'bg-emerald-500 text-white' : 'bg-gray-100 text-gray-600'
+              }`}>
+                <Smartphone size={18} />
+              </div>
+              <div className="flex-1">
+                <span className={`font-semibold text-sm ${paymentMethod === 'online' ? 'text-emerald-700' : 'text-gray-900'}`}>
+                  Online Payment
+                </span>
+                <p className="text-xs text-gray-500">UPI, Wallets, Netbanking</p>
+              </div>
+              <div className={`w-4 h-4 rounded-full border-2 flex items-center justify-center ${
+                paymentMethod === 'online' ? 'border-emerald-500 bg-emerald-500' : 'border-gray-300'
+              }`}>
+                {paymentMethod === 'online' && <div className="w-1.5 h-1.5 rounded-full bg-white" />}
+              </div>
+            </button>
+
+            {/* Card Payment */}
+            <button
+              type="button"
+              onClick={() => setPaymentMethod('card')}
+              className={`w-full p-3 rounded-xl border-2 flex items-center gap-3 transition-all duration-200 cursor-pointer text-left ${
+                paymentMethod === 'card' 
+                  ? 'border-emerald-500 bg-emerald-50' 
+                  : 'border-gray-200 bg-white hover:border-emerald-300'
+              }`}
+              style={{ fontFamily: 'Gyrotrope' }}
+            >
+              <div className={`w-9 h-9 rounded-lg flex items-center justify-center ${
+                paymentMethod === 'card' ? 'bg-emerald-500 text-white' : 'bg-gray-100 text-gray-600'
+              }`}>
+                <CreditCard size={18} />
+              </div>
+              <div className="flex-1">
+                <span className={`font-semibold text-sm ${paymentMethod === 'card' ? 'text-emerald-700' : 'text-gray-900'}`}>
+                  Debit / Credit Card
+                </span>
+                <p className="text-xs text-gray-500">Visa, Mastercard, RuPay</p>
+              </div>
+              <div className={`w-4 h-4 rounded-full border-2 flex items-center justify-center ${
+                paymentMethod === 'card' ? 'border-emerald-500 bg-emerald-500' : 'border-gray-300'
+              }`}>
+                {paymentMethod === 'card' && <div className="w-1.5 h-1.5 rounded-full bg-white" />}
+              </div>
+            </button>
+
+            {/* COD */}
+            <button
+              type="button"
+              onClick={() => setPaymentMethod('cod')}
+              className={`w-full p-3 rounded-xl border-2 flex items-center gap-3 transition-all duration-200 cursor-pointer text-left ${
+                paymentMethod === 'cod' 
+                  ? 'border-emerald-500 bg-emerald-50' 
+                  : 'border-gray-200 bg-white hover:border-emerald-300'
+              }`}
+              style={{ fontFamily: 'Gyrotrope' }}
+            >
+              <div className={`w-9 h-9 rounded-lg flex items-center justify-center ${
+                paymentMethod === 'cod' ? 'bg-emerald-500 text-white' : 'bg-gray-100 text-gray-600'
+              }`}>
+                <Banknote size={18} />
+              </div>
+              <div className="flex-1">
+                <span className={`font-semibold text-sm ${paymentMethod === 'cod' ? 'text-emerald-700' : 'text-gray-900'}`}>
+                  Cash on Delivery
+                </span>
+                <p className="text-xs text-gray-500">Pay when you receive</p>
+              </div>
+              <div className={`w-4 h-4 rounded-full border-2 flex items-center justify-center ${
+                paymentMethod === 'cod' ? 'border-emerald-500 bg-emerald-500' : 'border-gray-300'
+              }`}>
+                {paymentMethod === 'cod' && <div className="w-1.5 h-1.5 rounded-full bg-white" />}
+              </div>
+            </button>
+          </div>
+        </div>
+
         {/* Order Now Button */}
         <button
-          onClick={onOrderNow}
-          className="w-full transition-all duration-200 hover:opacity-90 cursor-pointer"
+          onClick={() => onOrderNow(paymentMethod)}
+          disabled={isPlacingOrder || cartItems.length === 0}
+          className="w-full transition-all duration-200 hover:opacity-90 cursor-pointer disabled:opacity-50 disabled:cursor-not-allowed"
           style={{
             fontFamily: 'Gyrotrope',
             fontSize: '14px',
             fontWeight: 600,
-            backgroundColor: '#FF7A59',
+            backgroundColor: '#10B981',
             color: '#FFFFFF',
             border: 'none',
             borderRadius: '10px',
-            padding: '8px',
+            padding: '12px',
             marginTop: '16px',
             boxShadow: '0 2px 4px rgba(0, 0, 0, 0.08)'
           }}
         >
-          Order Now
+          {isPlacingOrder ? 'Placing Order...' : `Proceed to Pay ₹${totals.total}`}
         </button>
       </div>
     </div>

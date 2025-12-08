@@ -1,17 +1,20 @@
 import React, { useState, useEffect, useRef, useCallback } from 'react';
 import { motion as Motion, AnimatePresence } from 'framer-motion';
-
-import { BANNERS } from '@/data/sampleData';
+import { useBanners } from '@/hooks/queries/useBanners';
+import Loading from '@/components/common/Loading';
+import ErrorState from '@/components/common/ErrorState';
 
 const BannerSection = () => {
   const [currentIndex, setCurrentIndex] = useState(0);
   const [isHovered, setIsHovered] = useState(false);
   const intervalRef = useRef(null);
 
-  const banners = BANNERS;
+  const { data: bannerData, isLoading, isError } = useBanners();
+  const banners = bannerData?.data || [];
 
   const startAutoSlide = useCallback(() => {
     if (intervalRef.current) clearInterval(intervalRef.current);
+    if (!banners.length) return;
 
     intervalRef.current = setInterval(() => {
       if (!isHovered) {
@@ -47,6 +50,9 @@ const BannerSection = () => {
   const goToNext = () => {
     setCurrentIndex((prevIndex) => (prevIndex + 1) % banners.length);
   };
+
+  if (isLoading) return <Loading className="h-[300px] w-full flex items-center justify-center bg-gray-100" />;
+  if (isError) return <ErrorState message="Failed to load banners" className="h-[300px]" />;
 
   return (
     <section className="w-full py-6 lg:py-8 bg-white mb-6 flex justify-center items-center" style={{ width: '100%', marginBottom: '3rem' }}>

@@ -1,34 +1,46 @@
 import React, { useState } from 'react';
+
 import { PharmacyProductCard } from '@/components/features/product';
 import { CartItem } from '@/components/features/cart';
 import { OrderSummary } from '@/components/features/order';
 import SuggestedItemsSection from '@/components/sections/SuggestedItemsSection';
 import { useCartStore } from '@/store/useCartStore';
+import { useCart } from '@/hooks/queries/useCart';
+import { useUpdateCart } from '@/hooks/mutations/useUpdateCart';
+import { useRemoveFromCart } from '@/hooks/mutations/useRemoveFromCart';
+import { usePlaceOrder } from '@/hooks/mutations/usePlaceOrder';
+import { useProducts } from '@/hooks/queries/useProducts';
 
-import { PRODUCTS } from '@/data/sampleData';
+
 
 const CartDetails = () => {
-  const { items: cartItems, updateQuantity: updateCartQuantity, removeItem: removeCartItem } = useCartStore();
+  // We still use store for 'items' because useCart syncs to it, 
+  // ensuring global state consistency if other components check cart.
+  const { items: cartItems } = useCartStore();
+  
+  // API Hooks
+  useCart();
+  const { mutate: updateCartItem } = useUpdateCart();
+  const { mutate: removeCartItem } = useRemoveFromCart();
+  const { mutate: placeOrder, isPending: isPlacingOrder } = usePlaceOrder();
+  
+  // Fetch suggested items
+  const { data: suggestionsData } = useProducts({ limit: 5 });
+  const suggestedItems = suggestionsData?.data || [];
 
   const [couponCode, setCouponCode] = useState('');
-  const [deliveryAddress] = useState({
+  const [deliveryAddress, setDeliveryAddress] = useState({
+    id: 1,
     name: 'Gourav Gupta',
-    phone: '9999999999',
-    address: 'A/B, Section Lane, Odisha, Noida, 744115'
+    phone: '+91 98765 43210',
+    address: '123, Tech Park, Sector 5, Bangalore, Karnataka - 560001',
+    type: 'Home'
   });
 
-  // Use products from sampleData for suggestions
-  const suggestedItems = PRODUCTS.slice(0, 5).map(p => ({
-    ...p,
-    // Ensure properties match what SuggestedItemsSection expects
-    image: p.image || p.imageUrl 
-  }));
-
-  const updateQuantity = (id, delta) => {
-    const item = cartItems.find(i => i.id === id);
-    if (item) {
-      updateCartQuantity(id, Math.max(1, item.quantity + delta));
-    }
+  const updateQuantity = (id, newQuantity) => {
+      // Optimistic update logic could go here, or just call API
+      // Our hook expects { itemId, quantity }
+      updateCartItem({ itemId: id, quantity: Math.max(1, newQuantity) });
   };
 
   const removeItem = (id) => {
@@ -37,21 +49,48 @@ const CartDetails = () => {
 
   const calculateTotals = () => {
     const totalCartValue = cartItems.reduce((sum, item) => sum + (item.price * item.quantity), 0);
-    // Assuming originalPrice is available in the item object, otherwise default to price
     const discount = cartItems.reduce((sum, item) => {
+      // Assuming item has originalPrice or we calculate it. 
+      // If backend doesn't send originalPrice, we might default to price (0 discount).
       const originalPrice = item.originalPrice || item.price;
       return sum + ((originalPrice - item.price) * item.quantity);
     }, 0);
     
-    const coupon = 0; // Implement coupon logic if needed
+    const coupon = 0; 
     const gst = Math.round(totalCartValue * 0.18);
-    const deliveryCharges = 40;
+    const deliveryCharges = totalCartValue > 0 ? 40 : 0;
     const total = totalCartValue - discount - coupon + gst + deliveryCharges;
 
     return { totalCartValue, discount, coupon, gst, deliveryCharges, total };
   };
 
   const totals = calculateTotals();
+
+  const handlePlaceOrder = (paymentMethod) => {
+    if (cartItems.length === 0) {
+      alert('Your cart is empty!');
+      return;
+    }
+
+    const orderData = {
+        items: cartItems.map(item => ({
+          id: item.id,
+          name: item.name || item.productName,
+          productName: item.name || item.productName,
+          price: item.price,
+          quantity: item.quantity,
+          image: item.image || item.imageUrl,
+        })),
+        totals,
+        deliveryAddress,
+        paymentMethod,
+        customerName: deliveryAddress.name,
+        phone: deliveryAddress.phone,
+        address: deliveryAddress.address,
+    };
+
+    placeOrder(orderData);
+  };
 
   return (
     <div style={{ paddingTop: '60px' }}>
@@ -75,7 +114,7 @@ const CartDetails = () => {
          }
        `}</style>
     <div className="orders-container w-full pt-4 pb-16 lg:pt-32 lg:pb-16">
-      <div className="cart-details-container w-full" style={{ maxWidth: '1200px', margin: '10px auto' }}>
+      <div className="cart-details-container w-full" style={{ maxWidth: '1280px', margin: '10px auto' }}>
         <div className="grid grid-cols-1 lg:grid-cols-3 gap-8">
           {/* Left Section - Cart Items */}
           <div className="lg:col-span-2">
@@ -91,7 +130,7 @@ const CartDetails = () => {
                   letterSpacing: '-0.01em'
                 }}
               >
-                Cart Items
+                Cart Items ({cartItems.length})
               </h1>
             </div>
 
@@ -99,7 +138,7 @@ const CartDetails = () => {
             <div 
               className="space-y-3" 
               style={{
-                maxHeight: '500px',
+                maxHeight: '750px',
                 overflowY: 'auto',
                 paddingRight: '5px',
                 scrollbarWidth: 'none', // Firefox
@@ -116,7 +155,8 @@ const CartDetails = () => {
                   <CartItem
                     key={item.id}
                     item={item}
-                    onUpdateQuantity={updateQuantity}
+                    // CartItem likely calls this with (id, newQuantity)
+                    onUpdateQuantity={(id, newQty) => updateQuantity(id, newQty)}
                     onRemove={removeItem}
                     
                   />
@@ -139,9 +179,11 @@ const CartDetails = () => {
               onCouponChange={(e) => setCouponCode(e.target.value)}
               onApplyCoupon={() => console.log('Apply coupon:', couponCode)}
               totals={totals}
-              onOrderNow={() => console.log('Order placed')}
+              onOrderNow={handlePlaceOrder}
               onAddNewAddress={() => console.log('Add new address')}
-              onChangeAddress={() => console.log('Change address')}
+              onChangeAddress={(newAddress) => setDeliveryAddress(newAddress)}
+              isPlacingOrder={isPlacingOrder}
+              cartItems={cartItems}
             />
           </div>
         </div>
@@ -168,3 +210,4 @@ const CartDetails = () => {
 };
 
 export default CartDetails;
+

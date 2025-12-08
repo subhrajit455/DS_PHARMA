@@ -1,15 +1,19 @@
+import React, { useState } from 'react'; // Added Rect import though not strictly needed in new JSX transform, good for compat
 import { motion as Motion } from 'framer-motion';
-import { useState } from 'react';
-import { CATEGORY_DETAILS } from '@/data/sampleData';
+import { useNavigate } from 'react-router-dom';
+import { useCategories } from '@/hooks/queries/useProducts'; // Updated hook path
+import Loading from '@/components/common/Loading';
+import ErrorState from '@/components/common/ErrorState';
 
 const PopularCategoriesSection = ({
-  categories = [], // Accept categories from backend
-  onCategoryClick = () => { } // Callback for category click
+  categories: propCategories = [], // Accept categories from backend
 }) => {
   const [, setHoveredCategory] = useState(null);
+  const navigate = useNavigate();
+  const { data: categoryData, isLoading, isError } = useCategories();
 
-  // Use provided categories or fallback to mock data
-  const displayCategories = categories.length > 0 ? categories : CATEGORY_DETAILS;
+  const fetchedCategories = categoryData?.data || [];
+  const displayCategories = propCategories.length > 0 ? propCategories : fetchedCategories;
 
   const containerVariants = {
     hidden: { opacity: 0 },
@@ -33,6 +37,9 @@ const PopularCategoriesSection = ({
       }
     }
   };
+
+  if (isLoading && propCategories.length === 0) return <Loading className="py-12" />;
+  if (isError && propCategories.length === 0) return null; // Or minor error state
 
   return (
     <section
@@ -110,11 +117,11 @@ const PopularCategoriesSection = ({
               role="button"
               tabIndex={0}
               aria-label={`View ${category.name} products`}
-              onClick={() => onCategoryClick(category)}
+              onClick={() => navigate(`/category/${encodeURIComponent(category.name)}`)}
               onKeyDown={(e) => {
                 if (e.key === 'Enter' || e.key === ' ') {
                   e.preventDefault();
-                  onCategoryClick(category);
+                  navigate(`/category/${encodeURIComponent(category.name)}`);
                 }
               }}
             >

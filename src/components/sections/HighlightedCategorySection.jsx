@@ -1,18 +1,29 @@
 import React from 'react';
+import { useNavigate } from 'react-router-dom';
 import { motion as Motion } from 'framer-motion';
 import { PharmacyProductCard } from '@/components/features/product';
-import { PRODUCTS } from '@/data/sampleData';
+import { useProducts } from '@/hooks/queries/useProducts';
+
+import Loading from '@/components/common/Loading';
+import ErrorState from '@/components/common/ErrorState';
 
 const HighlightedCategorySection = () => {
-  // Sample products data from mock
-  // Let's highlight Diabetes Care products
-  const products = PRODUCTS.filter(p => p.category === "Diabetes Care").slice(0, 5).map(p => ({
+  const navigate = useNavigate();
+  
+  // Fetch highlighted category
+  const { data, isLoading, isError } = useProducts({ category: "Diabetes Care", limit: 5 });
+  
+  const products = (data?.data || []).map(p => ({
      ...p,
      quantity: '1',
      unit: 'box',
      imageUrl: p.image, // Map image to imageUrl if card expects it
-     discount: 10 // Default discount if missing
+     discount: p.discount || 10 // Default discount if missing
   }));
+
+  if (isLoading) return <Loading className="py-20" />;
+  if (isError) return <ErrorState message="Failed to load highlighted items" />;
+
 
   const containerVariants = {
     hidden: { opacity: 0 },
@@ -42,11 +53,11 @@ const HighlightedCategorySection = () => {
   };
 
   const handleProductClick = (product) => {
-    console.log('Product clicked:', product);
+    navigate(`/product/${product.id}`);
   };
 
   const handleViewAll = () => {
-    console.log('View all clicked');
+    navigate('/category/Diabetes%20Care');
   };
 
   return (
@@ -145,7 +156,7 @@ const HighlightedCategorySection = () => {
                   duration: 0.5,
                   ease: "easeOut"
                 }}
-                className="w-[160px] shrink-0 sm:w-[220px]"
+                className="w-[160px] shrink-0 sm:w-[230px]"
               >
                 <PharmacyProductCard
                   {...product}

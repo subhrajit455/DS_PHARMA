@@ -114,6 +114,7 @@ const LoginPage = () => {
                     variant="primary"
                     size="full"
                     disabled={isPending}
+                    className="!bg-emerald-600 hover:!bg-emerald-700 !shadow-emerald-200"
                 >
                     {isPending ? 'Signing in...' : 'Sign In'}
                 </Button>

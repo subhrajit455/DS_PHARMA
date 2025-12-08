@@ -67,7 +67,7 @@ const ForgotPasswordPage = () => {
                     <div className="text-center">
                         <Link
                             to="/login"
-                            className="inline-flex items-center text-sm font-medium text-gray-600 hover:text-gray-900"
+                            className="sm:hidden inline-flex items-center text-sm font-medium text-gray-600 hover:text-gray-900"
                             style={{textDecoration:'none'}}
                         >
                             <ArrowLeft className="w-4 h-4 mr-2" />
@@ -103,6 +103,7 @@ const ForgotPasswordPage = () => {
                     variant="primary"
                     size="full"
                     disabled={isLoading}
+                    className="!bg-emerald-600 hover:!bg-emerald-700 !shadow-emerald-200"
                 >
                     {isLoading ? 'Sending Link...' : 'Send Reset Link'}
                 </Button>
@@ -110,7 +111,7 @@ const ForgotPasswordPage = () => {
                 <div className="text-center">
                     <Link
                         to="/login"
-                        className="inline-flex items-center text-sm font-medium text-gray-600 hover:text-gray-900"
+                        className="sm:hidden inline-flex items-center text-sm font-medium text-gray-600 hover:text-gray-900"
                         style={{textDecoration:'none'}}
                     >
                         <ArrowLeft className="w-4 h-4 mr-2" />

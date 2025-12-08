@@ -1,8 +1,15 @@
 import React from 'react';
+import { useNavigate } from 'react-router-dom';
 import { motion as Motion } from 'framer-motion';
 import { Trash2, Plus, Minus } from 'lucide-react';
 
 const CartItem = ({ item, onUpdateQuantity, onRemove }) => {
+  const navigate = useNavigate();
+
+  const handleProductClick = () => {
+    navigate(`/product/${item.id}`);
+  };
+
   return (
     <Motion.div
       key={item.id}
@@ -20,7 +27,8 @@ const CartItem = ({ item, onUpdateQuantity, onRemove }) => {
       <div className="flex gap-4">
         {/* Product Image */}
         <div
-          className="shrink-0 overflow-hidden w-16 h-16 md:w-[72px] md:h-[72px] rounded-lg bg-gray-100"
+          className="shrink-0 overflow-hidden w-16 h-16 md:w-[72px] md:h-[72px] rounded-lg bg-gray-100 cursor-pointer hover:opacity-80 transition-opacity"
+          onClick={handleProductClick}
         >
           <img
             src={item.image}
@@ -34,7 +42,8 @@ const CartItem = ({ item, onUpdateQuantity, onRemove }) => {
           <div className="flex justify-between items-start">
             <div className="flex-1 pr-4 text-bottom">
               <h3
-                className="font-gyrotrope text-xs md:text-[16px] font-semibold text-black mb-5 leading-relaxed tracking-tight pt-2"
+                className="font-gyrotrope text-xs md:text-[16px] font-semibold text-black mb-5 leading-relaxed tracking-tight pt-2 cursor-pointer hover:text-emerald-600 transition-colors"
+                onClick={handleProductClick}
               >
                 {item.name}
               </h3>
@@ -78,7 +87,7 @@ const CartItem = ({ item, onUpdateQuantity, onRemove }) => {
                 paddingTop: '8px'
               }}>
                 <button
-                  onClick={() => onUpdateQuantity(item.id, -1)}
+                  onClick={() => onUpdateQuantity(item.id, Math.max(1, item.quantity - 1))}
                   className="flex items-center justify-center border hover:bg-gray-50 transition-colors cursor-pointer w-6 h-6 md:w-7 md:h-7 rounded-md border-gray-300"
                   aria-label="Decrease quantity"
                 >
@@ -88,7 +97,7 @@ const CartItem = ({ item, onUpdateQuantity, onRemove }) => {
                   {item.quantity || 1}
                 </span>
                 <button
-                  onClick={() => onUpdateQuantity(item.id, 1)}
+                  onClick={() => onUpdateQuantity(item.id, item.quantity + 1)}
                   className="flex items-center justify-center border hover:bg-gray-50 transition-colors cursor-pointer w-6 h-6 md:w-7 md:h-7 rounded-md border-gray-300"
                   aria-label="Increase quantity"
                 >

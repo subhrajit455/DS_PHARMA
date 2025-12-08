@@ -21,7 +21,7 @@ export const MobileTopBar = ({ totalCartItems, isAuthenticated, user }) => {
   }, [navigate]);
 
   return (
-    <div className="md:hidden fixed top-0 left-0 right-0 z-50 bg-[rgba(165,232,220,0.95)] backdrop-blur-md border-b border-white/20 shadow-sm px-4 py-5 mt-5" style={{ padding: '10px 5px' }}>
+    <div className="md:hidden fixed top-0 left-0 right-0 z-50 bg-[rgba(165,232,220,0.95)] backdrop-blur-md border-b border-white/20 shadow-sm px-4 py-3" style={{ padding: '10px 5px' }}>
       <div className="flex items-center justify-between">
         <span
           style={{

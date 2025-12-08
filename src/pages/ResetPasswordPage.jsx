@@ -95,6 +95,7 @@ const ResetPasswordPage = () => {
                         onClick={() => navigate('/login')}
                         variant="primary"
                         size="full"
+                        className="!bg-emerald-600 hover:!bg-emerald-700 !shadow-emerald-200"
                     >
                         Go to Login
                     </Button>
@@ -141,6 +142,7 @@ const ResetPasswordPage = () => {
                     variant="primary"
                     size="full"
                     disabled={isLoading}
+                    className="!bg-emerald-600 hover:!bg-emerald-700 !shadow-emerald-200"
                 >
                     {isLoading ? 'Resetting Password...' : 'Reset Password'}
                 </Button>
@@ -148,7 +150,7 @@ const ResetPasswordPage = () => {
                 <div className="text-center" style={{ padding: '10px' }}>
                     <Link
                         to="/login"
-                        className="inline-flex items-center text-sm font-medium text-gray-600 hover:text-gray-900"
+                        className="sm:hidden inline-flex items-center text-sm font-medium text-gray-600 hover:text-gray-900"
                         style={{ textDecoration: 'none' }}
                     >
                         <ArrowLeft className="w-4 h-4 mr-2" />

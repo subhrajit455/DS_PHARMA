@@ -11,26 +11,40 @@ import { AppliedCouponCard } from "@/components/features/payment";
 import SuggestedItemsSection from "@/components/sections/SuggestedItemsSection";
 import { useOrderDetails } from "@/hooks/queries/useOrders";
 
-import { PRODUCTS } from '@/data/sampleData';
-import { MOCK_ORDERS } from '@/data/userData';
+import { useProducts } from '@/hooks/queries/useProducts';
 
 const OrderDetails = () => {
   const navigate = useNavigate();
   const { id } = useParams();
   
   // Fetch order details using React Query
-  const { data: orderData } = useOrderDetails(id);
+  const { data: orderResponse, isLoading } = useOrderDetails(id);
+  
+  const order = orderResponse?.data;
+  
+  // Suggestions
+  const { data: suggestionsData } = useProducts({ limit: 5 });
+  const suggestedItems = suggestionsData?.data || [];
 
-  // Mock data as fallback
-  const mockOrder = MOCK_ORDERS.find(o => o.id === id) || MOCK_ORDERS[0];
+  if (isLoading) return <div className="min-h-screen pt-32 text-center">Loading order details...</div>;
+  if (!order) return <div className="min-h-screen pt-32 text-center">Order not found</div>;
 
-  // Use real data if available, otherwise mock
-  const order = orderData || mockOrder;
+  // Normalize payment breakdown (handle both totals and paymentBreakdown)
+  const paymentBreakdown = order.paymentBreakdown || order.totals || {
+    totalCartValue: 0,
+    discount: 0,
+    coupon: 0,
+    gst: 0,
+    deliveryCharges: 0,
+    total: 0
+  };
 
-  const suggestedItems = PRODUCTS.slice(0, 5).map(p => ({
-    ...p,
-    image: p.image || p.imageUrl 
-  }));
+  // Normalize customer address (handle both customerAddress and deliveryAddress)
+  const customerAddress = order.customerAddress || order.deliveryAddress || {
+    name: order.customerName || 'N/A',
+    phone: order.phone || 'N/A',
+    address: order.address || 'N/A'
+  };
 
   const handleCancelOrder = () => navigate("/orders");
   const handleChangeAddress = () => console.log("Change address");
@@ -38,10 +52,10 @@ const OrderDetails = () => {
   const handleDownloadReceipt = () => console.log("Download receipt");
 
   return (
-    <div style={{ paddingTop: '60px' }}>
+    <div style={{ paddingTop: '20px' }}>
       <style>{` 
          @media (min-width: 768px) { 
-           .orders-container { 
+           .order-details-container { 
              padding-top: 80px !important; 
            } 
          }
@@ -58,16 +72,11 @@ const OrderDetails = () => {
            }
          }
        `}</style>
-      <div className="orders-container flex flex-col min-h-screen bg-gray-50">
-        {/* Main Content */}
-        <main
-          className="grow"
-          style={{ paddingBottom: "20px" }}
+      <div className="order-details-container w-full pt-4 pb-16 lg:pt-32 lg:pb-16">
+        <div
+          className="w-full px-4 mx-auto"
+          style={{ maxWidth: "1280px", margin: "10px auto" }}
         >
-          <div
-            className="order-details-container w-full px-4 mx-auto max-w-7xl"
-            style={{ maxWidth: "1240px", margin: "0 auto" }}
-          >
             {/* Header */}
             <div className="mb-6">
               <h1
@@ -134,17 +143,15 @@ const OrderDetails = () => {
               <div className="py-2 lg:h-full">
                 <div className="flex flex-col space-y-4 lg:space-y-0 lg:h-full lg:gap-4 min-h-[300px]">
                   <DeliveryAddressCard
-                    address={order.customerAddress}
+                    address={customerAddress}
                     onChangeAddress={handleChangeAddress}
                     className="lg:flex-1"
                   />
                   <AppliedCouponCard coupon={order.appliedCoupon} className="lg:flex-1" />
-                  <PaymentBreakdownCard breakdown={order.paymentBreakdown} className="lg:flex-1" />
+                  <PaymentBreakdownCard breakdown={paymentBreakdown} className="lg:flex-1" />
                 </div>
               </div>
             </div>
-
-
 
             {/* Suggested Items Section */}
             <SuggestedItemsSection
@@ -157,9 +164,8 @@ const OrderDetails = () => {
               containerStyle={{ marginBottom: '20px' }}
             />
           </div>
-        </main>
+        </div>
       </div>
-    </div>
   );
 };
 
