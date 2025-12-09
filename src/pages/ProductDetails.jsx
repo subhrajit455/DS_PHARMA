@@ -41,7 +41,11 @@ const ProductDetails = () => {
   const suggestedItems = suggestedData?.data || [];
 
   // If loading, show skeleton (implemented simply for now)
-  if (isProductLoading) return <div className="min-h-screen pt-32 flex justify-center"><div className="animate-spin h-8 w-8 border-4 border-emerald-500 rounded-full border-t-transparent"></div></div>;
+  if (isProductLoading) return (
+    <div className="flex justify-center items-center min-h-screen pt-20">
+      <div className="animate-spin h-12 w-12 border-4 border-emerald-500 rounded-full border-t-transparent"></div>
+    </div>
+  );
 
   // Use real data or fallback object structure if somehow missing (should be handled by error boundary usually)
   const product = fetchedProduct ? {
@@ -56,7 +60,11 @@ const ProductDetails = () => {
     }
   } : null;
 
-  if (!product) return <div className="min-h-screen pt-32 text-center">Product not found</div>;
+  if (!product) return (
+    <div className="flex justify-center items-center min-h-screen pt-20">
+      <h2 className="text-xl font-semibold text-gray-700 font-gyrotrope">Product not found</h2>
+    </div>
+  );
 
   const scrollThumbnails = (direction) => {
     if (direction === 'up' && selectedImage > 0) {

@@ -1,4 +1,5 @@
 import { MOCK_ORDERS } from "../data/userData.js";
+import { mockCartService } from "./mockCartService";
 
 // Initialize orders from localStorage or default to MOCK_ORDERS
 const initializeOrders = () => {
@@ -39,15 +40,38 @@ export const mockOrderService = {
       status: "Pending",
       ...orderData,
       timeline: [
-        { status: "Order Placed", date: new Date().toLocaleDateString('en-US', { day: 'numeric', month: 'short', year: 'numeric' }), completed: true, active: true },
+        {
+          status: "Order Placed",
+          date: new Date().toLocaleDateString("en-US", {
+            day: "numeric",
+            month: "short",
+            year: "numeric",
+          }),
+          completed: true,
+          active: true,
+        },
         { status: "Confirmed", date: "", completed: false, active: false },
-        { status: "Expected Delivery", date: "Within 5 days", completed: false, active: false },
-        { status: "Out for Delivery", date: "", completed: false, active: false },
+        {
+          status: "Expected Delivery",
+          date: "Within 5 days",
+          completed: false,
+          active: false,
+        },
+        {
+          status: "Out for Delivery",
+          date: "",
+          completed: false,
+          active: false,
+        },
         { status: "Delivered", date: "", completed: false, active: false },
       ],
     };
     orders.unshift(newOrder); // Add to beginning
     saveOrders(); // Persist to storage
+
+    // Clear the cart on the "server side"
+    await mockCartService.clearCart();
+
     return { data: newOrder };
   },
 };

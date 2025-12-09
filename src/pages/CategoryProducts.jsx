@@ -68,8 +68,8 @@ const CategoryProducts = () => {
     }
   };
 
-  if (isLoading) return <Loading className="py-20" />;
-  if (isError) return <ErrorState message="Failed to load products" />;
+  if (isLoading) return <Loading className="min-h-[60vh]" />;
+  if (isError) return <ErrorState message="Failed to load products" className="my-20" />;
 
   return (
     <div style={{ paddingTop: '3rem' }}>
@@ -147,7 +147,7 @@ const CategoryProducts = () => {
               ))}
             </Motion.div>
           ) : (
-            <div className="flex flex-col min-h-[400px] items-center justify-center py-16 text-center">
+            <div className="flex flex-col min-h-[60vh] items-center justify-center py-16 text-center">
               <Package className="w-16 h-16 text-gray-300 mb-4" />
               <h3 className="text-xl font-semibold text-gray-900 mb-2" style={{ fontFamily: 'Gyrotrope' }}>
                 No Products Found

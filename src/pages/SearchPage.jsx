@@ -1,7 +1,7 @@
 import React, { useState, useEffect } from 'react';
 import { useSearchParams } from 'react-router-dom';
 import { Filter, SlidersHorizontal, X } from 'lucide-react';
-import { motion, AnimatePresence } from 'framer-motion';
+import { AnimatePresence, motion } from 'framer-motion';
 import searchService from '@/services/api/searchService';
 import useDebounce from '@/hooks/useDebounce';
 import SearchResults from '@/components/features/search/SearchResults';
@@ -23,6 +23,9 @@ const SearchPage = () => {
      priceRangeStr: null, 
      inStock: searchParams.get('instock') === 'true',
   });
+  
+  // Temporary filters state for mobile drawer
+  const [tempFilters, setTempFilters] = useState(filters);
 
   const debouncedQuery = useDebounce(query, 300);
 
@@ -76,15 +79,12 @@ const SearchPage = () => {
   };
 
   return (
-    <div className="min-h-screen bg-gray-50/50 pt-28 pb-20">
+    <div className="min-h-screen bg-gray-50/50 pt-6 pb-20">
       <div className="px-4 sm:px-6 lg:px-8" style={{ width: '100%', maxWidth: '1280px', margin: '0 auto', padding:'10px' }}>
         
         {/* Header */}
         <div 
-          className="flex flex-col md:flex-row justify-between items-start md:justify-items-center gap-4 mb-8"
           style={{ 
-            position: 'sticky', 
-            top: '0', 
             zIndex: 30, 
             backgroundColor: 'rgba(249, 250, 251, 0.95)', 
             backdropFilter: 'blur(8px)',
@@ -92,6 +92,7 @@ const SearchPage = () => {
             paddingBottom: '1rem',
             marginTop: '-1rem' // Compensate for padding to maintain visual flow
           }}
+          className="flex flex-col md:flex-row justify-between items-start md:justify-items-center gap-4 mb-8 sticky md:sticky top-[60px] md:top-0"
         >
           <div>
              <h1 className="text-3xl font-bold text-gray-900 tracking-tight">
@@ -106,7 +107,10 @@ const SearchPage = () => {
 
           <div className="flex items-center gap-3 w-full md:w-auto">
              <button 
-                onClick={() => setIsMobileFiltersOpen(true)}
+                onClick={() => {
+                   setTempFilters(filters); // Initialize temp state with current real filters
+                   setIsMobileFiltersOpen(true);
+                }}
                 className="lg:hidden flex items-center gap-2 px-4 py-2.5 bg-white border border-gray-200 rounded-full text-sm font-semibold text-gray-700 shadow-sm active:scale-95 transition-all"
                 style={{ padding: '5px 10px' }}
              >
@@ -121,7 +125,7 @@ const SearchPage = () => {
 
         <div className="flex gap-8 items-start">
            {/* Sidebar Filters (Desktop) */}
-           <aside className="hidden lg:block w-72 shrink-0 sticky top-28">
+           <aside className="hidden lg:block w-72 shrink-0 sticky top-24">
               <SearchFilters 
                  filters={facets} 
                  selectedFilters={filters} 
@@ -158,14 +162,17 @@ const SearchPage = () => {
                         <div className="flex-1 overflow-y-auto p-5">
                            <SearchFilters 
                               filters={facets} 
-                              selectedFilters={filters} 
-                              onFilterChange={handleFilterChange}
+                              selectedFilters={tempFilters} 
+                              onFilterChange={setTempFilters}
                               className="shadow-none border-none p-0"
                            />
                         </div>
                         <div className="p-5 border-t border-gray-100 bg-gray-50">
                            <button 
-                              onClick={() => setIsMobileFiltersOpen(false)}
+                              onClick={() => {
+                                 setFilters(tempFilters); // Apply temp filters to real state
+                                 setIsMobileFiltersOpen(false);
+                              }}
                               className="w-full py-3 bg-emerald-600 text-white rounded-xl font-semibold hover:bg-emerald-700 transition-colors shadow-lg shadow-emerald-600/20"
                            >
                               Apply Filters

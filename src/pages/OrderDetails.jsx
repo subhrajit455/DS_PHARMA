@@ -26,8 +26,17 @@ const OrderDetails = () => {
   const { data: suggestionsData } = useProducts({ limit: 5 });
   const suggestedItems = suggestionsData?.data || [];
 
-  if (isLoading) return <div className="min-h-screen pt-32 text-center">Loading order details...</div>;
-  if (!order) return <div className="min-h-screen pt-32 text-center">Order not found</div>;
+  if (isLoading) return (
+    <div className="flex justify-center items-center min-h-screen pt-20">
+      <div className="w-12 h-12 border-4 border-teal-500 rounded-full border-t-transparent animate-spin"></div>
+    </div>
+  );
+  
+  if (!order) return (
+    <div className="flex justify-center items-center min-h-screen pt-20">
+      <h2 className="text-xl font-semibold text-gray-700 font-gyrotrope">Order not found</h2>
+    </div>
+  );
 
   // Normalize payment breakdown (handle both totals and paymentBreakdown)
   const paymentBreakdown = order.paymentBreakdown || order.totals || {
@@ -140,15 +149,14 @@ const OrderDetails = () => {
               </div>
 
               {/* Right Section */}
-              <div className="py-2 lg:h-full">
-                <div className="flex flex-col space-y-4 lg:space-y-0 lg:h-full lg:gap-4 min-h-[300px]">
+              <div className="py-2">
+                <div className="flex flex-col space-y-4 lg:space-y-0 lg:gap-4">
                   <DeliveryAddressCard
                     address={customerAddress}
                     onChangeAddress={handleChangeAddress}
-                    className="lg:flex-1"
                   />
-                  <AppliedCouponCard coupon={order.appliedCoupon} className="lg:flex-1" />
-                  <PaymentBreakdownCard breakdown={paymentBreakdown} className="lg:flex-1" />
+                  <AppliedCouponCard coupon={order.appliedCoupon} />
+                  <PaymentBreakdownCard breakdown={paymentBreakdown} />
                 </div>
               </div>
             </div>

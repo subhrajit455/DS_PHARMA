@@ -41,11 +41,7 @@ function App() {
           <Route path="/forgot-password" element={<ForgotPasswordPage />} />
           <Route path="/reset-password/:token" element={<ResetPasswordPage />} />
           
-          {/* Search Page (No Layout) */}
-          <Route path="/search" element={<SearchPage />} />
-          
-          {/* Order Confirmation (No Layout) */}
-          <Route path="/order-confirmation/:orderId" element={<OrderConfirmation />} />
+
 
           {/* Protected/Main Routes (With Layout) */}
           <Route element={<Layout />}>
@@ -54,9 +50,12 @@ function App() {
             <Route path="/product/:id" element={<ProductDetails />} />
             <Route path="/category/:categoryName" element={<CategoryProducts />} />
             <Route path="/orders" element={<Orders />} />
-            <Route path="/order/:id" element={<OrderDetails />} />
+            <Route path="/orders/:id" element={<OrderDetails />} />
+            <Route path="/search" element={<SearchPage />} />
+            <Route path="/order-confirmation/:orderId" element={<OrderConfirmation />} />
+            <Route path="/profile" element={<UserProfile />} />
           </Route>
-          <Route path="/profile" element={<UserProfile />} />
+
         </Routes>
       </Router>
       <ReactQueryDevtools initialIsOpen={false} />

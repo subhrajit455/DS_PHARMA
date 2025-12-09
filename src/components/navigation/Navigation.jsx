@@ -1,4 +1,4 @@
-import { useNavigate } from 'react-router-dom';
+import { useNavigate, useLocation } from 'react-router-dom';
 import { useAuthStore } from '../../store/useAuthStore';
 import { useCartStore } from '../../store/useCartStore';
 import { useActiveNavItem } from './hooks/useActiveNavItem';
@@ -11,6 +11,7 @@ import { MobileBottomNav } from './MobileBottomNav';
  */
 const Navigation = () => {
   const navigate = useNavigate();
+  const location = useLocation();
   const { user, isAuthenticated } = useAuthStore();
   const totalCartItems = useCartStore((state) => state.getTotalItems());
   const activeItem = useActiveNavItem();
@@ -109,13 +110,15 @@ const Navigation = () => {
       `}</style>
 
       {/* Desktop Navigation */}
-      <DesktopNavigation
-        activeItem={activeItem}
-        onNavClick={handleNavClick}
-        totalCartItems={totalCartItems}
-        isAuthenticated={isAuthenticated}
-        user={user}
-      />
+      {location.pathname !== '/search' && (
+        <DesktopNavigation
+          activeItem={activeItem}
+          onNavClick={handleNavClick}
+          totalCartItems={totalCartItems}
+          isAuthenticated={isAuthenticated}
+          user={user}
+        />
+      )}
 
       {/* Mobile Top Bar */}
       <MobileTopBar

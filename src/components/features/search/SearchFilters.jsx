@@ -234,10 +234,10 @@ export const SearchFilters = ({ filters, selectedFilters, onFilterChange, onView
          <div className="mt-4 pt-4 border-t border-gray-100" style={{ padding: '10px' }}>
            <button
              onClick={onViewAll}
-             className="w-full py-2.5 bg-emerald-600 hover:bg-emerald-700 text-white text-sm font-semibold rounded-xl transition-all shadow-md shadow-emerald-200 active:scale-95 flex items-center justify-center gap-2"
+             className="w-full py-1.5 bg-emerald-600 hover:bg-emerald-700 text-white text-sm font-semibold rounded-xl transition-all shadow-md shadow-emerald-200 active:scale-95 flex items-center justify-center gap-1"
            >
-             <ShoppingBag className="w-4 h-4" />
-             View All Products
+             <ShoppingBag className="w-4 h-4 " />
+             <p style={{ marginTop: '5px' }} >View All Products</p>
            </button>
          </div>
        )}

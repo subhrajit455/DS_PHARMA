@@ -60,7 +60,7 @@ const OrdersList = () => {
 
     if (isLoading) {
         return (
-            <div className="flex justify-center p-8">
+            <div className="flex justify-center items-center h-[50vh] w-full">
                 <div className="w-8 h-8 border-4 border-teal-500 rounded-full border-t-transparent animate-spin"></div>
             </div>
         );

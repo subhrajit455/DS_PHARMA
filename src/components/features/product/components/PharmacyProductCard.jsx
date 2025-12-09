@@ -94,7 +94,7 @@ const PharmacyProductCard = ({
       <div className="relative pt-2 translate-y-1/8" >
         {/* Product Name */}
         <h3 className="flex items-center justify-start text-[14px] font-semibold leading-tight text-left text-gray-900 min-h-8">
-          {name}
+          {name.length > 15 ? `${name.substring(0, 15)}...` : name}
         </h3>
 
         {/* Price and Discount Row */}
@@ -112,27 +112,36 @@ const PharmacyProductCard = ({
           )}
         </div>
 
+        <style>{`
+          .neumorphic-cart-btn {
+            transition: all 300ms cubic-bezier(0.23, 1, 0.32, 1);
+            box-shadow: 0 10px 15px -3px rgba(0, 0, 0, 0.4), inset 0 -2px 3px -1px rgba(0, 0, 0, 0.2), 0 -5px 8px -1px rgba(255, 255, 255, 0.6), inset 0 2px 3px -1px rgba(255, 255, 255, 0.2), inset 0 0 3px 1px rgba(255, 255, 255, 0.8), inset 0 10px 15px 0 rgba(255, 255, 255, 0.2);
+            border-radius: 50%;
+            background: #eaeaea;
+            color: #333;
+          }
+          .neumorphic-cart-btn:active {
+            filter: blur(0.5px);
+            box-shadow: 0 8px 15px -3px rgba(0, 0, 0, 0.3), inset 0 -5px 15px 1px rgba(255, 255, 255, 0.9), 0 -5px 8px -1px rgba(255, 255, 255, 0.6), inset 0 5px 15px 0 rgba(0, 0, 0, 0.3), inset 0 0 5px 1px rgba(255, 255, 255, 0.6);
+            transform: translateY(-50%) scale(0.95);
+          }
+        `}</style>
+        
         {/* Cart Icon - Positioned absolutely */}
         <button
           onClick={handleAddToCart}
           disabled={isPending}
-          className={`absolute flex items-center justify-center transition-all duration-200 -translate-y-1/2 rounded-full shadow-md cursor-pointer right-0 top-1/2 hover:scale-110 focus:outline-none w-7 h-7 sm:w-[35px] sm:h-[35px] ${isPending ? 'opacity-50' : ''}`}
+          className={`absolute flex items-center justify-center -translate-y-1/2 cursor-pointer right-0 top-1/2 focus:outline-none w-8 h-8 sm:w-10 sm:h-10 neumorphic-cart-btn ${isPending ? 'opacity-50' : ''}`}
           aria-label={`Add ${name} to cart`}
-          style={{
-            backgroundColor: '#f5f5f5',
-            border: '1px solid #e8e8e8',
-            display: 'flex',
-            alignItems: 'center',
-            justifyContent: 'center'
-          }}
         >
           <img
             src={CartIcon}
             alt="Add to Cart"
             style={{
-              width: '15px',
-              height: '15px',
-              objectFit: 'contain'
+              width: '16px',
+              height: '16px',
+              objectFit: 'contain',
+              opacity: 0.8
             }}
           />
         </button>

@@ -37,7 +37,7 @@ const OrderCard = ({ order, index }) => {
       initial={{ opacity: 0, y: 15 }}
       animate={{ opacity: 1, y: 0 }}
       transition={{ delay: index * 0.08, duration: 0.4 }}
-      onClick={() => navigate(`/order/${order.id}`)}
+      onClick={() => navigate(`/orders/${order.id}`)}
       className="bg-white cursor-pointer transition-all duration-200 hover:shadow-lg hover:border-emerald-400 active:scale-[0.995] group"
       style={{
         borderRadius: '8px',
