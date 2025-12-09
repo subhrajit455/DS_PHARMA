@@ -1,8 +1,7 @@
 import apiClient from "../api/axios.config";
 import { ENDPOINTS } from "../api/endpoints";
-import { mockAuthService } from "./mockAuthService";
+import mockApi from "../api/mockApi";
 
-// Use mock service for local development
 // Use mock service for local development
 const USE_MOCK = import.meta.env.VITE_USE_MOCK === "true" || true;
 
@@ -12,7 +11,7 @@ export const authService = {
    */
   login: async (credentials) => {
     if (USE_MOCK) {
-      return mockAuthService.login(credentials);
+      return mockApi.login(credentials);
     }
     return apiClient.post(ENDPOINTS.LOGIN, credentials);
   },
@@ -22,7 +21,12 @@ export const authService = {
    */
   signup: async (userData) => {
     if (USE_MOCK) {
-      return mockAuthService.signup(userData);
+      // mockApi doesn't have signup yet, but hooks handle it directly
+      // This is a fallback - hooks should use useSignup which talks to store directly
+      console.warn(
+        "authService.signup called - hooks should use useSignup directly"
+      );
+      return { data: { success: true, message: "Use useSignup hook instead" } };
     }
     return apiClient.post(ENDPOINTS.SIGNUP, userData);
   },
@@ -32,7 +36,8 @@ export const authService = {
    */
   logout: async () => {
     if (USE_MOCK) {
-      return mockAuthService.logout();
+      // Logout is handled by useDataStore directly
+      return { data: { success: true } };
     }
     return apiClient.post(ENDPOINTS.LOGOUT);
   },
@@ -63,12 +68,15 @@ export const authService = {
    */
   getProfile: async () => {
     if (USE_MOCK) {
-      // Get token from store if needed
-      const token = localStorage.getItem("ds-pharma-auth");
-      if (token) {
-        const auth = JSON.parse(token);
-        return mockAuthService.getProfile(auth.state?.token);
+      // Get current user from localStorage (useDataStore persistence)
+      const storeData = localStorage.getItem("ds-pharma-store");
+      if (storeData) {
+        const parsed = JSON.parse(storeData);
+        if (parsed.state?.currentUser) {
+          return { data: parsed.state.currentUser };
+        }
       }
+      return { data: null };
     }
     return apiClient.get(ENDPOINTS.USER_PROFILE);
   },
@@ -78,11 +86,8 @@ export const authService = {
    */
   updateProfile: async (profileData) => {
     if (USE_MOCK) {
-      const token = localStorage.getItem("ds-pharma-auth");
-      if (token) {
-        const auth = JSON.parse(token);
-        return mockAuthService.updateProfile(profileData, auth.state?.token);
-      }
+      // In mock mode, profile updates should go through useDataStore
+      return { data: { ...profileData, success: true } };
     }
     return apiClient.put(ENDPOINTS.UPDATE_PROFILE, profileData);
   },

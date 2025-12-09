@@ -2,14 +2,12 @@ import React from 'react';
 import { useNavigate } from 'react-router-dom';
 import ProductCategorySection from './ProductCategorySection';
 import { useProducts } from '@/hooks/queries/useProducts';
-import { useCartStore } from '@/store/useCartStore';
 
 import Loading from '@/components/common/Loading';
 import ErrorState from '@/components/common/ErrorState';
 
 const PharmacyProductsShowcase = () => {
   const navigate = useNavigate();
-  const { addItem } = useCartStore();
   
   // Fetch products by category
   // In a real app, might want to use a specific "featured sections" endpoint to avoid waterfalls
@@ -29,17 +27,6 @@ const PharmacyProductsShowcase = () => {
 
   const isLoading = isFeverLoading || isAntibioticLoading || isVitaminLoading || isStomachLoading || isSkinLoading || isCoughLoading;
   const isError = isFeverError || isAntibioticError || isVitaminError || isStomachError || isSkinError || isCoughError;
-
-  const handleAddToCart = (product) => {
-    addItem({
-      id: product.id,
-      name: product.name,
-      productName: product.name,
-      price: product.price,
-      image: product.image,
-      quantity: 1
-    });
-  };
 
   const handleProductClick = (product) => {
     navigate(`/product/${product.id}`);
@@ -75,7 +62,6 @@ const PharmacyProductsShowcase = () => {
           <ProductCategorySection
             title="Fever & Pain Relief"
             products={paracetamolProducts}
-            onAddToCart={handleAddToCart}
             onProductClick={handleProductClick}
             onViewAll={handleViewAll}
             className="py-0 bg-transparent mb-0"
@@ -87,7 +73,6 @@ const PharmacyProductsShowcase = () => {
           <ProductCategorySection
             title="Antibiotics"
             products={antibioticProducts}
-            onAddToCart={handleAddToCart}
             onProductClick={handleProductClick}
             onViewAll={handleViewAll}
             className="py-0 bg-transparent mb-0"
@@ -99,7 +84,6 @@ const PharmacyProductsShowcase = () => {
           <ProductCategorySection
             title="Vitamins & Supplements"
             products={vitaminProducts}
-            onAddToCart={handleAddToCart}
             onProductClick={handleProductClick}
             onViewAll={handleViewAll}
             className="py-0 bg-transparent mb-0"
@@ -111,7 +95,6 @@ const PharmacyProductsShowcase = () => {
           <ProductCategorySection
             title="Stomach Care"
             products={stomachProducts}
-            onAddToCart={handleAddToCart}
             onProductClick={handleProductClick}
             onViewAll={handleViewAll}
             className="py-0 bg-transparent mb-0"
@@ -123,7 +106,6 @@ const PharmacyProductsShowcase = () => {
           <ProductCategorySection
             title="Skin Care"
             products={skinProducts}
-            onAddToCart={handleAddToCart}
             onProductClick={handleProductClick}
             onViewAll={handleViewAll}
             className="py-0 bg-transparent mb-0"
@@ -134,7 +116,6 @@ const PharmacyProductsShowcase = () => {
         <ProductCategorySection
           title="Cough & Cold"
           products={coughProducts}
-          onAddToCart={handleAddToCart}
           onProductClick={handleProductClick}
           onViewAll={handleViewAll}
           className="py-0 bg-transparent mb-0"

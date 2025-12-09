@@ -4,8 +4,7 @@ import { PharmacyProductCard } from '@/components/features/product';
 import { CartItem } from '@/components/features/cart';
 import { OrderSummary } from '@/components/features/order';
 import SuggestedItemsSection from '@/components/sections/SuggestedItemsSection';
-import { useCartStore } from '@/store/useCartStore';
-import { useCart } from '@/hooks/queries/useCart';
+import useDataStore from '@/store/useDataStore';
 import { useUpdateCart } from '@/hooks/mutations/useUpdateCart';
 import { useRemoveFromCart } from '@/hooks/mutations/useRemoveFromCart';
 import { usePlaceOrder } from '@/hooks/mutations/usePlaceOrder';
@@ -14,12 +13,10 @@ import { useProducts } from '@/hooks/queries/useProducts';
 
 
 const CartDetails = () => {
-  // We still use store for 'items' because useCart syncs to it, 
-  // ensuring global state consistency if other components check cart.
-  const { items: cartItems } = useCartStore();
+  // Use global data store for cart items
+  const cartItems = useDataStore((state) => state.cart);
   
   // API Hooks
-  useCart();
   const { mutate: updateCartItem } = useUpdateCart();
   const { mutate: removeCartItem } = useRemoveFromCart();
   const { mutate: placeOrder, isPending: isPlacingOrder } = usePlaceOrder();
@@ -38,9 +35,8 @@ const CartDetails = () => {
   });
 
   const updateQuantity = (id, newQuantity) => {
-      // Optimistic update logic could go here, or just call API
-      // Our hook expects { itemId, quantity }
-      updateCartItem({ itemId: id, quantity: Math.max(1, newQuantity) });
+      // Our refactored hook expects { productId, quantity }
+      updateCartItem({ productId: id, quantity: Math.max(1, newQuantity) });
   };
 
   const removeItem = (id) => {
@@ -93,7 +89,7 @@ const CartDetails = () => {
   };
 
   return (
-    <div style={{ paddingTop: '60px' }}>
+    <div style={{ paddingTop: '4rem' }}>
       <style>{` 
          @media (min-width: 768px) { 
            .orders-container { 

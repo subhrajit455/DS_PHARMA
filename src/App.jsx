@@ -15,6 +15,7 @@ import SignupPage from "./pages/SignupPage";
 import ForgotPasswordPage from "./pages/ForgotPasswordPage";
 import ResetPasswordPage from "./pages/ResetPasswordPage";
 import SearchPage from "./pages/SearchPage";
+import AdminRouter from "./admin/AdminRouter";
 import Layout from "@/components/layout/Layout.jsx";
 
 // Create React Query client
@@ -40,7 +41,12 @@ function App() {
           <Route path="/signup" element={<SignupPage />} />
           <Route path="/forgot-password" element={<ForgotPasswordPage />} />
           <Route path="/reset-password/:token" element={<ResetPasswordPage />} />
+
+          {/* Admin Routes */}
+          <Route path="/admin/*" element={<AdminRouter />} />
           
+          {/* Standalone Routes (No Layout) */}
+          <Route path="/profile" element={<UserProfile />} />
 
 
           {/* Protected/Main Routes (With Layout) */}
@@ -53,7 +59,7 @@ function App() {
             <Route path="/orders/:id" element={<OrderDetails />} />
             <Route path="/search" element={<SearchPage />} />
             <Route path="/order-confirmation/:orderId" element={<OrderConfirmation />} />
-            <Route path="/profile" element={<UserProfile />} />
+
           </Route>
 
         </Routes>

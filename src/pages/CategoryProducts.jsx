@@ -4,14 +4,12 @@ import { motion as Motion } from 'framer-motion';
 import { ArrowLeft, Package } from 'lucide-react';
 import { PharmacyProductCard } from '@/components/features/product';
 import { useProducts } from '@/hooks/queries/useProducts';
-import { useCartStore } from '@/store/useCartStore';
 import Loading from '@/components/common/Loading';
 import ErrorState from '@/components/common/ErrorState';
 
 const CategoryProducts = () => {
   const { categoryName } = useParams();
   const navigate = useNavigate();
-  const { addItem } = useCartStore();
 
   // Decode category name from URL
   const decodedCategory = decodeURIComponent(categoryName);
@@ -29,17 +27,6 @@ const CategoryProducts = () => {
       discount: p.mrp > p.price ? Math.round(((p.mrp - p.price) / p.mrp) * 100) : 0
     }));
   }, [data]);
-
-  const handleAddToCart = (product) => {
-    addItem({
-      id: product.id,
-      name: product.name,
-      productName: product.name,
-      price: product.price,
-      image: product.image,
-      quantity: 1
-    });
-  };
 
   const handleProductClick = (product) => {
     navigate(`/product/${product.id}`);
@@ -139,7 +126,6 @@ const CategoryProducts = () => {
                 >
                   <PharmacyProductCard
                     {...product}
-                    onAddToCart={handleAddToCart}
                     onCardClick={handleProductClick}
                     className="h-full"
                   />

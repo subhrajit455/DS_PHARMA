@@ -12,6 +12,14 @@ const PersonalInfoForm = ({
     handleInputChange,
     isSaving
 }) => {
+    // Helper to get first/last name from single name field if needed
+    const getFirstName = (data) => data.firstName || data.name?.split(' ')[0] || '';
+    const getLastName = (data) => data.lastName || data.name?.split(' ').slice(1).join(' ') || '';
+
+    // Initialize values logic
+    const currentFirstName = isEditing ? (tempData.firstName !== undefined ? tempData.firstName : getFirstName(tempData)) : getFirstName(profileData);
+    const currentLastName = isEditing ? (tempData.lastName !== undefined ? tempData.lastName : getLastName(tempData)) : getLastName(profileData);
+
     return (
         <Motion.div
             initial={{ opacity: 0, y: 20 }}
@@ -75,8 +83,14 @@ const PersonalInfoForm = ({
                     </label>
                     <input
                         type="text"
-                        value={isEditing ? tempData.firstName : profileData.firstName}
-                        onChange={(e) => handleInputChange('firstName', e.target.value)}
+                        value={currentFirstName}
+                        onChange={(e) => {
+                            const newFirst = e.target.value;
+                            handleInputChange('firstName', newFirst);
+                            // Also update full name for store consistency
+                            const currentLast = tempData.lastName !== undefined ? tempData.lastName : getLastName(tempData);
+                            handleInputChange('name', `${newFirst} ${currentLast}`.trim());
+                        }}
                         disabled={!isEditing}
                         className="w-full px-3 py-2 text-sm border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-teal-500 disabled:bg-gray-50"
                         style={{ fontFamily: 'Gyrotrope' }}
@@ -89,8 +103,14 @@ const PersonalInfoForm = ({
                     </label>
                     <input
                         type="text"
-                        value={isEditing ? tempData.lastName : profileData.lastName}
-                        onChange={(e) => handleInputChange('lastName', e.target.value)}
+                        value={currentLastName}
+                        onChange={(e) => {
+                            const newLast = e.target.value;
+                            handleInputChange('lastName', newLast);
+                             // Also update full name for store consistency
+                             const currentFirst = tempData.firstName !== undefined ? tempData.firstName : getFirstName(tempData);
+                             handleInputChange('name', `${currentFirst} ${newLast}`.trim());
+                        }}
                         disabled={!isEditing}
                         className="w-full px-3 py-2 text-sm border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-teal-500 disabled:bg-gray-50"
                         style={{ fontFamily: 'Gyrotrope' }}
@@ -162,7 +182,7 @@ const PersonalInfoForm = ({
                     </label>
                     <input
                         type="text"
-                        value={isEditing ? tempData.address.street : profileData.address.street}
+                        value={isEditing ? (tempData.address?.street || '') : (profileData.address?.street || '')}
                         onChange={(e) => handleInputChange('address.street', e.target.value)}
                         disabled={!isEditing}
                         className="w-full px-3 py-2 text-sm border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-teal-500 disabled:bg-gray-50"
@@ -176,7 +196,7 @@ const PersonalInfoForm = ({
                     </label>
                     <input
                         type="text"
-                        value={isEditing ? tempData.address.city : profileData.address.city}
+                        value={isEditing ? (tempData.address?.city || '') : (profileData.address?.city || '')}
                         onChange={(e) => handleInputChange('address.city', e.target.value)}
                         disabled={!isEditing}
                         className="w-full px-3 py-2 text-sm border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-teal-500 disabled:bg-gray-50"
@@ -190,7 +210,7 @@ const PersonalInfoForm = ({
                     </label>
                     <input
                         type="text"
-                        value={isEditing ? tempData.address.state : profileData.address.state}
+                        value={isEditing ? (tempData.address?.state || '') : (profileData.address?.state || '')}
                         onChange={(e) => handleInputChange('address.state', e.target.value)}
                         disabled={!isEditing}
                         className="w-full px-3 py-2 text-sm border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-teal-500 disabled:bg-gray-50"
@@ -204,7 +224,7 @@ const PersonalInfoForm = ({
                     </label>
                     <input
                         type="text"
-                        value={isEditing ? tempData.address.pincode : profileData.address.pincode}
+                        value={isEditing ? (tempData.address?.pincode || '') : (profileData.address?.pincode || '')}
                         onChange={(e) => handleInputChange('address.pincode', e.target.value)}
                         disabled={!isEditing}
                         className="w-full px-3 py-2 text-sm border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-teal-500 disabled:bg-gray-50"
@@ -218,7 +238,7 @@ const PersonalInfoForm = ({
                     </label>
                     <input
                         type="text"
-                        value={isEditing ? tempData.address.country : profileData.address.country}
+                        value={isEditing ? (tempData.address?.country || '') : (profileData.address?.country || '')}
                         onChange={(e) => handleInputChange('address.country', e.target.value)}
                         disabled={!isEditing}
                         className="w-full px-3 py-2 text-sm border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-teal-500 disabled:bg-gray-50"

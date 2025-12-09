@@ -6,7 +6,6 @@ const ProductCategorySection = ({
   title = 'Product Category Title',
   products = [],
   onViewAll = () => { },
-  onAddToCart = () => { },
   onProductClick = () => { },
   className = ''
 }) => {
@@ -108,7 +107,6 @@ const ProductCategorySection = ({
               >
                 <PharmacyProductCard
                   {...product}
-                  onAddToCart={onAddToCart}
                   onCardClick={onProductClick}
                   className="w-full h-full"
                 />

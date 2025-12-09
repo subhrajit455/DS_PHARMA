@@ -3,13 +3,17 @@
  * Run with: node enhanceProducts.js
  */
 
-const fs = require("fs");
-const path = require("path");
+import { readFileSync, writeFileSync } from "fs";
+import { join, dirname } from "path";
+import { fileURLToPath } from "url";
 
-const SAMPLE_DATA_PATH = path.join(__dirname, "src", "data", "sampleData.js");
+const __filename = fileURLToPath(import.meta.url);
+const __dirname = dirname(__filename);
+
+const SAMPLE_DATA_PATH = join(__dirname, "src", "data", "sampleData.js");
 
 // Read the file
-let fileContent = fs.readFileSync(SAMPLE_DATA_PATH, "utf8");
+let fileContent = readFileSync(SAMPLE_DATA_PATH, "utf8");
 
 // Generate realistic random values
 function getRandomRating() {
@@ -73,7 +77,7 @@ fileContent = fileContent.replace(productPattern, enhanceProduct);
 console.log(`Enhanced ${enhancedProducts.size} products`);
 
 // Write back to file
-fs.writeFileSync(SAMPLE_DATA_PATH, fileContent, "utf8");
+writeFileSync(SAMPLE_DATA_PATH, fileContent, "utf8");
 
 console.log("✅ Successfully enhanced all products!");
 console.log("Added fields: rating, stock, reviewCount");

@@ -48,10 +48,6 @@ const HighlightedCategorySection = () => {
     }
   };
 
-  const handleAddToCart = (product) => {
-    console.log('Add to cart:', product);
-  };
-
   const handleProductClick = (product) => {
     navigate(`/product/${product.id}`);
   };
@@ -160,7 +156,6 @@ const HighlightedCategorySection = () => {
               >
                 <PharmacyProductCard
                   {...product}
-                  onAddToCart={handleAddToCart}
                   onCardClick={handleProductClick}
                   className="h-full w-full"
                 />

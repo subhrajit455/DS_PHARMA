@@ -10,13 +10,13 @@ import OrdersList from '@/components/features/profile/OrdersList';
 import AddressesList from '@/components/features/profile/AddressesList';
 import SecuritySettings from '@/components/features/profile/SecuritySettings';
 import { useProfile, useUpdateProfile } from '@/hooks/queries/useProfile';
-import { useAuthStore } from '@/store/useAuthStore';
+import useDataStore from '@/store/useDataStore';
 
 import { USERS } from '@/data/userData';
 
 const UserProfile = () => {
   const navigate = useNavigate();
-  const { isAuthenticated } = useAuthStore();
+  const { isAuthenticated, currentUser, orders, wishlist, logout } = useDataStore();
   const [isEditing, setIsEditing] = useState(false);
   const [activeTab, setActiveTab] = useState('profile');
 
@@ -27,28 +27,43 @@ const UserProfile = () => {
     }
   }, [isAuthenticated, navigate]);
 
+  // Logout handler
+  const handleLogout = () => {
+    logout();
+    navigate('/login');
+  };
+
   // Fetch profile data
   const { data: profileDataResponse, isLoading } = useProfile();
   const { mutate: updateProfile, isPending: isUpdating } = useUpdateProfile();
 
   // Mock data as fallback
-  const mockProfileData = USERS[0];
+  // Prioritize current user from store, then fetch, then mock
+  const [profileData, setProfileData] = useState(currentUser || USERS[0]);
 
-  const profileData = profileDataResponse?.data || mockProfileData;
+  // Sync profileData with store or fetch
+  useEffect(() => {
+    if (currentUser) {
+      setProfileData(currentUser);
+      setTempData(currentUser);
+    } else if (profileDataResponse?.data) {
+      setProfileData(profileDataResponse.data);
+      setTempData(profileDataResponse.data);
+    }
+  }, [currentUser, profileDataResponse]);
 
   const [tempData, setTempData] = useState({ ...profileData });
 
-  // Update tempData when profileData changes (e.g. after fetch)
-  useEffect(() => {
-    if (profileData) {
-      setTempData({ ...profileData });
-    }
-  }, [profileData]);
 
+
+  // Calculate dynamic stats from store
+  const userOrders = orders.filter(o => o.customerId === currentUser?.id || o.customerName === currentUser?.name);
+  const pendingOrders = userOrders.filter(o => !['Delivered', 'Cancelled', 'Returned'].includes(o.status));
+  
   const stats = [
-    { icon: ShoppingBag, label: 'Total Orders', value: '24' },
-    { icon: Package, label: 'Pending', value: '3' },
-    { icon: Heart, label: 'Wishlist', value: '12' },
+    { icon: ShoppingBag, label: 'Total Orders', value: String(userOrders.length) },
+    { icon: Package, label: 'Pending', value: String(pendingOrders.length) },
+    { icon: Heart, label: 'Wishlist', value: String(wishlist.length) },
     { icon: CreditCard, label: 'Saved Cards', value: '2' }
   ];
 
@@ -137,7 +152,7 @@ const UserProfile = () => {
 
             {/* Header Section */}
             <div className="p-4 mb-6 shadow-lg bg-linear-to-r from-emerald-500 to-teal-500 rounded-2xl md:p-8" style={{ padding: '10px' }}>
-              <ProfileHeader profileData={profileData} />
+              <ProfileHeader profileData={profileData} onLogout={handleLogout} />
               <ProfileStats stats={stats} />
             </div>
 
@@ -171,8 +186,6 @@ const UserProfile = () => {
           </div>
         </div>
       </main>
-
-      {/* Footer */}
       <Footer />
     </div>
   );

@@ -1,42 +1,62 @@
+// DEPRECATED: This service is largely redundant
+// Cart operations should use useDataStore directly via mutation hooks
+//
+// Migration guide:
+// OLD: cartService.addToCart()
+// NEW: Use useAddToCart() hook which updates useDataStore directly
+//
+// OLD: cartService.getCart()
+// NEW: const cart = useDataStore((state) => state.cart)
+
 import apiClient from "./api/apiClient";
 import { API_ENDPOINTS } from "./api/baseURL";
-import { mockCartService } from "./mockCartService";
 
 const USE_MOCK = import.meta.env.VITE_USE_MOCK === "true" || true;
 
 export const cartService = {
   getCart: async () => {
-    if (USE_MOCK) return mockCartService.getCart();
+    if (USE_MOCK) {
+      // Read from global store
+      const storeData = localStorage.getItem("ds-pharma-store");
+      if (storeData) {
+        const parsed = JSON.parse(storeData);
+        return { data: parsed.state?.cart || [] };
+      }
+      return { data: [] };
+    }
     return apiClient.get(API_ENDPOINTS.CART);
   },
 
-  addToCart: async (productId, quantity) => {
-    if (USE_MOCK) return mockCartService.addToCart({ id: productId, quantity });
-    return apiClient.post(API_ENDPOINTS.CART_ADD, { productId, quantity });
+  // All mutation methods deprecated - use hooks instead
+  addToCart: async () => {
+    console.warn("cartService.addToCart is deprecated - use useAddToCart hook");
+    return { data: { message: "Use useAddToCart hook" } };
   },
 
-  // Method to handle full item object (common in UI currently)
-  addItem: async (item) => {
-    if (USE_MOCK) return mockCartService.addToCart(item);
-    return apiClient.post(API_ENDPOINTS.CART_ADD, {
-      productId: item.id,
-      quantity: item.quantity,
-    });
+  addItem: async () => {
+    console.warn("cartService.addItem is deprecated - use useAddToCart hook");
+    return { data: { message: "Use useAddToCart hook" } };
   },
 
-  updateItem: async (itemId, quantity) => {
-    if (USE_MOCK) return mockCartService.updateCartItem(itemId, quantity);
-    return apiClient.put(API_ENDPOINTS.CART_UPDATE, { itemId, quantity });
+  updateItem: async () => {
+    console.warn(
+      "cartService.updateItem is deprecated - use useUpdateCart hook"
+    );
+    return { data: { message: "Use useUpdateCart hook" } };
   },
 
-  removeItem: async (itemId) => {
-    if (USE_MOCK) return mockCartService.removeFromCart(itemId);
-    return apiClient.delete(API_ENDPOINTS.CART_REMOVE, { data: { itemId } });
+  removeItem: async () => {
+    console.warn(
+      "cartService.removeItem is deprecated - use useRemoveFromCart hook"
+    );
+    return { data: { message: "Use useRemoveFromCart hook" } };
   },
 
   clearCart: async () => {
-    if (USE_MOCK) return mockCartService.clearCart();
-    return apiClient.delete(API_ENDPOINTS.CART);
+    console.warn(
+      "cartService.clearCart is deprecated - use useDataStore clearCart action"
+    );
+    return { data: { message: "Use useDataStore clearCart" } };
   },
 };
 

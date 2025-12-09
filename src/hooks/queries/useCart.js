@@ -1,3 +1,10 @@
+// DEPRECATED: This hook is no longer needed
+// Use `useDataStore` directly to access cart data
+//
+// Example migration:
+// OLD: const { data: cart } = useCart();
+// NEW: const cart = useDataStore((state) => state.cart);
+
 import { useQuery } from "@tanstack/react-query";
 import { cartService } from "../../services/cartService";
 import { useCartStore } from "../../store/useCartStore";

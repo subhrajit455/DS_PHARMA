@@ -1,7 +1,7 @@
 import React from 'react';
-import { User, Camera } from 'lucide-react';
+import { User, Camera, LogOut } from 'lucide-react';
 
-const ProfileHeader = ({ profileData }) => {
+const ProfileHeader = ({ profileData, onLogout }) => {
     return (
         <div className="flex flex-row items-center gap-4 md:gap-6" style={{ padding: '5px' }}>
             {/* Profile Picture */}
@@ -41,6 +41,17 @@ const ProfileHeader = ({ profileData }) => {
                     </span>
                 </div>
             </div>
+
+            
+            {/* Logout Button (Desktop/Mobile) */}
+            <button
+                onClick={onLogout}
+                className="flex items-center gap-2 px-3 py-1.5 md:px-4 md:py-2 text-xs md:text-sm font-semibold text-white bg-white/20 backdrop-blur-sm rounded-lg hover:bg-white/30 transition-colors ml-auto cursor-pointer"
+                style={{ fontFamily: 'Gyrotrope' }}
+            >
+                <LogOut className="w-3 h-3 md:w-4 md:h-4" />
+                <span>Logout</span>
+            </button>
         </div>
     );
 };

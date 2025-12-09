@@ -5,26 +5,43 @@ import { OrderCard } from '@/components/features/order';
 import SuggestedItemsSection from '@/components/sections/SuggestedItemsSection';
 import { useOrders } from '@/hooks/queries/useOrders';
 import { useProducts } from '@/hooks/queries/useProducts';
+import useDataStore from '@/store/useDataStore';
 
 const Orders = () => {
   const [searchQuery, setSearchQuery] = useState('');
+  const currentUser = useDataStore((state) => state.currentUser);
   
   // Fetch orders using React Query (API orders)
-  // This will return mock data if USE_MOCK is true, or real data
   const { data: ordersData } = useOrders();
 
-  // Combine stored orders (if any local persistence still needed) with API data
-  // But strictly, we should rely on API. 
-  // For hybrid transition:
+  // Get API orders and filter by current user
   const apiOrders = ordersData?.data || [];
   
-  // Use API orders as primary source
-  const allOrders = apiOrders.map(order => ({
+  // Filter by current user
+  const userOrders = apiOrders.filter(order => 
+    order.customerId === currentUser?.id || 
+    order.customerName === currentUser?.name
+  );
+  
+  // Map orders with correct data
+  const allOrders = userOrders.map(order => {
+    // Calculate total items from items array
+    const totalItems = order.items ? order.items.reduce((sum, item) => sum + (item.quantity || 1), 0) : 0;
+    
+    return {
       ...order,
-      // Ensure image/name fallbacks
+      totalItems: totalItems, // ✅ Use separate field for count
+      // items: order.items, // ✅ Keep original items array (already in ...order)
       productName: order.items?.[0]?.productName || order.items?.[0]?.name || 'Order',
       image: order.items?.[0]?.image || order.items?.[0]?.imageUrl || 'https://images.unsplash.com/photo-1584308666744-24d5c474f2ae?auto=format&fit=crop&w=400&q=80',
-  }));
+      total: order.totals?.total || order.paymentBreakdown?.total || 0,
+      date: order.date || new Date(order.createdAt).toLocaleDateString("en-GB", {
+        day: "numeric", 
+        month: "short",
+        year: "numeric"
+      })
+    };
+  });
 
   // Filter orders based on search query
   const filteredOrders = allOrders.filter(order => 

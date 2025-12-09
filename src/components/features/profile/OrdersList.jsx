@@ -3,60 +3,21 @@ import { motion as Motion } from 'framer-motion';
 import { Package } from 'lucide-react';
 import { useNavigate } from 'react-router-dom';
 import { useOrders } from '@/hooks/queries/useOrders';
+import useDataStore from '@/store/useDataStore';
 
 const OrdersList = () => {
     const navigate = useNavigate();
+    const currentUser = useDataStore((state) => state.currentUser);
     
     // Fetch orders using React Query
     const { data: ordersData, isLoading } = useOrders();
 
-    // Mock data as fallback
-    const mockOrders = [
-        { 
-            id: 1001, 
-            date: 'Nov 28, 2024', 
-            items: 5, 
-            total: 1250, 
-            status: 'Delivered', 
-            statusColor: 'green',
-            timeline: [
-                { status: "Order Placed", completed: true, active: false, date: "24 Nov, 2024" },
-                { status: "Confirmed", completed: true, active: false, date: "24 Nov, 2024" },
-                { status: "Out For Delivery", completed: true, active: false, date: "28 Nov, 2024" },
-                { status: "Delivered", completed: true, active: true, date: "28 Nov, 2024" },
-            ]
-        },
-        { 
-            id: 1002, 
-            date: 'Nov 25, 2024', 
-            items: 3, 
-            total: 890, 
-            status: 'In Transit', 
-            statusColor: 'blue',
-            timeline: [
-                { status: "Order Placed", completed: true, active: false, date: "25 Nov, 2024" },
-                { status: "Confirmed", completed: true, active: false, date: "25 Nov, 2024" },
-                { status: "In Transit", completed: true, active: true, date: "26 Nov, 2024" },
-                { status: "Delivered", completed: false, active: false },
-            ]
-        },
-        { 
-            id: 1003, 
-            date: 'Nov 20, 2024', 
-            items: 2, 
-            total: 450, 
-            status: 'Delivered', 
-            statusColor: 'green',
-            timeline: [
-                { status: "Order Placed", completed: true, active: false, date: "18 Nov, 2024" },
-                { status: "Confirmed", completed: true, active: false, date: "18 Nov, 2024" },
-                { status: "Out For Delivery", completed: true, active: false, date: "20 Nov, 2024" },
-                { status: "Delivered", completed: true, active: true, date: "20 Nov, 2024" },
-            ]
-        }
-    ];
-
-    const orders = ordersData || mockOrders;
+    // Filter orders by current user
+    const allOrders = ordersData?.data || [];
+    const orders = allOrders.filter(order => 
+        order.customerId === currentUser?.id || 
+        order.customerName === currentUser?.name
+    );
 
     if (isLoading) {
         return (

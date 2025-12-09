@@ -1,31 +1,31 @@
 import { useMutation, useQueryClient } from "@tanstack/react-query";
-import { orderService } from "../../services/orderService";
-import { useCartStore } from "../../store/useCartStore"; // To clear cart
+import mockApi from "../../api/mockApi";
 import { useToastStore } from "../../store/useToastStore";
 import { useNavigate } from "react-router-dom";
 
 export const usePlaceOrder = () => {
   const queryClient = useQueryClient();
-  const clearCart = useCartStore((state) => state.clearCart);
   const { success, error } = useToastStore();
   const navigate = useNavigate();
 
   return useMutation({
-    mutationFn: (orderData) => orderService.createOrder(orderData),
+    mutationFn: (orderData) => mockApi.placeOrder(orderData),
 
-    onSuccess: (data) => {
+    onSuccess: (response) => {
       success("Order placed successfully!");
-      clearCart(); // Clear local store
       queryClient.invalidateQueries({ queryKey: ["orders"] });
       queryClient.invalidateQueries({ queryKey: ["cart"] });
-      // Navigate to order confirmation or details
-      if (data?.data?.id) {
-        navigate(`/order-confirmation/${data.data.id}`);
+
+      // Navigate to order confirmation
+      if (response?.data?.id) {
+        navigate(`/order-confirmation/${response.data.id}`);
+      } else {
+        navigate("/orders");
       }
     },
 
     onError: (err) => {
-      error("Failed to place order. Please try again.");
+      error(err.message || "Failed to place order. Please try again.");
       console.error(err);
     },
   });

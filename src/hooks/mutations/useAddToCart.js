@@ -1,7 +1,6 @@
 import { useMutation, useQueryClient } from "@tanstack/react-query";
-import { cartService } from "../../services/cartService";
+import useDataStore from "../../store/useDataStore";
 import { useToastStore } from "../../store/useToastStore";
-import { useCartStore } from "../../store/useCartStore";
 
 /**
  * Hook to add product to cart
@@ -11,26 +10,24 @@ export const useAddToCart = () => {
   const { success, error } = useToastStore();
 
   return useMutation({
-    mutationFn: ({ product, quantity = 1 }) => {
-      // Optimistic update: Update local store immediately for instant UI feedback
-      useCartStore.getState().addItem(product, quantity);
+    mutationFn: async ({ product, quantity = 1 }) => {
+      // Direct update to Global Data Store
+      // Mimics API + Store update in one go for this architecture
+      useDataStore.getState().addToCart(product, quantity);
 
-      // Use the service to ensure backend/mock synchronization
-      return cartService.addItem({ ...product, quantity });
+      // Simulate network delay if desired, or return immediate success
+      return { success: true };
     },
 
     onSuccess: (data, variables) => {
       success(`Added ${variables.product.name} to cart!`);
-      // Re-sync with backend to ensure consistency
+      // Invalidate if we had other queries, but here store is the source
       queryClient.invalidateQueries({ queryKey: ["cart"] });
     },
 
     onError: (err) => {
       error("Failed to add product to cart");
       console.error(err);
-      // If error, the next query invalidation would fix the state,
-      // or we could force a refetch here to rollback
-      queryClient.invalidateQueries({ queryKey: ["cart"] });
     },
   });
 };

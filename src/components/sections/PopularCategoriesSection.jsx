@@ -104,9 +104,9 @@ const PopularCategoriesSection = ({
             gap: '1rem' // Gap for mobile flex layout
           }}
         >
-          {displayCategories.map((category) => (
+          {displayCategories.map((category, index) => (
             <Motion.div
-              key={category.id}
+              key={category.id || `category-${category.name}-${index}`}
               variants={itemVariants}
               className="flex flex-col items-center group cursor-pointer shrink-0 sm:shrink sm:w-auto max-w-[100px]"
               style={{

@@ -1,5 +1,5 @@
 import React, { useState } from 'react';
-import { ArrowLeft } from 'lucide-react';
+import { ArrowLeft, Heart } from 'lucide-react';
 import { useNavigate, useParams } from 'react-router-dom';
 import {
   PharmacyProductCard,
@@ -14,6 +14,7 @@ import { useProductDetails } from '@/hooks/queries/useProductDetails';
 import { useProducts } from '@/hooks/queries/useProducts';
 import { useReviews } from '@/hooks/queries/useReviews';
 import { useAddToCart } from '@/hooks/mutations/useAddToCart';
+import useDataStore from '@/store/useDataStore';
 
 const ProductDetails = () => {
   const navigate = useNavigate();
@@ -39,6 +40,13 @@ const ProductDetails = () => {
   });
   
   const suggestedItems = suggestedData?.data || [];
+  
+  // Wishlist functionality
+  const wishlist = useDataStore((state) => state.wishlist);
+  const addToWishlist = useDataStore((state) => state.addToWishlist);
+  const removeFromWishlist = useDataStore((state) => state.removeFromWishlist);
+  
+  const isInWishlist = wishlist.some((item) => item.id === id);
 
   // If loading, show skeleton (implemented simply for now)
   if (isProductLoading) return (
@@ -86,6 +94,21 @@ const ProductDetails = () => {
       },
       quantity: 1
     });
+  };
+  
+  const handleWishlistToggle = () => {
+    if (isInWishlist) {
+      removeFromWishlist(id);
+    } else {
+      addToWishlist({
+        id: product.id,
+        name: product.name,
+        price: product.price,
+        originalPrice: product.originalPrice || product.price,
+        discount: product.discount || 0,
+        image: product.images[0],
+      });
+    }
   };
 
   return (
@@ -142,18 +165,32 @@ const ProductDetails = () => {
 
                 {/* Right - Product Info */}
                 <div className="flex flex-col">
-                  <h1
-                    style={{
-                      fontFamily: 'Gyrotrope',
-                      fontSize: '18px',
-                      fontWeight: 600,
-                      color: '#000000',
-                      marginBottom: '10px',
-                      lineHeight: '1.4'
-                    }}
-                  >
-                    {product.name}
-                  </h1>
+                  <div className="flex items-start justify-between gap-3 mb-3">
+                    <h1
+                      style={{
+                        fontFamily: 'Gyrotrope',
+                        fontSize: '18px',
+                        fontWeight: 600,
+                        color: '#000000',
+                        lineHeight: '1.4',
+                        flex: 1
+                      }}
+                    >
+                      {product.name}
+                    </h1>
+                    
+                    {/* Wishlist Button */}
+                    <button
+                      onClick={handleWishlistToggle}
+                      className="p-2 rounded-full hover:bg-gray-100 transition-colors flex-shrink-0"
+                      aria-label={isInWishlist ? 'Remove from wishlist' : 'Add to wishlist'}
+                    >
+                      <Heart 
+                        size={24} 
+                        className={isInWishlist ? 'fill-red-500 text-red-500' : 'text-gray-400'} 
+                      />
+                    </button>
+                  </div>
 
                   <ProductPriceSection
                     price={product.price}

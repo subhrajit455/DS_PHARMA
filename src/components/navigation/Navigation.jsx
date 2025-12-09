@@ -1,6 +1,5 @@
 import { useNavigate, useLocation } from 'react-router-dom';
-import { useAuthStore } from '../../store/useAuthStore';
-import { useCartStore } from '../../store/useCartStore';
+import useDataStore from '../../store/useDataStore';
 import { useActiveNavItem } from './hooks/useActiveNavItem';
 import { DesktopNavigation } from './DesktopNavigation';
 import { MobileTopBar } from './MobileTopBar';
@@ -12,8 +11,13 @@ import { MobileBottomNav } from './MobileBottomNav';
 const Navigation = () => {
   const navigate = useNavigate();
   const location = useLocation();
-  const { user, isAuthenticated } = useAuthStore();
-  const totalCartItems = useCartStore((state) => state.getTotalItems());
+  
+  // Connect to Global Data Store
+  const { currentUser, isAuthenticated, cart } = useDataStore();
+  
+  // Calculate total items
+  const totalCartItems = cart.reduce((sum, item) => sum + (item.quantity || 1), 0);
+  
   const activeItem = useActiveNavItem();
 
   const handleNavClick = (itemName, href) => {
@@ -116,7 +120,7 @@ const Navigation = () => {
           onNavClick={handleNavClick}
           totalCartItems={totalCartItems}
           isAuthenticated={isAuthenticated}
-          user={user}
+          user={currentUser}
         />
       )}
 
@@ -124,7 +128,7 @@ const Navigation = () => {
       <MobileTopBar
         totalCartItems={totalCartItems}
         isAuthenticated={isAuthenticated}
-        user={user}
+        user={currentUser}
       />
 
       {/* Mobile Bottom Navigation */}
