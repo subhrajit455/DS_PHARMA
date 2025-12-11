@@ -1,8 +1,13 @@
 import { motion as Motion } from 'framer-motion';
 import { useAnnouncements } from '../../../contexts/AnnouncementContext';
+import { useEffect, useRef, useState } from 'react';
 
 export const HeroAddImage = () => {
   const { banners, marqueeMessages } = useAnnouncements();
+  const marqueeRef = useRef(null);
+  const containerRef = useRef(null);
+  const [animationDuration, setAnimationDuration] = useState(22);
+  const [animationId] = useState(() => `marquee-${Math.random().toString(36).substr(2, 9)}`);
 
   // Find the first enabled hero banner
   const heroBanner = banners.find(b => b.isEnabled && b.position === 'hero');
@@ -10,7 +15,73 @@ export const HeroAddImage = () => {
   // Find the first enabled hero marquee
   const heroMarquee = marqueeMessages.find(m => m.isEnabled && m.position === 'hero');
 
-  // Don't render if no banner is available
+  // Perfect marquee calculation with pixel-based positioning
+  useEffect(() => {
+    if (heroMarquee && marqueeRef.current && containerRef.current) {
+      const timer = setTimeout(() => {
+        if (!marqueeRef.current || !containerRef.current) return;
+        
+        // Get exact pixel measurements
+        const contentWidth = marqueeRef.current.scrollWidth;
+        const containerWidth = containerRef.current.offsetWidth;
+        
+        // Calculate exact pixel positions for perfect marquee behavior:
+        // START: Content positioned completely off-screen to the right
+        const startPosition = containerWidth; // in pixels
+        
+        // END: Content positioned completely off-screen to the left
+        // Content must travel its entire width past the left edge
+        const endPosition = -contentWidth; // in pixels
+        
+        // Total distance to travel
+        const totalDistance = startPosition + Math.abs(endPosition);
+        
+        // Calculate duration based on speed setting
+        // Lower speed value = faster scroll
+        const baseSpeed = 80; // pixels per second (adjustable)
+        const speedMultiplier = heroMarquee.speed / 22; // Normalize from admin setting
+        const pixelsPerSecond = baseSpeed * speedMultiplier;
+        
+        const calculatedDuration = totalDistance / pixelsPerSecond;
+        
+        setAnimationDuration(calculatedDuration);
+
+        // Inject dynamic keyframes with EXACT pixel positioning
+        const styleId = `marquee-style-${animationId}`;
+        let styleSheet = document.getElementById(styleId);
+        
+        if (!styleSheet) {
+          styleSheet = document.createElement('style');
+          styleSheet.id = styleId;
+          document.head.appendChild(styleSheet);
+        }
+
+        // Use pixel values for precise control
+        // This ensures the animation ends EXACTLY when content is fully off-screen
+        styleSheet.textContent = `
+          @keyframes ${animationId} {
+            0% {
+              transform: translateX(${startPosition}px);
+            }
+            100% {
+              transform: translateX(${endPosition}px);
+            }
+          }
+        `;
+      }, 160);
+
+      // Cleanup
+      return () => {
+        clearTimeout(timer);
+        const sheet = document.getElementById(`marquee-style-${animationId}`);
+        if (sheet) {
+          sheet.remove();
+        }
+      };
+    }
+  }, [heroMarquee, animationId]);
+
+  // Don't render if no banner is available - AFTER all hooks
   if (!heroBanner) return null;
 
   return (
@@ -26,40 +97,43 @@ export const HeroAddImage = () => {
         className="w-full h-auto block object-contain"
       />
 
-      {/* Scrolling Text Effect */}
+      {/* Perfect Marquee - Pixel-Perfect Positioning */}
       {heroMarquee && (
-        <div className="absolute top-1/2 md:left-[60%] lg:left-[59%] -translate-x-1/2 -translate-y-1/2 w-full bg-transparent py-2 overflow-hidden z-1 mask-linear-fade">
+        <div 
+          ref={containerRef}
+          className="absolute top-1/2 md:left-[60%] lg:left-[59%] -translate-x-1/2 -translate-y-1/2 w-full bg-transparent overflow-hidden z-1" 
+          style={{ height: '50px' }}
+        >
           <div 
-            className="flex whitespace-nowrap w-max pl-[100%] font-semibold text-lg tracking-[0.5px] md:text-xs lg:text-lg" 
+            ref={marqueeRef}
+            className="font-semibold text-lg tracking-[0.5px] md:text-xs lg:text-lg" 
             style={{ 
               fontFamily: 'Gyrotrope, sans-serif',
               color: heroMarquee.color,
-              animation: `scroll-marquee ${heroMarquee.speed}s linear infinite`
+              position: 'absolute',
+              height: '100%',
+              margin: 0,
+              lineHeight: '50px',
+              whiteSpace: 'nowrap',
+              display: 'inline-block',
+              animation: `${animationId} ${animationDuration}s linear infinite`,
+              willChange: 'transform'
             }}
           >
             {heroMarquee.messages.map((message, index) => (
-              <span key={index} className="pr-[50px] inline-block md:pr-[25px] lg:pr-[50px]">
+              <span 
+                key={index} 
+                style={{ 
+                  paddingRight: '60px',
+                  display: 'inline-block'
+                }}
+              >
                 {message}
               </span>
             ))}
           </div>
         </div>
       )}
-
-      <style>{`
-        @keyframes scroll-marquee {
-          0% {
-            transform: translateX(0);
-          }
-          100% {
-            transform: translateX(-100%);
-          }
-        }
-        .mask-linear-fade {
-          mask-image: linear-gradient(to right, transparent, black 1%, black 99%, transparent);
-          -webkit-mask-image: linear-gradient(to right, transparent, black 1%, black 99%, transparent);
-        }
-      `}</style>
     </Motion.div>
   );
 };
