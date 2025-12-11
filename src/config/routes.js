@@ -4,29 +4,30 @@
 
 export const ROUTES = {
   // Public Routes
-  HOME: '/',
-  PRODUCTS: '/products',
-  PRODUCT_DETAILS: '/product/:id',
-  ABOUT: '/about',
-  CONTACT: '/contact',
+  HOME: "/",
+  PRODUCTS: "/products",
+  PRODUCT_DETAILS: "/product/:id",
+  ABOUT: "/about",
+  CONTACT: "/contact",
 
   // User Routes
-  LOGIN: '/login',
-  REGISTER: '/register',
-  USER_PROFILE: '/profile',
+  LOGIN: "/login",
+  REGISTER: "/register",
+  USER_PROFILE: "/profile",
 
   // Shopping Routes
-  CART: '/cart',
-  CHECKOUT: '/checkout',
+  CART: "/cart",
+  CHECKOUT: "/checkout",
 
   // Order Routes
-  ORDERS: '/orders',
-  ORDER_DETAILS: '/orders/:id',
+  ORDERS: "/orders",
+  ORDER_DETAILS: "/orders/:id",
 
   // Admin Routes (if applicable)
-  ADMIN_DASHBOARD: '/admin/dashboard',
-  ADMIN_PRODUCTS: '/admin/products',
-  ADMIN_ORDERS: '/admin/orders',
+  ADMIN_DASHBOARD: "/admin/dashboard",
+  ADMIN_PRODUCTS: "/admin/products",
+  ADMIN_ORDERS: "/admin/orders",
+  ADMIN_ANNOUNCEMENTS: "/admin/announcements",
 };
 
 // Get route path with parameters

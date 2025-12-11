@@ -5,9 +5,9 @@ const OrderTimeline = ({ timeline = [], deliveryPartner }) => {
   const filteredTimeline = timeline.filter((_, index) => index !== 2);
 
   return (
-    <div className="w-full h-[100px]">
+    <div className="w-full min-h-[80px]">
       {/* Progress Bar */}
-      <div className="flex items-center justify-between mb-2">
+      <div className="flex items-center justify-between">
         {filteredTimeline.map((step, index) => (
           <TimelineStep key={index} step={step} isLast={index === filteredTimeline.length - 1} />
         ))}
@@ -17,7 +17,7 @@ const OrderTimeline = ({ timeline = [], deliveryPartner }) => {
       {/* Delivery Partner Message */}
       <p
         className="mt-8 text-xs font-medium text-center text-green-700"
-        style={{ fontFamily: 'Gyrotrope', margin: '14px 0px',}}
+        style={{ fontFamily: 'Gyrotrope', margin: '5px 0px',}}
       >
         Delivery Partner: {deliveryPartner}
       </p>

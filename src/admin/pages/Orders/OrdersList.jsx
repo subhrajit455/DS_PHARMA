@@ -2,7 +2,18 @@ import React, { useState, useEffect } from 'react';
 import { useNavigate } from 'react-router-dom';
 import { Search, Filter, Eye, ArrowRight } from 'lucide-react';
 import { toast } from 'react-hot-toast';
-import AdminTable from '../../components/ui/AdminTable';
+import { Button } from '../../components/ui/Button';
+import { Input } from '../../components/ui/Input';
+import { Badge } from '../../components/ui/Badge';
+import { Card, CardContent } from '../../components/ui/Card';
+import {
+  Table,
+  TableBody,
+  TableCell,
+  TableHead,
+  TableHeader,
+  TableRow,
+} from '../../components/ui/Table';
 import { orderService } from '../../api/orderService';
 
 const OrdersList = () => {
@@ -35,112 +46,121 @@ const OrdersList = () => {
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [activeStatus, searchQuery]);
 
-  const getStatusColor = (status) => {
-    switch(status) {
-      case 'Delivered': return 'bg-emerald-100 text-emerald-700';
-      case 'Processing': 
-      case 'In Process':
-      case 'Confirmed':
-      case 'Order Placed':
-        return 'bg-blue-100 text-blue-700';
-      case 'Shipped':
-      case 'On the Way':
-      case 'Out For Delivery':
-      case 'Waiting For Pick Up':
-        return 'bg-orange-100 text-orange-700';
-      case 'Cancelled':
-      case 'Returned': 
-        return 'bg-red-100 text-red-700';
-      default: return 'bg-gray-100 text-gray-700';
-    }
+  const getStatusVariant = (status) => {
+    const s = status?.toLowerCase() || '';
+    if (['delivered', 'completed'].includes(s)) return 'success'; // Green
+    if (['cancelled', 'returned', 'failed'].includes(s)) return 'destructive'; // Red
+    if (['shipped', 'on the way', 'out for delivery', 'waiting for pick up'].includes(s)) return 'warning'; // Yellow
+    return 'secondary'; // Gray (Processing, Placed, etc)
   };
 
   return (
-    <div className="space-y-8 max-w-7xl mx-auto">
+    <div className="space-y-6 min-h-screen" style={{ padding: '10px', background: 'linear-gradient(135deg, #f0fdf4 0%, #ecfdf5 50%, #f0fdfa 100%)' }}>
       <div className="flex flex-col sm:flex-row justify-between items-start sm:items-center gap-4">
         <div>
-          <h1 className="text-2xl font-bold text-slate-800">Orders</h1>
-          <p className="text-slate-500 text-sm mt-1">Manage and track customer orders</p>
+           <h2 className="text-3xl font-bold tracking-tight">Orders</h2>
+           <p className="text-gray-500 text-sm mt-1">Manage and track customer orders</p>
         </div>
       </div>
 
-      <div className="bg-white p-4 rounded-xl shadow-sm border border-slate-100 flex flex-col lg:flex-row gap-4 justify-between items-center">
-        {/* Status Tabs */}
-        <div className="flex gap-2 p-1 bg-slate-100 rounded-lg overflow-x-auto max-w-full">
-          {statuses.map(status => (
-            <button
-              key={status}
-              onClick={() => setActiveStatus(status)}
-              className={`px-4 py-2 text-sm font-medium rounded-md transition-all whitespace-nowrap ${
-                activeStatus === status 
-                  ? 'bg-white text-blue-600 shadow-sm' 
-                  : 'text-slate-500 hover:text-slate-800'
-              }`}
-            >
-              {status}
-            </button>
-          ))}
-        </div>
+      <Card>
+        <CardContent className="p-4 sm:p-6 space-y-4">
+            <div className="flex flex-col lg:flex-row gap-4 justify-between items-center" style={{ marginBottom: '10px' }}>
+                {/* Status Tabs */}
+                <div className="flex gap-2 p-1 bg-gray-100 rounded-lg overflow-x-auto max-w-full no-scrollbar" style={{ marginBottom: '10px' }}>
+                {statuses.map(status => (
+                    <button
+                        style={{ padding: '4px 10px', margin: '0px 10px' }}
+                        key={status}
+                        onClick={() => setActiveStatus(status)}
+                        className={`px-3 py-1.5 text-sm font-medium rounded-md transition-all whitespace-nowrap ${
+                            activeStatus === status 
+                            ? 'bg-white text-gray-900 shadow-sm' 
+                            : 'text-gray-500 hover:text-gray-900'
+                        }`}
+                    >
+                        {status}
+                    </button>
+                    /* Note: Could use Button variants here, but custom toggle styling is often cleaner for tabs */
+                ))}
+                </div>
 
-        {/* Search */}
-        <div className="relative w-full lg:w-72">
-          <Search className="absolute left-3 top-1/2 -translate-y-1/2 text-slate-400" size={18} />
-          <input 
-            type="text" 
-            placeholder="Search Order ID or Customer..." 
-            className="w-full pl-10 pr-4 py-2 border border-slate-200 rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500/20 focus:border-blue-500"
-            value={searchQuery}
-            onChange={(e) => setSearchQuery(e.target.value)}
-          />
-        </div>
-      </div>
+                {/* Search */}
+                <div className="relative w-full lg:w-72">
+                    <Search className="absolute right-2.5 top-2 h-4 w-4 text-gray-500" />
+                    <Input 
+                        placeholder="Search Order..." 
+                        className="pl-9"
+                        value={searchQuery}
+                        onChange={(e) => setSearchQuery(e.target.value)}
+                    />
+                </div>
+            </div>
 
-      <div className="bg-white rounded-xl shadow-sm border border-slate-100 overflow-hidden">
-        {isLoading ? (
-           <div className="p-12 text-center text-slate-500">Loading orders...</div>
-        ) : (
-           <AdminTable headers={['Order ID', 'Date', 'Customer', 'Items', 'Total', 'Payment', 'Status', 'Actions']}>
-              {orders.length > 0 ? (
-                orders.map((order) => (
-                  <tr key={order.id} className="hover:bg-slate-50/50 transition-colors border-b border-slate-50 last:border-none">
-                    <td className="px-6 py-4 font-medium text-slate-800">#{order.id}</td>
-                    <td className="px-6 py-4 text-slate-500 text-sm">{order.date}</td>
-                    <td className="px-6 py-4">
-                      <div className="text-slate-800 font-medium">{order.customer}</div>
-                      <div className="text-slate-400 text-xs">{order.email}</div>
-                    </td>
-                    <td className="px-6 py-4 text-slate-600">{order.items} items</td>
-                    <td className="px-6 py-4 font-bold text-slate-800">₹{order.total}</td>
-                    <td className="px-6 py-4">
-                      <span className={`text-xs font-semibold px-2 py-1 rounded bg-slate-100 ${order.payment === 'Paid' ? 'text-emerald-600 bg-emerald-50' : 'text-slate-600'}`}>
-                        {order.payment}
-                      </span>
-                    </td>
-                    <td className="px-6 py-4">
-                      <span className={`inline-flex px-2 py-1 rounded-full text-xs font-semibold ${getStatusColor(order.status)}`}>
-                        {order.status}
-                      </span>
-                    </td>
-                    <td className="px-6 py-4">
-                      <button 
-                        onClick={() => navigate(`/admin/orders/${order.id}`)}
-                        className="flex items-center gap-1 text-blue-600 hover:text-blue-800 font-medium text-sm"
-                      >
-                         Details <ArrowRight size={14} />
-                      </button>
-                    </td>
-                  </tr>
-                ))
-              ) : (
-                <tr>
-                   <td colSpan="8" className="px-6 py-12 text-center text-slate-500">
-                     No orders found.
-                   </td>
-                </tr>
-              )}
-           </AdminTable>
-        )}
-      </div>
+            <div className="rounded-md border border-gray-200" style={{ padding: '0px 10px' }}>
+                 <Table>
+                    <TableHeader>
+                        <TableRow style={{ background: 'linear-gradient(to right, #f0fdf4, #f0fdfa)' }}>
+                            <TableHead className="font-semibold text-gray-700" style={{ padding: '6px 8px' }}>Order ID</TableHead>
+                            <TableHead className="font-semibold text-gray-700" style={{ padding: '6px 8px' }}>Date</TableHead>
+                            <TableHead className="font-semibold text-gray-700" style={{ padding: '6px 8px' }}>Customer</TableHead>
+                            <TableHead className="font-semibold text-gray-700" style={{ padding: '6px 8px' }}>Items</TableHead>
+                            <TableHead className="font-semibold text-gray-700" style={{ padding: '6px 8px' }}>Total</TableHead>
+                            <TableHead className="font-semibold text-gray-700" style={{ padding: '6px 8px' }}>Payment</TableHead>
+                            <TableHead className="font-semibold text-gray-700" style={{ padding: '6px 8px' }}>Status</TableHead>
+                            <TableHead className="text-right font-semibold text-gray-700" style={{ padding: '6px 8px' }}>Actions</TableHead>
+                        </TableRow>
+                    </TableHeader>
+                    <TableBody>
+                        {isLoading ? (
+                            <TableRow>
+                                <TableCell colSpan={8} className="h-24 text-center">Loading orders...</TableCell>
+                            </TableRow>
+                        ) : orders.length > 0 ? (
+                            orders.map((order, index) => (
+                                <TableRow 
+                                    key={order.id} 
+                                    className="hover:bg-emerald-50/50 cursor-pointer transition-all duration-200 border-b border-gray-100" 
+                                    style={{ 
+                                        marginBottom: index !== orders.length - 1 ? '5px' : '0',
+                                    }}
+                                    onClick={() => navigate(`/admin/orders/${order.id}`)}
+                                >
+                                    <TableCell className="font-medium" style={{ padding: '10px' }}>#{order.id}</TableCell>
+                                    <TableCell className="text-gray-500 text-sm" style={{ padding: '10px' }}>{order.date}</TableCell>
+                                    <TableCell style={{ padding: '10px' }}>
+                                        <div className="font-medium text-gray-900">{order.customer || order.customerName}</div>
+                                        <div className="text-xs text-gray-500">{order.email}</div>
+                                    </TableCell>
+                                    <TableCell className="text-gray-500" style={{ padding: '10px' }}>{order.items} items</TableCell>
+                                    <TableCell className="font-bold" style={{ padding: '10px' }}>₹{order.total || order.paymentBreakdown?.total}</TableCell>
+                                    <TableCell style={{ padding: '10px' }}>
+                                        <Badge variant={order.payment === 'Paid' ? 'success' : 'secondary'} className="font-normal">
+                                            {order.payment}
+                                        </Badge>
+                                    </TableCell>
+                                    <TableCell style={{ padding: '10px' }}>
+                                        <Badge variant={getStatusVariant(order.status)}>
+                                            {order.status}
+                                        </Badge>
+                                    </TableCell>
+                                    <TableCell className="text-right" style={{ padding: '10px' }}>
+                                         <Button variant="ghost" size="sm" onClick={(e) => { e.stopPropagation(); navigate(`/admin/orders/${order.id}`); }}>
+                                            Details <ArrowRight className="ml-2 h-4 w-4" />
+                                         </Button>
+                                    </TableCell>
+                                </TableRow>
+                            ))
+                        ) : (
+                            <TableRow>
+                                <TableCell colSpan={8} className="h-24 text-center text-gray-500">No orders found.</TableCell>
+                            </TableRow>
+                        )}
+                    </TableBody>
+                 </Table>
+            </div>
+        </CardContent>
+      </Card>
     </div>
   );
 };

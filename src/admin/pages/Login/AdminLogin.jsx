@@ -3,6 +3,11 @@ import { useNavigate } from 'react-router-dom';
 import useAdminStore from '../../context/useAdminStore';
 import { toast } from 'react-hot-toast';
 import { USERS } from '../../../data/userData';
+import { Button } from '../../components/ui/Button';
+import { Input } from '../../components/ui/Input';
+import { Label } from '../../components/ui/Label';
+import { Card, CardContent, CardHeader, CardTitle, CardDescription, CardFooter } from '../../components/ui/Card';
+import { ShieldCheck, Sparkles } from 'lucide-react';
 
 const AdminLogin = () => {
   const [email, setEmail] = useState('');
@@ -37,44 +42,79 @@ const AdminLogin = () => {
   };
 
   return (
-    <div className="min-h-screen flex items-center justify-center bg-gray-100">
-      <div className="bg-white p-8 rounded-lg shadow-md w-96">
-        <h2 className="text-2xl font-bold mb-6 text-center text-gray-800">Admin Login</h2>
+    <div className="min-h-screen flex items-center justify-center bg-gradient-to-br from-slate-900 via-emerald-900 to-teal-900 px-4 py-12 relative overflow-hidden">
+      {/* Animated gradient blobs */}
+      <div className="absolute top-0 left-0 w-96 h-96 bg-emerald-500/20 rounded-full blur-3xl animate-pulse" />
+      <div className="absolute bottom-0 right-0 w-96 h-96 bg-teal-500/20 rounded-full blur-3xl animate-pulse" style={{ animationDelay: '1s' }} />
+      <div className="absolute top-1/2 left-1/2 -translate-x-1/2 -translate-y-1/2 w-96 h-96 bg-emerald-400/10 rounded-full blur-3xl animate-pulse" style={{ animationDelay: '2s' }} />
+      
+      <Card className="w-full max-w-md shadow-2xl shadow-emerald-500/20 backdrop-blur-xl bg-white/95 border-emerald-100 relative z-10">
+        <CardHeader className="space-y-3 text-center pb-8">
+          <div className="mx-auto bg-gradient-to-br from-emerald-500 to-teal-600 p-4 rounded-2xl w-fit shadow-lg shadow-emerald-500/30 mb-2">
+            <ShieldCheck className="h-10 w-10 text-white" />
+          </div>
+          <div>
+            <CardTitle className="text-3xl font-bold bg-gradient-to-r from-emerald-700 to-teal-700 bg-clip-text text-transparent flex items-center justify-center gap-2">
+              Admin Login
+              <Sparkles className="h-6 w-6 text-emerald-600" />
+            </CardTitle>
+            <CardDescription className="text-base mt-2 text-gray-600">
+              Enter your credentials to access the dashboard
+            </CardDescription>
+          </div>
+        </CardHeader>
+        
         <form onSubmit={handleLogin}>
-          <div className="mb-4">
-            <label className="block text-sm font-medium text-gray-700 mb-1">Email</label>
-            <input 
-              type="email" 
-              className="w-full border rounded px-3 py-2 focus:ring-2 focus:ring-blue-500 focus:outline-none" 
-              placeholder="admin@test.com"
-              value={email}
-              onChange={(e) => setEmail(e.target.value)}
-              required
-            />
-          </div>
-          <div className="mb-6">
-            <label className="block text-sm font-medium text-gray-700 mb-1">Password</label>
-            <input 
-              type="password" 
-              className="w-full border rounded px-3 py-2 focus:ring-2 focus:ring-blue-500 focus:outline-none" 
-              placeholder="admin" 
-              value={password}
-              onChange={(e) => setPassword(e.target.value)}
-              required
-            />
-          </div>
-          <button 
-            type="submit" 
-            disabled={isLoading}
-            className="w-full bg-slate-800 text-white py-2 rounded hover:bg-slate-700 transition-colors disabled:opacity-50"
-          >
-            {isLoading ? 'Logging in...' : 'Login'}
-          </button>
-          <p className="mt-4 text-xs text-center text-gray-500">
-            Hint: demo@dspharma.com / demo123 (Admin)
-          </p>
+          <CardContent className="space-y-5">
+            <div className="space-y-2">
+              <Label htmlFor="email" className="text-gray-700 font-semibold">Email</Label>
+              <Input 
+                id="email" 
+                type="email" 
+                placeholder="admin@dspharma.com"
+                value={email}
+                onChange={(e) => setEmail(e.target.value)}
+                required
+                className="h-11"
+              />
+            </div>
+            
+            <div className="space-y-2">
+              <div className="flex items-center justify-between">
+                <Label htmlFor="password" className="text-gray-700 font-semibold">Password</Label> 
+              </div>
+              <Input 
+                id="password" 
+                type="password" 
+                placeholder="••••••••"
+                value={password}
+                onChange={(e) => setPassword(e.target.value)}
+                required
+                className="h-11"
+              />
+            </div>
+          </CardContent>
+          
+          <CardFooter className="flex flex-col space-y-4 pt-2">
+            <Button 
+              type="submit" 
+              variant="premium"
+              size="lg"
+              className="w-full h-12 text-base font-semibold shadow-2xl"
+              isLoading={isLoading}
+            >
+              {isLoading ? 'Signing In...' : 'Sign In'}
+            </Button>
+            
+            <div className="bg-gradient-to-r from-emerald-50 to-teal-50 rounded-lg p-4 border border-emerald-200">
+              <div className="text-xs text-center text-gray-700">
+                <p className="font-semibold text-emerald-700 mb-1">Demo Credentials</p>
+                <p className="font-mono text-[11px]">demo@dspharma.com / demo123</p>
+              </div>
+            </div>
+          </CardFooter>
         </form>
-      </div>
+      </Card>
     </div>
   );
 };

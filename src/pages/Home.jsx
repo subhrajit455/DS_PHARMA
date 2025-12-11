@@ -5,10 +5,14 @@ import HighlightedCategorySection from '../components/sections/HighlightedCatego
 import PharmacyProductsShowcase from '../components/sections/PharmacyProductsShowcase';
 import WhyChooseUsSection from '../components/sections/WhyChooseUsSection';
 import AboutUsSection from '../components/sections/AboutUsSection';
+import AlertBanner from '../components/sections/alerts/AlertBanner';
 
 const Home = () => {
   return (
     <>
+      {/* Top Alerts */}
+      <AlertBanner position="top" />
+
       {/* Hero Section */}
       <section className="py-2 my-2 sm:py-12 sm:my-8">
         <ResponsiveHeroSection />
@@ -53,6 +57,9 @@ const Home = () => {
       <section className="py-2 my-2 sm:py-12 sm:my-8">
         <AboutUsSection />
       </section>
+
+      {/* Bottom Alerts */}
+      <AlertBanner position="bottom" />
     </>
   );
 };

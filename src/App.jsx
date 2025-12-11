@@ -17,6 +17,7 @@ import ResetPasswordPage from "./pages/ResetPasswordPage";
 import SearchPage from "./pages/SearchPage";
 import AdminRouter from "./admin/AdminRouter";
 import Layout from "@/components/layout/Layout.jsx";
+import { AnnouncementProvider } from './contexts/AnnouncementContext';
 
 // Create React Query client
 const queryClient = new QueryClient({
@@ -33,38 +34,40 @@ const queryClient = new QueryClient({
 function App() {
   return (
     <QueryClientProvider client={queryClient}>
-      <Router>
-        <ToastContainer />
-        <Routes>
-          {/* Public Auth Routes (No Layout) */}
-          <Route path="/login" element={<LoginPage />} />
-          <Route path="/signup" element={<SignupPage />} />
-          <Route path="/forgot-password" element={<ForgotPasswordPage />} />
-          <Route path="/reset-password/:token" element={<ResetPasswordPage />} />
+      <AnnouncementProvider>
+        <Router>
+          <ToastContainer />
+          <Routes>
+            {/* Public Auth Routes (No Layout) */}
+            <Route path="/login" element={<LoginPage />} />
+            <Route path="/signup" element={<SignupPage />} />
+            <Route path="/forgot-password" element={<ForgotPasswordPage />} />
+            <Route path="/reset-password/:token" element={<ResetPasswordPage />} />
 
-          {/* Admin Routes */}
-          <Route path="/admin/*" element={<AdminRouter />} />
-          
-          {/* Standalone Routes (No Layout) */}
-          <Route path="/profile" element={<UserProfile />} />
+            {/* Admin Routes */}
+            <Route path="/admin/*" element={<AdminRouter />} />
+            
+            {/* Standalone Routes (No Layout) */}
+            <Route path="/profile" element={<UserProfile />} />
 
 
-          {/* Protected/Main Routes (With Layout) */}
-          <Route element={<Layout />}>
-            <Route path="/" element={<Home />} />
-            <Route path="/cart" element={<CartDetails />} />
-            <Route path="/product/:id" element={<ProductDetails />} />
-            <Route path="/category/:categoryName" element={<CategoryProducts />} />
-            <Route path="/orders" element={<Orders />} />
-            <Route path="/orders/:id" element={<OrderDetails />} />
-            <Route path="/search" element={<SearchPage />} />
-            <Route path="/order-confirmation/:orderId" element={<OrderConfirmation />} />
+            {/* Protected/Main Routes (With Layout) */}
+            <Route element={<Layout />}>
+              <Route path="/" element={<Home />} />
+              <Route path="/cart" element={<CartDetails />} />
+              <Route path="/product/:id" element={<ProductDetails />} />
+              <Route path="/category/:categoryName" element={<CategoryProducts />} />
+              <Route path="/orders" element={<Orders />} />
+              <Route path="/orders/:id" element={<OrderDetails />} />
+              <Route path="/search" element={<SearchPage />} />
+              <Route path="/order-confirmation/:orderId" element={<OrderConfirmation />} />
 
-          </Route>
+            </Route>
 
-        </Routes>
-      </Router>
-      <ReactQueryDevtools initialIsOpen={false} />
+          </Routes>
+        </Router>
+        <ReactQueryDevtools initialIsOpen={false} />
+      </AnnouncementProvider>
     </QueryClientProvider>
   )
 }

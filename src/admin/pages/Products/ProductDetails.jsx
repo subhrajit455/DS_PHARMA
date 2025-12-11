@@ -3,7 +3,9 @@ import { useParams, useNavigate } from 'react-router-dom';
 import { Edit, Trash2, ArrowLeft, Package, User } from 'lucide-react';
 import { toast } from 'react-hot-toast';
 import { productService } from '../../api/productService';
-import AdminCard from '../../components/ui/AdminCard';
+import { Button } from '../../components/ui/Button';
+import { Card, CardContent, CardHeader, CardTitle, CardDescription } from '../../components/ui/Card';
+import { Badge } from '../../components/ui/Badge';
 
 const ProductDetails = () => {
   const { id } = useParams();
@@ -40,106 +42,118 @@ const ProductDetails = () => {
     }
   };
 
-  if (isLoading) return <div className="p-8 text-center text-slate-500">Loading details...</div>;
+  const getStatusVariant = (status) => {
+    const s = status?.toLowerCase() || '';
+    if (s === 'active') return 'success';
+    if (s === 'low stock') return 'warning';
+    return 'destructive'; // default or inactive or out of stock
+  };
+
+  if (isLoading) return <div className="p-12 text-center text-gray-500">Loading details...</div>;
   if (!product) return null;
 
   return (
-    <div className="space-y-8 max-w-7xl mx-auto">
-       <button 
-        onClick={() => navigate('/admin/products')}
-        className="flex items-center gap-2 text-slate-500 hover:text-slate-800 transition-colors"
-      >
-        <ArrowLeft size={18} />
-        <span>Back to Products</span>
-      </button>
+    <div className="space-y-6 min-h-screen" style={{ padding: '10px', background: 'linear-gradient(135deg, #f0fdf4 0%, #ecfdf5 50%, #f0fdfa 100%)' }}>
+       <Button variant="ghost" className="pl-0 text-gray-500 hover:text-gray-900" onClick={() => navigate('/admin/products')}>
+          <ArrowLeft className="mr-2 h-4 w-4" />
+         <span style={{ marginTop: '3px' }}>Back to Products</span>
+       </Button>
 
-      <div className="flex flex-col sm:flex-row justify-between items-start sm:items-center gap-4">
-        <h1 className="text-2xl font-bold text-slate-800">{product.name}</h1>
-        <div className="flex items-center gap-2">
-           <button 
-             onClick={() => navigate(`/admin/products/${id}/edit`)}
-             className="flex items-center gap-2 px-4 py-2 bg-white text-blue-600 border border-slate-200 rounded-lg hover:bg-slate-50 transition-colors"
-           >
-             <Edit size={18} />
-             <span>Edit</span>
-           </button>
-           <button 
-             onClick={handleDelete}
-             className="flex items-center gap-2 px-4 py-2 bg-white text-red-600 border border-slate-200 rounded-lg hover:bg-red-50 transition-colors"
-           >
-             <Trash2 size={18} />
-             <span>Delete</span>
-           </button>
-        </div>
-      </div>
+       <div className="flex flex-col sm:flex-row justify-between items-start sm:items-center gap-4">
+         <h1 className="text-3xl font-bold tracking-tight text-gray-900">{product.name}</h1>
+         <div className="flex items-center gap-2">
+            <Button variant="outline" onClick={() => navigate(`/admin/products/${id}/edit`)}>
+                <Edit className="mr-2 h-4 w-4" /> Edit
+            </Button>
+            <Button variant="destructive" onClick={handleDelete}>
+                <Trash2 className="mr-2 h-4 w-4" /> Delete
+            </Button>
+         </div>
+       </div>
 
-      <div className="grid grid-cols-1 lg:grid-cols-3 gap-6">
-        {/* Main Info */}
-        <div className="lg:col-span-2 space-y-6">
-           <AdminCard title="Product Information">
-              <div className="grid grid-cols-1 sm:grid-cols-2 gap-y-6 gap-x-12">
-                 <div>
-                    <label className="text-sm font-medium text-slate-500">SKU</label>
-                    <p className="text-slate-800 font-mono mt-1">{product.sku}</p>
-                 </div>
-                 <div>
-                    <label className="text-sm font-medium text-slate-500">Category</label>
-                    <p className="text-slate-800 mt-1">{product.category}</p>
-                 </div>
-                 <div>
-                    <label className="text-sm font-medium text-slate-500">Price</label>
-                    <p className="text-slate-800 font-bold text-lg mt-1">₹{product.price}</p>
-                 </div>
-                 <div>
-                    <label className="text-sm font-medium text-slate-500">Stock Status</label>
-                    <div className="mt-1">
-                       <span className={`inline-flex px-2 py-1 rounded-full text-xs font-semibold 
-                          ${product.status === 'Active' ? 'bg-emerald-100 text-emerald-700' : 'bg-red-100 text-red-700'}`}>
-                          {product.status}
-                       </span>
-                       <span className="ml-2 text-slate-600 text-sm">({product.stock} units)</span>
+       <div className="grid grid-cols-1 lg:grid-cols-3 gap-6">
+          {/* Main Info */}
+          <div className="lg:col-span-2 space-y-6">
+             <Card>
+                <CardHeader>
+                    <CardTitle>Product Information</CardTitle>
+                    <CardDescription>Details about the product inventory and pricing</CardDescription>
+                </CardHeader>
+                <CardContent>
+                   <div className="grid grid-cols-1 sm:grid-cols-2 gap-y-6 gap-x-12">
+                      <div>
+                         <label className="text-sm font-medium text-gray-500">SKU</label>
+                         <p className="text-gray-900 font-mono mt-1">{product.sku}</p>
+                      </div>
+                      <div>
+                         <label className="text-sm font-medium text-gray-500">Category</label>
+                         <p className="text-gray-900 mt-1">{product.category}</p>
+                      </div>
+                      <div>
+                         <label className="text-sm font-medium text-gray-500">Price</label>
+                         <p className="text-gray-900 font-bold text-lg mt-1">₹{product.price}</p>
+                      </div>
+                      <div>
+                         <label className="text-sm font-medium text-gray-500">Stock Status</label>
+                         <div className="mt-1 flex items-center gap-2">
+                            <Badge variant={getStatusVariant(product.status)}>
+                                {product.status}
+                            </Badge>
+                            <span className="text-gray-500 text-sm">({product.stock} units)</span>
+                         </div>
+                      </div>
+                   </div>
+
+                   <div className="mt-6 pt-6 border-t border-gray-100">
+                      <label className="text-sm font-medium text-gray-500">Description</label>
+                      <p className="text-gray-700 mt-2 leading-relaxed">
+                         {product.description || 'No description available for this product.'}
+                      </p>
+                   </div>
+                </CardContent>
+             </Card>
+          </div>
+
+          {/* Sidebar Info */}
+          <div className="space-y-6">
+             <Card>
+                <CardContent className="p-6 flex flex-col items-center justify-center min-h-[200px] text-center">
+                    {product.image ? (
+                         <img src={product.image} alt={product.name} className="w-full h-auto rounded-md object-cover max-h-[250px]" />
+                    ) : (
+                        <>
+                            <div className="w-32 h-32 bg-gray-100 rounded-lg flex items-center justify-center text-gray-400 mb-4">
+                                <Package className="h-10 w-10" />
+                            </div>
+                            <p className="text-sm text-gray-500">No image available</p>
+                        </>
+                    )}
+                </CardContent>
+             </Card>
+
+             <Card>
+                <CardHeader>
+                    <CardTitle>Metadata</CardTitle>
+                </CardHeader>
+                <CardContent className="space-y-4">
+                    <div className="flex justify-between items-center text-sm">
+                        <span className="text-gray-500">Created At</span>
+                        <span className="text-gray-900 font-medium">{new Date().toLocaleDateString()}</span>
                     </div>
-                 </div>
-              </div>
-
-              <div className="mt-6 pt-6 border-t border-slate-100">
-                  <label className="text-sm font-medium text-slate-500">Description</label>
-                  <p className="text-slate-600 mt-2 leading-relaxed">
-                     {product.description || 'No description available for this product.'}
-                  </p>
-              </div>
-           </AdminCard>
-        </div>
-
-        {/* Sidebar Info */}
-        <div className="space-y-6">
-           <div className="bg-white p-6 rounded-xl shadow-sm border border-slate-100 text-center">
-              <div className="w-32 h-32 bg-slate-100 rounded-lg mx-auto flex items-center justify-center text-slate-400 mb-4">
-                  <Package size={40} />
-              </div>
-              <p className="text-sm text-slate-500">Product Image Preview</p>
-           </div>
-
-           <AdminCard title="Metadata">
-              <div className="space-y-4">
-                 <div className="flex justify-between items-center text-sm">
-                    <span className="text-slate-500">Created At</span>
-                    <span className="text-slate-800 font-medium">Dec 12, 2023</span>
-                 </div>
-                 <div className="flex justify-between items-center text-sm">
-                    <span className="text-slate-500">Last Updated</span>
-                    <span className="text-slate-800 font-medium">2 hours ago</span>
-                 </div>
-                 <div className="flex justify-between items-center text-sm">
-                    <span className="text-slate-500">Created By</span>
-                    <span className="flex items-center gap-1.5 text-slate-800 font-medium">
-                       <User size={14} /> Admin User
-                    </span>
-                 </div>
-              </div>
-           </AdminCard>
-        </div>
-      </div>
+                    <div className="flex justify-between items-center text-sm">
+                        <span className="text-gray-500">Last Updated</span>
+                        <span className="text-gray-900 font-medium">Just now</span>
+                    </div>
+                     <div className="flex justify-between items-center text-sm">
+                        <span className="text-gray-500">Created By</span>
+                        <span className="flex items-center gap-1.5 text-gray-900 font-medium">
+                            <User className="h-4 w-4" /> Admin
+                        </span>
+                    </div>
+                </CardContent>
+             </Card>
+          </div>
+       </div>
     </div>
   );
 };

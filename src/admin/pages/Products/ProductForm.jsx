@@ -1,9 +1,13 @@
-import { useState, useEffect } from 'react';
+import React, { useState, useEffect } from 'react';
 import { useNavigate, useParams } from 'react-router-dom';
 import { Save, ArrowLeft, Upload } from 'lucide-react';
 import { toast } from 'react-hot-toast';
 import { useQueryClient } from '@tanstack/react-query';
 import { productService } from '../../api/productService';
+import { Button } from '../../components/ui/Button';
+import { Input } from '../../components/ui/Input';
+import { Label } from '../../components/ui/Label';
+import { Card, CardContent, CardHeader, CardTitle, CardDescription } from '../../components/ui/Card';
 
 const ProductForm = () => {
   const navigate = useNavigate();
@@ -19,12 +23,12 @@ const ProductForm = () => {
     price: '',
     stock: '',
     description: '',
+    status: 'active',
     image: null
   });
 
   useEffect(() => {
     if (isEditMode) {
-      // Fetch product data
       const fetchProduct = async () => {
         try {
           const product = await productService.getProduct(id);
@@ -35,7 +39,8 @@ const ProductForm = () => {
             price: product.price,
             stock: product.stock,
             description: product.description || '',
-            image: null // Handle image logic properly in real app
+            status: product.status || 'active',
+            image: null 
           });
         } catch (error) {
           console.error(error);
@@ -65,9 +70,7 @@ const ProductForm = () => {
         toast.success('Product created successfully');
       }
       
-      // Invalidate products query to force refresh
       await queryClient.invalidateQueries({ queryKey: ['products'] });
-      
       navigate('/admin/products');
     } catch (error) {
       toast.error(error.message || 'Failed to save product');
@@ -77,123 +80,169 @@ const ProductForm = () => {
   };
 
   return (
-    <div className="max-w-3xl mx-auto space-y-8" style={{ padding: '1rem' }}>
-      <button 
-        onClick={() => navigate('/admin/products')}
-        className="flex items-center gap-2 text-slate-500 hover:text-slate-800 transition-colors"
-      >
-        <ArrowLeft size={18} />
-        <span>Back to Products</span>
-      </button>
+    <div className="max-w-7xl mx-auto space-y-6 min-h-screen" style={{ padding: '10px', background: 'linear-gradient(135deg, #f0fdf4 0%, #ecfdf5 50%, #f0fdfa 100%)' }}>
+      <Button variant="ghost" className="pl-0 text-gray-500 hover:text-gray-900" onClick={() => navigate('/admin/products')} style={{ paddingBottom: '20px' }}>  
+         <ArrowLeft className="mr-2 h-4 w-4" />
+         <span style={{ marginTop: '4px' }}>Back to Products</span>
+      </Button>
 
-      <div className="flex justify-between items-center">
-        <h1 className="text-2xl font-bold text-slate-800">
+      <div className="flex justify-between items-center" style={{ marginTop: '10px' }}>
+        <h1 className="text-3xl font-bold tracking-tight text-gray-900">
           {isEditMode ? 'Edit Product' : 'Add New Product'}
         </h1>
       </div>
 
-      <form onSubmit={handleSubmit} className="bg-white rounded-xl shadow-sm border border-slate-100 p-6 space-y-6">
-        {/* Basic Info */}
-        <div className="grid grid-cols-1 sm:grid-cols-2 gap-6">
-          <div className="sm:col-span-2">
-            <label className="block text-sm font-medium text-slate-700 mb-1">Product Name</label>
-            <input 
-              type="text" 
-              name="name"
-              required
-              className="w-full border border-slate-200 rounded-lg px-4 py-2 bg-slate-50 focus:bg-white focus:outline-none focus:ring-2 focus:ring-blue-500/20 focus:border-blue-500 transition-all"
-              placeholder="e.g. Paracetamol 500mg"
-              value={formData.name}
-              onChange={handleChange}
-            />
-          </div>
+      <form onSubmit={handleSubmit}>
+        <div className="grid grid-cols-1 lg:grid-cols-3 gap-6" style={{ marginTop: '15px' }}>
+            {/* Main Info */}
+            <div className="lg:col-span-2 space-y-6">
+                <Card>
+                    <CardHeader style={{ paddingBottom: '15px' }}>
+                        <CardTitle>Product Details</CardTitle>
+                        <CardDescription>Enter the basic information for the product.</CardDescription>
+                    </CardHeader>
+                    <CardContent className="space-y-4">
+                        <div className="grid gap-2" style={{ marginBottom: '30px' }}>
+                             <Label htmlFor="name">Product Name</Label>
+                             <Input 
+                                id="name"
+                                name="name"
+                                required
+                                placeholder="e.g. Paracetamol 500mg"
+                                value={formData.name}
+                                onChange={handleChange}
+                                style={{ padding: '20px 10px' }}
+                             />
+                        </div>
+                        <div className="grid grid-cols-2 gap-4" style={{ marginBottom: '30px' }}>
+                            <div className="grid gap-2">
+                                <Label htmlFor="sku">SKU</Label>
+                                <Input 
+                                    id="sku"
+                                    name="sku"
+                                    required
+                                    className="font-mono"
+                                    placeholder="e.g. MED-001"
+                                    value={formData.sku}
+                                    onChange={handleChange}
+                                    style={{ padding: '20px 10px' }}
+                                />
+                            </div>
+                            <div className="grid gap-2">
+                                <Label htmlFor="category">Category</Label>
+                                <select 
+                                    id="category"
+                                    name="category"
+                                    required
+                                    className="flex h-auto w-full rounded-md border border-gray-200 bg-white px-3 py-2 text-sm shadow-sm transition-colors file:border-0 file:bg-transparent file:text-sm file:font-medium placeholder:text-gray-400 focus-visible:outline-none focus-visible:ring-1 focus-visible:ring-emerald-600 disabled:cursor-not-allowed disabled:opacity-50"
+                                    value={formData.category}
+                                    onChange={handleChange}
+                                    style={{ padding: '12px 5px' }}
+                                >
+                                    <option value="">Select Category</option>
+                                    <option value="Medicine">Medicine</option>
+                                    <option value="Skincare">Skincare</option>
+                                    <option value="Wellness">Wellness</option>
+                                    <option value="Devices">Devices</option>
+                                </select>
+                            </div>
+                        </div>
+                        <div className="grid gap-2" style={{ marginBottom: '30px' }}>
+                            <Label htmlFor="status">Status</Label>
+                            <select 
+                                id="status"
+                                name="status"
+                                required
+                                className="flex h-auto w-full rounded-md border border-gray-200 bg-white px-3 py-2 text-sm shadow-sm transition-colors file:border-0 file:bg-transparent file:text-sm file:font-medium placeholder:text-gray-400 focus-visible:outline-none focus-visible:ring-1 focus-visible:ring-emerald-600 disabled:cursor-not-allowed disabled:opacity-50"
+                                value={formData.status}
+                                onChange={handleChange}
+                                style={{ padding: '10px 5px' }}
+                            >
+                                <option value="active">Active</option>
+                                <option value="inactive">Inactive</option>
+                                <option value="draft">Draft</option>
+                                <option value="out_of_stock">Out of Stock</option>
+                            </select>
+                        </div>
+                        <div className="grid gap-2">
+                            <Label htmlFor="description">Description</Label>
+                            <textarea
+                                id="description"
+                                name="description"
+                                rows="5"
+                                className="flex min-h-[60px] w-full rounded-md border border-gray-200 bg-white px-3 py-2 text-sm shadow-sm placeholder:text-gray-400 focus-visible:outline-none focus-visible:ring-1 focus-visible:ring-emerald-600 disabled:cursor-not-allowed disabled:opacity-50 resize-y"
+                                placeholder="Product detailed description..."
+                                value={formData.description}
+                                onChange={handleChange}
+                                style={{ padding: '20px 10px' }}
+                            />
+                        </div>
+                    </CardContent>
+                </Card>
+            </div>
 
-          <div>
-            <label className="block text-sm font-medium text-slate-700 mb-1">SKU</label>
-            <input 
-              type="text" 
-              name="sku"
-              required
-              className="w-full border border-slate-200 rounded-lg px-4 py-2 bg-slate-50 focus:bg-white focus:outline-none focus:ring-2 focus:ring-blue-500/20 focus:border-blue-500 transition-all font-mono"
-              placeholder="e.g. MED-001"
-              value={formData.sku}
-              onChange={handleChange}
-            />
-          </div>
+            {/* Side Info */}
+            <div className="space-y-6">
+                <Card style={{ marginBottom: '10px', padding: '10px' }}>
+                    <CardHeader>
+                        <CardTitle>Pricing & Inventory</CardTitle>
+                    </CardHeader>
+                    <CardContent className="space-y-4">
+                        <div className="grid gap-2" style={{ marginBottom: '10px' }}>
+                             <Label htmlFor="price">Price (₹)</Label>
+                             <Input 
+                                id="price"
+                                type="number"
+                                name="price"
+                                required
+                                min="0"
+                                step="0.01"
+                                value={formData.price}
+                                onChange={handleChange}
+                                style={{ padding: '20px 10px' }}
+                             />
+                        </div>
+                        <div className="grid gap-2">
+                             <Label htmlFor="stock">Stock</Label>
+                             <Input 
+                                id="stock"
+                                type="number"
+                                name="stock"
+                                required
+                                min="0"
+                                value={formData.stock}
+                                onChange={handleChange}
+                                style={{ padding: '20px 10px' }}
+                             />
+                        </div>
+                    </CardContent>
+                </Card>
 
-          <div>
-            <label className="block text-sm font-medium text-slate-700 mb-1">Category</label>
-            <select 
-              name="category"
-              required
-              className="w-full border border-slate-200 rounded-lg px-4 py-2 bg-slate-50 focus:bg-white focus:outline-none focus:ring-2 focus:ring-blue-500/20 focus:border-blue-500 transition-all"
-              value={formData.category}
-              onChange={handleChange}
-            >
-              <option value="">Select Category</option>
-              <option value="Medicine">Medicine</option>
-              <option value="Skincare">Skincare</option>
-              <option value="Wellness">Wellness</option>
-              <option value="Devices">Devices</option>
-            </select>
-          </div>
-
-          <div>
-             <label className="block text-sm font-medium text-slate-700 mb-1">Price (₹)</label>
-             <input 
-               type="number" 
-               name="price"
-               required
-               min="0"
-               step="0.01"
-               className="w-full border border-slate-200 rounded-lg px-4 py-2 bg-slate-50 focus:bg-white focus:outline-none focus:ring-2 focus:ring-blue-500/20 focus:border-blue-500 transition-all"
-               value={formData.price}
-               onChange={handleChange}
-             />
-          </div>
-
-          <div>
-             <label className="block text-sm font-medium text-slate-700 mb-1">Stock</label>
-             <input 
-               type="number" 
-               name="stock"
-               required
-               min="0"
-               className="w-full border border-slate-200 rounded-lg px-4 py-2 bg-slate-50 focus:bg-white focus:outline-none focus:ring-2 focus:ring-blue-500/20 focus:border-blue-500 transition-all"
-               value={formData.stock}
-               onChange={handleChange}
-             />
-          </div>
+                <Card>
+                    <CardHeader>
+                        <CardTitle>Product Image</CardTitle>
+                    </CardHeader>
+                    <CardContent>
+                        <div className="border-2 border-dashed border-gray-200 rounded-lg p-6 text-center hover:bg-gray-50 transition-colors cursor-pointer group" style={{ padding: '20px 10px' }}>
+                             <div className="w-full mx-auto flex items-center justify-center">
+                              <div className="h-10 w-10 bg-gray-100 rounded-full flex items-center justify-center mx-auto mb-3 group-hover:bg-white transition-colors">
+                                <Upload className="h-5 w-5 text-gray-400 group-hover:text-emerald-600 transition-colors" />
+                             </div>
+                             </div>
+                             <div className="text-sm font-medium text-gray-900">Click to upload</div>
+                             <div className="text-xs text-gray-500 mt-1">SVG, PNG, JPG (max. 2MB)</div>
+                             <input type="file" className="hidden" />
+                        </div>
+                    </CardContent>
+                </Card>
+            </div>
         </div>
 
-        <div>
-          <label className="block text-sm font-medium text-slate-700 mb-1">Description</label>
-          <textarea 
-            name="description"
-            rows="4"
-            className="w-full border border-slate-200 rounded-lg px-4 py-2 bg-slate-50 focus:bg-white focus:outline-none focus:ring-2 focus:ring-blue-500/20 focus:border-blue-500 transition-all resize-none"
-            placeholder="Product detailed description..."
-            value={formData.description}
-            onChange={handleChange}
-          ></textarea>
-        </div>
-
-        {/* Image Upload Placeholder */}
-        <div className="border-2 border-dashed border-slate-200 rounded-xl p-8 text-center cursor-pointer hover:bg-slate-50 transition-colors">
-            <Upload className="mx-auto text-slate-400 mb-2" size={32} />
-            <p className="text-sm text-slate-600 font-medium">Click to upload product image</p>
-            <p className="text-xs text-slate-400 mt-1">SVG, PNG, JPG or GIF (max. 2MB)</p>
-        </div>
-
-        <div className="flex justify-end pt-4 border-t border-slate-100">
-           <button 
-             type="submit"
-             disabled={isLoading}
-             className="flex items-center gap-2 bg-blue-600 text-white px-6 py-2.5 rounded-lg hover:bg-blue-700 transition-colors disabled:opacity-50"
-           >
-             <Save size={20} />
-             <span>{isLoading ? 'Saving...' : 'Save Product'}</span>
-           </button>
+        <div className="flex justify-end pt-6" style={{ marginTop: '10px' }}>
+           <Button type="submit" disabled={isLoading} size="md" style={{ padding: '5px 10px' }}>
+              <Save className="mr-2 h-4 w-4" />
+              {isLoading ? <span style={{ marginTop: '4px', paddingLeft: '5px' }}>Saving...</span> : <span style={{ marginTop: '4px', paddingLeft: '5px' }}>Save Product</span>}
+           </Button>
         </div>
       </form>
     </div>

@@ -1,8 +1,19 @@
 import React, { useState, useEffect } from 'react';
 import { useNavigate } from 'react-router-dom';
-import { Plus, Search, Edit, Trash2, Filter } from 'lucide-react';
+import { Plus, Search, Edit, Trash2, Filter, MoreHorizontal } from 'lucide-react';
 import { toast } from 'react-hot-toast';
-import AdminTable from '../../components/ui/AdminTable';
+import { Button } from '../../components/ui/Button';
+import { Input } from '../../components/ui/Input';
+import { Badge } from '../../components/ui/Badge';
+import { Card, CardContent } from '../../components/ui/Card';
+import {
+  Table,
+  TableBody,
+  TableCell,
+  TableHead,
+  TableHeader,
+  TableRow,
+} from '../../components/ui/Table';
 import { productService } from '../../api/productService';
 
 const ProductsList = () => {
@@ -45,106 +56,115 @@ const ProductsList = () => {
     }
   };
 
-  const getStatusBadge = (status) => {
-    const styles = {
-      'Active': 'bg-emerald-100 text-emerald-700',
-      'Low Stock': 'bg-yellow-100 text-yellow-700',
-      'Out of Stock': 'bg-red-100 text-red-700',
-    };
-    return (
-      <span className={`inline-flex px-2 py-1 rounded-full text-xs font-semibold ${styles[status] || 'bg-gray-100'}`}>
-        {status}
-      </span>
-    );
+  const getStatusVariant = (status) => {
+      const s = status?.toLowerCase() || '';
+      if (s === 'active') return 'success';
+      if (s === 'low stock') return 'warning';
+      if (s === 'out of stock') return 'destructive';
+      return 'secondary';
   };
 
   return (
-    <div className="space-y-8 max-w-7xl mx-auto">
-      {/* Header & Actions */}
-      <div className="flex flex-col sm:flex-row justify-between items-start sm:items-center gap-4">
-        <div>
-          <h1 className="text-2xl font-bold text-slate-800">Products</h1>
-          <p className="text-slate-500 text-sm mt-1">Manage your pharmacy inventory</p>
-        </div>
-        <button 
-          onClick={() => navigate('/admin/products/new')}
-          className="flex items-center gap-2 bg-blue-600 text-white px-4 py-2 rounded-lg hover:bg-blue-700 transition-colors"
-        >
-          <Plus size={20} />
-          <span>Add Product</span>
-        </button>
-      </div>
+        <div className="space-y-6 min-h-screen" style={{ padding: '10px', background: 'linear-gradient(135deg, #f0fdf4 0%, #ecfdf5 50%, #f0fdfa 100%)' }}>
+            <div className="flex flex-col sm:flex-row justify-between items-start sm:items-center gap-4" style={{ paddingBottom: '20px' }}>
+                <div>
+                    <h2 className="text-3xl font-bold tracking-tight">Products</h2>
+                    <p className="text-gray-500 text-sm mt-1">Manage your pharmacy inventory</p>
+                </div>
+                <Button onClick={() => navigate('/admin/products/new')} style={{ padding: '0px 5px' }}>
+                    <Plus className="mr-2 h-4 w-4"  /> <span style={{ marginTop: '3px' }}>Add Product</span>
+                </Button>
+            </div>
 
-      {/* Filters & Search */}
-      <div className="bg-white p-4 rounded-xl shadow-sm border border-slate-100 flex flex-col sm:flex-row gap-4">
-        <div className="relative flex-1">
-          <Search className="absolute left-3 top-1/2 -translate-y-1/2 text-slate-400" size={20} />
-          <input 
-            type="text" 
-            placeholder="Search products by name or SKU..." 
-            className="w-full pl-10 pr-4 py-2 border border-slate-200 rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500/20 focus:border-blue-500"
-            value={searchQuery}
-            onChange={(e) => setSearchQuery(e.target.value)}
-          />
-        </div>
-        <button className="flex items-center gap-2 px-4 py-2 border border-slate-200 rounded-lg hover:bg-slate-50 text-slate-600">
-          <Filter size={18} />
-          <span>Filters</span>
-        </button>
-      </div>
-
-      {/* Products Table */}
-      <div className="bg-white rounded-xl shadow-sm border border-slate-100 overflow-hidden">
-        {isLoading ? (
-          <div className="p-12 text-center text-slate-500">Loading products...</div>
-        ) : (
-          <AdminTable headers={['Name', 'SKU', 'Category', 'Price', 'Stock', 'Status', 'Actions']}>
-            {products.length > 0 ? (
-              products.map((product) => (
-                <tr key={product.id} className="hover:bg-slate-50/50 transition-colors border-b border-slate-50 last:border-none">
-                  <td className="px-6 py-4 font-medium text-slate-800">{product.name}</td>
-                  <td className="px-6 py-4 text-slate-500 font-mono text-xs">{product.sku}</td>
-                  <td className="px-6 py-4 text-slate-600">{product.category}</td>
-                  <td className="px-6 py-4 font-medium">₹{product.price}</td>
-                  <td className="px-6 py-4">
-                    <span className={product.stock < 10 ? 'text-red-600 font-medium' : 'text-slate-600'}>
-                      {product.stock}
-                    </span>
-                  </td>
-                  <td className="px-6 py-4">
-                    {getStatusBadge(product.status)}
-                  </td>
-                  <td className="px-6 py-4">
-                    <div className="flex items-center gap-2">
-                      <button 
-                        onClick={() => navigate(`/admin/products/${product.id}/edit`)}
-                        className="p-1.5 text-blue-600 hover:bg-blue-50 rounded transition-colors"
-                        title="Edit"
-                      >
-                        <Edit size={18} />
-                      </button>
-                      <button 
-                        onClick={() => handleDelete(product.id)}
-                        className="p-1.5 text-red-600 hover:bg-red-50 rounded transition-colors"
-                        title="Delete"
-                      >
-                        <Trash2 size={18} />
-                      </button>
+            <Card>
+                <CardContent className="p-4 sm:p-6 space-y-4" style={{ padding: '10px' }}>
+                    {/* Filters & Search */}
+                    <div className="flex flex-col sm:flex-row gap-4" style={{ paddingBottom: '10px' }}>
+                        <div className="relative flex-1">
+                            <Search className="absolute right-2.5 top-2.5 h-4 w-4 text-gray-500" />
+                            <Input
+                                placeholder="Search products by name or SKU..."
+                                className="pl-9"
+                                value={searchQuery}
+                                onChange={(e) => setSearchQuery(e.target.value)}
+                                style={{ padding: '19px' }}
+                            />
+                        </div>
+                        <Button variant="outline" className="shrink-0" style={{ padding: '0px 5px' }}>
+                            <Filter className="mr-2 h-4 w-4" />
+                            <span style={{ marginTop: '3px' }}>Filter</span>
+                        </Button>
                     </div>
-                  </td>
-                </tr>
-              ))
-            ) : (
-              <tr>
-                <td colSpan="7" className="px-6 py-12 text-center text-slate-500">
-                  No products found matching your search.
-                </td>
-              </tr>
-            )}
-          </AdminTable>
-        )}
-      </div>
-    </div>
+
+                    {/* Products Table */}
+                    <div className="rounded-md border border-gray-200" style={{ padding: '10px' }}>
+                        <Table>
+                            <TableHeader>
+                                <TableRow style={{ background: 'linear-gradient(to right, #f0fdf4, #f0fdfa)' }}>
+                                    <TableHead className="font-semibold text-gray-700" style={{ padding: '6px 8px' }}>Name</TableHead>
+                                    <TableHead className="font-semibold text-gray-700" style={{ padding: '6px 8px' }}>SKU</TableHead>
+                                    <TableHead className="font-semibold text-gray-700" style={{ padding: '6px 8px' }}>Category</TableHead>
+                                    <TableHead className="font-semibold text-gray-700" style={{ padding: '6px 8px' }}>Price</TableHead>
+                                    <TableHead className="font-semibold text-gray-700" style={{ padding: '6px 8px' }}>Stock</TableHead>
+                                    <TableHead className="font-semibold text-gray-700" style={{ padding: '6px 8px' }}>Status</TableHead>
+                                    <TableHead className="text-right font-semibold text-gray-700" style={{ padding: '6px 8px' }}>Actions</TableHead>
+                                </TableRow>
+                            </TableHeader>
+                            <TableBody>
+                                {isLoading ? (
+                                    <TableRow>
+                                        <TableCell colSpan={7} className="h-24 text-center">
+                                            Loading products...
+                                        </TableCell>
+                                    </TableRow>
+                                ) : products.length > 0 ? (
+                                    products.map((product, index) => (
+                                        <TableRow 
+                                            key={product.id}
+                                            className="hover:bg-emerald-50/50 transition-all duration-200 border-b border-gray-100"
+                                            style={{ 
+                                                marginBottom: index !== products.length - 1 ? '10px' : '0',
+                                            }}
+                                        >
+                                            <TableCell className="font-medium text-gray-900" style={{ padding: '10px' }}>{product.name}</TableCell>
+                                            <TableCell className="font-mono text-xs text-gray-500" style={{ padding: '10px' }}>{product.sku}</TableCell>
+                                            <TableCell className="text-gray-600" style={{ padding: '10px' }}>{product.category}</TableCell>
+                                            <TableCell style={{ padding: '10px' }}>₹{product.price}</TableCell>
+                                            <TableCell style={{ padding: '10px' }}>
+                                                <span className={product.stock < 10 ? 'text-red-600 font-medium' : 'text-gray-600'}>
+                                                    {product.stock}
+                                                </span>
+                                            </TableCell>
+                                            <TableCell style={{ padding: '10px' }}>
+                                                <Badge variant={getStatusVariant(product.status)}>
+                                                    {product.status}
+                                                </Badge>
+                                            </TableCell>
+                                            <TableCell className="text-right" style={{ padding: '10px' }}>
+                                                <div className="flex items-center justify-end gap-2">
+                                                    <Button variant="ghost" size="icon" onClick={() => navigate(`/admin/products/${product.id}/edit`)}>
+                                                        <Edit className="h-4 w-4 text-blue-600" />
+                                                    </Button>
+                                                    <Button variant="ghost" size="icon" onClick={() => handleDelete(product.id)}>
+                                                        <Trash2 className="h-4 w-4 text-red-600" />
+                                                    </Button>
+                                                </div>
+                                            </TableCell>
+                                        </TableRow>
+                                    ))
+                                ) : (
+                                    <TableRow>
+                                        <TableCell colSpan={7} className="h-24 text-center text-gray-500">
+                                            No products found matching your search.
+                                        </TableCell>
+                                    </TableRow>
+                                )}
+                            </TableBody>
+                        </Table>
+                    </div>
+                </CardContent>
+            </Card>
+        </div>
   );
 };
 

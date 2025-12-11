@@ -1,26 +1,49 @@
 import React, { useEffect, useState } from 'react';
-import { ShoppingBag, Users, DollarSign, Package } from 'lucide-react';
+import { ShoppingBag, Users, DollarSign, Package, ArrowUpRight, ArrowDownRight, Plus, ExternalLink, TrendingUp, Sparkles } from 'lucide-react';
 import { useNavigate } from 'react-router-dom';
-import AdminCard from '../../components/ui/AdminCard';
-import AdminTable from '../../components/ui/AdminTable';
+import { Card, CardContent, CardHeader, CardTitle, CardDescription } from '../../components/ui/Card';
+import { Button } from '../../components/ui/Button';
+import { Badge } from '../../components/ui/Badge';
+import {
+  Table,
+  TableBody,
+  TableCell,
+  TableHead,
+  TableHeader,
+  TableRow,
+} from '../../components/ui/Table';
 import { productService } from '../../api/productService';
 import { orderService } from '../../api/orderService';
 import { customerService } from '../../api/customerService';
 
-const StatCard = ({ title, value, icon, trend, trendUp }) => (
-  <div className="bg-white p-6 rounded-xl shadow-sm border border-slate-100 flex items-start justify-between">
-    <div>
-      <p className="text-sm font-medium text-slate-500 mb-1">{title}</p>
-      <h3 className="text-2xl font-bold text-slate-800">{value}</h3>
-      <div className={`flex items-center gap-1 mt-2 text-xs font-medium ${trendUp ? 'text-emerald-600' : 'text-red-600'}`}>
-        <span>{trend}</span>
-        <span>vs last month</span>
+const StatCard = ({ title, value, icon: Icon, trend, trendUp, description, gradient }) => (
+  <Card variant="gradient" className="relative overflow-hidden group" >
+    {/* Gradient background for icon */}
+    <div className={`absolute top-0 right-0 w-32 h-32 ${gradient} opacity-10 rounded-full blur-3xl group-hover:opacity-20 transition-opacity`} />
+    
+    <CardHeader className="flex flex-row items-center justify-between space-y-0 pb-3 relative z-10">
+      <CardTitle className="text-sm font-semibold text-gray-700">
+        {title}
+      </CardTitle>
+      <div className={`p-3 rounded-xl bg-opacity-10 group-hover:scale-110 transition-transform`}>
+        <Icon className="h-6 w-6 text-emerald-700" />
       </div>
-    </div>
-    <div className="p-3 bg-slate-50 rounded-lg text-slate-600">
-      {icon}
-    </div>
-  </div>
+    </CardHeader>
+    <CardContent className="relative z-10">
+      <div className="text-3xl font-bold bg-gradient-to-r from-gray-900 to-gray-700 bg-clip-text text-transparent">
+        {value}
+      </div>
+      <div className="flex items-center mt-2 text-xs">
+        {trend && (
+          <span className={`flex items-center font-semibold ${trendUp ? "text-emerald-600" : "text-red-600"}`}>
+            {trendUp ? <TrendingUp className="h-3 w-3 mr-1"/> : <ArrowDownRight className="h-3 w-3 mr-1"/>}
+            {trend}
+          </span>
+        )}
+        <span className="ml-2 text-gray-500 font-medium">{description || "from last month"}</span>
+      </div>
+    </CardContent>
+  </Card>
 );
 
 const Dashboard = () => {
@@ -38,7 +61,7 @@ const Dashboard = () => {
     const fetchDashboardData = async () => {
       try {
         const [productsData, ordersData, customersData] = await Promise.all([
-          productService.getProducts({ limit: 100 }), // Get all or sufficient amount to count
+          productService.getProducts({ limit: 100 }), 
           orderService.getOrders(),
           customerService.getCustomers()
         ]);
@@ -50,7 +73,7 @@ const Dashboard = () => {
           sales: totalSales.toLocaleString('en-IN', { style: 'currency', currency: 'INR', maximumFractionDigits: 0 }),
           orders: ordersData.length,
           customers: customersData.length,
-          products: productsData.total || productsData.data.length
+          products: productsData.total || productsData.data?.length || 0
         });
 
         // Recent Orders
@@ -66,94 +89,181 @@ const Dashboard = () => {
     fetchDashboardData();
   }, []);
 
-  const getStatusColor = (status) => {
-    switch(status) {
-      case 'Delivered': return 'bg-emerald-100 text-emerald-700';
-      case 'Processing': return 'bg-blue-100 text-blue-700';
-      case 'Shipped': return 'bg-orange-100 text-orange-700';
-      case 'On the Way': return 'bg-orange-100 text-orange-700';
-      case 'Cancelled': return 'bg-red-100 text-red-700';
-      case 'Out For Delivery': return 'bg-yellow-100 text-yellow-700';
-      default: return 'bg-gray-100 text-gray-700';
+  const getStatusVariant = (status) => {
+    switch(status?.toLowerCase()) {
+      case 'delivered': return 'success';
+      case 'processing': return 'default';
+      case 'shipped': return 'warning';
+      case 'on the way': return 'warning';
+      case 'cancelled': return 'destructive';
+      case 'out for delivery': return 'warning';
+      default: return 'secondary';
     }
   };
 
   if (isLoading) {
-    return <div className="p-8 text-center text-slate-500">Loading dashboard...</div>;
+    return (
+      <div className="flex h-[50vh] items-center justify-center">
+        <div className="flex flex-col items-center gap-4">
+          <div className="h-12 w-12 animate-spin rounded-full border-4 border-gray-200 border-t-emerald-600"></div>
+          <p className="text-gray-600 font-medium">Loading dashboard...</p>
+        </div>
+      </div>
+    );
   }
 
-  const statCards = [
-    { title: 'Total Sales', value: stats.sales, icon: <DollarSign size={24} />, trend: '+12.5%', trendUp: true },
-    { title: 'Total Orders', value: stats.orders, icon: <ShoppingBag size={24} />, trend: '+8.2%', trendUp: true },
-    { title: 'Total Customers', value: stats.customers, icon: <Users size={24} />, trend: '+2.1%', trendUp: true },
-    { title: 'Total Products', value: stats.products, icon: <Package size={24} />, trend: '+4.5%', trendUp: true },
-  ];
-
   return (
-    <div className="space-y-8 max-w-7xl mx-auto">
-      {/* Header */}
-      <div>
-        <h1 className="text-2xl font-bold text-slate-800">Dashboard</h1>
-        <p className="text-slate-500">Welcome back, here's what's happening today.</p>
-      </div>
-
-      {/* Stats Grid */}
-      <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-6">
-        {statCards.map((stat, index) => (
-          <StatCard key={index} {...stat} />
-        ))}
-      </div>
-
-      {/* Recent Orders */}
-      <div className="grid grid-cols-1 lg:grid-cols-3 gap-6">
-        <div className="lg:col-span-2">
-            <AdminCard title="Recent Orders" actions={<button onClick={() => navigate('/admin/orders')} className="text-sm text-blue-600 font-medium hover:underline">View All</button>}>
-                <AdminTable headers={['Order ID', 'Customer', 'Product', 'Amount', 'Status']}>
-                    {recentOrders.map((order) => (
-                        <tr key={order.id} className="hover:bg-slate-50/50 transition-colors">
-                            <td className="px-6 py-4 font-medium text-slate-700 cursor-pointer hover:text-blue-600" onClick={() => navigate(`/admin/orders/${order.id}`)}>#{order.id}</td>
-                            <td className="px-6 py-4 text-slate-600">{order.customerName}</td>
-                            <td className="px-6 py-4 text-slate-600 truncate max-w-[150px]" title={order.productName}>{order.productName}</td>
-                            <td className="px-6 py-4 font-medium text-slate-800">₹{order.paymentBreakdown?.total || order.price}</td>
-                            <td className="px-6 py-4">
-                                <span className={`inline-flex items-center px-2.5 py-0.5 rounded-full text-xs font-medium whitespace-nowrap ${getStatusColor(order.status)}`}>
-                                    {order.status}
-                                </span>
-                            </td>
-                        </tr>
-                    ))}
-                    {recentOrders.length === 0 && (
-                      <tr><td colSpan="5" className="p-4 text-center text-slate-500">No active orders</td></tr>
-                    )}
-                </AdminTable>
-            </AdminCard>
+    <div className="space-y-8 animate-in fade-in slide-in-from-bottom-6 duration-700 min-h-screen" style={{ padding: '10px', background: 'linear-gradient(135deg, #f0fdf4 0%, #ecfdf5 50%, #f0fdfa 100%)' }}>
+      {/* Header with gradient text */}
+      <div className="flex flex-col sm:flex-row justify-between items-start sm:items-center gap-4" style={{ padding: '10px' }}>
+        <div>
+          <h1 className="text-4xl font-bold bg-gradient-to-r from-gray-900 via-emerald-800 to-teal-800 bg-clip-text text-transparent flex items-center gap-3">
+            Dashboard
+            <Sparkles className="h-8 w-8 text-emerald-500" />
+          </h1>
+          <p className="text-gray-600 mt-2 font-medium">Welcome back! Here's what's happening with your store today.</p>
         </div>
+      </div>
+
+      {/* Stats Grid with gradients */}
+      <div className="grid gap-6 md:grid-cols-2 lg:grid-cols-4" style={{ padding: '10px' }}>
+        <StatCard 
+          title="Total Sales" 
+          value={stats.sales} 
+          icon={DollarSign} 
+          trend="+12.5%" 
+          trendUp={true} 
+          description="vs last month"
+          gradient="bg-gradient-to-br from-emerald-500 to-teal-600"
+          
+        />
+        <StatCard 
+          title="Total Orders" 
+          value={stats.orders} 
+          icon={ShoppingBag} 
+          trend="+8.2%" 
+          trendUp={true} 
+          description="vs last month"
+          gradient="bg-gradient-to-br from-blue-500 to-cyan-600"
+        />
+        <StatCard 
+          title="Total Customers" 
+          value={stats.customers} 
+          icon={Users} 
+          trend="+2.1%" 
+          trendUp={true} 
+          description="active now"
+          gradient="bg-gradient-to-br from-purple-500 to-pink-600"
+        />
+        <StatCard 
+          title="Total Products" 
+          value={stats.products} 
+          icon={Package} 
+          trend="+4.5%" 
+          trendUp={true} 
+          description="in catalog"
+          gradient="bg-gradient-to-br from-amber-500 to-orange-600"
+        />
+      </div>
+
+      {/* Recent Orders & Quick Actions */}
+      <div className="grid gap-6 md:grid-cols-2 lg:grid-cols-7" style={{ padding: '10px' }}>
         
-        {/* Quick Actions / Mini Widget */}
-        <div className="space-y-6">
-             <AdminCard title="Quick Actions">
-                <div className="grid grid-cols-2 gap-3">
-                    <button onClick={() => navigate('/admin/products/new')} className="p-3 text-sm font-medium text-slate-700 bg-slate-50 hover:bg-slate-100 rounded-lg border border-slate-200 transition-colors text-center">
-                        Add Product
-                    </button>
-                    <button onClick={() => navigate('/admin/orders')} className="p-3 text-sm font-medium text-slate-700 bg-slate-50 hover:bg-slate-100 rounded-lg border border-slate-200 transition-colors text-center">
-                         View Orders
-                    </button>
-                    <button onClick={() => navigate('/admin/customers')} className="p-3 text-sm font-medium text-slate-700 bg-slate-50 hover:bg-slate-100 rounded-lg border border-slate-200 transition-colors text-center">
-                         View Customers
-                    </button>
-                    <button className="p-3 text-sm font-medium text-slate-700 bg-slate-50 hover:bg-slate-100 rounded-lg border border-slate-200 transition-colors text-center opacity-50 cursor-not-allowed">
-                         View Reports
-                    </button>
-                </div>
-             </AdminCard>
-             
-             <AdminCard title="Platform Traffic">
-                <div className="h-48 flex items-center justify-center bg-slate-50 rounded-lg border border-dashed border-slate-300">
-                    <span className="text-slate-400 text-sm">Chart Placeholder</span>
-                </div>
-             </AdminCard>
-        </div>
+        {/* Recent Orders - Premium Table */}
+        <Card variant="elevated" className="col-span-7 lg:col-span-4">
+          <CardHeader className="flex flex-row items-center justify-between border-b border-gray-100 pb-4">
+            <div>
+              <CardTitle className="text-xl">Recent Orders</CardTitle>
+              <CardDescription className="mt-1">Latest transactions from your customers</CardDescription>
+            </div>
+            <Button variant="ghost" size="sm" onClick={() => navigate('/admin/orders')} className="text-emerald-600 hover:text-emerald-700 hover:bg-emerald-50">
+              <span style={{ marginTop: '5px', paddingRight: '5px' }}>View All</span> <ExternalLink className="ml-2 h-4 w-4" />
+            </Button>
+          </CardHeader>
+          <CardContent className="p-0">
+            {recentOrders.length > 0 ? (
+              <div className="overflow-x-auto">
+                <Table>
+                  <TableHeader>
+                    <TableRow className="hover:bg-gradient-to-r hover:from-emerald-50 hover:to-teal-50" style={{ background: 'linear-gradient(to right, #f0fdf4, #f0fdfa)' }}>
+                      <TableHead className="font-semibold text-gray-700" style={{ padding: '12px 16px' }}>Order ID</TableHead>
+                      <TableHead className="font-semibold text-gray-700" style={{ padding: '12px 16px' }}>Customer</TableHead>
+                      <TableHead className="font-semibold text-gray-700" style={{ padding: '12px 16px' }}>Status</TableHead>
+                      <TableHead className="text-right font-semibold text-gray-700" style={{ padding: '12px 16px' }}>Amount</TableHead>
+                    </TableRow>
+                  </TableHeader>
+                  <TableBody>
+                    {recentOrders.map((order, index) => (
+                      <TableRow
+                        key={order.id} 
+                        className="cursor-pointer hover:bg-emerald-50/50 transition-all duration-200 border-b border-gray-100" 
+                        style={{ 
+                          marginBottom: index !== recentOrders.length - 1 ? '5px' : '0',
+                        }}
+                        onClick={() => navigate(`/admin/orders/${order.id}`)}
+                      >
+                        <TableCell className="font-bold text-gray-900" style={{ padding: '16px' }}>#{order.id}</TableCell>
+                        <TableCell className="text-gray-700 font-medium" style={{ padding: '16px' }}>{order.customerName}</TableCell>
+                        <TableCell style={{ padding: '16px' }}>
+                          <Badge variant={getStatusVariant(order.status)} glow>
+                            {order.status}
+                          </Badge>
+                        </TableCell>
+                        <TableCell className="text-right font-bold text-gray-900" style={{ padding: '10px' }}>
+                          ₹{order.paymentBreakdown?.total || order.price}
+                        </TableCell>
+                      </TableRow>
+                    ))}
+                  </TableBody>
+                </Table>
+              </div>
+            ) : (
+              <div className="text-center text-gray-500 py-12 font-medium">No recent orders found.</div>
+            )}
+          </CardContent>
+        </Card>
+
+        {/* Quick Actions - Premium Cards */}
+        <Card variant="gradient" className="col-span-7 lg:col-span-3">
+          <CardHeader className="border-b border-emerald-100 pb-4">
+            <CardTitle className="text-xl">Quick Actions</CardTitle>
+            <CardDescription>Manage your store efficiently</CardDescription>
+          </CardHeader>
+          <CardContent className="grid gap-4 pt-6">
+            <Button 
+              variant="outline" 
+              className="h-24 flex-col items-center justify-center space-y-2 hover:bg-gradient-to-br hover:from-emerald-50 hover:to-teal-50 hover:border-emerald-300 group" 
+              onClick={() => navigate('/admin/products/new')}
+            >
+              <div className="p-2 bg-emerald-100 rounded-lg group-hover:bg-emerald-200 transition-colors">
+                <Package className="h-6 w-6 text-emerald-700" />
+              </div>
+              <span className="font-semibold text-gray-900">Add Product</span>
+            </Button>
+            
+            <Button 
+              variant="outline" 
+              className="h-24 flex-col items-center justify-center space-y-2 hover:bg-gradient-to-br hover:from-blue-50 hover:to-cyan-50 hover:border-blue-300 group" 
+              onClick={() => navigate('/admin/orders')}
+            >
+              <div className="p-2 bg-blue-100 rounded-lg group-hover:bg-blue-200 transition-colors">
+                <ShoppingBag className="h-6 w-6 text-blue-700" />
+              </div>
+              <span className="font-semibold text-gray-900">View Orders</span>
+            </Button>
+            
+            <Button 
+              variant="outline" 
+              className="h-24 flex-col items-center justify-center space-y-2 hover:bg-gradient-to-br hover:from-purple-50 hover:to-pink-50 hover:border-purple-300 group" 
+              onClick={() => navigate('/admin/customers')}
+            >
+              <div className="p-2 bg-purple-100 rounded-lg group-hover:bg-purple-200 transition-colors">
+                <Users className="h-6 w-6 text-purple-700" />
+              </div>
+              <span className="font-semibold text-gray-900">Customers</span>
+            </Button>
+          </CardContent>
+        </Card>
       </div>
     </div>
   );

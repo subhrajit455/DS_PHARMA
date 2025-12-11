@@ -116,7 +116,7 @@ const OrderDetails = () => {
               <div>
                 <OrderProductCard order={order} onCancel={handleCancelOrder} />
                 {/* Contact Section */}
-                <Card className="mt-6 w-full" style={{ marginTop: '12px' }}>
+                <Card className="mt-6 w-full" style={{ marginTop: '10px' }}>
                   <div className="flex flex-col gap-3 p-3 sm:gap-4 sm:p-4 sm:flex-row sm:items-center sm:justify-between" style={{ padding: '3px 8px' }}>
                     <p
                       className="font-medium text-gray-600 text-[10px] sm:text-base"

@@ -10,6 +10,10 @@ import OrdersList from './pages/Orders/OrdersList';
 import OrderDetails from './pages/Orders/OrderDetails';
 import CustomersList from './pages/Customers/CustomersList';
 import CustomerDetails from './pages/Customers/CustomerDetails';
+import AnnouncementsList from './pages/Announcements/AnnouncementsList';
+import BannerForm from './pages/Announcements/BannerForm';
+import MarqueeForm from './pages/Announcements/MarqueeForm';
+import AlertForm from './pages/Announcements/AlertForm';
 
 const AdminRouter = () => {
   return (
@@ -33,6 +37,15 @@ const AdminRouter = () => {
         {/* Customers */}
         <Route path="customers" element={<CustomersList />} />
         <Route path="customers/:id" element={<CustomerDetails />} />
+        
+        {/* Announcements */}
+        <Route path="announcements" element={<AnnouncementsList />} />
+        <Route path="announcements/banners/new" element={<BannerForm />} />
+        <Route path="announcements/banners/:id/edit" element={<BannerForm />} />
+        <Route path="announcements/marquee/new" element={<MarqueeForm />} />
+        <Route path="announcements/marquee/:id/edit" element={<MarqueeForm />} />
+        <Route path="announcements/alerts/new" element={<AlertForm />} />
+        <Route path="announcements/alerts/:id/edit" element={<AlertForm />} />
       </Route>
 
       <Route path="*" element={<Navigate to="/admin/dashboard" replace />} />

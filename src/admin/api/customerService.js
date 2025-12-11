@@ -6,16 +6,26 @@ export const customerService = {
     // For now, we fetch all users (non-admin) and filter/transform here.
     const allUsers = await mockApi.getCustomers(); // returns non-admins
 
+    // ✅ DEFENSIVE: Ensure allUsers is an array
+    if (!Array.isArray(allUsers)) {
+      console.error("getCustomers: Expected array, got:", typeof allUsers);
+      return [];
+    }
+
     let filtered = allUsers;
     const { search } = params || {};
 
     if (search) {
       const lowerSearch = search.toLowerCase();
-      filtered = filtered.filter(
-        (u) =>
-          u.name.toLowerCase().includes(lowerSearch) ||
-          u.email.toLowerCase().includes(lowerSearch)
-      );
+      filtered = filtered.filter((u) => {
+        // ✅ DEFENSIVE: Check for null/undefined before calling .toLowerCase()
+        const name = u?.name || "";
+        const email = u?.email || "";
+        return (
+          name.toLowerCase().includes(lowerSearch) ||
+          email.toLowerCase().includes(lowerSearch)
+        );
+      });
     }
 
     // In a real app we would join orders here via API,
