@@ -68,7 +68,11 @@ export const MobileTopBar = ({ totalCartItems, isAuthenticated, user }) => {
             }}
             ref={searchContainerRef}
           >
-            <SearchInput className="w-full shadow-2xl border border-gray-100/50 backdrop-blur-sm" autoFocus />
+            <SearchInput 
+              className="w-full shadow-2xl border border-gray-100/50 backdrop-blur-sm" 
+              autoFocus 
+              onSearchSubmit={() => setIsSearchOpen(false)}
+            />
           </Motion.div>
         )}
       </AnimatePresence>

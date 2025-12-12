@@ -79,7 +79,7 @@ const Orders = () => {
       <div className="orders-container w-full px-4 md:px-6 lg:px-12 flex flex-col items-center mb-8">
         <div className="w-full max-w-7xl mx-auto">
           {/* Header Section */}
-          <div className="mb-8 md:mb-12 lg:mb-20">
+          <div className="mb-8 md:mb-12 lg:mb-20" style={{ marginBottom: '10px'}}>
             <div className="flex flex-col md:flex-row items-start md:items-center justify-between gap-4 mb-8 md:mb-12 lg:mb-16">
               <h1
                 className="text-xl md:text-2xl font-semibold"
@@ -158,7 +158,8 @@ const Orders = () => {
           <div 
             className="space-y-3 mb-8 md:mb-12 lg:mb-16 mt-4 md:mt-8 lg:mt-12"
             style={{
-              maxHeight: '600px',
+              maxHeight: '700px',
+              minHeight: '600px',
               overflowY: 'auto',
               paddingRight: '5px',
               scrollbarWidth: 'none', // Firefox

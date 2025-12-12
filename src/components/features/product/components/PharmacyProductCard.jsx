@@ -89,7 +89,7 @@ const PharmacyProductCard = ({
   return (
     <Motion.div
       className={`bg-transparent overflow-hidden rounded-lg cursor-pointer transition-all duration-300 hover:shadow-lg w-full ${className} ${!isAvailable ? 'opacity-60' : ''}`}
-      style={{ maxWidth: '320px', padding: '10px' }}
+      style={{ maxWidth: '300px', padding: '10px' }}
       initial={{ opacity: 0, y: 20 }}
       animate={{ opacity: 1, y: 0 }}
       whileHover={{ y: -2 }}
@@ -123,17 +123,17 @@ const PharmacyProductCard = ({
           onClick={handleWishlistToggle}
           className="absolute top-2 right-2 p-1.5 rounded-full bg-white/80 hover:bg-white shadow-sm transition-all"
           aria-label={isInWishlist ? 'Remove from wishlist' : 'Add to wishlist'}
+          style={{ padding: '5px' }}
         >
-          <Heart 
-            size={16} 
-            className={isInWishlist ? 'fill-red-500 text-red-500' : 'text-gray-400'} 
+          <Heart
+            className={isInWishlist ? 'fill-red-500 text-red-500 w-3 h-3 sm:w-4 sm:h-4' : 'text-gray-400 w-3 h-3 sm:w-4 sm:h-4'}
           />
         </button>
         
         {/* Out of Stock Badge */}
         {!isAvailable && (
           <div className="absolute inset-0 flex items-center justify-center bg-black/30">
-            <span className="px-3 py-1 text-[8px] sm:text-xs font-semibold text-white bg-red-500 rounded-full">
+            <span className="px-3 py-1 text-[8px] sm:text-xs font-semibold text-white bg-red-500 rounded-full" style={{ padding: '5px' }}>
               Out of Stock
             </span>
           </div>
@@ -141,7 +141,7 @@ const PharmacyProductCard = ({
         
         {/* Discount Badge */}
         {discountPercentage > 0 && isAvailable && (
-          <div className="absolute top-2 left-2 px-2 py-0.5 text-[10px] font-bold text-white bg-green-500 rounded">
+          <div className="absolute top-2 left-2 px-2 py-0.5 text-[8px] sm:text-[10px] font-bold text-white bg-green-500 rounded" style={{ padding: '1px  5px' }}>
             {discountPercentage}% OFF
           </div>
         )}
@@ -159,8 +159,8 @@ const PharmacyProductCard = ({
       {/* Product Info */}
       <div className="relative pt-2 translate-y-1/8" >
         {/* Product Name */}
-        <h3 className="flex items-center justify-start text-[14px] font-semibold leading-tight text-left text-gray-900 min-h-8">
-          {name.length > 15 ? `${name.substring(0, 15)}...` : name}
+        <h3 className="flex items-center justify-start text-[10px] sm:text-[14px] font-semibold leading-tight text-left text-gray-900 min-h-8">
+          {name.length > 15 ? `${name.substring(0, 13)}...` : name}
         </h3>
 
         {/* Price and Discount Row */}
@@ -201,15 +201,14 @@ const PharmacyProductCard = ({
         <button
           onClick={handleAddToCart}
           disabled={isPending || !isAvailable}
-          className={`absolute flex items-center justify-center -translate-y-1/2 cursor-pointer right-0 top-1/2 focus:outline-none w-8 h-8 sm:w-10 sm:h-10 neumorphic-cart-btn`}
+          className={`absolute flex items-center justify-center -translate-y-1/2 cursor-pointer right-0 top-1/2 focus:outline-none w-6 h-6 sm:w-8 sm:h-8 neumorphic-cart-btn`}
           aria-label={isAvailable ? `Add ${name} to cart` : 'Out of stock'}
         >
           <img
+            className="w-2.5 h-2.5 sm:w-4.5 sm:h-4.5"
             src={CartIcon}
             alt="Add to Cart"
             style={{
-              width: '16px',
-              height: '16px',
               objectFit: 'contain',
               opacity: 0.8
             }}

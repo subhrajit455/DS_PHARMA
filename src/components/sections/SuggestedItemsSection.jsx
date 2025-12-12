@@ -14,7 +14,7 @@ const SuggestedItemsSection = ({
     // Default styles that can be overridden
     const defaultTitleStyle = {
         fontFamily: 'Gyrotrope',
-        fontSize: '20px',
+        fontSize: '15px sm:20px',
         fontWeight: 600,
         color: '#000000',
         marginBottom: '1.5rem',
@@ -48,24 +48,40 @@ const SuggestedItemsSection = ({
                     marginBottom: '2rem'
                 }}
             >
-                {items.map((item) => (
-                    <div
-                        key={item.id}
-                        className="w-[160px] shrink-0 sm:w-[230px]"
-                    >
-                        <PharmacyProductCard
-                            id={item.id}
-                            name={item.name}
-                            price={item.price}
-                            originalPrice={item.originalPrice}
-                            discount={item.discount}
-                            quantity="1 piece"
-                            imageUrl={item.image}
-                            onCardClick={() => handleProductClick(item)}
-                            className="w-full h-full"
-                        />
-                    </div>
-                ))}
+                {items.map((item) => {
+                    // Force display of MRP and Discount if missing (User Request)
+                    const price = Number(item.price) || 0;
+                    let mrp = Number(item.mrp || item.originalPrice) || 0;
+                    let discount = Number(item.discount) || 0;
+
+                    // If no valid MRP exist or MRP is not greater than price, synthesize it to ensure visual consistency
+                    if (mrp <= price) {
+                        // If we have a discount, calculate MRP from it, otherwise assume random 10-30% discount
+                        const syntheticDiscount = discount || Math.floor(Math.random() * (30 - 10 + 1)) + 10; 
+                        discount = syntheticDiscount;
+                        mrp = Math.ceil(price * (100 / (100 - syntheticDiscount)));
+                    }
+
+                    return (
+                        <div
+                            key={item.id}
+                            className="w-[160px] shrink-0 sm:w-[230px]"
+                        >
+                            <PharmacyProductCard
+                                id={item.id}
+                                name={item.name}
+                                price={price}
+                                originalPrice={mrp}
+                                mrp={mrp}
+                                discount={discount}
+                                quantity="1 piece"
+                                imageUrl={item.image}
+                                onCardClick={() => handleProductClick(item)}
+                                className="w-full h-full"
+                            />
+                        </div>
+                    );
+                })}
             </div>
         </div>
     );

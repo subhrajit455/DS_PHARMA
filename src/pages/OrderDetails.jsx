@@ -1,5 +1,5 @@
 import React from "react";
-import { useNavigate, useParams } from "react-router-dom";
+import { useNavigate, useParams, useLocation } from "react-router-dom";
 import { Card, Button } from "@/components/ui";
 import {
   OrderProductCard,
@@ -16,23 +16,27 @@ import { useProducts } from '@/hooks/queries/useProducts';
 const OrderDetails = () => {
   const navigate = useNavigate();
   const { id } = useParams();
+  const location = useLocation();
   
   // Fetch order details using React Query
-  const { data: orderResponse, isLoading } = useOrderDetails(id);
+  const { data: orderResponse, isLoading, isError } = useOrderDetails(id);
   
-  const order = orderResponse?.data;
+  // Use fetched data first, fall back to navigation state (instant load)
+  const order = orderResponse?.data || location.state?.order;
   
   // Suggestions
   const { data: suggestionsData } = useProducts({ limit: 5 });
   const suggestedItems = suggestionsData?.data || [];
 
-  if (isLoading) return (
+  // Only show loading if we have NO data to show
+  if (isLoading && !order) return (
     <div className="flex justify-center items-center min-h-screen pt-20">
       <div className="w-12 h-12 border-4 border-teal-500 rounded-full border-t-transparent animate-spin"></div>
     </div>
   );
   
-  if (!order) return (
+  // Show error only if we really couldn't find the order after trying
+  if (!order && (!isLoading || isError)) return (
     <div className="flex justify-center items-center min-h-screen pt-20">
       <h2 className="text-xl font-semibold text-gray-700 font-gyrotrope">Order not found</h2>
     </div>

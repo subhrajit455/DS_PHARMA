@@ -92,10 +92,10 @@ const SearchPage = () => {
             paddingBottom: '1rem',
             marginTop: '-1rem' // Compensate for padding to maintain visual flow
           }}
-          className="flex flex-col md:flex-row justify-between items-start md:justify-items-center gap-4 mb-8 sticky md:sticky top-[60px] md:top-0"
+          className="flex flex-col md:flex-row justify-between items-start md:justify-items-center gap-4 mb-8 sticky md:sticky top-[40px] sm:top-[60px] md:top-0"
         >
           <div>
-             <h1 className="text-3xl font-bold text-gray-900 tracking-tight">
+             <h1 className="text-2xl font-bold text-gray-900 tracking-tight">
                {query ? (
                   <>Results for <span className="text-emerald-600">"{query}"</span></>
                ) : 'All Products'}
@@ -105,17 +105,17 @@ const SearchPage = () => {
              </p>
           </div>
 
-          <div className="flex items-center gap-3 w-full md:w-auto">
+          <div className="flex items-center gap-1 sm:gap-3 w-full md:w-auto">
              <button 
                 onClick={() => {
                    setTempFilters(filters); // Initialize temp state with current real filters
                    setIsMobileFiltersOpen(true);
                 }}
-                className="lg:hidden flex items-center gap-2 px-4 py-2.5 bg-white border border-gray-200 rounded-full text-sm font-semibold text-gray-700 shadow-sm active:scale-95 transition-all"
+                className="lg:hidden flex items-center gap-1 sm:gap-2 px-4 py-2.5 bg-white border border-gray-200 rounded-full text-sm font-semibold text-gray-700 shadow-sm active:scale-95 transition-all"
                 style={{ padding: '5px 10px' }}
              >
-                <SlidersHorizontal className="w-4 h-4" />
-               <span style={{marginTop: '5px'}}>Filters</span>
+                <SlidersHorizontal className="w-2.5 h-2.5 sm:w-4 sm:h-4" />
+               <span className='text-[9px] sm:text-[12px]' style={{marginTop: '5px'}}>Filters</span>
              </button>
              <div className="ml-auto w-auto">
                 <SortDropdown currentSort={sort} onSortChange={handleSortChange} />
@@ -185,7 +185,7 @@ const SearchPage = () => {
            </AnimatePresence>
 
            {/* Results Grid */}
-           <main className="flex-1 min-w-0">
+           <main className="flex-1 min-w-0 ">
                <SearchResults products={products} isLoading={isLoading} query={query} onReset={handleViewAll} />
            </main>
         </div>

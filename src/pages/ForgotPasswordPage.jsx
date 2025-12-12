@@ -104,6 +104,7 @@ const ForgotPasswordPage = () => {
                     size="full"
                     disabled={isLoading}
                     className="!bg-emerald-600 hover:!bg-emerald-700 !shadow-emerald-200"
+                    style={{ marginBottom: '15px' }}
                 >
                     {isLoading ? 'Sending Link...' : 'Send Reset Link'}
                 </Button>

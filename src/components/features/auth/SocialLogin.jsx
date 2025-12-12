@@ -19,7 +19,7 @@ const SocialLogin = () => {
                     <div className="w-full border-t border-gray-300" />
                 </div>
                 <div className="relative flex justify-center text-sm">
-                    <span className="px-2 bg-white text-gray-500">Or continue with</span>
+                    <span className="px-2 bg-[#83f1daff] rounded-full text-gray-500" style={{ padding: '2px 10px' }}>Or continue with</span>
                 </div>
             </div>
 

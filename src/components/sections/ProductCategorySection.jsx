@@ -83,7 +83,7 @@ const ProductCategorySection = ({
         {/* Products Grid - Compact Responsive Layout */}
         <div className="relative flex justify-center w-full">
           <Motion.div
-            className="flex w-full overflow-x-auto pb-4 hide-scrollbar gap-4 px-4 sm:gap-6 lg:gap-8"
+            className="flex w-full overflow-x-auto pb-4 hide-scrollbar gap-3 px-4 sm:gap-4 lg:gap-6"
             style={{
               scrollbarWidth: 'none',
               msOverflowStyle: 'none',

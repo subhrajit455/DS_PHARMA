@@ -145,7 +145,7 @@ const SignupPage = () => {
                                 className="h-4 w-4 text-emerald-600 focus:ring-emerald-500 border-gray-300 rounded cursor-pointer"
                             />
                         </div>
-                        <div className="ml-2 text-base" style={{ padding: '2px' }}>
+                        <div className="ml-2 text-xs sm:text-base" style={{ padding: '2px' }}>
                             <label htmlFor="agree-terms" className="font-medium text-gray-700">
                                 I agree to the <button type="button" onClick={() => setShowTerms(true)} className="text-emerald-600 hover:text-emerald-400 cursor-pointer" style={{ textDecoration: 'none' }}>Terms and Conditions</button>
                             </label>
@@ -161,6 +161,7 @@ const SignupPage = () => {
                         size="full"
                         disabled={isPending}
                         className="!bg-emerald-600 hover:!bg-emerald-700 !shadow-emerald-200"
+                        style={{ marginBottom: '10px' }}
                     >
                         {isPending ? 'Creating Account...' : 'Sign Up'}
                     </Button>

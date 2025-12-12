@@ -1,11 +1,12 @@
 import React, { useState, useEffect, useRef } from 'react';
 import { useNavigate } from 'react-router-dom';
 import { Search, X, Loader2, Pill, TestTube2, ArrowRight } from 'lucide-react';
+// eslint-disable-next-line no-unused-vars
 import { motion, AnimatePresence } from 'framer-motion';
 import useDebounce from '@/hooks/useDebounce';
 import searchService from '@/services/api/searchService';
 
-const SearchInput = ({ className = '', placeholder = "Search for medicines, health products..." }) => {
+const SearchInput = ({ className = '', placeholder = "Search for medicines, health products...", onSearchSubmit }) => {
   const [query, setQuery] = useState('');
   const [suggestions, setSuggestions] = useState([]);
   const [isLoading, setIsLoading] = useState(false);
@@ -47,10 +48,14 @@ const SearchInput = ({ className = '', placeholder = "Search for medicines, heal
     return () => document.removeEventListener('mousedown', handleClickOutside);
   }, []);
 
+  const inputRef = useRef(null);
+
   const handleSearch = (e) => {
     e.preventDefault();
     if (query.trim()) {
       setIsOpen(false);
+      inputRef.current?.blur();
+      if (onSearchSubmit) onSearchSubmit();
       navigate(`/search?query=${encodeURIComponent(query.trim())}`);
     }
   };
@@ -75,6 +80,7 @@ const SearchInput = ({ className = '', placeholder = "Search for medicines, heal
           </div>
           
           <input
+            ref={inputRef}
             type="text"
             value={query}
             onChange={(e) => setQuery(e.target.value)}

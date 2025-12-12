@@ -96,6 +96,7 @@ const ResetPasswordPage = () => {
                         variant="primary"
                         size="full"
                         className="!bg-emerald-600 hover:!bg-emerald-700 !shadow-emerald-200"
+                        style={{ marginBottom: '10px' }}
                     >
                         Go to Login
                     </Button>

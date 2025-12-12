@@ -24,7 +24,7 @@ const InputField = ({
                 type={isPassword ? (showPassword ? 'text' : 'password') : type}
                 error={error}
                 placeholder={placeholder}
-                className={`${className} ${isPassword ? 'pr-10' : ''} focus:border-emerald-500 focus:ring-emerald-200`}
+                className={`${className} ${isPassword ? 'pr-10' : ''} bg-gray-50 border-gray-200 focus:bg-white focus:border-emerald-500 focus:ring-4 focus:ring-emerald-500/10 transition-all duration-200 hover:border-emerald-300`}
                 labelClassName="text-[15px]"
                 {...props}
                 style={{ padding: '10px 5px' }}
@@ -36,6 +36,7 @@ const InputField = ({
                     onClick={togglePasswordVisibility}
                     className="absolute right-3 top-[25px] text-gray-500 hover:text-gray-700 focus:outline-none"
                     aria-label={showPassword ? "Hide password" : "Show password"}
+                    style={{ marginTop: '7px' }}
                 >
                     {showPassword ? (
                         <EyeOff size={20} />

@@ -17,12 +17,12 @@ export const SortDropdown = ({ currentSort, onSortChange }) => {
     <div className="relative">
       <button 
         onClick={() => setIsOpen(!isOpen)}
-        className="flex items-center gap-2 px-4 py-2.5 bg-white border border-gray-200 rounded-full text-[12px] font-medium text-gray-700 hover:border-emerald-500 hover:text-emerald-600 transition-all shadow-sm"
+        className="flex items-center gap-1 sm:gap-2 px-2 sm:px-4 py-2.5 bg-white border border-gray-200 rounded-full text-[9px] sm:text-[12px] font-medium text-gray-700 hover:border-emerald-500 hover:text-emerald-600 transition-all shadow-sm"
         style={{ padding: '5px 10px' }}   
       >
-        <ArrowUpDown className="w-4 h-4" />
+        <ArrowUpDown className="w-2.5 h-2.5 sm:w-4 sm:h-4" />
         <span style={{ marginTop: '3px' }}>{currentLabel}</span>
-        <ChevronDown className={`w-3.5 h-3.5 transition-transform ${isOpen ? 'rotate-180' : ''}`} />
+        <ChevronDown className={`w-2.5 h-2.5 sm:w-4 sm:h-4 transition-transform ${isOpen ? 'rotate-180' : ''}`} />
       </button>
 
       <AnimatePresence>
@@ -31,7 +31,7 @@ export const SortDropdown = ({ currentSort, onSortChange }) => {
             initial={{ opacity: 0, scale: 0.95, y: 5 }}
             animate={{ opacity: 1, scale: 1, y: 0 }}
             exit={{ opacity: 0, scale: 0.95, y: 5 }}
-            className="absolute right-0 mt-2 w-48 bg-white rounded-xl shadow-xl border border-gray-100 z-50 overflow-hidden"
+            className="absolute right-0 mt-2 w-34 sm:w-48 bg-white rounded-xl shadow-xl border border-gray-100 z-50 overflow-hidden"
             style={{ padding: '5px 10px' }}
           >
              <div className="py-1">
@@ -42,7 +42,7 @@ export const SortDropdown = ({ currentSort, onSortChange }) => {
                         onSortChange(option.value);
                         setIsOpen(false);
                      }}
-                     className={`w-full text-left px-4 py-2.5 text-[12px] transition-colors ${
+                     className={`w-full text-left px-4 py-2.5 text-[9px] sm:text-[12px] transition-colors ${
                         currentSort === option.value 
                            ? 'bg-emerald-50 text-emerald-600 font-medium' 
                            : 'text-gray-600 hover:bg-gray-100'
@@ -71,11 +71,11 @@ const FilterSection = ({ title, icon: Icon, isOpen, onToggle, children }) => {
            onClick={onToggle}
            className="w-full flex items-center justify-between py-4 px-1 group"
          >
-            <div className="flex items-center gap-2.5 text-gray-700 font-semibold text-[12px] group-hover:text-emerald-600 transition-colors">
-               {Icon && <Icon className="w-4 h-4 text-gray-400 group-hover:text-emerald-500" />}
+            <div className="flex items-center gap-2.5 text-gray-700 font-semibold text-[8px] sm:text-[12px] group-hover:text-emerald-600 transition-colors">
+               {Icon && <Icon className="w-2.5 h-2.5 sm:w-4 sm:h-4 text-gray-400 group-hover:text-emerald-500" />}
                <span style={{ marginTop: '5px' }}>{title}</span>
             </div>
-            <ChevronDown className={`w-4 h-4 text-gray-400 transition-transform duration-300 ${isOpen ? 'rotate-180' : ''}`} />
+            <ChevronDown className={`w-2.5 h-2.5 sm:w-4 sm:h-4 text-gray-400 transition-transform duration-300 ${isOpen ? 'rotate-180' : ''}`} />
          </button>
          <AnimatePresence>
             {isOpen && (

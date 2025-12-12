@@ -30,21 +30,30 @@ const SearchResults = ({ products, isLoading, query, onReset }) => {
   }
 
   return (
-    <div className="grid grid-cols-2 md:grid-cols-3 lg:grid-cols-4 gap-4 sm:gap-6">
-      {products.map((product) => (
-        <PharmacyProductCard
-          key={product.id}
-          id={product.id}
-          name={product.name}
-          price={product.price}
-          originalPrice={product.mrp}
-          quantity="1"
-          unit="strip"
-          imageUrl={product.image}
-          className="h-full hover:-translate-y-1 transition-transform"
-        />
-      ))}
-    </div>
+    <>
+      <style>{`
+        @media (max-width: 639px) {
+          .search-results-grid {
+            margin-top: 35px !important;
+          }
+        }
+      `}</style>
+      <div className="search-results-grid grid grid-cols-2 md:grid-cols-3 lg:grid-cols-4 gap-4 sm:gap-6">
+        {products.map((product) => (
+          <PharmacyProductCard
+            key={product.id}
+            id={product.id}
+            name={product.name}
+            price={product.price}
+            originalPrice={product.mrp}
+            quantity="1"
+            unit="strip"
+            imageUrl={product.image}
+            className="h-full hover:-translate-y-1 transition-transform"
+          />
+        ))}
+      </div>
+    </>
   );
 };
 
