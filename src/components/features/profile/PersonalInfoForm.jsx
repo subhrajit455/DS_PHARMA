@@ -39,7 +39,7 @@ const PersonalInfoForm = ({
                 {!isEditing ? (
                     <button
                         onClick={handleEdit}
-                        className="flex items-center gap-1 md:gap-2 px-2 py-1 md:px-4 md:py-2 text-xs md:text-sm font-semibold text-white transition-colors bg-teal-500 rounded-lg cursor-pointer hover:bg-teal-600"
+                        className="flex items-center gap-1 md:gap-2 px-2 py-1 md:px-4 md:py-2 text-[8px] sm:text-xs md:text-sm font-semibold text-white transition-colors bg-teal-500 rounded-lg cursor-pointer hover:bg-teal-600"
                         style={{ fontFamily: 'Gyrotrope', padding: '5px 10px' }}
                     >
                         <Edit2 className="w-3 h-3 md:w-4 md:h-4" />
@@ -51,7 +51,7 @@ const PersonalInfoForm = ({
                         <button
                             onClick={handleSave}
                             disabled={isSaving}
-                            className={`flex items-center gap-1 md:gap-2 px-2 py-1 md:px-4 md:py-2 text-xs md:text-sm font-semibold text-white transition-colors bg-green-500 rounded-lg cursor-pointer hover:bg-green-600 ${isSaving ? 'opacity-50 cursor-not-allowed' : ''}`}
+                            className={`flex items-center gap-1 md:gap-2 px-2 py-1 md:px-4 md:py-2 text-[8px] sm:text-xs md:text-sm font-semibold text-white transition-colors bg-green-500 rounded-lg cursor-pointer hover:bg-green-600 ${isSaving ? 'opacity-50 cursor-not-allowed' : ''}`}
                             style={{ fontFamily: 'Gyrotrope', padding: '2px 5px' }}
                         >
                             {isSaving ? (
@@ -64,7 +64,7 @@ const PersonalInfoForm = ({
                         </button>
                         <button
                             onClick={handleCancel}
-                            className="flex items-center gap-1 md:gap-2 px-2 py-1 md:px-4 md:py-2 text-xs md:text-sm font-semibold text-white transition-colors bg-gray-500 rounded-lg cursor-pointer hover:bg-gray-600"
+                            className="flex items-center gap-1 md:gap-2 px-2 py-1 md:px-4 md:py-2 text-[8px] sm:text-xs md:text-sm font-semibold text-white transition-colors bg-gray-500 rounded-lg cursor-pointer hover:bg-gray-600"
                             style={{ fontFamily: 'Gyrotrope', padding: '2px 5px' }}
                         >
                             <X className="w-3 h-3 md:w-4 md:h-4" />
@@ -78,7 +78,7 @@ const PersonalInfoForm = ({
             <div className="grid grid-cols-1 md:grid-cols-2 gap-6" style={{ padding: ' 5px 15px' }}>
                 {/* Form Fields */}
                 <div>
-                    <label className="block mb-1 text-sm font-semibold text-gray-700" style={{ fontFamily: 'Gyrotrope' }}>
+                    <label className="block mb-1 text-[12px] font-semibold text-gray-700" style={{ fontFamily: 'Gyrotrope' }}>
                         First Name
                     </label>
                     <input
@@ -92,13 +92,13 @@ const PersonalInfoForm = ({
                             handleInputChange('name', `${newFirst} ${currentLast}`.trim());
                         }}
                         disabled={!isEditing}
-                        className="w-full px-3 py-2 text-sm border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-teal-500 disabled:bg-gray-50"
+                        className="w-full px-3 py-2 text-[12px] border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-teal-500 disabled:bg-gray-50"
                         style={{ fontFamily: 'Gyrotrope' }}
                     />
                 </div>
 
                 <div>
-                    <label className="block mb-1 text-sm font-semibold text-gray-700" style={{ fontFamily: 'Gyrotrope' }}>
+                    <label className="block mb-1 text-[12px] font-semibold text-gray-700" style={{ fontFamily: 'Gyrotrope' }}>
                         Last Name
                     </label>
                     <input
@@ -112,13 +112,13 @@ const PersonalInfoForm = ({
                              handleInputChange('name', `${currentFirst} ${newLast}`.trim());
                         }}
                         disabled={!isEditing}
-                        className="w-full px-3 py-2 text-sm border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-teal-500 disabled:bg-gray-50"
+                        className="w-full px-3 py-2 text-[12px] border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-teal-500 disabled:bg-gray-50"
                         style={{ fontFamily: 'Gyrotrope' }}
                     />
                 </div>
 
                 <div>
-                    <label className="block mb-1 text-sm font-semibold text-gray-700" style={{ fontFamily: 'Gyrotrope' }}>
+                    <label className="block mb-1 text-[12px] font-semibold text-gray-700" style={{ fontFamily: 'Gyrotrope' }}>
                         Email Address
                     </label>
                     <input
@@ -126,13 +126,13 @@ const PersonalInfoForm = ({
                         value={isEditing ? tempData.email : profileData.email}
                         onChange={(e) => handleInputChange('email', e.target.value)}
                         disabled={!isEditing}
-                        className="w-full px-3 py-2 text-sm border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-teal-500 disabled:bg-gray-50"
+                        className="w-full px-3 py-2 text-[12px] border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-teal-500 disabled:bg-gray-50"
                         style={{ fontFamily: 'Gyrotrope' }}
                     />
                 </div>
 
                 <div>
-                    <label className="block mb-1 text-sm font-semibold text-gray-700" style={{ fontFamily: 'Gyrotrope' }}>
+                    <label className="block mb-1 text-[12px] font-semibold text-gray-700" style={{ fontFamily: 'Gyrotrope' }}>
                         Phone Number
                     </label>
                     <input
@@ -140,13 +140,13 @@ const PersonalInfoForm = ({
                         value={isEditing ? tempData.phone : profileData.phone}
                         onChange={(e) => handleInputChange('phone', e.target.value)}
                         disabled={!isEditing}
-                        className="w-full px-3 py-2 text-sm border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-teal-500 disabled:bg-gray-50"
+                        className="w-full px-3 py-2 text-[12px] border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-teal-500 disabled:bg-gray-50"
                         style={{ fontFamily: 'Gyrotrope' }}
                     />
                 </div>
 
                 <div>
-                    <label className="block mb-1 text-sm font-semibold text-gray-700" style={{ fontFamily: 'Gyrotrope' }}>
+                    <label className="block mb-1 text-[12px] font-semibold text-gray-700" style={{ fontFamily: 'Gyrotrope' }}>
                         Date of Birth
                     </label>
                     <input
@@ -154,20 +154,20 @@ const PersonalInfoForm = ({
                         value={isEditing ? tempData.dateOfBirth : profileData.dateOfBirth}
                         onChange={(e) => handleInputChange('dateOfBirth', e.target.value)}
                         disabled={!isEditing}
-                        className="w-full px-3 py-2 text-sm border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-teal-500 disabled:bg-gray-50"
+                        className="w-full px-3 py-2 text-[12px] border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-teal-500 disabled:bg-gray-50"
                         style={{ fontFamily: 'Gyrotrope' }}
                     />
                 </div>
 
                 <div>
-                    <label className="block mb-1 text-sm font-semibold text-gray-700" style={{ fontFamily: 'Gyrotrope' }}>
+                    <label className="block mb-1 text-[12px] font-semibold text-gray-700" style={{ fontFamily: 'Gyrotrope' }}>
                         Gender
                     </label>
                     <select
                         value={isEditing ? tempData.gender : profileData.gender}
                         onChange={(e) => handleInputChange('gender', e.target.value)}
                         disabled={!isEditing}
-                        className="w-full px-3 py-2 text-sm border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-teal-500 disabled:bg-gray-50 cursor-pointer"
+                        className="w-full px-3 py-2 text-[12px] border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-teal-500 disabled:bg-gray-50 cursor-pointer"
                         style={{ fontFamily: 'Gyrotrope' }}
                     >
                         <option value="Male">Male</option>
@@ -177,7 +177,7 @@ const PersonalInfoForm = ({
                 </div>
 
                 <div className="md:col-span-2">
-                    <label className="block mb-1 text-sm font-semibold text-gray-700" style={{ fontFamily: 'Gyrotrope' }}>
+                    <label className="block mb-1 text-[12px] font-semibold text-gray-700" style={{ fontFamily: 'Gyrotrope' }}>
                         Street Address
                     </label>
                     <input
@@ -185,13 +185,13 @@ const PersonalInfoForm = ({
                         value={isEditing ? (tempData.address?.street || '') : (profileData.address?.street || '')}
                         onChange={(e) => handleInputChange('address.street', e.target.value)}
                         disabled={!isEditing}
-                        className="w-full px-3 py-2 text-sm border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-teal-500 disabled:bg-gray-50"
+                        className="w-full px-3 py-2 text-[12px] border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-teal-500 disabled:bg-gray-50"
                         style={{ fontFamily: 'Gyrotrope' }}
                     />
                 </div>
 
                 <div>
-                    <label className="block mb-1 text-sm font-semibold text-gray-700" style={{ fontFamily: 'Gyrotrope' }}>
+                    <label className="block mb-1 text-[12px] font-semibold text-gray-700" style={{ fontFamily: 'Gyrotrope' }}>
                         City
                     </label>
                     <input
@@ -199,13 +199,13 @@ const PersonalInfoForm = ({
                         value={isEditing ? (tempData.address?.city || '') : (profileData.address?.city || '')}
                         onChange={(e) => handleInputChange('address.city', e.target.value)}
                         disabled={!isEditing}
-                        className="w-full px-3 py-2 text-sm border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-teal-500 disabled:bg-gray-50"
+                        className="w-full px-3 py-2 text-[12px] border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-teal-500 disabled:bg-gray-50"
                         style={{ fontFamily: 'Gyrotrope' }}
                     />
                 </div>
 
                 <div>
-                    <label className="block mb-1 text-sm font-semibold text-gray-700" style={{ fontFamily: 'Gyrotrope' }}>
+                    <label className="block mb-1 text-[12px] font-semibold text-gray-700" style={{ fontFamily: 'Gyrotrope' }}>
                         State
                     </label>
                     <input
@@ -213,13 +213,13 @@ const PersonalInfoForm = ({
                         value={isEditing ? (tempData.address?.state || '') : (profileData.address?.state || '')}
                         onChange={(e) => handleInputChange('address.state', e.target.value)}
                         disabled={!isEditing}
-                        className="w-full px-3 py-2 text-sm border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-teal-500 disabled:bg-gray-50"
+                        className="w-full px-3 py-2 text-[12px] border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-teal-500 disabled:bg-gray-50"
                         style={{ fontFamily: 'Gyrotrope' }}
                     />
                 </div>
 
                 <div>
-                    <label className="block mb-1 text-sm font-semibold text-gray-700" style={{ fontFamily: 'Gyrotrope' }}>
+                    <label className="block mb-1 text-[12px] font-semibold text-gray-700" style={{ fontFamily: 'Gyrotrope' }}>
                         Pincode
                     </label>
                     <input
@@ -227,13 +227,13 @@ const PersonalInfoForm = ({
                         value={isEditing ? (tempData.address?.pincode || '') : (profileData.address?.pincode || '')}
                         onChange={(e) => handleInputChange('address.pincode', e.target.value)}
                         disabled={!isEditing}
-                        className="w-full px-3 py-2 text-sm border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-teal-500 disabled:bg-gray-50"
+                        className="w-full px-3 py-2 text-[12px] border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-teal-500 disabled:bg-gray-50"
                         style={{ fontFamily: 'Gyrotrope' }}
                     />
                 </div>
 
                 <div>
-                    <label className="block mb-1 text-sm font-semibold text-gray-700" style={{ fontFamily: 'Gyrotrope' }}>
+                    <label className="block mb-1 text-[12px] font-semibold text-gray-700" style={{ fontFamily: 'Gyrotrope' }}>
                         Country
                     </label>
                     <input
@@ -241,7 +241,7 @@ const PersonalInfoForm = ({
                         value={isEditing ? (tempData.address?.country || '') : (profileData.address?.country || '')}
                         onChange={(e) => handleInputChange('address.country', e.target.value)}
                         disabled={!isEditing}
-                        className="w-full px-3 py-2 text-sm border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-teal-500 disabled:bg-gray-50"
+                        className="w-full px-3 py-2 text-[12px] border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-teal-500 disabled:bg-gray-50"
                         style={{ fontFamily: 'Gyrotrope', marginBottom: '15px' }}
                     />
                 </div>

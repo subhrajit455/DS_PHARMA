@@ -25,7 +25,7 @@ const ProfileHeader = ({ profileData, onLogout }) => {
                     {profileData.firstName} {profileData.lastName}
                 </h1>
                 <p
-                    className="mb-2 text-xs text-white/90 md:text-base md:mb-4"
+                    className="mb-2 text-[8px] sm:text-xs text-white/90 md:text-base md:mb-4"
                     style={{
                         fontFamily: 'Gyrotrope',
                     }}
@@ -33,10 +33,10 @@ const ProfileHeader = ({ profileData, onLogout }) => {
                     {profileData.email}
                 </p>
                 <div className="flex flex-wrap gap-2 justify-start" style={{ padding: '5px 0' }}>
-                    <span className="px-2 py-0.5 text-xs font-medium text-white rounded-full bg-white/20 backdrop-blur-sm md:px-4 md:py-1 md:text-sm" style={{ padding: '2px 10px' }}>
+                    <span className="px-2 py-0.5 text-[8px] sm:text-xs font-medium text-white rounded-full bg-white/20 backdrop-blur-sm md:px-4 md:py-1 md:text-sm" style={{ padding: '2px 10px' }}>
                         Premium Member
                     </span>
-                    <span className="px-2 py-0.5 text-xs font-medium text-white rounded-full bg-white/20 backdrop-blur-sm md:px-4 md:py-1 md:text-sm" style={{ padding: '2px 10px' }}>
+                    <span className="px-2 py-0.5 text-[8px] sm:text-xs font-medium text-white rounded-full bg-white/20 backdrop-blur-sm md:px-4 md:py-1 md:text-sm" style={{ padding: '2px 10px' }}>
                         Joined Nov 2024
                     </span>
                 </div>
@@ -46,7 +46,7 @@ const ProfileHeader = ({ profileData, onLogout }) => {
             {/* Logout Button (Desktop/Mobile) */}
             <button
                 onClick={onLogout}
-                className="flex items-center gap-2 px-3 py-1.5 md:px-4 md:py-2 text-xs md:text-sm font-semibold text-white bg-white/20 backdrop-blur-sm rounded-lg hover:bg-white/30 transition-colors ml-auto cursor-pointer"
+                className="flex items-center gap-2 px-3 py-1.5 md:px-4 md:py-2 text-[8px] sm:text-xs md:text-sm font-semibold text-white bg-white/20 backdrop-blur-sm rounded-lg hover:bg-white/30 transition-colors ml-auto cursor-pointer"
                 style={{ fontFamily: 'Gyrotrope' }}
             >
                 <LogOut className="w-3 h-3 md:w-4 md:h-4" />

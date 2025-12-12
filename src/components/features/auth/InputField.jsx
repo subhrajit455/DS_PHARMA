@@ -25,8 +25,9 @@ const InputField = ({
                 error={error}
                 placeholder={placeholder}
                 className={`${className} ${isPassword ? 'pr-10' : ''} focus:border-emerald-500 focus:ring-emerald-200`}
+                labelClassName="text-[15px]"
                 {...props}
-                style={{ padding: '2px 5px' }}
+                style={{ padding: '10px 5px' }}
             />
 
             {isPassword && (

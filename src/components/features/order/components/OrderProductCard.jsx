@@ -36,7 +36,7 @@ const OrderProductCard = ({ order, onCancel }) => {
                   <p className="text-sm font-medium text-gray-900" style={{ fontFamily: 'Gyrotrope' }}>
                     {item.productName || item.name}
                   </p>
-                  <p className="text-xs text-gray-600" style={{ fontFamily: 'Gyrotrope' }}>
+                  <p className="text-[8px] sm:text-xs text-gray-600" style={{ fontFamily: 'Gyrotrope' }}>
                     Qty: {item.quantity}
                   </p>
                 </div>
@@ -92,7 +92,7 @@ const OrderProductCard = ({ order, onCancel }) => {
 const OrderDetail = ({ label, value }) => (
   <div>
     <p
-      className="text-xs text-gray-600"
+      className="text-[8px] sm:text-xs text-gray-600"
       style={{ fontFamily: 'Gyrotrope', marginBottom: '4px' }}
     >
       {label}:

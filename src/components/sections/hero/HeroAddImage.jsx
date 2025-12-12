@@ -106,7 +106,7 @@ export const HeroAddImage = () => {
         >
           <div 
             ref={marqueeRef}
-            className="font-semibold text-lg tracking-[0.5px] md:text-xs lg:text-lg" 
+            className="font-semibold text-lg tracking-[0.5px] md:text-[8px] sm:text-xs lg:text-lg" 
             style={{ 
               fontFamily: 'Gyrotrope, sans-serif',
               color: heroMarquee.color,

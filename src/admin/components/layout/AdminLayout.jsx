@@ -2,7 +2,6 @@ import React, { useEffect, useState } from 'react';
 import { Outlet, useNavigate } from 'react-router-dom';
 import AdminSidebar from './AdminSidebar';
 import AdminHeader from './AdminHeader';
-import { cn } from '../../utils/cn';
 import useAdminStore from '../../context/useAdminStore';
 
 const AdminLayout = () => {
@@ -52,11 +51,11 @@ const AdminLayout = () => {
        )}
 
       {/* Main Content Area - Flexible */}
-      <div className="flex-1 flex flex-col min-w-0 h-screen overflow-hidden relative z-10 transition-all duration-300">
+      <div className="flex-1 flex flex-col min-w-0 h-screen overflow-x-hidden overflow-y-hidden relative z-10 transition-all duration-300">
         <AdminHeader onMobileMenuToggle={() => setSidebarOpen(true)} />
 
-        <main className="flex-1 overflow-y-auto py-8 scrollbar-thin scrollbar-thumb-emerald-200 scrollbar-track-transparent">
-          <div className="px-4 sm:px-6 lg:px-8 animate-in fade-in slide-in-from-bottom-4 duration-700">
+        <main className="flex-1 overflow-x-hidden overflow-y-auto py-4 sm:py-6 lg:py-8 scrollbar-thin scrollbar-thumb-emerald-200 scrollbar-track-transparent">
+          <div className="max-w-full overflow-x-hidden px-3 sm:px-4 md:px-6 lg:px-8 animate-in fade-in slide-in-from-bottom-4 duration-700">
             <Outlet />
           </div>
         </main>

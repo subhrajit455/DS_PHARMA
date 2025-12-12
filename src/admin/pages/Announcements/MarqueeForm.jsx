@@ -100,12 +100,12 @@ const MarqueeForm = () => {
   };
 
   return (
-    <div className="max-w-7xl mx-auto space-y-6 min-h-screen" style={{ padding: '10px', background: 'linear-gradient(135deg, #f0fdf4 0%, #ecfdf5 50%, #f0fdfa 100%)' }}>
+    <div className="max-w-7xl mx-auto space-y-6 min-h-screen" style={{ padding: '5px', background: 'linear-gradient(135deg, #f0fdf4 0%, #ecfdf5 50%, #f0fdfa 100%)' }}>
       <Button
         variant="ghost"
         className="pl-0 text-gray-500 hover:text-gray-900"
         onClick={() => navigate('/admin/announcements')}
-        style={{ paddingBottom: '20px' }}
+        style={{ paddingBottom: '10px' }}
       >
         <ArrowLeft className="mr-2 h-4 w-4" />
         <span style={{ marginTop: '4px' }}>Back to Announcements</span>
@@ -118,11 +118,11 @@ const MarqueeForm = () => {
       </div>
 
       <form onSubmit={handleSubmit}>
-        <div className="grid grid-cols-1 lg:grid-cols-3 gap-6" style={{ marginTop: '15px' }}>
+        <div className="grid grid-cols-1 lg:grid-cols-3 gap-6" style={{ marginTop: '10px' }}>
           {/* Main Info */}
           <div className="lg:col-span-2 space-y-6">
             <Card>
-              <CardHeader style={{ paddingBottom: '15px' }}>
+              <CardHeader style={{ paddingBottom: '10px' }}>
                 <CardTitle>Marquee Messages</CardTitle>
                 <CardDescription>Add scrolling text messages (e.g., features, offers, announcements)</CardDescription>
               </CardHeader>
@@ -130,7 +130,7 @@ const MarqueeForm = () => {
                 <div className="space-y-3">
                   <Label>Messages</Label>
                   {formData.messages.map((message, index) => (
-                    <div key={index} className="flex gap-2">
+                    <div key={index} className="flex gap-2" style={{ paddingBottom: '10px' }}>
                       <Input
                         placeholder="e.g. ✓ Free Shipping on Orders Above ₹999"
                         value={message}
@@ -156,13 +156,14 @@ const MarqueeForm = () => {
                     size="sm"
                     onClick={addMessage}
                     className="mt-2"
+                    style={{ padding: '0px 5px' }}
                   >
                     <Plus className="h-4 w-4 mr-2" />
-                    Add Message
+                    <span style={{ marginTop: '2px' }}>Add Message</span>
                   </Button>
                 </div>
 
-                <div className="grid gap-2" style={{ marginTop: '30px' }}>
+                <div className="grid gap-2" style={{ marginTop: '10px' }}>
                   <Label htmlFor="position">Position</Label>
                   <select
                     id="position"
@@ -170,6 +171,7 @@ const MarqueeForm = () => {
                     className="flex h-auto w-full rounded-md border border-gray-200 bg-white px-3 py-2 text-sm shadow-sm transition-colors focus-visible:outline-none focus-visible:ring-1 focus-visible:ring-emerald-600"
                     value={formData.position}
                     onChange={handleChange}
+                    style={{ padding: '10px 5px' }}
                   >
                     <option value="hero">Hero Section</option>
                     <option value="top">Top of Page</option>
@@ -177,7 +179,7 @@ const MarqueeForm = () => {
                   </select>
                 </div>
 
-                <div className="flex items-center gap-2" style={{ marginTop: '20px' }}>
+                <div className="flex items-center gap-2" style={{ marginTop: '10px' }}>
                   <input
                     type="checkbox"
                     id="isEnabled"
@@ -185,12 +187,13 @@ const MarqueeForm = () => {
                     checked={formData.isEnabled}
                     onChange={handleChange}
                     className="h-4 w-4 rounded border-gray-300 text-emerald-600 focus:ring-emerald-500"
+                    
                   />
-                  <Label htmlFor="isEnabled" className="cursor-pointer">Enable this marquee</Label>
+                  <Label htmlFor="isEnabled" className="cursor-pointer" style={{ marginTop: '5px' }}>Enable this marquee</Label>
                 </div>
 
                 {/* Preview */}
-                <div className="mt-6 p-4 bg-gray-50 rounded-lg border border-gray-200">
+                <div className="mt-4 p-4 bg-gray-50 rounded-lg border border-gray-200" style={{ marginTop: '10px', padding: '10px 5px' }}>
                   <Label className="mb-2 block">Preview</Label>
                   <div className="overflow-hidden bg-white rounded">
                     <div 
@@ -251,7 +254,7 @@ const MarqueeForm = () => {
                     onChange={handleChange}
                     className="w-full h-2 bg-gray-200 rounded-lg appearance-none cursor-pointer accent-emerald-600"
                   />
-                  <div className="flex justify-between text-xs text-gray-500">
+                  <div className="flex justify-between text-[8px] sm:text-xs text-gray-500">
                     <span>Fast (10s)</span>
                     <span>Slow (60s)</span>
                   </div>
@@ -261,7 +264,7 @@ const MarqueeForm = () => {
           </div>
         </div>
 
-        <div className="flex justify-end pt-6" style={{ marginTop: '10px' }}>
+        <div className="flex justify-end pt-4" style={{ marginTop: '10px' }}> 
           <Button type="submit" size="md" style={{ padding: '5px 10px' }}>
             <Save className="mr-2 h-4 w-4" />
             <span style={{ marginTop: '4px', paddingLeft: '5px' }}>

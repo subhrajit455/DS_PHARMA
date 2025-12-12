@@ -95,7 +95,7 @@ const CustomersList = () => {
    */
   if (hasError) {
     return (
-      <div className="space-y-6">
+      <div className="space-y-6" style={{padding:'5px'}}>
         <div className="flex flex-col sm:flex-row justify-between items-start sm:items-center gap-4">
           <div>
             <h2 className="text-3xl font-bold tracking-tight text-gray-900">Customers</h2>
@@ -118,37 +118,37 @@ const CustomersList = () => {
   }
 
   return (
-    <div className="space-y-6 min-h-screen" style={{ padding: '10px', background: 'linear-gradient(135deg, #f0fdf4 0%, #ecfdf5 50%, #f0fdfa 100%)' }}>
-      <div className="flex flex-col sm:flex-row justify-between items-start sm:items-center gap-4">
+    <div className="space-y-6 min-h-screen" style={{ padding: '5px', background: 'linear-gradient(135deg, #f0fdf4 0%, #ecfdf5 50%, #f0fdfa 100%)' }}>
+      <div className="flex flex-col sm:flex-row justify-between items-start sm:items-center gap-3 sm:gap-4">
         <div>
-          <h2 className="text-3xl font-bold tracking-tight text-gray-900">Customers</h2>
-          <p className="text-gray-500 text-sm mt-1">Manage your customer base</p>
+          <h2 className="text-xl sm:text-2xl md:text-3xl font-bold tracking-tight text-gray-900">Customers</h2>
+          <p className="text-gray-500 text-[10px] sm:text-[8px] sm:text-xs md:text-sm mt-0.5">Manage your customer base</p>
         </div>
       </div>
 
       <Card>
-        <CardContent className="p-4 sm:p-6 space-y-4">
-          <div className="relative max-w-md" style={{ marginBottom: '10px' }}>
-            <Search className="absolute right-2.5 top-2 h-4 w-4 text-gray-500" />
+        <CardContent className="p-2 sm:p-3 md:p-4 lg:p-6 space-y-2 sm:space-y-3 md:space-y-4">
+          <div className="relative max-w-md mb-3 sm:mb-4" style={{ paddingBottom: '5px' }}>
+            <Search className="absolute right-2.5 top-2 h-3 w-3 sm:h-4 sm:w-4 text-gray-500" />
             <Input 
-              placeholder="Search by name or email..." 
-              className="pl-9"
+              placeholder="Search customers..." 
+              className="pl-8 sm:pl-9 text-[8px] sm:text-sm h-9 sm:h-10"
               value={searchQuery}
               onChange={(e) => setSearchQuery(e.target.value)}
             />
           </div>
 
-          <div className="rounded-md border border-gray-200" style={{ padding: '0px 10px' }}>
+          <div className="rounded-md border border-gray-200 p-0 sm:p-2">
             <Table>
               <TableHeader>
                 <TableRow style={{ background: 'linear-gradient(to right, #f0fdf4, #f0fdfa)' }}>
-                  <TableHead className="font-semibold text-gray-700" style={{ padding: '12px 16px' }}>Customer</TableHead>
-                  <TableHead className="font-semibold text-gray-700" style={{ padding: '12px 16px' }}>Contact</TableHead>
-                  <TableHead className="font-semibold text-gray-700" style={{ padding: '12px 16px' }}>Joined</TableHead>
-                  <TableHead className="font-semibold text-gray-700" style={{ padding: '12px 16px' }}>Orders</TableHead>
-                  <TableHead className="font-semibold text-gray-700" style={{ padding: '12px 16px' }}>Total Spent</TableHead>
-                  <TableHead className="font-semibold text-gray-700" style={{ padding: '12px 16px' }}>Status</TableHead>
-                  <TableHead className="text-right font-semibold text-gray-700" style={{ padding: '12px 16px' }}>Actions</TableHead>
+                  <TableHead className="font-semibold text-gray-700 text-[8px] sm:text-sm" style={{ padding: '8px 5px' }}>Customer</TableHead>
+                  <TableHead className="font-semibold text-gray-700 text-[8px] sm:text-sm hidden md:table-cell" style={{ padding: '8px 5px' }}>Contact</TableHead>
+                  <TableHead className="font-semibold text-gray-700 text-[8px] sm:text-sm hidden lg:table-cell" style={{ padding: '8px 5px' }}>Joined</TableHead>
+                  <TableHead className="font-semibold text-gray-700 text-[8px] sm:text-sm " style={{ padding: '8px 5px' }}>Orders</TableHead>
+                  <TableHead className="font-semibold text-gray-700 text-[8px] sm:text-sm" style={{ padding: '8px 5px' }}>Total Spent</TableHead>
+                  <TableHead className="font-semibold text-gray-700 text-[8px] sm:text-sm" style={{ padding: '8px 5px' }}>Status</TableHead>
+                  <TableHead className="text-right font-semibold text-gray-700 text-[8px] sm:text-sm" style={{ padding: '8px 5px' }}>Actions</TableHead>
                 </TableRow>
               </TableHeader>
               <TableBody>
@@ -157,20 +157,19 @@ const CustomersList = () => {
                     <TableCell colSpan={7} className="h-24 text-center">
                       <div className="flex items-center justify-center gap-2">
                         <div className="h-4 w-4 animate-spin rounded-full border-2 border-gray-300 border-t-gray-900"></div>
-                        <span>Loading customers...</span>
+                        <span className="text-[8px] sm:text-sm">Loading customers...</span>
                       </div>
                     </TableCell>
                   </TableRow>
                 ) : !Array.isArray(customers) || customers.length === 0 ? (
                   <TableRow>
-                    <TableCell colSpan={7} className="h-24 text-center text-gray-500">
+                    <TableCell colSpan={7} className="h-24 text-center text-gray-500 text-[8px] sm:text-sm">
                       {searchQuery ? `No customers found matching "${searchQuery}"` : 'No customers found.'}
                     </TableCell>
                   </TableRow>
                  ) : (
                   // ✅ DEFENSIVE: Extra safety check before mapping
-                  customers.map((customer, index) => {
-                    // ✅ Skip rendering if customer is invalid
+                  customers.map((customer) => {
                     if (!customer || !customer.id) {
                       console.warn('Invalid customer object:', customer);
                       return null;
@@ -180,42 +179,39 @@ const CustomersList = () => {
                       <TableRow 
                         key={customer.id} 
                         className="hover:bg-emerald-50/50 transition-all duration-200 border-b border-gray-100"
-                        style={{ 
-                            marginBottom: index !== customers.length - 1 ? '5px' : '0',
-                        }}
                       >
-                        <TableCell style={{ padding: '16px' }}>
-                          <div className="flex items-center gap-3">
+                        <TableCell className="" style={{ padding: '8px 5px' }}>
+                          <div className="flex items-center gap-2 sm:gap-3">
                             <Avatar 
-                              className="h-8 w-8 bg-emerald-100 text-emerald-800" 
+                              className="h-7 w-7 sm:h-8 sm:w-8 bg-emerald-100 text-emerald-800 text-[8px] sm:text-[8px] sm:text-xs" 
                               fallback={getInitials(customer.name)} 
                             />
-                            <div className="font-medium text-gray-900">
+                            <div className="font-medium text-gray-900 text-[8px] sm:text-sm">
                               {customer.name || 'N/A'}
                             </div>
                           </div>
                         </TableCell>
-                        <TableCell style={{ padding: '10px' }}>
+                        <TableCell className="hidden md:table-cell" style={{ padding: '8px 5px' }}>
                           <div className="flex flex-col gap-1">
-                            <div className="flex items-center gap-2 text-xs text-gray-500">
+                            <div className="flex items-center gap-2 text-[8px] sm:text-xs text-gray-500">
                               <Mail className="h-3 w-3" /> {customer.email || 'N/A'}
                             </div>
-                            <div className="flex items-center gap-2 text-xs text-gray-500">
+                            <div className="flex items-center gap-2 text-[8px] sm:text-xs text-gray-500">
                               <Phone className="h-3 w-3" /> {customer.phone || 'N/A'}
                             </div>
                           </div>
                         </TableCell>
-                        <TableCell className="text-gray-500 text-sm" style={{ padding: '10px' }}>
+                        <TableCell className="text-gray-500 text-[8px] sm:text-sm hidden lg:table-cell text" style={{ padding: '8px 5px' }}>
                           {customer.joined || 'N/A'}
                         </TableCell>
-                        <TableCell className="text-gray-900 font-medium" style={{ padding: '10px' }}>
+                        <TableCell className="text-gray-900 font-medium text-[8px] sm:text-sm text-center" style={{ padding: '8px 5px' }}>
                           {customer.orders ?? 0}
                         </TableCell>
-                        <TableCell className="text-gray-900 font-bold" style={{ padding: '10px' }}>
+                        <TableCell className="text-gray-900 font-bold text-[8px] sm:text-sm" style={{ padding: '8px 5px' }}>
                           ₹{customer.totalSpent?.toFixed(2) || '0.00'}
                         </TableCell>
-                        <TableCell style={{ padding: '10px' }}>
-                          <Badge variant={customer.status === 'Active' ? 'success' : 'secondary'}>
+                        <TableCell className="" style={{ padding: '8px 5px' }}>
+                          <Badge variant={customer.status === 'Active' ? 'success' : 'secondary'} className="text-[8px] sm:text-xs">
                             {customer.status || 'Unknown'}
                           </Badge>
                         </TableCell>
@@ -223,9 +219,11 @@ const CustomersList = () => {
                           <Button 
                             variant="ghost" 
                             size="sm" 
+                            className="text-[8px] sm:text-sm h-7 sm:h-8"
                             onClick={() => navigate(`/admin/customers/${customer.id}`)}
                           >
-                            Details <ArrowRight className="ml-2 h-4 w-4" />
+                            <span className="hidden sm:inline">Details</span>
+                            <ArrowRight className="h-3 w-3 sm:h-4 sm:w-4 sm:ml-2" />
                           </Button>
                         </TableCell>
                       </TableRow>

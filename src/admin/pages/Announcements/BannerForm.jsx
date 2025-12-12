@@ -104,7 +104,7 @@ const BannerForm = () => {
         variant="ghost"
         className="pl-0 text-gray-500 hover:text-gray-900"
         onClick={() => navigate('/admin/announcements')}
-        style={{ paddingBottom: '20px' }}
+        style={{ paddingBottom: '10px' }}
       >
         <ArrowLeft className="mr-2 h-4 w-4" />
         <span style={{ marginTop: '4px' }}>Back to Announcements</span>
@@ -117,7 +117,7 @@ const BannerForm = () => {
       </div>
 
       <form onSubmit={handleSubmit}>
-        <div className="grid grid-cols-1 lg:grid-cols-3 gap-6" style={{ marginTop: '15px' }}>
+        <div className="grid grid-cols-1 lg:grid-cols-3 gap-6" style={{ marginTop: '10px' }}>
           {/* Main Info */}
           <div className="lg:col-span-2 space-y-6">
             <Card>
@@ -156,7 +156,7 @@ const BannerForm = () => {
                     }}
                     style={{ padding: '20px 10px' }}
                   />
-                  <p className="text-xs text-gray-500">Or upload an image below</p>
+                  <p className="text-[8px] sm:text-xs text-gray-500">Or upload an image below</p>
                 </div>
 
                 <div className="grid gap-2" style={{ marginBottom: '20px' }}>
@@ -170,7 +170,7 @@ const BannerForm = () => {
                     onChange={handleChange}
                     style={{ padding: '20px 10px' }}
                   />
-                  <p className="text-xs text-gray-500">Where users will be redirected when clicking the banner</p>
+                  <p className="text-[8px] sm:text-xs text-gray-500">Where users will be redirected when clicking the banner</p>
                 </div>
 
                 <div className="grid gap-2" style={{ marginBottom: '20px' }}>
@@ -181,6 +181,7 @@ const BannerForm = () => {
                     className="flex h-auto w-full rounded-md border border-gray-200 bg-white px-3 py-2 text-sm shadow-sm transition-colors focus-visible:outline-none focus-visible:ring-1 focus-visible:ring-emerald-600"
                     value={formData.position}
                     onChange={handleChange}
+                    style={{ padding: '12px 5px' }}
                   >
                     <option value="hero">Hero Section</option>
                     <option value="top">Top of Page</option>
@@ -213,6 +214,7 @@ const BannerForm = () => {
               <CardContent>
                 <div className="space-y-4">
                   <label
+                    style={{ padding: '10px 5px' }}
                     htmlFor="imageUpload"
                     className="border-2 border-dashed border-gray-200 rounded-lg p-6 text-center hover:bg-gray-50 transition-colors cursor-pointer group block"
                   >
@@ -222,7 +224,7 @@ const BannerForm = () => {
                       </div>
                     </div>
                     <div className="text-sm font-medium text-gray-900">Click to upload</div>
-                    <div className="text-xs text-gray-500 mt-1">PNG, JPG (max. 5MB)</div>
+                    <div className="text-[8px] sm:text-xs text-gray-500 mt-1">PNG, JPG (max. 5MB)</div>
                     <input
                       type="file"
                       id="imageUpload"

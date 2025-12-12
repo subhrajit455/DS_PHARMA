@@ -193,7 +193,7 @@ const OrderDetails = () => {
                       <CreditCard className="mt-1 h-5 w-5 text-gray-400" />
                       <div>
                          <p className="text-sm font-medium text-gray-900">Paid Online</p>
-                         <p className="text-xs text-gray-500 mt-1">Status: {order.payment || 'Completed'}</p>
+                         <p className="text-[8px] sm:text-xs text-gray-500 mt-1">Status: {order.payment || 'Completed'}</p>
                       </div>
                    </div>
                </CardContent>

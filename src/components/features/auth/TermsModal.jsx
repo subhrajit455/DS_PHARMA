@@ -39,22 +39,22 @@ const TermsModal = ({ isOpen, onClose }) => {
 
                             <div className="p-6 overflow-y-auto custom-scrollbar">
                                 <div className="prose prose-sm max-w-none text-gray-600 space-y-4">
-                                    <p className="text-xs sm:text-sm" style={{ paddingBottom: '10px' }}>Last updated: December 2025</p>
+                                    <p className="text-[8px] sm:text-sm" style={{ paddingBottom: '10px' }}>Last updated: December 2025</p>
 
                                     <h4 className="text-sm sm:text-md font-semibold text-gray-900">1. Introduction</h4>
-                                    <p className="text-xs sm:text-sm" style={{paddingBottom:'5px'}}>Welcome to DS Pharma. By accessing our website and using our services, you agree to be bound by these Terms and Conditions.</p>
+                                    <p className="text-[8px] sm:text-sm" style={{paddingBottom:'5px'}}>Welcome to DS Pharma. By accessing our website and using our services, you agree to be bound by these Terms and Conditions.</p>
 
                                     <h4 className="text-sm sm:text-md font-semibold text-gray-900">2. Medical Disclaimer</h4>
-                                    <p className="text-xs sm:text-sm" style={{paddingBottom:'5px'}}>The content provided on this platform is for informational purposes only and is not intended as a substitute for professional medical advice, diagnosis, or treatment.</p>
+                                    <p className="text-[8px] sm:text-sm" style={{paddingBottom:'5px'}}>The content provided on this platform is for informational purposes only and is not intended as a substitute for professional medical advice, diagnosis, or treatment.</p>
 
                                     <h4 className="text-sm sm:text-md font-semibold text-gray-900">3. User Accounts</h4>
-                                    <p className="text-xs sm:text-sm" style={{paddingBottom:'5px'}}>You are responsible for maintaining the confidentiality of your account and password. You agree to accept responsibility for all activities that occur under your account.</p>
+                                    <p className="text-[8px] sm:text-sm" style={{paddingBottom:'5px'}}>You are responsible for maintaining the confidentiality of your account and password. You agree to accept responsibility for all activities that occur under your account.</p>
 
                                     <h4 className="text-sm sm:text-md font-semibold text-gray-900">4. Privacy Policy</h4>
-                                    <p className="text-xs sm:text-sm" style={{paddingBottom:'5px'}}>Your use of our services is also governed by our Privacy Policy. Please review our Privacy Policy to understand our practices.</p>
+                                    <p className="text-[8px] sm:text-sm" style={{paddingBottom:'5px'}}>Your use of our services is also governed by our Privacy Policy. Please review our Privacy Policy to understand our practices.</p>
 
                                     <h4 className="text-sm sm:text-md font-semibold text-gray-900">5. Product Information</h4>
-                                    <p className="text-xs sm:text-sm" style={{paddingBottom:'5px'}}>We attempt to be as accurate as possible. However, we do not warrant that product descriptions or other content is accurate, complete, reliable, current, or error-free.</p>
+                                    <p className="text-[8px] sm:text-sm" style={{paddingBottom:'5px'}}>We attempt to be as accurate as possible. However, we do not warrant that product descriptions or other content is accurate, complete, reliable, current, or error-free.</p>
                                 </div>
                             </div>
 

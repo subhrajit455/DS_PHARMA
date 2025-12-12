@@ -3,7 +3,7 @@ import { motion as Motion } from 'framer-motion';
 
 const AuthCard = ({ children, title, subtitle, className = '' }) => {
     return (
-        <div className="min-h-screen flex items-center justify-center relative overflow-hidden bg-slate-50">
+        <div className="min-h-screen flex items-center justify-center relative overflow-hidden bg-slate-50" >
             {/* Background Pattern - Subtle Dot Grid */}
             <div className="absolute inset-0 bg-[linear-gradient(to_right,#80808012_1px,transparent_1px),linear-gradient(to_bottom,#80808012_1px,transparent_1px)] bg-[size:24px_24px]" />
             
@@ -27,12 +27,15 @@ const AuthCard = ({ children, title, subtitle, className = '' }) => {
                 <div className={`
                     bg-white
                     rounded-3xl
-                    shadow-[0_20px_60px_-15px_rgba(0,0,0,0.08)]
-                    border border-gray-100
+                    shadow-[0_20px_60px_-15px_rgba(16,185,129,0.15)]
+                    border border-emerald-100/50
                     p-8 sm:p-10 md:p-12
+                    relative overflow-hidden
                     ${className}
                 `}>
-                    <div className="text-center mb-8">
+                    {/* Premium Top Gradient Accent */}
+                    <div className="absolute top-0 left-0 right-0 h-1.5 bg-gradient-to-r from-emerald-400 via-teal-500 to-cyan-500" />
+                    <div className="text-center mb-8" style={{ paddingTop: '10px' }}>
                         {/* Title */}
                         <h2
                             className="text-3xl font-bold text-gray-900 tracking-tight mb-2"

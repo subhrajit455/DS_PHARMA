@@ -8,7 +8,7 @@ const ProfileTabs = ({ tabs, activeTab, setActiveTab }) => {
                     <button
                         key={tab.id}
                         onClick={() => setActiveTab(tab.id)}
-                        className={`flex flex-col md:flex-row items-center justify-center gap-1 md:gap-2 px-2 py-2 md:px-6 md:py-4 font-medium transition-colors cursor-pointer text-xs md:text-base ${activeTab === tab.id
+                        className={`flex flex-col md:flex-row items-center justify-center gap-1 md:gap-2 px-2 py-2 md:px-6 md:py-4 font-medium transition-colors cursor-pointer text-[8px] sm:text-xs md:text-base ${activeTab === tab.id
                                 ? 'bg-teal-50 text-teal-600 border-b-2 border-teal-600'
                                 : 'text-gray-600 hover:bg-gray-50'
                             }`}

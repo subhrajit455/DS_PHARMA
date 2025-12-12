@@ -133,7 +133,7 @@ const PharmacyProductCard = ({
         {/* Out of Stock Badge */}
         {!isAvailable && (
           <div className="absolute inset-0 flex items-center justify-center bg-black/30">
-            <span className="px-3 py-1 text-xs font-semibold text-white bg-red-500 rounded-full">
+            <span className="px-3 py-1 text-[8px] sm:text-xs font-semibold text-white bg-red-500 rounded-full">
               Out of Stock
             </span>
           </div>

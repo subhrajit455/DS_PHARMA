@@ -2,7 +2,7 @@ import React from 'react';
 import { cn } from '../../utils/cn';
 
 const Badge = React.forwardRef(({ className, variant = 'default', glow = false, ...props }, ref) => {
-  const baseStyles = "inline-flex items-center rounded-full border px-2.5 py-0.5 text-xs font-semibold transition-all duration-200";
+  const baseStyles = "inline-flex items-center rounded-full border px-2.5 py-0.5 text-[8px] sm:text-xs font-semibold transition-all duration-200";
   
   const variants = {
     default: "border-transparent bg-gradient-to-r from-gray-100 to-gray-200 text-gray-900 hover:from-gray-200 hover:to-gray-300",

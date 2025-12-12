@@ -80,7 +80,7 @@ const SearchInput = ({ className = '', placeholder = "Search for medicines, heal
             onChange={(e) => setQuery(e.target.value)}
             onFocus={() => query.trim() && setIsOpen(true)}
             placeholder={placeholder}
-            className="w-full py-4 px-4 bg-transparent border-none text-gray-800 placeholder-gray-400 focus:outline-none focus:ring-0 text-md font-medium"
+            className="w-full py-4 px-4 bg-transparent border-none text-gray-800 placeholder-gray-400 focus:outline-none focus:ring-0 text-[12px] font-medium"
             style={{ padding: '10px 5px', marginTop: '3px' }}
           />
             
@@ -158,7 +158,7 @@ const SearchInput = ({ className = '', placeholder = "Search for medicines, heal
                          <h4 className="text-sm font-semibold text-gray-800 group-hover:text-emerald-700 truncate">
                            {item.name}
                          </h4>
-                         <p className="text-xs text-gray-500 truncate flex items-center gap-1.5">
+                         <p className="text-[8px] sm:text-xs text-gray-500 truncate flex items-center gap-1.5">
                             {item.manufacturer && <span>{item.manufacturer}</span>}
                             {item.type && (
                               <>
@@ -180,7 +180,7 @@ const SearchInput = ({ className = '', placeholder = "Search for medicines, heal
               <div className="px-5 py-3 bg-gray-50 border-t border-gray-100 text-center">
                  <button 
                    onClick={handleSearch}
-                   className="text-xs font-semibold text-emerald-600 hover:text-emerald-700 flex items-center justify-center gap-1 transition-colors"
+                   className="text-[8px] sm:text-xs font-semibold text-emerald-600 hover:text-emerald-700 flex items-center justify-center gap-1 transition-colors"
                  >
                     View all results for "{query}" <ArrowRight className="w-3 h-3" />
                  </button>

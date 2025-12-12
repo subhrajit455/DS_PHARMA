@@ -60,7 +60,7 @@ const OrdersList = () => {
                                     <p className="font-bold text-base md:text-lg" style={{ fontFamily: 'Gyrotrope' }}>
                                         Order #{order.id}
                                     </p>
-                                    <span className={`px-3 py-1 rounded-full text-xs font-semibold ${order.statusColor === 'green' || order.status === 'Delivered'
+                                    <span className={`px-3 py-1 rounded-full text-[8px] sm:text-xs font-semibold ${order.statusColor === 'green' || order.status === 'Delivered'
                                             ? 'bg-green-100 text-green-700'
                                             : 'bg-blue-100 text-blue-700'
                                         }`}>

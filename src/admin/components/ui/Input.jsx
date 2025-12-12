@@ -7,8 +7,8 @@ const Input = React.forwardRef(({ className, type, error, ...props }, ref) => {
     style={{ paddingLeft: '5px' }}
       type={type}
       className={cn(
-        "flex h-8 w-full rounded-lg border bg-white px-4 py-2 text-sm shadow-sm transition-all duration-200",
-        "placeholder:text-gray-400",
+        "flex h-8 w-full rounded-lg border bg-white px-4 py-2 text-[12px] shadow-sm transition-all duration-200",
+        "placeholder:text-gray-400 placeholder:text-[12px]",
         "focus:outline-none focus:ring-2 focus:ring-emerald-500/50 focus:border-emerald-500 focus:shadow-lg focus:shadow-emerald-500/20",
         "disabled:cursor-not-allowed disabled:opacity-50 disabled:bg-gray-50",
         "hover:border-gray-300",

@@ -38,7 +38,7 @@ const OnlinePaymentForm = () => {
                         type="button"
                         onClick={() => setPaymentType(tab.id)}
                         className={`
-                            px-4 py-2 rounded-lg text-sm font-medium transition-all
+                            px-4 py-2 rounded-lg text-[12px] font-medium transition-all
                             ${paymentType === tab.id
                                 ? 'bg-emerald-500 text-white'
                                 : 'bg-white text-gray-600 border border-gray-200 hover:border-emerald-300'
@@ -62,7 +62,7 @@ const OnlinePaymentForm = () => {
                         onChange={(e) => setUpiId(e.target.value)}
                         className="focus:border-emerald-500 focus:ring-emerald-200"
                     />
-                    <p className="text-xs text-gray-500">Enter your UPI ID (e.g., name@okaxis, name@paytm)</p>
+                    <p className="text-[8px] sm:text-xs text-gray-500">Enter your UPI ID (e.g., name@okaxis, name@paytm)</p>
                 </div>
             )}
 
@@ -75,7 +75,7 @@ const OnlinePaymentForm = () => {
                             type="button"
                             onClick={() => setSelectedWallet(wallet.id)}
                             className={`
-                                p-3 rounded-lg text-sm font-medium transition-all border-2
+                                p-3 rounded-lg text-[12px] font-medium transition-all border-2
                                 ${selectedWallet === wallet.id
                                     ? 'border-emerald-500 bg-emerald-50 text-emerald-700'
                                     : 'border-gray-200 bg-white text-gray-700 hover:border-emerald-300'
@@ -92,13 +92,13 @@ const OnlinePaymentForm = () => {
             {/* Netbanking Selection */}
             {paymentType === 'netbanking' && (
                 <div className="space-y-3">
-                    <label className="block mb-2 text-sm font-semibold text-gray-700" style={{ fontFamily: 'Gyrotrope' }}>
+                    <label className="block mb-2 text-[12px] font-semibold text-gray-700" style={{ fontFamily: 'Gyrotrope' }}>
                         Select Bank
                     </label>
                     <select
                         value={selectedBank}
                         onChange={(e) => setSelectedBank(e.target.value)}
-                        className="w-full px-4 py-2.5 rounded-lg border border-gray-300 focus:outline-none focus:border-emerald-500 focus:ring-2 focus:ring-emerald-200 transition-all bg-white"
+                        className="w-full px-4 py-2.5 rounded-lg border border-gray-300 focus:outline-none focus:border-emerald-500 focus:ring-2 focus:ring-emerald-200 transition-all bg-white text-[12px]"
                         style={{ fontFamily: 'Gyrotrope' }}
                     >
                         <option value="">Choose your bank</option>

@@ -59,11 +59,7 @@ const AdminSidebar = ({ isCollapsed, toggleCollapse, isMobile, onCloseMobile }) 
           )}
         >
           {item.name}
-          {isActive && (
-            <div className="ml-2" style={{marginLeft: '15px'}}>
-              <Sparkles className="h-4 w-4 text-emerald-200 animate-pulse" />
-            </div>
-          )}
+          
         </span>
       </NavLink>
     );

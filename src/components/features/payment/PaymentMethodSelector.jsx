@@ -83,7 +83,7 @@ const PaymentMethodSelector = ({ onProceed, isLoading = false }) => {
             </div>
 
             {/* Security Note */}
-            <p className="text-center text-xs text-gray-500 mt-4" style={{ fontFamily: 'Gyrotrope' }}>
+            <p className="text-center text-[8px] sm:text-xs text-gray-500 mt-4" style={{ fontFamily: 'Gyrotrope' }}>
                 🔒 Your payment information is secure and encrypted
             </p>
         </div>

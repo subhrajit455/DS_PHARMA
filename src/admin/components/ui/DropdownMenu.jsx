@@ -72,7 +72,7 @@ const DropdownMenuItem = ({ children, className, onClick, ...props }) => {
     <div
       onClick={handleClick}
       className={cn(
-        "relative flex cursor-pointer select-none items-center rounded-sm px-2 py-1.5 text-sm outline-none transition-colors hover:bg-gray-100 hover:text-gray-900 data-[disabled]:pointer-events-none data-[disabled]:opacity-50",
+        "relative flex cursor-pointer select-none items-center rounded-sm px-2 py-1.5 text-[12px] outline-none transition-colors hover:bg-gray-100 hover:text-gray-900 data-[disabled]:pointer-events-none data-[disabled]:opacity-50",
         className
       )}
       {...props}
@@ -84,7 +84,7 @@ const DropdownMenuItem = ({ children, className, onClick, ...props }) => {
 
 const DropdownMenuLabel = ({ children, className, ...props }) => (
   <div
-    className={cn("px-2 py-1.5 text-sm font-semibold", className)}
+    className={cn("px-2 py-1.5 text-[12px] font-semibold", className)}
     {...props}
   >
     {children}

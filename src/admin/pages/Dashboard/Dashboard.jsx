@@ -21,19 +21,19 @@ const StatCard = ({ title, value, icon: Icon, trend, trendUp, description, gradi
     {/* Gradient background for icon */}
     <div className={`absolute top-0 right-0 w-32 h-32 ${gradient} opacity-10 rounded-full blur-3xl group-hover:opacity-20 transition-opacity`} />
     
-    <CardHeader className="flex flex-row items-center justify-between space-y-0 pb-3 relative z-10">
-      <CardTitle className="text-sm font-semibold text-gray-700">
+    <CardHeader className="flex flex-row items-center justify-between space-y-0 pb-2 sm:pb-3 relative z-10">
+      <CardTitle className="text-[8px] sm:text-sm font-semibold text-gray-700">
         {title}
       </CardTitle>
-      <div className={`p-3 rounded-xl bg-opacity-10 group-hover:scale-110 transition-transform`}>
-        <Icon className="h-6 w-6 text-emerald-700" />
+      <div className={`p-2 sm:p-3 rounded-xl bg-opacity-10 group-hover:scale-110 transition-transform`}>
+        <Icon className="h-5 w-5 sm:h-6 sm:w-6 text-emerald-700" />
       </div>
     </CardHeader>
     <CardContent className="relative z-10">
-      <div className="text-3xl font-bold bg-gradient-to-r from-gray-900 to-gray-700 bg-clip-text text-transparent">
+      <div className="text-2xl sm:text-3xl font-bold bg-gradient-to-r from-gray-900 to-gray-700 bg-clip-text text-transparent">
         {value}
       </div>
-      <div className="flex items-center mt-2 text-xs">
+      <div className="flex items-center mt-2 text-[8px] sm:text-xs">
         {trend && (
           <span className={`flex items-center font-semibold ${trendUp ? "text-emerald-600" : "text-red-600"}`}>
             {trendUp ? <TrendingUp className="h-3 w-3 mr-1"/> : <ArrowDownRight className="h-3 w-3 mr-1"/>}
@@ -113,20 +113,20 @@ const Dashboard = () => {
   }
 
   return (
-    <div className="space-y-8 animate-in fade-in slide-in-from-bottom-6 duration-700 min-h-screen" style={{ padding: '10px', background: 'linear-gradient(135deg, #f0fdf4 0%, #ecfdf5 50%, #f0fdfa 100%)' }}>
+    <div className="space-y-4 sm:space-y-6 lg:space-y-8 animate-in fade-in slide-in-from-bottom-6 duration-700 min-h-screen" style={{ padding: '5px', background: 'linear-gradient(135deg, #f0fdf4 0%, #ecfdf5 50%, #f0fdfa 100%)' }}>
       {/* Header with gradient text */}
-      <div className="flex flex-col sm:flex-row justify-between items-start sm:items-center gap-4" style={{ padding: '10px' }}>
+      <div className="flex flex-col sm:flex-row justify-between items-start sm:items-center gap-2 sm:gap-4" style={{ padding: '5px' }}>
         <div>
-          <h1 className="text-4xl font-bold bg-gradient-to-r from-gray-900 via-emerald-800 to-teal-800 bg-clip-text text-transparent flex items-center gap-3">
+          <h1 className="text-2xl sm:text-3xl lg:text-4xl font-bold bg-gradient-to-r from-gray-900 via-emerald-800 to-teal-800 bg-clip-text text-transparent flex items-center gap-2 sm:gap-3">
             Dashboard
-            <Sparkles className="h-8 w-8 text-emerald-500" />
+            <Sparkles className="h-6 w-6 sm:h-7 sm:w-7 lg:h-8 lg:w-8 text-emerald-500" />
           </h1>
-          <p className="text-gray-600 mt-2 font-medium">Welcome back! Here's what's happening with your store today.</p>
+          <p className="text-[8px] sm:text-sm text-gray-600 mt-1 sm:mt-2 font-medium">Welcome back! Here's what's happening with your store today.</p>
         </div>
       </div>
 
       {/* Stats Grid with gradients */}
-      <div className="grid gap-6 md:grid-cols-2 lg:grid-cols-4" style={{ padding: '10px' }}>
+      <div className="grid gap-2 sm:gap-3 md:gap-4 lg:gap-6 grid-cols-2 lg:grid-cols-4" style={{ padding: '5px' }}>
         <StatCard 
           title="Total Sales" 
           value={stats.sales} 
@@ -167,29 +167,29 @@ const Dashboard = () => {
       </div>
 
       {/* Recent Orders & Quick Actions */}
-      <div className="grid gap-6 md:grid-cols-2 lg:grid-cols-7" style={{ padding: '10px' }}>
+      <div className="grid gap-3 sm:gap-4 md:gap-6 grid-cols-1 lg:grid-cols-7" style={{ padding: '5px' }}>
         
         {/* Recent Orders - Premium Table */}
         <Card variant="elevated" className="col-span-7 lg:col-span-4">
-          <CardHeader className="flex flex-row items-center justify-between border-b border-gray-100 pb-4">
+          <CardHeader className="flex flex-row items-center justify-between border-b border-gray-100 pb-3 sm:pb-4 gap-2 sm:gap-0">
             <div>
-              <CardTitle className="text-xl">Recent Orders</CardTitle>
-              <CardDescription className="mt-1">Latest transactions from your customers</CardDescription>
+              <CardTitle className="text-md sm:text-xl">Recent Orders</CardTitle>
+              <CardDescription className="mt-1 text-[8px] sm:text-sm">Latest transactions</CardDescription>
             </div>
-            <Button variant="ghost" size="sm" onClick={() => navigate('/admin/orders')} className="text-emerald-600 hover:text-emerald-700 hover:bg-emerald-50">
-              <span style={{ marginTop: '5px', paddingRight: '5px' }}>View All</span> <ExternalLink className="ml-2 h-4 w-4" />
+            <Button variant="ghost" size="md" onClick={() => navigate('/admin/orders')} className="text-emerald-600 hover:text-emerald-700 hover:bg-emerald-50 text-[8px] sm:text-sm">
+              <span className='text-[8px] sm:text-sm' style={{ marginTop: '5px', paddingRight: '5px' }}>View All</span> <ExternalLink className="ml-1 sm:ml-2 h-3 w-3 sm:h-4 sm:w-4" />
             </Button>
           </CardHeader>
           <CardContent className="p-0">
             {recentOrders.length > 0 ? (
-              <div className="overflow-x-auto">
+              <div>
                 <Table>
                   <TableHeader>
-                    <TableRow className="hover:bg-gradient-to-r hover:from-emerald-50 hover:to-teal-50" style={{ background: 'linear-gradient(to right, #f0fdf4, #f0fdfa)' }}>
-                      <TableHead className="font-semibold text-gray-700" style={{ padding: '12px 16px' }}>Order ID</TableHead>
-                      <TableHead className="font-semibold text-gray-700" style={{ padding: '12px 16px' }}>Customer</TableHead>
-                      <TableHead className="font-semibold text-gray-700" style={{ padding: '12px 16px' }}>Status</TableHead>
-                      <TableHead className="text-right font-semibold text-gray-700" style={{ padding: '12px 16px' }}>Amount</TableHead>
+                    <TableRow className="hover:bg-linear-to-r hover:from-emerald-50 hover:to-teal-50" style={{ background: 'linear-gradient(to right, #f0fdf4, #f0fdfa)' }}>
+                      <TableHead className="font-semibold text-gray-700 text-[8px] sm:text-sm" style={{ padding: '8px 5px' }}>Order ID</TableHead>
+                      <TableHead className="font-semibold text-gray-700 text-[8px] sm:text-sm hidden sm:table-cell" style={{ padding: '8px 5px' }}>Customer</TableHead>
+                      <TableHead className="font-semibold text-gray-700 text-[8px] sm:text-sm" style={{ padding: '8px 5px' }}>Status</TableHead>
+                      <TableHead className="text-right font-semibold text-gray-700 text-[8px] sm:text-sm" style={{ padding: '8px 5px' }}>Amount</TableHead>
                     </TableRow>
                   </TableHeader>
                   <TableBody>
@@ -202,14 +202,14 @@ const Dashboard = () => {
                         }}
                         onClick={() => navigate(`/admin/orders/${order.id}`)}
                       >
-                        <TableCell className="font-bold text-gray-900" style={{ padding: '16px' }}>#{order.id}</TableCell>
-                        <TableCell className="text-gray-700 font-medium" style={{ padding: '16px' }}>{order.customerName}</TableCell>
-                        <TableCell style={{ padding: '16px' }}>
-                          <Badge variant={getStatusVariant(order.status)} glow>
+                        <TableCell className="font-bold text-gray-900 text-[8px] sm:text-sm" style={{ padding: '10px 2px' }}>#{order.id}</TableCell>
+                        <TableCell className="text-gray-700 font-medium text-[8px] sm:text-sm hidden sm:table-cell" style={{ padding: '12px 8px' }}>{order.customerName}</TableCell>
+                        <TableCell style={{ padding: '12px 8px' }}>
+                          <Badge variant={getStatusVariant(order.status)} glow className="text-[8px] sm:text-xs">
                             {order.status}
                           </Badge>
                         </TableCell>
-                        <TableCell className="text-right font-bold text-gray-900" style={{ padding: '10px' }}>
+                        <TableCell className="text-right font-bold text-gray-900 text-[8px] sm:text-sm" style={{ padding: '10px 5px' }}>
                           ₹{order.paymentBreakdown?.total || order.price}
                         </TableCell>
                       </TableRow>
@@ -225,42 +225,42 @@ const Dashboard = () => {
 
         {/* Quick Actions - Premium Cards */}
         <Card variant="gradient" className="col-span-7 lg:col-span-3">
-          <CardHeader className="border-b border-emerald-100 pb-4">
-            <CardTitle className="text-xl">Quick Actions</CardTitle>
-            <CardDescription>Manage your store efficiently</CardDescription>
+          <CardHeader className="border-b border-emerald-100 pb-3 sm:pb-4">
+            <CardTitle className="text-lg sm:text-xl">Quick Actions</CardTitle>
+            <CardDescription className="text-[8px] sm:text-sm">Manage your store efficiently</CardDescription>
           </CardHeader>
           <CardContent className="grid gap-4 pt-6">
             <Button 
               variant="outline" 
-              className="h-24 flex-col items-center justify-center space-y-2 hover:bg-gradient-to-br hover:from-emerald-50 hover:to-teal-50 hover:border-emerald-300 group" 
+              className="h-20 sm:h-24 flex-col items-center justify-center space-y-1 sm:space-y-2 hover:bg-linear-to-br hover:from-emerald-50 hover:to-teal-50 hover:border-emerald-300 group" 
               onClick={() => navigate('/admin/products/new')}
             >
-              <div className="p-2 bg-emerald-100 rounded-lg group-hover:bg-emerald-200 transition-colors">
-                <Package className="h-6 w-6 text-emerald-700" />
+              <div className="p-1.5 sm:p-2 bg-emerald-100 rounded-lg group-hover:bg-emerald-200 transition-colors">
+                <Package className="h-5 w-5 sm:h-6 sm:w-6 text-emerald-700" />
               </div>
-              <span className="font-semibold text-gray-900">Add Product</span>
+              <span className="font-semibold text-gray-900 text-[8px] sm:text-sm">Add Product</span>
             </Button>
             
             <Button 
               variant="outline" 
-              className="h-24 flex-col items-center justify-center space-y-2 hover:bg-gradient-to-br hover:from-blue-50 hover:to-cyan-50 hover:border-blue-300 group" 
+              className="h-20 sm:h-24 flex-col items-center justify-center space-y-1 sm:space-y-2 hover:bg-linear-to-br hover:from-blue-50 hover:to-cyan-50 hover:border-blue-300 group" 
               onClick={() => navigate('/admin/orders')}
             >
-              <div className="p-2 bg-blue-100 rounded-lg group-hover:bg-blue-200 transition-colors">
-                <ShoppingBag className="h-6 w-6 text-blue-700" />
+              <div className="p-1.5 sm:p-2 bg-blue-100 rounded-lg group-hover:bg-blue-200 transition-colors">
+                <ShoppingBag className="h-5 w-5 sm:h-6 sm:w-6 text-blue-700" />
               </div>
-              <span className="font-semibold text-gray-900">View Orders</span>
+              <span className="font-semibold text-gray-900 text-[8px] sm:text-sm">View Orders</span>
             </Button>
             
             <Button 
               variant="outline" 
-              className="h-24 flex-col items-center justify-center space-y-2 hover:bg-gradient-to-br hover:from-purple-50 hover:to-pink-50 hover:border-purple-300 group" 
+              className="h-20 sm:h-24 flex-col items-center justify-center space-y-1 sm:space-y-2 hover:bg-linear-to-br hover:from-purple-50 hover:to-pink-50 hover:border-purple-300 group" 
               onClick={() => navigate('/admin/customers')}
             >
-              <div className="p-2 bg-purple-100 rounded-lg group-hover:bg-purple-200 transition-colors">
-                <Users className="h-6 w-6 text-purple-700" />
+              <div className="p-1.5 sm:p-2 bg-purple-100 rounded-lg group-hover:bg-purple-200 transition-colors">
+                <Users className="h-5 w-5 sm:h-6 sm:w-6 text-purple-700" />
               </div>
-              <span className="font-semibold text-gray-900">Customers</span>
+              <span className="font-semibold text-gray-900 text-[8px] sm:text-sm">Customers</span>
             </Button>
           </CardContent>
         </Card>

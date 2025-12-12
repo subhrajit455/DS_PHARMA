@@ -58,7 +58,7 @@ const ProductReviews = ({ reviews = [], isLoading = false }) => {
                 <span className="font-semibold text-gray-900" style={{ fontFamily: 'Gyrotrope', fontSize: '14px' }}>
                   {review.user}
                 </span>
-                <span className="text-gray-400 text-xs" style={{ fontFamily: 'Gyrotrope' }}>
+                <span className="text-gray-400 text-[8px] sm:text-xs" style={{ fontFamily: 'Gyrotrope' }}>
                   • {review.date}
                 </span>
               </div>

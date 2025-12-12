@@ -101,7 +101,7 @@ const Orders = () => {
                     placeholder="Search Your Order"
                     value={searchQuery}
                     onChange={(e) => setSearchQuery(e.target.value)}
-                    className="w-full pr-10 md:pr-12 focus:outline-none transition-all text-xs md:text-sm"
+                    className="w-full pr-10 md:pr-12 focus:outline-none transition-all text-[8px] sm:text-xs md:text-sm"
                     style={{
                       fontFamily: 'Gyrotrope',
                       color: '#000000',
@@ -132,7 +132,7 @@ const Orders = () => {
                   </button>
                 </div>
                 <button
-                  className="transition-all duration-200 hover:opacity-90 whitespace-nowrap cursor-pointer flex items-center gap-1 md:gap-2 text-xs md:text-sm"
+                  className="transition-all duration-200 hover:opacity-90 whitespace-nowrap cursor-pointer flex items-center gap-1 md:gap-2 text-[8px] sm:text-xs md:text-sm"
                   style={{
                     fontFamily: 'Gyrotrope',
                     fontWeight: 600,

@@ -36,7 +36,7 @@ const SecuritySettings = () => {
                                 <p className="text-sm text-gray-600" style={{ fontFamily: 'Gyrotrope' }}>
                                     Last updated: <span className="font-semibold">30 days ago</span>
                                 </p>
-                                <p className="text-xs text-gray-500 mt-1">Keep your account secure with a strong password</p>
+                                <p className="text-[8px] sm:text-xs text-gray-500 mt-1">Keep your account secure with a strong password</p>
                             </div>
                         </div>
                         <Motion.button
@@ -66,7 +66,7 @@ const SecuritySettings = () => {
                                 <p className="text-sm text-gray-600" style={{ fontFamily: 'Gyrotrope' }}>
                                     Status: <span className="font-semibold text-orange-600">Not Enabled</span>
                                 </p>
-                                <p className="text-xs text-gray-500 mt-1">Add an extra layer of security to your account</p>
+                                <p className="text-[8px] sm:text-xs text-gray-500 mt-1">Add an extra layer of security to your account</p>
                             </div>
                         </div>
                         <Motion.button
@@ -92,7 +92,7 @@ const SecuritySettings = () => {
                             <p className="font-bold text-base md:text-lg" style={{ fontFamily: 'Gyrotrope' }}>
                                 Recent Login Activity
                             </p>
-                            <p className="text-xs text-gray-500">Monitor your account access</p>
+                            <p className="text-[8px] sm:text-xs text-gray-500">Monitor your account access</p>
                         </div>
                     </div>
                     <div className="space-y-3 ml-2">
@@ -104,16 +104,16 @@ const SecuritySettings = () => {
                                             {activity.device}
                                         </p>
                                         {activity.current && (
-                                            <span className="px-2 py-0.5 bg-green-100 text-green-700 rounded-full text-xs font-bold">
+                                            <span className="px-2 py-0.5 bg-green-100 text-green-700 rounded-full text-[8px] sm:text-xs font-bold">
                                                 Current
                                             </span>
                                         )}
                                     </div>
-                                    <p className="text-xs text-gray-500 mt-1" style={{ fontFamily: 'Gyrotrope' }}>
+                                    <p className="text-[8px] sm:text-xs text-gray-500 mt-1" style={{ fontFamily: 'Gyrotrope' }}>
                                         📍 {activity.location}
                                     </p>
                                 </div>
-                                <p className="text-xs text-gray-500 font-medium" style={{ fontFamily: 'Gyrotrope' }}>
+                                <p className="text-[8px] sm:text-xs text-gray-500 font-medium" style={{ fontFamily: 'Gyrotrope' }}>
                                     {activity.time}
                                 </p>
                             </div>

@@ -68,12 +68,12 @@ const Sidebar = () => {
 
         <div className="p-4 border-t border-slate-800">
           <div className="flex items-center gap-3 px-4 py-3">
-             <div className="w-8 h-8 rounded-full bg-slate-700 flex items-center justify-center font-bold text-xs">
+             <div className="w-8 h-8 rounded-full bg-slate-700 flex items-center justify-center font-bold text-[8px] sm:text-xs">
                AD
              </div>
              <div className="text-sm">
                <p className="font-medium">Admin User</p>
-               <p className="text-xs text-slate-500">Super Admin</p>
+               <p className="text-[8px] sm:text-xs text-slate-500">Super Admin</p>
              </div>
           </div>
         </div>

@@ -55,25 +55,25 @@ const OrdersList = () => {
   };
 
   return (
-    <div className="space-y-6 min-h-screen" style={{ padding: '10px', background: 'linear-gradient(135deg, #f0fdf4 0%, #ecfdf5 50%, #f0fdfa 100%)' }}>
-      <div className="flex flex-col sm:flex-row justify-between items-start sm:items-center gap-4">
+    <div className="space-y-6 min-h-screen" style={{ padding: '5px', background: 'linear-gradient(135deg, #f0fdf4 0%, #ecfdf5 50%, #f0fdfa 100%)' }}>
+      <div className="flex flex-col sm:flex-row justify-between items-start sm:items-center gap-3 sm:gap-4">
         <div>
-           <h2 className="text-3xl font-bold tracking-tight">Orders</h2>
-           <p className="text-gray-500 text-sm mt-1">Manage and track customer orders</p>
+           <h2 className="text-xl sm:text-2xl md:text-3xl font-bold tracking-tight">Orders</h2>
+           <p className="text-gray-500 text-[10px] sm:text-[8px] sm:text-xs md:text-sm mt-0.5">Manage and track customer orders</p>
         </div>
       </div>
 
       <Card>
-        <CardContent className="p-4 sm:p-6 space-y-4">
-            <div className="flex flex-col lg:flex-row gap-4 justify-between items-center" style={{ marginBottom: '10px' }}>
+        <CardContent className="p-2 sm:p-3 md:p-4 lg:p-6 space-y-2 sm:space-y-3 md:space-y-4">
+            <div className="flex flex-col lg:flex-row gap-2 sm:gap-3 md:gap-4 justify-between items-center mb-2 sm:mb-3 md:mb-4" style={{ paddingBottom: '5px' }}>
                 {/* Status Tabs */}
-                <div className="flex gap-2 p-1 bg-gray-100 rounded-lg overflow-x-auto max-w-full no-scrollbar" style={{ marginBottom: '10px' }}>
+                <div className="flex gap-1 sm:gap-2 p-1 bg-gray-100 rounded-lg overflow-x-auto max-w-full no-scrollbar">
                 {statuses.map(status => (
                     <button
-                        style={{ padding: '4px 10px', margin: '0px 10px' }}
+                        style={{padding:'2px 5px'}}
                         key={status}
                         onClick={() => setActiveStatus(status)}
-                        className={`px-3 py-1.5 text-sm font-medium rounded-md transition-all whitespace-nowrap ${
+                        className={`px-2 sm:px-3 py-1.5 text-[8px] sm:text-sm font-medium rounded-md transition-all whitespace-nowrap ${
                             activeStatus === status 
                             ? 'bg-white text-gray-900 shadow-sm' 
                             : 'text-gray-500 hover:text-gray-900'
@@ -81,34 +81,33 @@ const OrdersList = () => {
                     >
                         {status}
                     </button>
-                    /* Note: Could use Button variants here, but custom toggle styling is often cleaner for tabs */
                 ))}
                 </div>
 
                 {/* Search */}
                 <div className="relative w-full lg:w-72">
-                    <Search className="absolute right-2.5 top-2 h-4 w-4 text-gray-500" />
+                    <Search className="absolute right-2.5 top-2 h-3 w-3 sm:h-4 sm:w-4 text-gray-500" />
                     <Input 
                         placeholder="Search Order..." 
-                        className="pl-9"
+                        className="pl-8 sm:pl-9 text-[8px] sm:text-sm h-9 sm:h-10"
                         value={searchQuery}
                         onChange={(e) => setSearchQuery(e.target.value)}
                     />
                 </div>
             </div>
 
-            <div className="rounded-md border border-gray-200" style={{ padding: '0px 10px' }}>
+            <div className="rounded-md border border-gray-200 p-0 sm:p-2">
                  <Table>
                     <TableHeader>
                         <TableRow style={{ background: 'linear-gradient(to right, #f0fdf4, #f0fdfa)' }}>
-                            <TableHead className="font-semibold text-gray-700" style={{ padding: '6px 8px' }}>Order ID</TableHead>
-                            <TableHead className="font-semibold text-gray-700" style={{ padding: '6px 8px' }}>Date</TableHead>
-                            <TableHead className="font-semibold text-gray-700" style={{ padding: '6px 8px' }}>Customer</TableHead>
-                            <TableHead className="font-semibold text-gray-700" style={{ padding: '6px 8px' }}>Items</TableHead>
-                            <TableHead className="font-semibold text-gray-700" style={{ padding: '6px 8px' }}>Total</TableHead>
-                            <TableHead className="font-semibold text-gray-700" style={{ padding: '6px 8px' }}>Payment</TableHead>
-                            <TableHead className="font-semibold text-gray-700" style={{ padding: '6px 8px' }}>Status</TableHead>
-                            <TableHead className="text-right font-semibold text-gray-700" style={{ padding: '6px 8px' }}>Actions</TableHead>
+                            <TableHead className="font-semibold text-gray-700 text-[8px] sm:text-sm" style={{ padding: '6px 8px' }}>Order ID</TableHead>
+                            <TableHead className="font-semibold text-gray-700 text-[8px] sm:text-sm hidden md:table-cell" style={{ padding: '6px 8px' }}>Date</TableHead>
+                            <TableHead className="font-semibold text-gray-700 text-[8px] sm:text-sm hidden sm:table-cell" style={{ padding: '6px 8px' }}>Customer</TableHead>
+                            <TableHead className="font-semibold text-gray-700 text-[8px] sm:text-sm hidden lg:table-cell" style={{ padding: '6px 8px' }}>Items</TableHead>
+                            <TableHead className="font-semibold text-gray-700 text-[8px] sm:text-sm" style={{ padding: '6px 8px' }}>Total</TableHead>
+                            <TableHead className="font-semibold text-gray-700 text-[8px] sm:text-sm hidden xl:table-cell" style={{ padding: '6px 8px' }}>Payment</TableHead>
+                            <TableHead className="font-semibold text-gray-700 text-[8px] sm:text-sm" style={{ padding: '6px 8px' }}>Status</TableHead>
+                            <TableHead className="text-right font-semibold text-gray-700 text-[8px] sm:text-sm" style={{ padding: '6px 8px' }}>Actions</TableHead>
                         </TableRow>
                     </TableHeader>
                     <TableBody>
@@ -120,33 +119,31 @@ const OrdersList = () => {
                             orders.map((order, index) => (
                                 <TableRow 
                                     key={order.id} 
-                                    className="hover:bg-emerald-50/50 cursor-pointer transition-all duration-200 border-b border-gray-100" 
-                                    style={{ 
-                                        marginBottom: index !== orders.length - 1 ? '5px' : '0',
-                                    }}
+                                    className="hover:bg-emerald-50/50 cursor-pointer transition-all duration-200 border-b border-gray-100"
                                     onClick={() => navigate(`/admin/orders/${order.id}`)}
                                 >
-                                    <TableCell className="font-medium" style={{ padding: '10px' }}>#{order.id}</TableCell>
-                                    <TableCell className="text-gray-500 text-sm" style={{ padding: '10px' }}>{order.date}</TableCell>
-                                    <TableCell style={{ padding: '10px' }}>
-                                        <div className="font-medium text-gray-900">{order.customer || order.customerName}</div>
-                                        <div className="text-xs text-gray-500">{order.email}</div>
+                                    <TableCell className="font-medium text-[8px] sm:text-sm" style={{ padding: '8px 5px' }}>#{order.id}</TableCell>
+                                    <TableCell className="text-gray-500 text-[8px] sm:text-sm hidden md:table-cell" style={{ padding: '8px 5px' }}>{order.date}</TableCell>
+                                    <TableCell className="hidden sm:table-cell" style={{ padding: '8px 5px' }}>
+                                        <div className="font-medium text-gray-900 text-[8px] sm:text-sm">{order.customer || order.customerName}</div>
+                                        <div className="text-[8px] sm:text-xs text-gray-500">{order.email}</div>
                                     </TableCell>
-                                    <TableCell className="text-gray-500" style={{ padding: '10px' }}>{order.items} items</TableCell>
-                                    <TableCell className="font-bold" style={{ padding: '10px' }}>₹{order.total || order.paymentBreakdown?.total}</TableCell>
-                                    <TableCell style={{ padding: '10px' }}>
-                                        <Badge variant={order.payment === 'Paid' ? 'success' : 'secondary'} className="font-normal">
+                                    <TableCell className="text-gray-500 text-[8px] sm:text-sm hidden lg:table-cell" style={{ padding: '8px 5px' }}>{order.items} items</TableCell>
+                                    <TableCell className="font-bold text-[8px] sm:text-sm" style={{ padding: '8px 5px' }}>₹{order.total || order.paymentBreakdown?.total}</TableCell>
+                                    <TableCell className="hidden xl:table-cell" style={{ padding: '8px 5px' }}>
+                                        <Badge variant={order.payment === 'Paid' ? 'success' : 'secondary'} className="font-normal text-[8px] sm:text-xs">
                                             {order.payment}
                                         </Badge>
                                     </TableCell>
-                                    <TableCell style={{ padding: '10px' }}>
-                                        <Badge variant={getStatusVariant(order.status)}>
+                                    <TableCell className="" style={{ padding: '8px 5px' }}>
+                                        <Badge variant={getStatusVariant(order.status)} className="text-[8px] sm:text-xs">
                                             {order.status}
                                         </Badge>
                                     </TableCell>
-                                    <TableCell className="text-right" style={{ padding: '10px' }}>
-                                         <Button variant="ghost" size="sm" onClick={(e) => { e.stopPropagation(); navigate(`/admin/orders/${order.id}`); }}>
-                                            Details <ArrowRight className="ml-2 h-4 w-4" />
+                                    <TableCell className="text-right" style={{ padding: '8px 5px' }}>
+                                         <Button variant="ghost" size="sm" className="text-[8px] sm:text-sm h-7 sm:h-8" onClick={(e) => { e.stopPropagation(); navigate(`/admin/orders/${order.id}`); }}>
+                                            <span className="hidden sm:inline" style={{marginTop:'3px', paddingRight:'3px'}}>Details</span>
+                                            <Eye className="text-center h-3 w-3 sm:h-4 sm:w-4 sm:ml-2" />
                                          </Button>
                                     </TableCell>
                                 </TableRow>

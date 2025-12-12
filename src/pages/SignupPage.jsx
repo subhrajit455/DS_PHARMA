@@ -150,7 +150,7 @@ const SignupPage = () => {
                                 I agree to the <button type="button" onClick={() => setShowTerms(true)} className="text-emerald-600 hover:text-emerald-400 cursor-pointer" style={{ textDecoration: 'none' }}>Terms and Conditions</button>
                             </label>
                             {errors.agreeToTerms && (
-                                <p className="text-red-500 text-xs mt-1">{errors.agreeToTerms}</p>
+                                <p className="text-red-500 text-[8px] sm:text-xs mt-1">{errors.agreeToTerms}</p>
                             )}
                         </div>
                     </div>

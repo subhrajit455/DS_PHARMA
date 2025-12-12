@@ -28,7 +28,7 @@ export const MascotCard = () => {
         padding: '10px 20px',
       }}>
         <p
-          className="text-base font-medium text-[#2D3748] leading-normal m-0 tracking-[0.01em] md:text-xs lg:text-base"
+          className="text-base font-medium text-[#2D3748] leading-normal m-0 tracking-[0.01em] md:text-[8px] sm:text-xs lg:text-base"
           style={{
             fontFamily: 'Gyrotrope',
           }}

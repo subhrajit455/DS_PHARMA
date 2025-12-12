@@ -16,7 +16,7 @@ const OrderTimeline = ({ timeline = [], deliveryPartner }) => {
 
       {/* Delivery Partner Message */}
       <p
-        className="mt-8 text-xs font-medium text-center text-green-700"
+        className="mt-8 text-[8px] sm:text-xs font-medium text-center text-green-700"
         style={{ fontFamily: 'Gyrotrope', margin: '5px 0px',}}
       >
         Delivery Partner: {deliveryPartner}
@@ -63,7 +63,7 @@ const TimelineStep = ({ step, isLast }) => (
     {/* Date Label - Show with step if available */}
     {step.date && (
       <p
-        className="text-xs text-center text-green-700"
+        className="text-[8px] sm:text-xs text-center text-green-700"
         style={{ fontFamily: 'Gyrotrope', marginTop: '5px' }}
       >
         {step.date}

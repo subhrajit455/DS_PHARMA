@@ -149,7 +149,7 @@ const OrderSummary = ({
                 style={{ animation: 'fadeIn 0.2s ease-out' }}
               >
                 <div className="p-2 bg-gray-50 border-b border-gray-100">
-                  <span className="text-xs font-semibold text-gray-500 px-2">Select Delivery Location</span>
+                  <span className="text-[8px] sm:text-xs font-semibold text-gray-500 px-2">Select Delivery Location</span>
                 </div>
                 <div className="max-h-64 overflow-y-auto py-1">
                   {sampleAddresses.map((addr) => (
@@ -164,12 +164,12 @@ const OrderSummary = ({
                         </div>
                         <div className="flex-1">
                           <div className="flex justify-between items-center mb-0.5">
-                            <span className="font-semibold text-xs text-gray-900">{addr.type}</span>
+                            <span className="font-semibold text-[8px] sm:text-xs text-gray-900">{addr.type}</span>
                             {currentAddress?.id === addr.id && (
                               <Check size={14} className="text-emerald-600" />
                             )}
                           </div>
-                          <p className="text-xs text-gray-600 line-clamp-2 leading-relaxed">
+                          <p className="text-[8px] sm:text-xs text-gray-600 line-clamp-2 leading-relaxed">
                             {addr.address}
                           </p>
                         </div>
@@ -436,7 +436,7 @@ const OrderSummary = ({
                 <span className={`font-semibold text-sm ${paymentMethod === 'online' ? 'text-emerald-700' : 'text-gray-900'}`}>
                   Online Payment
                 </span>
-                <p className="text-xs text-gray-500">UPI, Wallets, Netbanking</p>
+                <p className="text-[8px] sm:text-xs text-gray-500">UPI, Wallets, Netbanking</p>
               </div>
               <div className={`w-4 h-4 rounded-full border-2 flex items-center justify-center ${
                 paymentMethod === 'online' ? 'border-emerald-500 bg-emerald-500' : 'border-gray-300'
@@ -465,7 +465,7 @@ const OrderSummary = ({
                 <span className={`font-semibold text-sm ${paymentMethod === 'card' ? 'text-emerald-700' : 'text-gray-900'}`}>
                   Debit / Credit Card
                 </span>
-                <p className="text-xs text-gray-500">Visa, Mastercard, RuPay</p>
+                <p className="text-[8px] sm:text-xs text-gray-500">Visa, Mastercard, RuPay</p>
               </div>
               <div className={`w-4 h-4 rounded-full border-2 flex items-center justify-center ${
                 paymentMethod === 'card' ? 'border-emerald-500 bg-emerald-500' : 'border-gray-300'
@@ -494,7 +494,7 @@ const OrderSummary = ({
                 <span className={`font-semibold text-sm ${paymentMethod === 'cod' ? 'text-emerald-700' : 'text-gray-900'}`}>
                   Cash on Delivery
                 </span>
-                <p className="text-xs text-gray-500">Pay when you receive</p>
+                <p className="text-[8px] sm:text-xs text-gray-500">Pay when you receive</p>
               </div>
               <div className={`w-4 h-4 rounded-full border-2 flex items-center justify-center ${
                 paymentMethod === 'cod' ? 'border-emerald-500 bg-emerald-500' : 'border-gray-300'

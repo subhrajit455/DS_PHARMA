@@ -57,7 +57,7 @@ const AddressesList = () => {
                     >
                         {addr.isDefault && (
                             <div className="absolute top-3 right-3">
-                                <span className="px-3 py-1 bg-gradient-to-r from-teal-500 to-teal-600 text-white rounded-full text-xs font-bold shadow-md">
+                                <span className="px-3 py-1 bg-gradient-to-r from-teal-500 to-teal-600 text-white rounded-full text-[8px] sm:text-xs font-bold shadow-md">
                                     ⭐ Default
                                 </span>
                             </div>

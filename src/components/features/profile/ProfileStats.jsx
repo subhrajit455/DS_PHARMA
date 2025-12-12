@@ -14,7 +14,7 @@ const ProfileStats = ({ stats }) => {
                         <stat.icon className="w-5 h-5 mb-1 text-white md:w-8 md:h-8 md:mb-2 md:mr-2" />
                         <p className="text-sm font-bold text-white md:text-2xl">{stat.value}</p>
                     </div>
-                    <p className="text-[10px] text-white/80 md:text-xs">{stat.label}</p>
+                    <p className="text-[10px] text-white/80 md:text-[8px] sm:text-xs">{stat.label}</p>
                 </Motion.div>
             ))}
         </div>

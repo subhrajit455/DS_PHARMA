@@ -17,7 +17,7 @@ export const SortDropdown = ({ currentSort, onSortChange }) => {
     <div className="relative">
       <button 
         onClick={() => setIsOpen(!isOpen)}
-        className="flex items-center gap-2 px-4 py-2.5 bg-white border border-gray-200 rounded-full text-sm font-medium text-gray-700 hover:border-emerald-500 hover:text-emerald-600 transition-all shadow-sm"
+        className="flex items-center gap-2 px-4 py-2.5 bg-white border border-gray-200 rounded-full text-[12px] font-medium text-gray-700 hover:border-emerald-500 hover:text-emerald-600 transition-all shadow-sm"
         style={{ padding: '5px 10px' }}   
       >
         <ArrowUpDown className="w-4 h-4" />
@@ -42,7 +42,7 @@ export const SortDropdown = ({ currentSort, onSortChange }) => {
                         onSortChange(option.value);
                         setIsOpen(false);
                      }}
-                     className={`w-full text-left px-4 py-2.5 text-sm transition-colors ${
+                     className={`w-full text-left px-4 py-2.5 text-[12px] transition-colors ${
                         currentSort === option.value 
                            ? 'bg-emerald-50 text-emerald-600 font-medium' 
                            : 'text-gray-600 hover:bg-gray-100'
@@ -71,7 +71,7 @@ const FilterSection = ({ title, icon: Icon, isOpen, onToggle, children }) => {
            onClick={onToggle}
            className="w-full flex items-center justify-between py-4 px-1 group"
          >
-            <div className="flex items-center gap-2.5 text-gray-700 font-semibold text-sm group-hover:text-emerald-600 transition-colors">
+            <div className="flex items-center gap-2.5 text-gray-700 font-semibold text-[12px] group-hover:text-emerald-600 transition-colors">
                {Icon && <Icon className="w-4 h-4 text-gray-400 group-hover:text-emerald-500" />}
                <span style={{ marginTop: '5px' }}>{title}</span>
             </div>
@@ -157,7 +157,7 @@ export const SearchFilters = ({ filters, selectedFilters, onFilterChange, onView
                   className="peer h-4 w-4 rounded border-gray-300 text-emerald-600 focus:ring-emerald-500 transition-all cursor-pointer"
                 />
               </div>
-              <span className="text-sm text-gray-600 group-hover:text-gray-900 transition-colors" style={{ marginTop: '5px' }}>
+              <span className="text-[12px] text-gray-600 group-hover:text-gray-900 transition-colors" style={{ marginTop: '5px' }}>
                 {category}
               </span>
             </label>
@@ -181,7 +181,7 @@ export const SearchFilters = ({ filters, selectedFilters, onFilterChange, onView
                     className="peer h-4 w-4 border-gray-300 text-emerald-600 focus:ring-emerald-500 cursor-pointer"
                   />
               </div>
-              <span className="text-sm text-gray-600 group-hover:text-gray-900 transition-colors" style={{ marginTop: '5px' }}>
+              <span className="text-[12px] text-gray-600 group-hover:text-gray-900 transition-colors" style={{ marginTop: '5px' }}>
                 {range.label}
               </span>
             </label>
@@ -201,7 +201,7 @@ export const SearchFilters = ({ filters, selectedFilters, onFilterChange, onView
                 onChange={() => onFilterChange({ ...selectedFilters, inStock: !selectedFilters.inStock })}
                 className="h-4 w-4 rounded border-gray-300 text-emerald-600 focus:ring-emerald-500 cursor-pointer"
              />
-             <span className="text-sm text-gray-600 group-hover:text-gray-900" style={{ marginTop: '5px' }}>Exclude Out of Stock</span>
+             <span className="text-[12px] text-gray-600 group-hover:text-gray-900" style={{ marginTop: '5px' }}>Exclude Out of Stock</span>
           </label>
        </FilterSection>
 
@@ -225,7 +225,7 @@ export const SearchFilters = ({ filters, selectedFilters, onFilterChange, onView
                 }}
                 className="h-4 w-4 rounded border-gray-300 text-emerald-600 focus:ring-emerald-500 cursor-pointer"
              />
-             <span className="text-sm text-gray-600 group-hover:text-gray-900" style={{ marginTop: '5px' }}>OTC Products Only</span>
+             <span className="text-[12px] text-gray-600 group-hover:text-gray-900" style={{ marginTop: '5px' }}>OTC Products Only</span>
           </label>
        </FilterSection>
        
@@ -234,7 +234,7 @@ export const SearchFilters = ({ filters, selectedFilters, onFilterChange, onView
          <div className="mt-4 pt-4 border-t border-gray-100" style={{ padding: '10px' }}>
            <button
              onClick={onViewAll}
-             className="w-full py-1.5 bg-emerald-600 hover:bg-emerald-700 text-white text-sm font-semibold rounded-xl transition-all shadow-md shadow-emerald-200 active:scale-95 flex items-center justify-center gap-1"
+             className="w-full py-1.5 bg-emerald-600 hover:bg-emerald-700 text-white text-[12px] font-semibold rounded-xl transition-all shadow-md shadow-emerald-200 active:scale-95 flex items-center justify-center gap-1"
            >
              <ShoppingBag className="w-4 h-4 " />
              <p style={{ marginTop: '5px' }} >View All Products</p>

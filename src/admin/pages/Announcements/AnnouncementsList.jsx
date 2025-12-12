@@ -38,37 +38,38 @@ const AnnouncementsList = () => {
   ];
 
   return (
-    <div className="max-w-7xl mx-auto space-y-6 min-h-screen" style={{ padding: '10px', background: 'linear-gradient(135deg, #f0fdf4 0%, #ecfdf5 50%, #f0fdfa 100%)' }}>
-      <div className="flex justify-between items-center" style={{ marginTop: '10px' }}>
-        <h1 className="text-3xl font-bold tracking-tight text-gray-900">
+    <div className="max-w-7xl mx-auto space-y-6 min-h-screen" style={{ padding: '5px', background: 'linear-gradient(135deg, #f0fdf4 0%, #ecfdf5 50%, #f0fdfa 100%)' }}>
+      <div className="flex justify-between items-center mt-1 sm:mt-2 md:mt-4">
+        <h1 className="text-xl sm:text-2xl md:text-3xl font-bold tracking-tight text-gray-900">
           Announcements & Alerts
         </h1>
       </div>
 
       {/* Tabs */}
-      <div className="flex gap-2 border-b border-gray-200" style={{ marginTop: '20px' }}>
+      <div className="flex gap-2 border-b border-gray-200 mt-4 sm:mt-6 overflow-x-auto no-scrollbar" style={{ paddingTop: '5px' }}>
         {tabs.map(tab => {
           const Icon = tab.icon;
           return (
             <button
+              style={{ padding: '2px 5px' }}
               key={tab.id}
               onClick={() => setActiveTab(tab.id)}
-              className={`flex items-center gap-2 px-4 py-3 font-medium text-sm border-b-2 transition-colors ${
+              className={`flex items-center gap-1 px-3 sm:px-4 py-2 sm:py-3 font-medium text-[8px] sm:text-sm border-b-2 transition-colors whitespace-nowrap ${
                 activeTab === tab.id
                   ? 'border-emerald-600 text-emerald-600'
                   : 'border-transparent text-gray-500 hover:text-gray-700'
               }`}
             >
-              <Icon className="h-4 w-4" />
-              {tab.label}
-              <Badge variant="secondary">{tab.count}</Badge>
+              <Icon className="h-3 w-3 sm:h-4 sm:w-4" />
+              <span style={{ marginTop: '3px' }}>{tab.label}</span>
+              <Badge variant="secondary" className="text-[8px] sm:text-xs">{tab.count}</Badge>
             </button>
           );
         })}
       </div>
 
       {/* Tab Content */}
-      <div style={{ marginTop: '20px' }}>
+      <div className="mt-4 sm:mt-6">
         {activeTab === 'banners' && (
           <BannersTab
             banners={banners}
@@ -106,10 +107,10 @@ const AnnouncementsList = () => {
 // Banners Tab Component
 const BannersTab = ({ banners, onToggle, onDelete, onEdit, onAdd }) => (
   <div>
-    <div className="flex justify-end mb-4">
-      <Button onClick={onAdd}>
-        <Plus className="h-4 w-4 mr-2" />
-        Add Banner
+    <div className="flex justify-end mb-2 sm:mb-3 md:mb-4" style={{ padding: '5px' }}>
+      <Button onClick={onAdd} className="text-[10px] sm:text-[8px] sm:text-xs md:text-sm h-7 sm:h-9 md:h-10" style={{ padding: '5px' }}>
+        <Plus className="h-3 w-3 sm:h-4 sm:w-4 mr-2" />
+        <span style={{ marginTop: '3px' }}>Add Banner</span>
       </Button>
     </div>
 
@@ -124,8 +125,8 @@ const BannersTab = ({ banners, onToggle, onDelete, onEdit, onAdd }) => (
       ) : (
         banners.map(banner => (
           <Card key={banner.id}>
-            <CardContent className="flex items-center gap-4 p-4">
-              <div className="w-32 h-20 bg-gray-100 rounded-lg overflow-hidden flex-shrink-0">
+            <CardContent className="flex flex-col sm:flex-row items-start sm:items-center gap-3 sm:gap-4 p-3 sm:p-4">
+              <div className="w-full sm:w-32 h-20 bg-gray-100 rounded-lg overflow-hidden flex-shrink-0">
                 {banner.imageUrl || banner.imageBase64 ? (
                   <img
                     src={banner.imageBase64 || banner.imageUrl}
@@ -139,15 +140,15 @@ const BannersTab = ({ banners, onToggle, onDelete, onEdit, onAdd }) => (
                 )}
               </div>
 
-              <div className="flex-1">
-                <h3 className="font-semibold text-gray-900">{banner.title}</h3>
-                <p className="text-sm text-gray-500">Position: {banner.position}</p>
+              <div className="flex-1 min-w-0">
+                <h3 className="font-semibold text-gray-900 text-sm sm:text-base truncate">{banner.title}</h3>
+                <p className="text-[8px] sm:text-sm text-gray-500">Position: {banner.position}</p>
                 {banner.link && (
-                  <p className="text-sm text-gray-500">Link: {banner.link}</p>
+                  <p className="text-[8px] sm:text-sm text-gray-500 truncate">Link: {banner.link}</p>
                 )}
               </div>
 
-              <div className="flex items-center gap-3">
+              <div className="flex items-center gap-2 sm:gap-3 self-end sm:self-center">
                 <Switch
                   checked={banner.isEnabled}
                   onCheckedChange={() => onToggle(banner.id)}
@@ -155,17 +156,18 @@ const BannersTab = ({ banners, onToggle, onDelete, onEdit, onAdd }) => (
                 <Button
                   variant="ghost"
                   size="icon"
+                  className="h-8 w-8 sm:h-10 sm:w-10"
                   onClick={() => onEdit(banner.id)}
                 >
-                  <Edit2 className="h-4 w-4" />
+                  <Edit2 className="h-3 w-3 sm:h-4 sm:w-4" />
                 </Button>
                 <Button
                   variant="ghost"
                   size="icon"
+                  className="h-8 w-8 sm:h-10 sm:w-10 text-red-600 hover:text-red-700 hover:bg-red-50"
                   onClick={() => onDelete(banner.id)}
-                  className="text-red-600 hover:text-red-700 hover:bg-red-50"
                 >
-                  <Trash2 className="h-4 w-4" />
+                  <Trash2 className="h-3 w-3 sm:h-4 sm:w-4" />
                 </Button>
               </div>
             </CardContent>
@@ -179,10 +181,10 @@ const BannersTab = ({ banners, onToggle, onDelete, onEdit, onAdd }) => (
 // Marquee Tab Component
 const MarqueeTab = ({ marqueeMessages, onToggle, onDelete, onEdit, onAdd }) => (
   <div>
-    <div className="flex justify-end mb-4">
-      <Button onClick={onAdd}>
+    <div className="flex justify-end mb-4" style={{ padding: '5px' }} >
+      <Button onClick={onAdd} className="text-[10px] sm:text-[8px] sm:text-xs md:text-sm h-7 sm:h-9 md:h-10" style={{ padding: '5px' }}>
         <Plus className="h-4 w-4 mr-2" />
-        Add Marquee
+        <span style={{ marginTop: '3px' }}>Add Marquee</span>
       </Button>
     </div>
 
@@ -263,10 +265,10 @@ const AlertsTab = ({ alerts, onToggle, onDelete, onEdit, onAdd }) => {
 
   return (
     <div>
-      <div className="flex justify-end mb-4">
-        <Button onClick={onAdd}>
+      <div className="flex justify-end mb-4" style={{ padding: '5px' }}>
+        <Button onClick={onAdd} className="text-[10px] sm:text-[8px] sm:text-xs md:text-sm h-7 sm:h-9 md:h-10" style={{ padding: '5px' }}>
           <Plus className="h-4 w-4 mr-2" />
-          Add Alert
+          <span style={{ marginTop: '3px' }}>Add Alert</span>
         </Button>
       </div>
 
@@ -289,7 +291,7 @@ const AlertsTab = ({ alerts, onToggle, onDelete, onEdit, onAdd }) => {
                       <Badge variant="outline">{alert.type}</Badge>
                     </div>
                     <p className="text-sm mb-2">{alert.message}</p>
-                    <div className="flex gap-4 text-xs opacity-75">
+                    <div className="flex gap-4 text-[8px] sm:text-xs opacity-75">
                       <span>Position: {alert.position}</span>
                       {alert.dismissible && <span>Dismissible</span>}
                       {alert.expiresAt && <span>Expires: {new Date(alert.expiresAt).toLocaleDateString()}</span>}

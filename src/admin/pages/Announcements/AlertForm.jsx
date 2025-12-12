@@ -103,11 +103,11 @@ const AlertForm = () => {
       </div>
 
       <form onSubmit={handleSubmit}>
-        <div className="grid grid-cols-1 lg:grid-cols-3 gap-6" style={{ marginTop: '15px' }}>
+        <div className="grid grid-cols-1 lg:grid-cols-3 gap-6" style={{ marginTop: '10px' }}>
           {/* Main Info */}
           <div className="lg:col-span-2 space-y-6">
             <Card>
-              <CardHeader style={{ paddingBottom: '15px' }}>
+              <CardHeader style={{ paddingBottom: '10px' }}>
                 <CardTitle>Alert Details</CardTitle>
                 <CardDescription>Configure your alert notification</CardDescription>
               </CardHeader>
@@ -117,9 +117,10 @@ const AlertForm = () => {
                   <select
                     id="type"
                     name="type"
-                    className="flex h-auto w-full rounded-md border border-gray-200 bg-white px-3 py-2 text-sm shadow-sm transition-colors focus-visible:outline-none focus-visible:ring-1 focus-visible:ring-emerald-600"
+                    className="flex h-auto w-full rounded-md border border-gray-200 bg-white px-3 py-2 text-[12px] shadow-sm transition-colors focus-visible:outline-none focus-visible:ring-1 focus-visible:ring-emerald-600"
                     value={formData.type}
                     onChange={handleChange}
+                    style={{ padding: '11px 5px' }}
                   >
                     <option value="info">Info</option>
                     <option value="success">Success</option>
@@ -148,7 +149,7 @@ const AlertForm = () => {
                     name="message"
                     required
                     rows="4"
-                    className="flex min-h-[60px] w-full rounded-md border border-gray-200 bg-white px-3 py-2 text-sm shadow-sm placeholder:text-gray-400 focus-visible:outline-none focus-visible:ring-1 focus-visible:ring-emerald-600 disabled:cursor-not-allowed disabled:opacity-50 resize-y"
+                    className="flex min-h-[60px] w-full rounded-md border border-gray-200 bg-white px-3 py-2 text-[12px] shadow-sm placeholder:text-gray-400 focus-visible:outline-none focus-visible:ring-1 focus-visible:ring-emerald-600 disabled:cursor-not-allowed disabled:opacity-50 resize-y"
                     placeholder="e.g. Get free delivery on all orders above ₹999. Limited time offer!"
                     value={formData.message}
                     onChange={handleChange}
@@ -162,9 +163,10 @@ const AlertForm = () => {
                     <select
                       id="position"
                       name="position"
-                      className="flex h-auto w-full rounded-md border border-gray-200 bg-white px-3 py-2 text-sm shadow-sm transition-colors focus-visible:outline-none focus-visible:ring-1 focus-visible:ring-emerald-600"
+                      className="flex h-auto w-full rounded-md border border-gray-200 bg-white px-3 py-2 text-[12px] shadow-sm transition-colors focus-visible:outline-none focus-visible:ring-1 focus-visible:ring-emerald-600"
                       value={formData.position}
                       onChange={handleChange}
+                      style={{ padding: '11px 5px' }}
                     >
                       <option value="top">Top of Page</option>
                       <option value="bottom">Bottom of Page</option>
@@ -180,7 +182,7 @@ const AlertForm = () => {
                       value={formData.expiresAt}
                       onChange={handleChange}
                       min={new Date().toISOString().split('T')[0]}
-                      style={{ padding: '10px' }}
+                      style={{ padding: '20px 10px' }}
                     />
                   </div>
                 </div>
@@ -195,7 +197,7 @@ const AlertForm = () => {
                       onChange={handleChange}
                       className="h-4 w-4 rounded border-gray-300 text-emerald-600 focus:ring-emerald-500"
                     />
-                    <Label htmlFor="dismissible" className="cursor-pointer">Allow users to dismiss this alert</Label>
+                    <Label htmlFor="dismissible" className="cursor-pointer" style={{ marginTop: '5px' }}>Allow users to dismiss this alert</Label>
                   </div>
 
                   <div className="flex items-center gap-2">
@@ -207,14 +209,14 @@ const AlertForm = () => {
                       onChange={handleChange}
                       className="h-4 w-4 rounded border-gray-300 text-emerald-600 focus:ring-emerald-500"
                     />
-                    <Label htmlFor="isEnabled" className="cursor-pointer">Enable this alert</Label>
+                    <Label htmlFor="isEnabled" className="cursor-pointer" style={{ marginTop: '5px' }}>Enable this alert</Label>
                   </div>
                 </div>
 
                 {/* Preview */}
-                <div className="mt-6">
-                  <Label className="mb-2 block">Preview</Label>
-                  <div className={`p-4 rounded-lg border-l-4 ${getAlertPreviewStyles()}`}>
+                <div className="mt-6" style={{ marginTop: '10px' }}>
+                  <Label className="mb-2 block" style={{ marginBottom: '10px' }}>Preview</Label>
+                  <div className={`p-4 rounded-lg border-l-4 ${getAlertPreviewStyles()}`} style={{ padding: '10px 5px' }}>
                     <div className="flex items-start justify-between">
                       <div className="flex-1">
                         <h4 className="font-semibold mb-1">{formData.title || 'Alert Title'}</h4>
@@ -243,22 +245,22 @@ const AlertForm = () => {
                   <div className="flex items-center gap-2">
                     <div className="w-3 h-3 rounded-full bg-blue-500"></div>
                     <span className="font-medium">Info</span>
-                    <span className="text-gray-500 text-xs">- General information</span>
+                    <span className="text-gray-500 text-[8px] sm:text-xs">- General information</span>
                   </div>
                   <div className="flex items-center gap-2">
                     <div className="w-3 h-3 rounded-full bg-green-500"></div>
                     <span className="font-medium">Success</span>
-                    <span className="text-gray-500 text-xs">- Positive updates</span>
+                    <span className="text-gray-500 text-[8px] sm:text-xs">- Positive updates</span>
                   </div>
                   <div className="flex items-center gap-2">
                     <div className="w-3 h-3 rounded-full bg-yellow-500"></div>
                     <span className="font-medium">Warning</span>
-                    <span className="text-gray-500 text-xs">- Important notices</span>
+                    <span className="text-gray-500 text-[8px] sm:text-xs">- Important notices</span>
                   </div>
                   <div className="flex items-center gap-2">
                     <div className="w-3 h-3 rounded-full bg-red-500"></div>
                     <span className="font-medium">Error</span>
-                    <span className="text-gray-500 text-xs">- Critical alerts</span>
+                    <span className="text-gray-500 text-[8px] sm:text-xs">- Critical alerts</span>
                   </div>
                 </div>
               </CardContent>

@@ -42,7 +42,7 @@ const CartItem = ({ item, onUpdateQuantity, onRemove }) => {
           <div className="flex justify-between items-start">
             <div className="flex-1 pr-4 text-bottom">
               <h3
-                className="font-gyrotrope text-xs md:text-[16px] font-semibold text-black mb-5 leading-relaxed tracking-tight pt-2 cursor-pointer hover:text-emerald-600 transition-colors"
+                className="font-gyrotrope text-[8px] sm:text-xs md:text-[16px] font-semibold text-black mb-5 leading-relaxed tracking-tight pt-2 cursor-pointer hover:text-emerald-600 transition-colors"
                 onClick={handleProductClick}
               >
                 {item.name}
@@ -50,11 +50,11 @@ const CartItem = ({ item, onUpdateQuantity, onRemove }) => {
               <div className="flex items-center gap-2 mt-15" style={{
                 paddingTop: '8px'
               }}>
-                <span className="font-gyrotrope text-xs md:text-[16px] font-bold text-black">
+                <span className="font-gyrotrope text-[8px] sm:text-xs md:text-[16px] font-bold text-black">
                   ₹{item.price || 0}
                 </span>
                 {item.originalPrice && item.originalPrice !== item.price && (
-                  <span className="font-gyrotrope text-xs md:text-[13px] font-normal text-gray-400 line-through">
+                  <span className="font-gyrotrope text-[8px] sm:text-xs md:text-[13px] font-normal text-gray-400 line-through">
                     ₹{item.originalPrice}
                   </span>
                 )}
@@ -93,7 +93,7 @@ const CartItem = ({ item, onUpdateQuantity, onRemove }) => {
                 >
                   <Minus size={14} strokeWidth={2.5} />
                 </button>
-                <span className="font-gyrotrope text-xs md:text-sm font-semibold text-black min-w-[24px] text-center">
+                <span className="font-gyrotrope text-[8px] sm:text-xs md:text-sm font-semibold text-black min-w-[24px] text-center">
                   {item.quantity || 1}
                 </span>
                 <button

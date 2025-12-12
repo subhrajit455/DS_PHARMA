@@ -7,7 +7,7 @@ const PaymentBreakdownCard = ({ breakdown, className }) => {
       <h3 className="mb-2 sm:mb-3 text-sm sm:text-base font-semibold text-[#34B485]" style={{ fontFamily: 'Gyrotrope', marginBottom: '10px' }}>
         Payment Breakdown
       </h3>
-      <div className="space-y-1 sm:space-y-2 text-[10px] sm:text-xs p-2 sm:p-3">
+      <div className="space-y-1 sm:space-y-2 text-[10px] sm:text-[8px] sm:text-xs p-2 sm:p-3">
         <BreakdownRow label="Total Cart Value" value={breakdown.totalCartValue} />
         <BreakdownRow label="Discount" value={breakdown.discount} isDeduction />
         <BreakdownRow label="Coupon" value={breakdown.coupon} isDeduction />
@@ -22,7 +22,7 @@ const PaymentBreakdownCard = ({ breakdown, className }) => {
 };
 
 const BreakdownRow = ({ label, value, isDeduction, isTotal }) => (
-  <div className="flex justify-between text-xs sm:text-sm">
+  <div className="flex justify-between text-[8px] sm:text-sm">
     <span
       className={isTotal ? 'font-bold text-gray-900' : 'text-gray-600'}
       style={{ fontFamily: 'Gyrotrope' }}
