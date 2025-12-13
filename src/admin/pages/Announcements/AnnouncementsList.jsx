@@ -38,8 +38,8 @@ const AnnouncementsList = () => {
   ];
 
   return (
-    <div className="max-w-7xl mx-auto space-y-6 min-h-screen" style={{ padding: '5px', background: 'linear-gradient(135deg, #f0fdf4 0%, #ecfdf5 50%, #f0fdfa 100%)' }}>
-      <div className="flex justify-between items-center mt-1 sm:mt-2 md:mt-4">
+    <div className="flex flex-col h-full space-y-6" style={{ padding: '10px', background: 'linear-gradient(135deg, #f0fdf4 0%, #ecfdf5 50%, #f0fdfa 100%)' }}>
+      <div className="flex justify-between items-center shrink-0">
         <h1 className="text-xl sm:text-2xl md:text-3xl font-bold tracking-tight text-gray-900">
           Announcements & Alerts
         </h1>
@@ -104,17 +104,52 @@ const AnnouncementsList = () => {
   );
 };
 
+
+
+// Helper for pagination
+const PaginationControls = ({ currentPage, totalPages, onPageChange }) => (
+    <div className="flex items-center justify-between mt-4 border-t pt-4">
+        <div className="text-sm text-gray-500">
+            Page {currentPage} of {totalPages}
+        </div>
+        <div className="flex gap-2">
+            <Button 
+                variant="outline" 
+                size="sm" 
+                onClick={() => onPageChange(Math.max(1, currentPage - 1))}
+                disabled={currentPage === 1}
+            >
+                Previous
+            </Button>
+            <Button 
+                variant="outline" 
+                size="sm" 
+                onClick={() => onPageChange(Math.min(totalPages, currentPage + 1))}
+                disabled={currentPage === totalPages}
+            >
+                Next
+            </Button>
+        </div>
+    </div>
+);
+
 // Banners Tab Component
-const BannersTab = ({ banners, onToggle, onDelete, onEdit, onAdd }) => (
-  <div>
-    <div className="flex justify-end mb-2 sm:mb-3 md:mb-4" style={{ padding: '5px' }}>
+const BannersTab = ({ banners, onToggle, onDelete, onEdit, onAdd }) => {
+  const [currentPage, setCurrentPage] = useState(1);
+  const itemsPerPage = 5;
+  const totalPages = Math.ceil(banners.length / itemsPerPage);
+  const paginatedBanners = banners.slice((currentPage - 1) * itemsPerPage, currentPage * itemsPerPage);
+
+  return (
+  <div className="flex flex-col">
+    <div className="flex justify-end mb-2 sm:mb-3 md:mb-4 shrink-0" style={{ padding: '5px' }}>
       <Button onClick={onAdd} className="text-[10px] sm:text-[8px] sm:text-xs md:text-sm h-7 sm:h-9 md:h-10" style={{ padding: '5px' }}>
         <Plus className="h-3 w-3 sm:h-4 sm:w-4 mr-2" />
         <span style={{ marginTop: '3px' }}>Add Banner</span>
       </Button>
     </div>
 
-    <div className="grid gap-4">
+    <div className="space-y-4">
       {banners.length === 0 ? (
         <Card>
           <CardContent className="flex flex-col items-center justify-center py-12">
@@ -123,60 +158,70 @@ const BannersTab = ({ banners, onToggle, onDelete, onEdit, onAdd }) => (
           </CardContent>
         </Card>
       ) : (
-        banners.map(banner => (
-          <Card key={banner.id}>
-            <CardContent className="flex flex-col sm:flex-row items-start sm:items-center gap-3 sm:gap-4 p-3 sm:p-4">
-              <div className="w-full sm:w-32 h-20 bg-gray-100 rounded-lg overflow-hidden flex-shrink-0">
-                {banner.imageUrl || banner.imageBase64 ? (
-                  <img
-                    src={banner.imageBase64 || banner.imageUrl}
-                    alt={banner.title}
-                    className="w-full h-full object-cover"
-                  />
-                ) : (
-                  <div className="w-full h-full flex items-center justify-center">
-                    <ImageIcon className="h-8 w-8 text-gray-400" />
-                  </div>
-                )}
-              </div>
+        <>
+            {paginatedBanners.map(banner => (
+            <Card key={banner.id}>
+                <CardContent className="flex flex-col sm:flex-row items-start sm:items-center gap-3 sm:gap-4 p-3 sm:p-4">
+                <div className="w-full sm:w-32 h-20 bg-gray-100 rounded-lg overflow-hidden flex-shrink-0">
+                    {banner.imageUrl || banner.imageBase64 ? (
+                    <img
+                        src={banner.imageBase64 || banner.imageUrl}
+                        alt={banner.title}
+                        className="w-full h-full object-cover"
+                    />
+                    ) : (
+                    <div className="w-full h-full flex items-center justify-center">
+                        <ImageIcon className="h-8 w-8 text-gray-400" />
+                    </div>
+                    )}
+                </div>
 
-              <div className="flex-1 min-w-0">
-                <h3 className="font-semibold text-gray-900 text-sm sm:text-base truncate">{banner.title}</h3>
-                <p className="text-[8px] sm:text-sm text-gray-500">Position: {banner.position}</p>
-                {banner.link && (
-                  <p className="text-[8px] sm:text-sm text-gray-500 truncate">Link: {banner.link}</p>
-                )}
-              </div>
+                <div className="flex-1 min-w-0">
+                    <h3 className="font-semibold text-gray-900 text-sm sm:text-base truncate">{banner.title}</h3>
+                    <p className="text-[8px] sm:text-sm text-gray-500">Position: {banner.position}</p>
+                    {banner.link && (
+                    <p className="text-[8px] sm:text-sm text-gray-500 truncate">Link: {banner.link}</p>
+                    )}
+                </div>
 
-              <div className="flex items-center gap-2 sm:gap-3 self-end sm:self-center">
-                <Switch
-                  checked={banner.isEnabled}
-                  onCheckedChange={() => onToggle(banner.id)}
+                <div className="flex items-center gap-2 sm:gap-3 self-end sm:self-center">
+                    <Switch
+                    checked={banner.isEnabled}
+                    onCheckedChange={() => onToggle(banner.id)}
+                    />
+                    <Button
+                    variant="ghost"
+                    size="icon"
+                    className="h-8 w-8 sm:h-10 sm:w-10"
+                    onClick={() => onEdit(banner.id)}
+                    >
+                    <Edit2 className="h-3 w-3 sm:h-4 sm:w-4" />
+                    </Button>
+                    <Button
+                    variant="ghost"
+                    size="icon"
+                    className="h-8 w-8 sm:h-10 sm:w-10 text-red-600 hover:text-red-700 hover:bg-red-50"
+                    onClick={() => onDelete(banner.id)}
+                    >
+                    <Trash2 className="h-3 w-3 sm:h-4 sm:w-4" />
+                    </Button>
+                </div>
+                </CardContent>
+            </Card>
+            ))}
+            {banners.length > itemsPerPage && (
+                <PaginationControls 
+                    currentPage={currentPage}
+                    totalPages={totalPages}
+                    onPageChange={setCurrentPage}
                 />
-                <Button
-                  variant="ghost"
-                  size="icon"
-                  className="h-8 w-8 sm:h-10 sm:w-10"
-                  onClick={() => onEdit(banner.id)}
-                >
-                  <Edit2 className="h-3 w-3 sm:h-4 sm:w-4" />
-                </Button>
-                <Button
-                  variant="ghost"
-                  size="icon"
-                  className="h-8 w-8 sm:h-10 sm:w-10 text-red-600 hover:text-red-700 hover:bg-red-50"
-                  onClick={() => onDelete(banner.id)}
-                >
-                  <Trash2 className="h-3 w-3 sm:h-4 sm:w-4" />
-                </Button>
-              </div>
-            </CardContent>
-          </Card>
-        ))
+            )}
+        </>
       )}
     </div>
   </div>
-);
+  );
+};
 
 // Marquee Tab Component
 const MarqueeTab = ({ marqueeMessages, onToggle, onDelete, onEdit, onAdd }) => (

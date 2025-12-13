@@ -16,6 +16,7 @@ import {
   TableRow,
 } from '../../components/ui/Table';
 import { customerService } from '../../api/customerService';
+import { Pagination } from '../../components/ui/Pagination';
 
 const CustomersList = () => {
   const navigate = useNavigate();
@@ -23,6 +24,8 @@ const CustomersList = () => {
   const [isLoading, setIsLoading] = useState(true);
   const [hasError, setHasError] = useState(false);
   const [searchQuery, setSearchQuery] = useState('');
+  const [currentPage, setCurrentPage] = useState(1);
+  const [itemsPerPage, setItemsPerPage] = useState(10);
 
   const fetchCustomers = async () => {
     setIsLoading(true);
@@ -117,35 +120,36 @@ const CustomersList = () => {
     );
   }
 
-  return (
-    <div className="space-y-6 min-h-screen" style={{ padding: '5px', background: 'linear-gradient(135deg, #f0fdf4 0%, #ecfdf5 50%, #f0fdfa 100%)' }}>
-      <div className="flex flex-col sm:flex-row justify-between items-start sm:items-center gap-3 sm:gap-4">
+    <div className="h-full flex flex-col space-y-4 p-2 sm:p-4 bg-gradient-to-br from-gray-50 via-emerald-50/20 to-teal-50/30">
+      <div className="flex flex-col sm:flex-row justify-between items-start sm:items-center gap-3 sm:gap-4 shrink-0">
         <div>
           <h2 className="text-xl sm:text-2xl md:text-3xl font-bold tracking-tight text-gray-900">Customers</h2>
           <p className="text-gray-500 text-[10px] sm:text-[8px] sm:text-xs md:text-sm mt-0.5">Manage your customer base</p>
         </div>
       </div>
 
-      <Card>
-        <CardContent className="p-2 sm:p-3 md:p-4 lg:p-6 space-y-2 sm:space-y-3 md:space-y-4">
-          <div className="relative max-w-md mb-3 sm:mb-4" style={{ paddingBottom: '5px' }}>
-            <Search className="absolute right-2.5 top-2 h-3 w-3 sm:h-4 sm:w-4 text-gray-500" />
-            <Input 
-              placeholder="Search customers..." 
-              className="pl-8 sm:pl-9 text-[8px] sm:text-sm h-9 sm:h-10"
-              value={searchQuery}
-              onChange={(e) => setSearchQuery(e.target.value)}
-            />
+      <Card className="flex-1 flex flex-col min-h-0 shadow-sm border-gray-200/60 bg-white/50 backdrop-blur-xl">
+        <CardContent className="flex-1 flex flex-col p-2 sm:p-3 md:p-4 min-h-0">
+          <div className="flex flex-col lg:flex-row gap-2 sm:gap-3 md:gap-4 justify-between items-center mb-2 sm:mb-3 md:mb-4 shrink-0" style={{ paddingBottom: '5px' }}>
+            <div className="relative w-full lg:w-72">
+              <Search className="absolute right-2.5 top-2 h-3 w-3 sm:h-4 sm:w-4 text-gray-500" />
+              <Input 
+                placeholder="Search customers..." 
+                className="pl-8 sm:pl-9 text-[8px] sm:text-sm h-9 sm:h-10"
+                value={searchQuery}
+                onChange={(e) => { setSearchQuery(e.target.value); setCurrentPage(1); }}
+              />
+            </div>
           </div>
 
-          <div className="rounded-md border border-gray-200 p-0 sm:p-2">
+          <div className="flex-1 overflow-auto rounded-md border border-gray-200">
             <Table>
               <TableHeader>
                 <TableRow style={{ background: 'linear-gradient(to right, #f0fdf4, #f0fdfa)' }}>
                   <TableHead className="font-semibold text-gray-700 text-[8px] sm:text-sm" style={{ padding: '8px 5px' }}>Customer</TableHead>
                   <TableHead className="font-semibold text-gray-700 text-[8px] sm:text-sm hidden md:table-cell" style={{ padding: '8px 5px' }}>Contact</TableHead>
                   <TableHead className="font-semibold text-gray-700 text-[8px] sm:text-sm hidden lg:table-cell" style={{ padding: '8px 5px' }}>Joined</TableHead>
-                  <TableHead className="font-semibold text-gray-700 text-[8px] sm:text-sm " style={{ padding: '8px 5px' }}>Orders</TableHead>
+                  <TableHead className="font-semibold text-gray-700 text-[8px] sm:text-sm text-center" style={{ padding: '8px 5px' }}>Orders</TableHead>
                   <TableHead className="font-semibold text-gray-700 text-[8px] sm:text-sm" style={{ padding: '8px 5px' }}>Total Spent</TableHead>
                   <TableHead className="font-semibold text-gray-700 text-[8px] sm:text-sm" style={{ padding: '8px 5px' }}>Status</TableHead>
                   <TableHead className="text-right font-semibold text-gray-700 text-[8px] sm:text-sm" style={{ padding: '8px 5px' }}>Actions</TableHead>
@@ -163,22 +167,19 @@ const CustomersList = () => {
                   </TableRow>
                 ) : !Array.isArray(customers) || customers.length === 0 ? (
                   <TableRow>
-                    <TableCell colSpan={7} className="h-24 text-center text-gray-500 text-[8px] sm:text-sm">
+                     <TableCell colSpan={7} className="h-24 text-center text-gray-500 text-[8px] sm:text-sm">
                       {searchQuery ? `No customers found matching "${searchQuery}"` : 'No customers found.'}
                     </TableCell>
                   </TableRow>
                  ) : (
-                  // ✅ DEFENSIVE: Extra safety check before mapping
-                  customers.map((customer) => {
-                    if (!customer || !customer.id) {
-                      console.warn('Invalid customer object:', customer);
-                      return null;
-                    }
+                  customers.slice((currentPage - 1) * itemsPerPage, currentPage * itemsPerPage).map((customer) => {
+                    if (!customer || !customer.id) return null;
 
                     return (
                       <TableRow 
                         key={customer.id} 
                         className="hover:bg-emerald-50/50 transition-all duration-200 border-b border-gray-100"
+                        onClick={() => navigate(`/admin/customers/${customer.id}`)}
                       >
                         <TableCell className="" style={{ padding: '8px 5px' }}>
                           <div className="flex items-center gap-2 sm:gap-3">
@@ -201,7 +202,7 @@ const CustomersList = () => {
                             </div>
                           </div>
                         </TableCell>
-                        <TableCell className="text-gray-500 text-[8px] sm:text-sm hidden lg:table-cell text" style={{ padding: '8px 5px' }}>
+                        <TableCell className="text-gray-500 text-[8px] sm:text-sm hidden lg:table-cell" style={{ padding: '8px 5px' }}>
                           {customer.joined || 'N/A'}
                         </TableCell>
                         <TableCell className="text-gray-900 font-medium text-[8px] sm:text-sm text-center" style={{ padding: '8px 5px' }}>
@@ -215,14 +216,14 @@ const CustomersList = () => {
                             {customer.status || 'Unknown'}
                           </Badge>
                         </TableCell>
-                        <TableCell className="text-right" style={{ padding: '10px' }}>
+                        <TableCell className="text-right" style={{ padding: '8px 5px' }}>
                           <Button 
                             variant="ghost" 
                             size="sm" 
                             className="text-[8px] sm:text-sm h-7 sm:h-8"
-                            onClick={() => navigate(`/admin/customers/${customer.id}`)}
+                            onClick={(e) => { e.stopPropagation(); navigate(`/admin/customers/${customer.id}`); }}
                           >
-                            <span className="hidden sm:inline">Details</span>
+                            <span className="hidden sm:inline" style={{marginTop:'3px', paddingRight:'3px'}}>Details</span>
                             <ArrowRight className="h-3 w-3 sm:h-4 sm:w-4 sm:ml-2" />
                           </Button>
                         </TableCell>
@@ -232,7 +233,23 @@ const CustomersList = () => {
                 )}
               </TableBody>
             </Table>
+            
           </div>
+            
+          {!isLoading && customers.length > 0 && (
+            <div className="shrink-0 mt-4 border-t pt-4">
+              <Pagination
+                currentPage={currentPage}
+                totalPages={Math.ceil(customers.length / itemsPerPage)}
+                onPageChange={page => setCurrentPage(page)}
+                itemsPerPage={itemsPerPage}
+                onItemsPerPageChange={(val) => {
+                    setItemsPerPage(val);
+                    setCurrentPage(1);
+                }}
+              />
+            </div>
+          )}
         </CardContent>
       </Card>
     </div>

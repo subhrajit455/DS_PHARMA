@@ -15,6 +15,7 @@ import {
   TableRow,
 } from '../../components/ui/Table';
 import { productService } from '../../api/productService';
+import { Pagination } from '../../components/ui/Pagination';
 
 const ProductsList = () => {
   const navigate = useNavigate();
@@ -28,6 +29,8 @@ const ProductsList = () => {
   const [maxPrice, setMaxPrice] = useState('');
   const [stockFilter, setStockFilter] = useState('all'); // all, in_stock, out_of_stock
   const [showFilters, setShowFilters] = useState(false);
+  const [currentPage, setCurrentPage] = useState(1);
+  const [itemsPerPage, setItemsPerPage] = useState(10);
 
   // Categories for dropdown (In real app, fetch from API)
   const categories = ["All", "Fever & Pain", "Antibiotics", "Vitamins & Supplements", "Stomach Care", "Skin Care", "Devices"];
@@ -96,7 +99,7 @@ const ProductsList = () => {
   }
 
   return (
-        <div className="space-y-4 sm:space-y-6 min-h-screen" style={{ padding: '10px', background: 'linear-gradient(135deg, #f0fdf4 0%, #ecfdf5 50%, #f0fdfa 100%)' }}>
+        <div className="flex flex-col h-full space-y-4 sm:space-y-6" style={{ padding: '10px', background: 'linear-gradient(135deg, #f0fdf4 0%, #ecfdf5 50%, #f0fdfa 100%)' }}>
             <div className="flex flex-row justify-between items-start sm:items-center gap-3 sm:gap-4" style={{ paddingBottom: '10px' }}>
                 <div>
                     <h2 className="text-xl sm:text-2xl md:text-3xl font-bold tracking-tight">Products</h2>
@@ -107,8 +110,8 @@ const ProductsList = () => {
                 </Button>
             </div>
 
-            <Card>
-                <CardContent className="p-2 sm:p-3 md:p-4 lg:p-6 space-y-2 sm:space-y-3 md:space-y-4" style={{ padding: '5px' }}>
+            <Card className="flex-1 flex flex-col overflow-hidden">
+                <CardContent className="flex flex-col h-full p-2 sm:p-3 md:p-4 lg:p-6 space-y-2 sm:space-y-3 md:space-y-4 overflow-hidden" style={{ padding: '5px' }}>
                     {/* Filters & Search Bar */}
                     <div className="flex flex-col gap-3">
                         <div className="flex flex-row gap-2 sm:gap-4" style={{ paddingBottom: '5px' }}>
@@ -118,7 +121,7 @@ const ProductsList = () => {
                                     placeholder="Search by name, generic name, or SKU..."
                                     className="pl-8 sm:pl-9 text-[8px] sm:text-sm h-9 sm:h-10"
                                     value={searchQuery}
-                                    onChange={(e) => setSearchQuery(e.target.value)}
+                                    onChange={(e) => { setSearchQuery(e.target.value); setCurrentPage(1); }}
                                     style={{ padding: '15px' }}
                                 />
                             </div>
@@ -200,7 +203,7 @@ const ProductsList = () => {
                     </div>
 
                     {/* Products Table */}
-                    <div className="rounded-md border border-gray-200 p-2 overflow-x-auto">
+                    <div className="flex-1 overflow-auto rounded-md border border-gray-200">
                         <Table>
                             <TableHeader>
                                 <TableRow style={{ background: 'linear-gradient(to right, #f0fdf4, #f0fdfa)' }}>
@@ -224,7 +227,7 @@ const ProductsList = () => {
                                         </TableCell>
                                     </TableRow>
                                 ) : products.length > 0 ? (
-                                    products.map((product, index) => (
+                                    products.slice((currentPage - 1) * itemsPerPage, currentPage * itemsPerPage).map((product, index) => (
                                         <TableRow 
                                             key={product.id}
                                             className="hover:bg-emerald-50/50 transition-all duration-200 border-b border-gray-100 group"
@@ -277,6 +280,21 @@ const ProductsList = () => {
                             </TableBody>
                         </Table>
                     </div>
+
+                    {!isLoading && products.length > 0 && (
+                        <div className="shrink-0 mt-auto border-t pt-4">
+                        <Pagination
+                            currentPage={currentPage}
+                            totalPages={Math.ceil(products.length / itemsPerPage)}
+                            onPageChange={page => setCurrentPage(page)}
+                            itemsPerPage={itemsPerPage}
+                            onItemsPerPageChange={(val) => {
+                                setItemsPerPage(val);
+                                setCurrentPage(1);
+                            }}
+                        />
+                        </div>
+                    )}
                 </CardContent>
             </Card>
         </div>

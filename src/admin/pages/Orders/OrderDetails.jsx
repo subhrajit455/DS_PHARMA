@@ -15,6 +15,7 @@ import {
   TableRow,
 } from '../../components/ui/Table';
 import { orderService } from '../../api/orderService';
+import ConfirmationModal from '../../components/ui/ConfirmationModal';
 
 const OrderDetails = () => {
   const { id } = useParams();
@@ -23,6 +24,9 @@ const OrderDetails = () => {
   const [order, setOrder] = useState(null);
   const [isLoading, setIsLoading] = useState(true);
   const [isUpdating, setIsUpdating] = useState(false);
+
+  const [isModalOpen, setIsModalOpen] = useState(false);
+  const [pendingStatus, setPendingStatus] = useState(null);
 
   const statusOptions = ['Order Placed', 'Confirmed', 'In Process', 'Waiting For Pick Up', 'On the Way', 'Out For Delivery', 'Delivered', 'Returned', 'Cancelled'];
 
@@ -42,21 +46,27 @@ const OrderDetails = () => {
     fetchOrder();
   }, [id, navigate]);
 
-  const handleStatusChange = async (newStatus) => {
+
+
+  const confirmStatusUpdate = async () => {
+    if (!pendingStatus) return;
+    
     setIsUpdating(true);
     try {
-      await orderService.updateOrderStatus(id, newStatus);
-      setOrder(prev => ({ ...prev, status: newStatus }));
+      await orderService.updateOrderStatus(id, pendingStatus);
+      setOrder(prev => ({ ...prev, status: pendingStatus }));
       
       // Invalidate orders list
       await queryClient.invalidateQueries({ queryKey: ['orders'] });
       
-      toast.success(`Order updated to ${newStatus}`);
+      toast.success(`Order updated to ${pendingStatus}`);
+      setPendingStatus(null); // Clear pending status on success
     } catch (error) {
       console.error(error);
       toast.error('Failed to update status');
     } finally {
       setIsUpdating(false);
+      setIsModalOpen(false);
     }
   };
 
@@ -76,17 +86,17 @@ const OrderDetails = () => {
            <p className="text-gray-500 text-sm mt-1">{order.date} • {order.items?.length || 0} Items</p>
         </div>
         
-        <div className="flex items-center gap-2 bg-white p-2">
-           <span className="text-lg font-bold text-gray-900 pl-2" style={{ marginTop: '2px', padding: '10px 0px' }}>Status:</span>
+        <div className="flex items-center gap-2 bg-white p-2 border rounded-lg shadow-sm">
+           <span className="text-sm font-semibold text-gray-700 pl-2">Status:</span>
            <select 
              className="bg-gray-50 border border-gray-200 text-gray-700 text-sm rounded-md focus:ring-emerald-500 focus:border-emerald-500 block p-2 outline-none"
-             value={order.status}
-             onChange={(e) => handleStatusChange(e.target.value)}
+             value={pendingStatus || order.status}
+             onChange={(e) => setPendingStatus(e.target.value)}
              disabled={isUpdating}
-             style={{ padding: '8px 0px' }}
+             style={{ padding: '8px' }}
            >
-             {statusOptions.map(status => (
-               <option key={status} value={status}>{status}</option>
+             {statusOptions.map(option => (
+               <option key={option} value={option}>{option}</option>
              ))}
            </select>
         </div>
@@ -200,6 +210,37 @@ const OrderDetails = () => {
            </Card>
         </div>
       </div>
+      
+      {/* Sticky Bottom Bar for Update Action */}
+      {pendingStatus && pendingStatus !== order.status && (
+          <div className="fixed bottom-0 right-0 left-0 lg:left-64 bg-white border-t border-gray-200 p-4 shadow-[0_-4px_6px_-1px_rgba(0,0,0,0.1)] z-40 animate-in slide-in-from-bottom-5">
+              <div className="flex justify-between items-center max-w-7xl mx-auto px-4">
+                  <span className="text-sm text-gray-600 hidden sm:block">
+                      Status change: <span className="font-semibold text-gray-900">{order.status}</span> → <span className="font-semibold text-emerald-600">{pendingStatus}</span>
+                  </span>
+                  <div className="flex items-center gap-4 ml-auto sm:ml-0">
+                      <Button variant="ghost" onClick={() => setPendingStatus(null)}>Cancel</Button>
+                      <Button 
+                        onClick={() => setIsModalOpen(true)}
+                        className="bg-emerald-600 hover:bg-emerald-700 text-white shadow-md hover:shadow-lg transition-all"
+                      >
+                        Update Status
+                      </Button>
+                  </div>
+              </div>
+          </div>
+      )}
+
+      
+      <ConfirmationModal 
+        isOpen={isModalOpen}
+        onClose={() => setIsModalOpen(false)}
+        onConfirm={confirmStatusUpdate}
+        title="Update Order Status"
+        message={`Are you sure you want to change the order status to "${pendingStatus}"? This will notify the customer.`}
+        confirmText="Update Status"
+        isLoading={isUpdating}
+      />
     </div>
   );
 };

@@ -109,14 +109,14 @@ const ForgotPasswordPage = () => {
                     {isLoading ? 'Sending Link...' : 'Send Reset Link'}
                 </Button>
 
-                <div className="text-center">
+                <div className="text-center" style={{ marginBottom: '10px' }}>
                     <Link
                         to="/login"
-                        className="sm:hidden inline-flex items-center text-sm font-medium text-gray-600 hover:text-gray-900"
-                        style={{textDecoration:'none'}}
+                        className="inline-flex items-center justify-center w-auto px-4 py-2 text-sm font-medium text-gray-700 bg-white border border-gray-300 rounded-full hover:bg-gray-50"
+                        style={{textDecoration:'none', padding:'1px 10px'}}
                     >
                         <ArrowLeft className="w-4 h-4 mr-2" />
-                        <p style={{ padding: '5px 0px', marginTop: '3px' }}>Back to Sign In</p>
+                        <span style={{ padding: '0px 5px', marginTop: '3px' }}>Back to Login</span>
                     </Link>
                 </div>
             </form>

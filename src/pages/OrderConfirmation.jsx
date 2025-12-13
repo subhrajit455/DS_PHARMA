@@ -42,7 +42,14 @@ const OrderConfirmation = () => {
     }
 
     return (
-        <div className="min-h-screen bg-linear-to-br from-emerald-50 via-teal-50 to-cyan-50 py-12 px-4">
+        <div className="min-h-screen bg-linear-to-br from-emerald-50 via-teal-50 to-cyan-50 py-12 px-4 relative">
+            <Button 
+                variant="ghost" 
+                onClick={() => navigate('/')} 
+                className="absolute top-4 left-4 text-gray-600 hover:text-emerald-600 flex items-center gap-2"
+            >
+                <ArrowRight className="w-4 h-4 rotate-180" /> Back to Home
+            </Button>
             <div className="max-w-4xl mx-auto" style={{ width: '100%', margin: '0 auto', paddingTop: '2rem' }}>
                 <Motion.div
                     initial={{ opacity: 0, scale: 0.9 }}

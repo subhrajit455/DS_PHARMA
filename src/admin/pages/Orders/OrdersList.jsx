@@ -15,6 +15,7 @@ import {
   TableRow,
 } from '../../components/ui/Table';
 import { orderService } from '../../api/orderService';
+import { Pagination } from '../../components/ui/Pagination';
 
 const OrdersList = () => {
   const navigate = useNavigate();
@@ -22,6 +23,8 @@ const OrdersList = () => {
   const [isLoading, setIsLoading] = useState(true);
   const [activeStatus, setActiveStatus] = useState('All');
   const [searchQuery, setSearchQuery] = useState('');
+  const [currentPage, setCurrentPage] = useState(1);
+  const [itemsPerPage, setItemsPerPage] = useState(10);
 
   const statuses = ['All', 'Processing', 'Shipped', 'Delivered', 'Cancelled'];
 
@@ -55,17 +58,17 @@ const OrdersList = () => {
   };
 
   return (
-    <div className="space-y-6 min-h-screen" style={{ padding: '5px', background: 'linear-gradient(135deg, #f0fdf4 0%, #ecfdf5 50%, #f0fdfa 100%)' }}>
-      <div className="flex flex-col sm:flex-row justify-between items-start sm:items-center gap-3 sm:gap-4">
+    <div className="h-full flex flex-col space-y-4 p-2 sm:p-4 bg-gradient-to-br from-gray-50 via-emerald-50/20 to-teal-50/30">
+      <div className="flex flex-col sm:flex-row justify-between items-start sm:items-center gap-3 sm:gap-4 shrink-0">
         <div>
            <h2 className="text-xl sm:text-2xl md:text-3xl font-bold tracking-tight">Orders</h2>
            <p className="text-gray-500 text-[10px] sm:text-[8px] sm:text-xs md:text-sm mt-0.5">Manage and track customer orders</p>
         </div>
       </div>
 
-      <Card>
-        <CardContent className="p-2 sm:p-3 md:p-4 lg:p-6 space-y-2 sm:space-y-3 md:space-y-4">
-            <div className="flex flex-col lg:flex-row gap-2 sm:gap-3 md:gap-4 justify-between items-center mb-2 sm:mb-3 md:mb-4" style={{ paddingBottom: '5px' }}>
+      <Card className="flex-1 flex flex-col min-h-0 shadow-sm border-gray-200/60 bg-white/50 backdrop-blur-xl">
+        <CardContent className="flex-1 flex flex-col p-2 sm:p-3 md:p-4 min-h-0">
+            <div className="flex flex-col lg:flex-row gap-2 sm:gap-3 md:gap-4 justify-between items-center mb-2 sm:mb-3 md:mb-4 shrink-0" style={{ paddingBottom: '5px' }}>
                 {/* Status Tabs */}
                 <div className="flex gap-1 sm:gap-2 p-1 bg-gray-100 rounded-lg overflow-x-auto max-w-full no-scrollbar">
                 {statuses.map(status => (
@@ -91,12 +94,12 @@ const OrdersList = () => {
                         placeholder="Search Order..." 
                         className="pl-8 sm:pl-9 text-[8px] sm:text-sm h-9 sm:h-10"
                         value={searchQuery}
-                        onChange={(e) => setSearchQuery(e.target.value)}
+                        onChange={(e) => { setSearchQuery(e.target.value); setCurrentPage(1); }}
                     />
                 </div>
             </div>
 
-            <div className="rounded-md border border-gray-200 p-0 sm:p-2">
+            <div className="flex-1 overflow-auto rounded-md border border-gray-200">
                  <Table>
                     <TableHeader>
                         <TableRow style={{ background: 'linear-gradient(to right, #f0fdf4, #f0fdfa)' }}>
@@ -116,7 +119,7 @@ const OrdersList = () => {
                                 <TableCell colSpan={8} className="h-24 text-center">Loading orders...</TableCell>
                             </TableRow>
                         ) : orders.length > 0 ? (
-                            orders.map((order, index) => (
+                            orders.slice((currentPage - 1) * itemsPerPage, currentPage * itemsPerPage).map((order) => (
                                 <TableRow 
                                     key={order.id} 
                                     className="hover:bg-emerald-50/50 cursor-pointer transition-all duration-200 border-b border-gray-100"
@@ -156,6 +159,20 @@ const OrdersList = () => {
                     </TableBody>
                  </Table>
             </div>
+            {!isLoading && orders.length > 0 && (
+              <div className="shrink-0 mt-4 border-t pt-4">
+                <Pagination
+                  currentPage={currentPage}
+                  totalPages={Math.ceil(orders.length / itemsPerPage)}
+                  onPageChange={page => setCurrentPage(page)}
+                  itemsPerPage={itemsPerPage}
+                  onItemsPerPageChange={(val) => {
+                      setItemsPerPage(val);
+                      setCurrentPage(1);
+                  }}
+                />
+              </div>
+            )}
         </CardContent>
       </Card>
     </div>

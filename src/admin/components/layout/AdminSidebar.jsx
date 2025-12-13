@@ -1,5 +1,5 @@
 import React from 'react';
-import { NavLink, useLocation } from 'react-router-dom';
+import { NavLink, useLocation, useNavigate } from 'react-router-dom';
 import { 
   LayoutDashboard, 
   Package, 
@@ -10,24 +10,34 @@ import {
   Menu,
   LogOut,
   Sparkles,
-  Megaphone
+  Megaphone,
+  Tags,
+  Star
 } from 'lucide-react';
 import { cn } from '../../utils/cn';
 import { Button } from '../ui/Button';
+import useDataStore from '../../../store/useDataStore';
 
 const AdminSidebar = ({ isCollapsed, toggleCollapse, isMobile, onCloseMobile }) => {
   const location = useLocation();
+  const navigate = useNavigate();
+  const { logout } = useDataStore();
 
   const navigation = [
     { name: 'Dashboard', href: '/admin/dashboard', icon: LayoutDashboard },
-    { name: 'Products', href: '/admin/products', icon: Package },
     { name: 'Orders', href: '/admin/orders', icon: ShoppingCart },
+    { name: 'Products', href: '/admin/products', icon: Package },
+    { name: 'Categories', href: '/admin/categories', icon: Tags },
+    { name: 'Featured', href: '/admin/products/featured', icon: Star },
     { name: 'Customers', href: '/admin/customers', icon: Users },
     { name: 'Announcements', href: '/admin/announcements', icon: Megaphone },
   ];
 
   const NavItem = ({ item }) => {
-    const isActive = location.pathname.startsWith(item.href);
+    const isActive = 
+      location.pathname === item.href || 
+      (location.pathname.startsWith(item.href) && 
+       (item.href !== '/admin/products' || !location.pathname.startsWith('/admin/products/featured')));
     return (
       <NavLink
         to={item.href}
@@ -63,6 +73,11 @@ const AdminSidebar = ({ isCollapsed, toggleCollapse, isMobile, onCloseMobile }) 
         </span>
       </NavLink>
     );
+  };
+
+  const handleLogout = () => {
+      logout();
+      navigate('/login');
   };
 
   return (
@@ -124,6 +139,7 @@ const AdminSidebar = ({ isCollapsed, toggleCollapse, isMobile, onCloseMobile }) 
       {/* Footer */}
       <div className="border-t border-slate-800/50 p-4 bg-gradient-to-t from-slate-950 to-transparent" >
         <button 
+            onClick={handleLogout}
             className={cn(
                 "flex items-center w-full rounded-xl px-3 py-3 text-sm font-medium text-slate-400 hover:bg-red-500/10 hover:text-red-400 transition-all duration-200 group",
                 isCollapsed && !isMobile ? "justify-center" : "space-x-3"

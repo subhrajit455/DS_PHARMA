@@ -1,6 +1,6 @@
 import React, { useState, useEffect } from 'react';
 import { useNavigate, useParams } from 'react-router-dom';
-import { Save, ArrowLeft, Upload } from 'lucide-react';
+import { Save, ArrowLeft, Upload, Package, Tag, DollarSign, Box } from 'lucide-react';
 import { toast } from 'react-hot-toast';
 import { useQueryClient } from '@tanstack/react-query';
 import { productService } from '../../api/productService';
@@ -8,6 +8,7 @@ import { Button } from '../../components/ui/Button';
 import { Input } from '../../components/ui/Input';
 import { Label } from '../../components/ui/Label';
 import { Card, CardContent, CardHeader, CardTitle, CardDescription } from '../../components/ui/Card';
+import ConfirmationModal from '../../components/ui/ConfirmationModal';
 
 const ProductForm = () => {
   const navigate = useNavigate();
@@ -16,6 +17,8 @@ const ProductForm = () => {
   const isEditMode = Boolean(id);
   const [isLoading, setIsLoading] = useState(false);
   
+  const [isModalOpen, setIsModalOpen] = useState(false);
+
   const [formData, setFormData] = useState({
     name: '',
     sku: '',
@@ -57,8 +60,12 @@ const ProductForm = () => {
     setFormData(prev => ({ ...prev, [name]: value }));
   };
 
-  const handleSubmit = async (e) => {
+  const handleSubmit = (e) => {
     e.preventDefault();
+    setIsModalOpen(true);
+  };
+
+  const handleConfirm = async () => {
     setIsLoading(true);
 
     try {
@@ -76,6 +83,7 @@ const ProductForm = () => {
       toast.error(error.message || 'Failed to save product');
     } finally {
       setIsLoading(false);
+      setIsModalOpen(false);
     }
   };
 
@@ -112,6 +120,7 @@ const ProductForm = () => {
                                 className="text-[12px] h-10 sm:h-auto"
                                 value={formData.name}
                                 onChange={handleChange}
+                                icon={Package}
                                 style={{ padding: '10px 5px' }}
                              />
                         </div>
@@ -126,6 +135,7 @@ const ProductForm = () => {
                                     placeholder="e.g. MED-001"
                                     value={formData.sku}
                                     onChange={handleChange}
+                                    icon={Tag}
                                     style={{ padding: '10px 5px' }}
                                 />
                             </div>
@@ -205,6 +215,7 @@ const ProductForm = () => {
                                 step="0.01"
                                 value={formData.price}
                                 onChange={handleChange}
+                                icon={DollarSign}
                                 style={{ padding: '20px 10px' }}
                              />
                         </div>
@@ -218,6 +229,7 @@ const ProductForm = () => {
                                 min="0"
                                 value={formData.stock}
                                 onChange={handleChange}
+                                icon={Box}
                                 style={{ padding: '20px 10px' }}
                              />
                         </div>
@@ -251,6 +263,16 @@ const ProductForm = () => {
            </Button>
         </div>
       </form>
+      
+      <ConfirmationModal 
+        isOpen={isModalOpen}
+        onClose={() => setIsModalOpen(false)}
+        onConfirm={handleConfirm}
+        title={isEditMode ? "Update Product" : "Create Product"}
+        message={isEditMode ? "Are you sure you want to update this product details?" : "Are you sure you want to create this new product?"}
+        confirmText={isEditMode ? "Update" : "Create"}
+        isLoading={isLoading}
+      />
     </div>
   );
 };

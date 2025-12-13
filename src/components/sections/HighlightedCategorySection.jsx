@@ -10,8 +10,8 @@ import ErrorState from '@/components/common/ErrorState';
 const HighlightedCategorySection = () => {
   const navigate = useNavigate();
   
-  // Fetch highlighted category
-  const { data, isLoading, isError } = useProducts({ category: "Diabetes Care", limit: 5 });
+  // Fetch highlighted products
+  const { data, isLoading, isError } = useProducts({ isHighlighted: true, limit: 10 });
   
   const products = (data?.data || []).map(p => ({
      ...p,
@@ -53,7 +53,7 @@ const HighlightedCategorySection = () => {
   };
 
   const handleViewAll = () => {
-    navigate('/category/Diabetes%20Care');
+    navigate('/products?highlighted=true');
   };
 
   return (
@@ -109,7 +109,7 @@ const HighlightedCategorySection = () => {
                 lineHeight: '1.2',
               }}
             >
-              Diabetes Care Bundle
+              Featured Products
             </span>
           </h2>
           <button

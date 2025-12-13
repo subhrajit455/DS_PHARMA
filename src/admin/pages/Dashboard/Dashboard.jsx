@@ -18,7 +18,7 @@ import { customerService } from '../../api/customerService';
 
 const StatCard = ({ title, value, trend, trendUp, description, gradient, icon: Icon }) => {
   // Ensure Icon is a valid component - provide fallback
-  const IconComponent = Icon && typeof Icon === 'function' ? Icon : Package;
+  const IconComponent = Icon || Package;
   
   return (
     <Card variant="gradient" className="relative overflow-hidden group" >
@@ -82,7 +82,16 @@ const Dashboard = () => {
         });
 
         // Recent Orders
-        const sortedOrders = [...ordersData].reverse().slice(0, 5);
+        // Sort by date descending (handle ISO strings or DD MMM YYYY)
+        const sortedOrders = [...ordersData].sort((a, b) => {
+             const dateA = new Date(a.createdAt || a.date);
+             const dateB = new Date(b.createdAt || b.date);
+             if (dateB.getTime() !== dateA.getTime()) {
+                 return dateB.getTime() - dateA.getTime();
+             }
+             // Fallback to ID if dates equal (handle string IDs)
+             return String(b.id).localeCompare(String(a.id), undefined, { numeric: true });
+        }).slice(0, 5);
         setRecentOrders(sortedOrders);
       } catch (error) {
         console.error('Failed to load dashboard data', error);
@@ -118,7 +127,7 @@ const Dashboard = () => {
   }
 
   return (
-    <div className="space-y-4 sm:space-y-6 lg:space-y-8 animate-in fade-in slide-in-from-bottom-6 duration-700 min-h-screen" style={{ padding: '5px', background: 'linear-gradient(135deg, #f0fdf4 0%, #ecfdf5 50%, #f0fdfa 100%)' }}>
+    <div className="flex-1 overflow-y-auto h-full space-y-4 sm:space-y-6 lg:space-y-8 animate-in fade-in slide-in-from-bottom-6 duration-700 p-2 sm:p-4 lg:p-6" style={{ background: 'linear-gradient(135deg, #f0fdf4 0%, #ecfdf5 50%, #f0fdfa 100%)' }}>
       {/* Header with gradient text */}
       <div className="flex flex-col sm:flex-row justify-between items-start sm:items-center gap-2 sm:gap-4" style={{ padding: '5px' }}>
         <div>
@@ -208,14 +217,14 @@ const Dashboard = () => {
                         onClick={() => navigate(`/admin/orders/${order.id}`)}
                       >
                         <TableCell className="font-bold text-gray-900 text-[8px] sm:text-sm" style={{ padding: '10px 2px' }}>#{order.id}</TableCell>
-                        <TableCell className="text-gray-700 font-medium text-[8px] sm:text-sm table-cell" style={{ padding: '12px 8px' }}>{order.customerName}</TableCell>
+                        <TableCell className="text-gray-700 font-medium text-[8px] sm:text-sm table-cell" style={{ padding: '12px 8px' }}>{order.customer || order.customerName}</TableCell>
                         <TableCell style={{ padding: '12px 8px' }}>
                           <Badge variant={getStatusVariant(order.status)} glow className="text-[8px] sm:text-xs">
                             {order.status}
                           </Badge>
                         </TableCell>
                         <TableCell className="text-right font-bold text-gray-900 text-[8px] sm:text-sm" style={{ padding: '10px 5px' }}>
-                          ₹{order.paymentBreakdown?.total || order.price}
+                          ₹{order.total || order.paymentBreakdown?.total || order.price}
                         </TableCell>
                       </TableRow>
                     ))}

@@ -51,6 +51,8 @@ function App() {
             <Route path="/profile" element={<UserProfile />} />
 
 
+              <Route path="/order-confirmation/:orderId" element={<OrderConfirmation />} />
+
             {/* Protected/Main Routes (With Layout) */}
             <Route element={<Layout />}>
               <Route path="/" element={<Home />} />
@@ -60,7 +62,6 @@ function App() {
               <Route path="/orders" element={<Orders />} />
               <Route path="/orders/:id" element={<OrderDetails />} />
               <Route path="/search" element={<SearchPage />} />
-              <Route path="/order-confirmation/:orderId" element={<OrderConfirmation />} />
 
             </Route>
 

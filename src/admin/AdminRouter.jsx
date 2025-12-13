@@ -1,7 +1,6 @@
 import React from 'react';
 import { Routes, Route, Navigate } from 'react-router-dom';
 import AdminLayout from './components/layout/AdminLayout';
-import AdminLogin from './pages/Login/AdminLogin';
 import Dashboard from './pages/Dashboard/Dashboard';
 import ProductsList from './pages/Products/ProductsList';
 import ProductForm from './pages/Products/ProductForm';
@@ -14,12 +13,12 @@ import AnnouncementsList from './pages/Announcements/AnnouncementsList';
 import BannerForm from './pages/Announcements/BannerForm';
 import MarqueeForm from './pages/Announcements/MarqueeForm';
 import AlertForm from './pages/Announcements/AlertForm';
+import CategoriesList from './pages/Categories/CategoriesList';
+import FeaturedProducts from './pages/Products/FeaturedProducts';
 
 const AdminRouter = () => {
   return (
     <Routes>
-      <Route path="/login" element={<AdminLogin />} />
-      
       <Route element={<AdminLayout />}>
         <Route index element={<Navigate to="/admin/dashboard" replace />} />
         <Route path="dashboard" element={<Dashboard />} />
@@ -27,8 +26,12 @@ const AdminRouter = () => {
         {/* Products */}
         <Route path="products" element={<ProductsList />} />
         <Route path="products/new" element={<ProductForm />} />
+        <Route path="products/featured" element={<FeaturedProducts />} />
         <Route path="products/:id" element={<ProductDetails />} />
         <Route path="products/:id/edit" element={<ProductForm />} />
+        
+        {/* Categories */}
+        <Route path="categories" element={<CategoriesList />} />
         
         {/* Orders */}
         <Route path="orders" element={<OrdersList />} />

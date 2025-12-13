@@ -61,8 +61,8 @@ const InputField = ({
                 <div className="relative">
                     {/* Icon on the left */}
                     {hasIcon && (
-                        <div className="absolute left-3 top-[20px] -translate-y-1/2 text-gray-400 pointer-events-none z-10">
-                            <FieldIcon size={22} />
+                        <div className="absolute left-3 top-[19px] -translate-y-1/2 text-gray-400 pointer-events-none z-10">
+                            <FieldIcon size={18} />
                         </div>
                     )}
                     
