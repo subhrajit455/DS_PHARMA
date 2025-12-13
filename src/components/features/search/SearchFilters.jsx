@@ -95,7 +95,7 @@ const FilterSection = ({ title, icon: Icon, isOpen, onToggle, children }) => {
    );
 };
 
-export const SearchFilters = ({ filters, selectedFilters, onFilterChange, onViewAll, className = '' }) => {
+export const SearchFilters = ({ filters = {}, selectedFilters = {}, onFilterChange = () => {}, onViewAll, className = '' }) => {
   const [openSections, setOpenSections] = useState({
      categories: true,
      price: true,
@@ -107,7 +107,12 @@ export const SearchFilters = ({ filters, selectedFilters, onFilterChange, onView
      setOpenSections(prev => ({...prev, [section]: !prev[section]}));
   };
 
-  const categories = filters?.categories || ['Antibiotics', 'Fever & Pain', 'Supplements', 'First Aid'];
+  // Ensure categories is always an array
+  const categories = Array.isArray(filters?.categories) 
+    ? filters.categories 
+    : (filters?.categories && typeof filters.categories === 'object' 
+        ? Object.values(filters.categories) 
+        : ['Antibiotics', 'Fever & Pain', 'Supplements', 'First Aid']);
   const priceRanges = [
     { label: 'Under ₹100', value: '0-100' },
     { label: '₹100 - ₹500', value: '100-500' },

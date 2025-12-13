@@ -40,10 +40,12 @@ const SearchPage = () => {
           page: 1,
           limit: 50
         });
-        setProducts(response.data.products);
-        setFacets(response.data.facets);
+        setProducts(response?.data?.products || []);
+        setFacets(response?.data?.facets || {});
       } catch (error) {
         console.error('Search failed:', error);
+        setProducts([]); // Reset to empty array on error
+        setFacets({}); // Reset facets on error
       } finally {
         setIsLoading(false);
       }

@@ -16,35 +16,40 @@ import { productService } from '../../api/productService';
 import { orderService } from '../../api/orderService';
 import { customerService } from '../../api/customerService';
 
-const StatCard = ({ title, value, icon: Icon, trend, trendUp, description, gradient }) => (
-  <Card variant="gradient" className="relative overflow-hidden group" >
-    {/* Gradient background for icon */}
-    <div className={`absolute top-0 right-0 w-32 h-32 ${gradient} opacity-10 rounded-full blur-3xl group-hover:opacity-20 transition-opacity`} />
-    
-    <CardHeader className="flex flex-row items-center justify-between space-y-0 pb-2 sm:pb-3 relative z-10">
-      <CardTitle className="text-[8px] sm:text-sm font-semibold text-gray-700">
-        {title}
-      </CardTitle>
-      <div className={`p-2 sm:p-3 rounded-xl bg-opacity-10 group-hover:scale-110 transition-transform`}>
-        <Icon className="h-5 w-5 sm:h-6 sm:w-6 text-emerald-700" />
-      </div>
-    </CardHeader>
-    <CardContent className="relative z-10">
-      <div className="text-2xl sm:text-3xl font-bold bg-gradient-to-r from-gray-900 to-gray-700 bg-clip-text text-transparent">
-        {value}
-      </div>
-      <div className="flex items-center mt-2 text-[8px] sm:text-xs">
-        {trend && (
-          <span className={`flex items-center font-semibold ${trendUp ? "text-emerald-600" : "text-red-600"}`}>
-            {trendUp ? <TrendingUp className="h-3 w-3 mr-1"/> : <ArrowDownRight className="h-3 w-3 mr-1"/>}
-            {trend}
-          </span>
-        )}
-        <span className="ml-2 text-gray-500 font-medium">{description || "from last month"}</span>
-      </div>
-    </CardContent>
-  </Card>
-);
+const StatCard = ({ title, value, trend, trendUp, description, gradient, icon: Icon }) => {
+  // Ensure Icon is a valid component - provide fallback
+  const IconComponent = Icon && typeof Icon === 'function' ? Icon : Package;
+  
+  return (
+    <Card variant="gradient" className="relative overflow-hidden group" >
+      {/* Gradient background for icon */}
+      <div className={`absolute top-0 right-0 w-32 h-32 ${gradient} opacity-10 rounded-full blur-3xl group-hover:opacity-20 transition-opacity`} />
+      
+      <CardHeader className="flex flex-row items-center justify-between space-y-0 pb-2 sm:pb-3 relative z-10">
+        <CardTitle className="text-[8px] sm:text-sm font-semibold text-gray-700">
+          {title}
+        </CardTitle>
+        <div className={`p-2 sm:p-3 rounded-xl bg-opacity-10 group-hover:scale-110 transition-transform`}>
+          <IconComponent className="h-5 w-5 sm:h-6 sm:w-6 text-emerald-700" />
+        </div>
+      </CardHeader>
+      <CardContent className="relative z-10">
+        <div className="text-2xl sm:text-3xl font-bold bg-gradient-to-r from-gray-900 to-gray-700 bg-clip-text text-transparent">
+          {value}
+        </div>
+        <div className="flex items-center mt-2 text-[8px] sm:text-xs">
+          {trend && (
+            <span className={`flex items-center font-semibold ${trendUp ? "text-emerald-600" : "text-red-600"}`}>
+              {trendUp ? <TrendingUp className="h-3 w-3 mr-1"/> : <ArrowDownRight className="h-3 w-3 mr-1"/>}
+              {trend}
+            </span>
+          )}
+          <span className="ml-2 text-gray-500 font-medium">{description || "from last month"}</span>
+        </div>
+      </CardContent>
+    </Card>
+  );
+};
 
 const Dashboard = () => {
   const navigate = useNavigate();
@@ -187,7 +192,7 @@ const Dashboard = () => {
                   <TableHeader>
                     <TableRow className="hover:bg-linear-to-r hover:from-emerald-50 hover:to-teal-50" style={{ background: 'linear-gradient(to right, #f0fdf4, #f0fdfa)' }}>
                       <TableHead className="font-semibold text-gray-700 text-[8px] sm:text-sm" style={{ padding: '8px 5px' }}>Order ID</TableHead>
-                      <TableHead className="font-semibold text-gray-700 text-[8px] sm:text-sm hidden sm:table-cell" style={{ padding: '8px 5px' }}>Customer</TableHead>
+                      <TableHead className="font-semibold text-gray-700 text-[8px] sm:text-sm table-cell" style={{ padding: '8px 5px' }}>Customer</TableHead>
                       <TableHead className="font-semibold text-gray-700 text-[8px] sm:text-sm" style={{ padding: '8px 5px' }}>Status</TableHead>
                       <TableHead className="text-right font-semibold text-gray-700 text-[8px] sm:text-sm" style={{ padding: '8px 5px' }}>Amount</TableHead>
                     </TableRow>
@@ -203,7 +208,7 @@ const Dashboard = () => {
                         onClick={() => navigate(`/admin/orders/${order.id}`)}
                       >
                         <TableCell className="font-bold text-gray-900 text-[8px] sm:text-sm" style={{ padding: '10px 2px' }}>#{order.id}</TableCell>
-                        <TableCell className="text-gray-700 font-medium text-[8px] sm:text-sm hidden sm:table-cell" style={{ padding: '12px 8px' }}>{order.customerName}</TableCell>
+                        <TableCell className="text-gray-700 font-medium text-[8px] sm:text-sm table-cell" style={{ padding: '12px 8px' }}>{order.customerName}</TableCell>
                         <TableCell style={{ padding: '12px 8px' }}>
                           <Badge variant={getStatusVariant(order.status)} glow className="text-[8px] sm:text-xs">
                             {order.status}

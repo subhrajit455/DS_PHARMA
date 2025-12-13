@@ -141,10 +141,15 @@ const ProductForm = () => {
                                     style={{ padding: '10px 5px' }}
                                 >
                                     <option value="">Select Category</option>
-                                    <option value="Medicine">Medicine</option>
-                                    <option value="Skincare">Skincare</option>
-                                    <option value="Wellness">Wellness</option>
+                                    <option value="Fever & Pain">Fever & Pain</option>
+                                    <option value="Antibiotics">Antibiotics</option>
+                                    <option value="Vitamins & Supplements">Vitamins & Supplements</option>
+                                    <option value="Diabetes Care">Diabetes Care</option>
+                                    <option value="Skin Care">Skin Care</option>
+                                    <option value="Stomach Care">Stomach Care</option>
+                                    <option value="First Aid">First Aid</option>
                                     <option value="Devices">Devices</option>
+                                    <option value="Personal Care">Personal Care</option>
                                 </select>
                             </div>
                         </div>

@@ -5,16 +5,53 @@ const delay = (ms = 500) => new Promise((resolve) => setTimeout(resolve, ms));
 
 export const mockApi = {
   // --- Products ---
-  getProducts: async ({ category, limit } = {}) => {
+  getProducts: async ({
+    category,
+    limit,
+    query,
+    minPrice,
+    maxPrice,
+    inStock,
+  } = {}) => {
     await delay();
     let products = useDataStore.getState().products;
 
-    if (category) {
+    // Search Query
+    if (query) {
+      const lowerQuery = query.toLowerCase().trim();
+      products = products.filter(
+        (p) =>
+          p.name.toLowerCase().includes(lowerQuery) ||
+          p.genericName?.toLowerCase().includes(lowerQuery) ||
+          p.category?.toLowerCase().includes(lowerQuery)
+      );
+    }
+
+    // Category Filter
+    if (category && category !== "All") {
       const targetCategory = category.toLowerCase().trim();
       products = products.filter(
         (p) => p.category?.toLowerCase().trim() === targetCategory
       );
     }
+
+    // Price Filter
+    if (minPrice !== undefined && minPrice !== null) {
+      products = products.filter((p) => p.price >= Number(minPrice));
+    }
+    if (maxPrice !== undefined && maxPrice !== null) {
+      products = products.filter((p) => p.price <= Number(maxPrice));
+    }
+
+    // Stock Filter
+    if (inStock !== undefined && inStock !== null) {
+      // if inStock is 'true'/'false' string or boolean
+      const stockValue = String(inStock) === "true";
+      products = products.filter((p) => !!p.inStock === stockValue);
+    }
+
+    // Sorting (optional default: newest first if created field existed, currently just id reverse)
+    // products.sort((a,b) => b.id.localeCompare(a.id));
 
     if (limit) {
       products = products.slice(0, limit);

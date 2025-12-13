@@ -13,8 +13,9 @@ import { useProducts } from '@/hooks/queries/useProducts';
 
 
 const CartDetails = () => {
-  // Use global data store for cart items
+  // Use global data store
   const cartItems = useDataStore((state) => state.cart);
+  const currentUser = useDataStore((state) => state.currentUser);
   
   // API Hooks
   const { mutate: updateCartItem } = useUpdateCart();
@@ -28,11 +29,24 @@ const CartDetails = () => {
   const [couponCode, setCouponCode] = useState('');
   const [deliveryAddress, setDeliveryAddress] = useState({
     id: 1,
-    name: 'Gourav Gupta',
-    phone: '+91 98765 43210',
-    address: '123, Tech Park, Sector 5, Bangalore, Karnataka - 560001',
+    name: currentUser?.name || '',
+    phone: currentUser?.phone || '',
+    address: currentUser?.address ? `${currentUser.address.street}, ${currentUser.address.city}, ${currentUser.address.state} - ${currentUser.address.pincode}` : '',
     type: 'Home'
   });
+
+  // Sync address when user loads (e.g. refresh)
+  React.useEffect(() => {
+      if (currentUser) {
+          setDeliveryAddress({
+              id: 1,
+              name: currentUser.name || '',
+              phone: currentUser.phone || '',
+              address: currentUser.address ? `${currentUser.address.street}, ${currentUser.address.city}, ${currentUser.address.state} - ${currentUser.address.pincode}` : '',
+              type: 'Home'
+          });
+      }
+  }, [currentUser]);
 
   const updateQuantity = (id, newQuantity) => {
       // Our refactored hook expects { productId, quantity }
