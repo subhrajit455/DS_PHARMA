@@ -16,13 +16,17 @@ const OrdersList = () => {
     const allOrders = ordersData?.data || [];
     const orders = allOrders.filter(order => 
         order.customerId === currentUser?.id || 
-        order.customerName === currentUser?.name
-    );
+        order.customerName === currentUser?.name ||
+        order.user?.id === currentUser?.id ||
+        order.email === currentUser?.email
+    ).sort((a, b) => b.id - a.id);
 
     if (isLoading) {
         return (
-            <div className="flex justify-center items-center h-[50vh] w-full">
-                <div className="w-8 h-8 border-4 border-teal-500 rounded-full border-t-transparent animate-spin"></div>
+            <div className="space-y-4">
+                {[1, 2, 3].map((i) => (
+                    <div key={i} className="h-32 bg-gray-100 rounded-xl animate-pulse" />
+                ))}
             </div>
         );
     }
@@ -32,6 +36,7 @@ const OrdersList = () => {
             initial={{ opacity: 0, y: 20 }}
             animate={{ opacity: 1, y: 0 }}
             className="bg-white rounded-xl shadow-sm p-4 md:p-8"
+            style={{ height: 'calc(100vh - 200px)', overflowY: 'auto', padding: '10px', scrollbarWidth: 'none', msOverflowStyle: 'none', marginTop: '20px' }}
         >
             <div className="flex justify-between items-center mb-8">
                 <h2 className="text-xl md:text-2xl font-bold" style={{ fontFamily: 'Gyrotrope', color: '#1F2937' }}>
@@ -48,12 +53,13 @@ const OrdersList = () => {
             <div className="space-y-4">
                 {orders.map((order) => (
                     <Motion.div
+                        style={{ marginBottom: '10px' }}
                         key={order.id}
                         whileHover={{ scale: 1.01, boxShadow: '0 10px 25px rgba(0,0,0,0.1)' }}
                         className="border border-gray-200 rounded-xl p-5 transition-all cursor-pointer bg-gradient-to-r from-white to-gray-50"
                         onClick={() => navigate(`/orders/${order.id}`)}
                     >
-                        <div className="flex flex-col md:flex-row md:justify-between md:items-center gap-4">
+                        <div className="flex flex-col md:flex-row md:justify-between md:items-center gap-4" style={{ padding: '5px' }}>
                             <div className="flex-1">
                                 <div className="flex items-center gap-3 mb-2">
                                     <Package className="w-5 h-5 text-teal-600" />
@@ -72,7 +78,7 @@ const OrdersList = () => {
                                         📅 {order.date || order.expectedDelivery}
                                     </span>
                                     <span className="flex items-center gap-1">
-                                        📦 {order.items || 1} items
+                                        📦 {Array.isArray(order.items) ? order.items.length : (order.items || 1)} items
                                     </span>
                                     <span className="flex items-center gap-1 font-semibold text-gray-800">
                                         💰 ₹{(order.total || order.price || 0).toFixed(2)}
@@ -81,6 +87,7 @@ const OrdersList = () => {
                             </div>
                             <div className="flex gap-2 ml-8 md:ml-0">
                                 <button 
+                                    style={{ padding: '2px 10px' }}
                                     onClick={(e) => {
                                         e.stopPropagation();
                                         // Track order logic
@@ -90,6 +97,7 @@ const OrdersList = () => {
                                     Track Order
                                 </button>
                                 <button 
+                                    style={{ padding: '2px 10px' }}
                                     onClick={(e) => {
                                         e.stopPropagation();
                                         navigate(`/orders/${order.id}`);

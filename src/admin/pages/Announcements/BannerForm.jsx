@@ -1,6 +1,6 @@
 import React, { useState, useEffect } from 'react';
 import { useNavigate, useParams } from 'react-router-dom';
-import { ArrowLeft, Save, Upload } from 'lucide-react';
+import { ArrowLeft, Save, Upload, Sparkles } from 'lucide-react';
 import { toast } from 'react-hot-toast';
 import { useAnnouncements } from '../../../contexts/AnnouncementContext';
 import { Button } from '../../components/ui/Button';
@@ -98,22 +98,26 @@ const BannerForm = () => {
     }
   };
 
-  return (
-    <div className="max-w-7xl mx-auto space-y-6 min-h-screen" style={{ padding: '10px', background: 'linear-gradient(135deg, #f0fdf4 0%, #ecfdf5 50%, #f0fdfa 100%)' }}>
-      <Button
-        variant="ghost"
-        className="pl-0 text-gray-500 hover:text-gray-900"
-        onClick={() => navigate('/admin/announcements')}
-        style={{ paddingBottom: '10px' }}
-      >
-        <ArrowLeft className="mr-2 h-4 w-4" />
-        <span style={{ marginTop: '4px' }}>Back to Announcements</span>
-      </Button>
-
-      <div className="flex justify-between items-center" style={{ marginTop: '10px' }}>
-        <h1 className="text-3xl font-bold tracking-tight text-gray-900">
-          {isEditMode ? 'Edit Banner' : 'Add New Banner'}
-        </h1>
+    return (
+    <div className="flex-1 overflow-y-auto h-full space-y-4 sm:space-y-6 lg:space-y-8 animate-in fade-in slide-in-from-bottom-6 duration-700 p-2 sm:p-4 lg:p-6" style={{ background: 'linear-gradient(135deg, #f0fdf4 0%, #ecfdf5 50%, #f0fdfa 100%)' }}>
+      <div className="flex flex-col sm:flex-row justify-between items-start sm:items-center gap-2 sm:gap-4" style={{ padding: '5px' }}>
+        <div>
+          <h1 className="text-2xl sm:text-3xl lg:text-4xl font-bold bg-gradient-to-r from-gray-900 via-emerald-800 to-teal-800 bg-clip-text text-transparent flex items-center gap-2 sm:gap-3">
+            {isEditMode ? 'Edit Banner' : 'Add New Banner'}
+            <Sparkles className="h-6 w-6 sm:h-7 sm:w-7 lg:h-8 lg:w-8 text-emerald-500" />
+          </h1>
+          <p className="text-[8px] sm:text-sm text-gray-600 mt-1 sm:mt-2 font-medium">
+            {isEditMode ? 'Update your banner details' : 'Create a new banner for your store'}
+          </p>
+        </div>
+        <Button
+          variant="ghost"
+          className="pl-0 text-gray-500 hover:text-gray-900 text-[8px] sm:text-sm"
+          onClick={() => navigate('/admin/announcements')}
+        >
+          <ArrowLeft className="mr-2 h-3 w-3 sm:h-4 sm:w-4" />
+          <span style={{ marginTop: '3px' }}>Back to Announcements</span>
+        </Button>
       </div>
 
       <form onSubmit={handleSubmit}>

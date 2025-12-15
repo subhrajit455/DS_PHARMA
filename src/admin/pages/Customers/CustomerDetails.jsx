@@ -45,7 +45,7 @@ const CustomerDetails = () => {
     <div className="space-y-6 min-h-screen" style={{ padding: '10px', background: 'linear-gradient(135deg, #f0fdf4 0%, #ecfdf5 50%, #f0fdfa 100%)' }}>
        <Button variant="ghost" className="pl-0 text-gray-500 hover:text-gray-900 mb-2 sm:mb-3 md:mb-4 text-[10px] sm:text-[8px] sm:text-xs md:text-sm" onClick={() => navigate('/admin/customers')}>
          <ArrowLeft className="mr-1 sm:mr-2 h-3 w-3 sm:h-4 sm:w-4" />
-         <span>Back to Customers</span>
+         <span style={{marginTop: '3px'}}>Back to Customers</span>
       </Button>
 
       {/* Header Profile */}

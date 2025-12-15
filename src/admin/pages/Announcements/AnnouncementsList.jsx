@@ -1,11 +1,12 @@
 import React, { useState } from 'react';
 import { useNavigate } from 'react-router-dom';
-import { Plus, Edit2, Trash2, Image as ImageIcon, MessageSquare, Bell } from 'lucide-react';
+import { Plus, Edit2, Trash2, Image as ImageIcon, MessageSquare, Bell, Sparkles, Star } from 'lucide-react';
 import { useAnnouncements } from '../../../contexts/AnnouncementContext';
 import { Button } from '../../components/ui/Button';
 import { Card, CardContent, CardHeader, CardTitle, CardDescription } from '../../components/ui/Card';
 import { Switch } from '../../components/ui/Switch';
 import { Badge } from '../../components/ui/Badge';
+import { Pagination } from '../../components/ui/Pagination';
 
 const AnnouncementsList = () => {
   const navigate = useNavigate();
@@ -38,15 +39,20 @@ const AnnouncementsList = () => {
   ];
 
   return (
-    <div className="flex flex-col h-full space-y-6" style={{ padding: '10px', background: 'linear-gradient(135deg, #f0fdf4 0%, #ecfdf5 50%, #f0fdfa 100%)' }}>
-      <div className="flex justify-between items-center shrink-0">
-        <h1 className="text-xl sm:text-2xl md:text-3xl font-bold tracking-tight text-gray-900">
-          Announcements & Alerts
-        </h1>
+    <div className="flex-1 overflow-y-auto h-full space-y-4 sm:space-y-6 lg:space-y-8 animate-in fade-in slide-in-from-bottom-6 duration-700 p-2 sm:p-4 lg:p-6" style={{ background: 'linear-gradient(135deg, #f0fdf4 0%, #ecfdf5 50%, #f0fdfa 100%)' }}>
+      <div className="flex flex-col sm:flex-row justify-between items-start sm:items-center gap-2 sm:gap-4" style={{ padding: '5px' }}>
+        <div>
+          <h1 className="text-2xl sm:text-3xl lg:text-4xl font-bold bg-gradient-to-r from-gray-900 via-emerald-800 to-teal-800 bg-clip-text text-transparent flex items-center gap-2 sm:gap-3">
+            Announcements & Alerts
+            <Sparkles className="h-6 w-6 sm:h-7 sm:w-7 lg:h-8 lg:w-8 text-emerald-500" />
+           
+          </h1>
+          <p className="text-[8px] sm:text-sm text-gray-600 mt-1 sm:mt-2 font-medium">Manage all your store announcements, banners, and alerts</p>
+        </div>
       </div>
 
       {/* Tabs */}
-      <div className="flex gap-2 border-b border-gray-200 mt-4 sm:mt-6 overflow-x-auto no-scrollbar" style={{ paddingTop: '5px' }}>
+      <div className="flex gap-2 border-b border-gray-200 mt-4 sm:mt-6 overflow-x-auto no-scrollbar" style={{ paddingTop: '5px', background: 'rgba(255,255,255,0.3)', borderRadius: '8px' }}>
         {tabs.map(tab => {
           const Icon = tab.icon;
           return (
@@ -310,12 +316,12 @@ const AlertsTab = ({ alerts, onToggle, onDelete, onEdit, onAdd }) => {
 
   return (
     <div>
-      <div className="flex justify-end mb-4" style={{ padding: '5px' }}>
+    <div className="flex justify-end mb-4" style={{ padding: '5px' }}>
         <Button onClick={onAdd} className="text-[10px] sm:text-[8px] sm:text-xs md:text-sm h-7 sm:h-9 md:h-10" style={{ padding: '5px' }}>
           <Plus className="h-4 w-4 mr-2" />
           <span style={{ marginTop: '3px' }}>Add Alert</span>
         </Button>
-      </div>
+    </div>
 
       <div className="grid gap-4">
         {alerts.length === 0 ? (

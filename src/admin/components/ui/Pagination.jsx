@@ -73,10 +73,10 @@ export const Pagination = ({
                         size="sm"
                         onClick={() => onPageChange(currentPage - 1)}
                         disabled={currentPage === 1}
-                        className="h-8 w-8 p-0 sm:w-auto sm:px-3 gap-1"
+                        className="h-6 w-6 p-0 sm:w-auto sm:px-3 gap-1"
                     >
                         <ChevronLeft className="h-4 w-4" />
-                        <span className="hidden sm:inline">Previous</span>
+                        <span className="hidden sm:inline" style={{marginTop: '2px'}}>Previous</span>
                     </Button>
 
                     <div className="flex items-center gap-1 sm:gap-2">
@@ -90,7 +90,7 @@ export const Pagination = ({
                                         size="sm"
                                         onClick={() => onPageChange(page)}
                                         className={cn(
-                                            "h-8 w-8 p-0 font-medium",
+                                            "h-6 w-6 p-0 font-medium",
                                             currentPage === page 
                                             ? "bg-emerald-600 hover:bg-emerald-700 text-white shadow-emerald-200"
                                             : "text-gray-600 hover:bg-gray-100"
@@ -108,9 +108,9 @@ export const Pagination = ({
                         size="sm"
                         onClick={() => onPageChange(currentPage + 1)}
                         disabled={currentPage === totalPages}
-                        className="h-8 w-8 p-0 sm:w-auto sm:px-3 gap-1"
+                        className="h-6 w-6 p-0 sm:w-auto sm:px-3 gap-1"
                     >
-                        <span className="hidden sm:inline">Next</span>
+                        <span className="hidden sm:inline mt-1" style={{marginTop: '2px'}}>Next</span>
                         <ChevronRight className="h-4 w-4" />
                     </Button>
                 </div>

@@ -1,194 +1,167 @@
 import React, { useState, useEffect } from 'react';
 import { useNavigate } from 'react-router-dom';
-import { Heart, ShoppingBag, Package, CreditCard, MapPin, Lock, User, ArrowLeft } from 'lucide-react';
-import Footer from '@/components/sections/Footer';
-import ProfileHeader from '@/components/features/profile/ProfileHeader';
-import ProfileStats from '@/components/features/profile/ProfileStats';
-import ProfileTabs from '@/components/features/profile/ProfileTabs';
-import PersonalInfoForm from '@/components/features/profile/PersonalInfoForm';
-import OrdersList from '@/components/features/profile/OrdersList';
-import AddressesList from '@/components/features/profile/AddressesList';
-import SecuritySettings from '@/components/features/profile/SecuritySettings';
+import { 
+  User, 
+  MapPin, 
+  ShoppingBag, 
+  Settings,
+} from 'lucide-react';
+import { motion as Motion, AnimatePresence } from 'framer-motion';
+
+// Hooks & Store
 import { useProfile, useUpdateProfile } from '@/hooks/queries/useProfile';
 import useDataStore from '@/store/useDataStore';
-
 import { USERS } from '@/data/userData';
 
+// Components
+import Footer from '@/components/sections/Footer';
+import PersonalInfoForm from '@/components/features/profile/PersonalInfoForm';
+import AddressesList from '@/components/features/profile/AddressesList';
+import OrdersPreview from '@/components/features/profile/OrdersPreview';
+import AccountActions from '@/components/features/profile/AccountActions';
+import OrdersList from '@/components/features/profile/OrdersList';
+import ProfileSidebar from '@/components/features/profile/ProfileSidebar';
+import ProfileHeader from '@/components/features/profile/ProfileHeader';
+
 const UserProfile = () => {
-  const navigate = useNavigate();
-  const { isAuthenticated, currentUser, orders, wishlist, logout } = useDataStore();
-  const [isEditing, setIsEditing] = useState(false);
-  const [activeTab, setActiveTab] = useState('profile');
+    const navigate = useNavigate();
+    const { isAuthenticated, currentUser } = useDataStore();
+    const [activeSection, setActiveSection] = useState('overview');
+    const [isEditingProfile, setIsEditingProfile] = useState(false);
 
-  // Redirect if not authenticated
-  useEffect(() => {
-    if (!isAuthenticated) {
-      navigate('/login');
-    }
-  }, [isAuthenticated, navigate]);
-
-  // Logout handler
-  const handleLogout = () => {
-    logout();
-    navigate('/login');
-  };
-
-  // Fetch profile data
-  const { data: profileDataResponse, isLoading } = useProfile();
-  const { mutate: updateProfile, isPending: isUpdating } = useUpdateProfile();
-
-  // Mock data as fallback
-  // Prioritize current user from store, then fetch, then mock
-  const [profileData, setProfileData] = useState(currentUser || USERS[0]);
-
-  // Sync profileData with store or fetch
-  useEffect(() => {
-    if (currentUser) {
-      setProfileData(currentUser);
-      setTempData(currentUser);
-    } else if (profileDataResponse?.data) {
-      setProfileData(profileDataResponse.data);
-      setTempData(profileDataResponse.data);
-    }
-  }, [currentUser, profileDataResponse]);
-
-  const [tempData, setTempData] = useState({ ...profileData });
-
-
-
-  // Calculate dynamic stats from store
-  const userOrders = orders.filter(o => o.customerId === currentUser?.id || o.customerName === currentUser?.name);
-  const pendingOrders = userOrders.filter(o => !['Delivered', 'Cancelled', 'Returned'].includes(o.status));
-  
-  const stats = [
-    { icon: ShoppingBag, label: 'Total Orders', value: String(userOrders.length) },
-    { icon: Package, label: 'Pending', value: String(pendingOrders.length) },
-    { icon: Heart, label: 'Wishlist', value: String(wishlist.length) },
-    { icon: CreditCard, label: 'Saved Cards', value: '2' }
-  ];
-
-  const tabs = [
-    { id: 'profile', label: 'Profile', icon: User },
-    { id: 'orders', label: 'Orders', icon: Package },
-    { id: 'addresses', label: 'Addresses', icon: MapPin },
-    { id: 'security', label: 'Security', icon: Lock }
-  ];
-
-  const handleEdit = () => {
-    setIsEditing(true);
-    setTempData({ ...profileData });
-  };
-
-  const handleSave = () => {
-    updateProfile(tempData, {
-      onSuccess: () => {
-        setIsEditing(false);
-      }
-    });
-  };
-
-  const handleCancel = () => {
-    setTempData({ ...profileData });
-    setIsEditing(false);
-  };
-
-  const handleInputChange = (field, value) => {
-    if (field.includes('.')) {
-      const [parent, child] = field.split('.');
-      setTempData(prev => ({
-        ...prev,
-        [parent]: {
-          ...prev[parent],
-          [child]: value
+    // Redirect if not authenticated
+    useEffect(() => {
+        if (!isAuthenticated) {
+            navigate('/login');
         }
-      }));
-    } else {
-      setTempData(prev => ({
-        ...prev,
-        [field]: value
-      }));
-    }
-  };
+    }, [isAuthenticated, navigate]);
 
-  if (isLoading) {
-    return (
-      <div className="flex items-center justify-center min-h-screen">
-        <div className="w-12 h-12 border-4 border-emerald-500 rounded-full border-t-transparent animate-spin"></div>
-      </div>
-    );
-  }
+    // Fetch profile data
+    const { data: profileDataResponse, isLoading } = useProfile();
+    const { mutate: updateProfile, isPending: isUpdating } = useUpdateProfile();
 
-  return (
-    <div className="flex flex-col w-full min-h-screen bg-gray-50">
-      <main className="grow w-full max-w-7xl mx-auto mt-8"
-      style={{ width: '100%', maxWidth: '1280px', margin: '0 auto' }}
-      >
-        <style>{`
-          @media (max-width: 639px) {
-            .user-profile-container {
-              padding-left: 5px !important;
-              padding-right: 5px !important;
-              padding-bottom: 80px !important;
+    // Dynamic profile data with fallback
+    const [profileData, setProfileData] = useState(currentUser || USERS[0]);
+    const [tempProfileData, setTempProfileData] = useState({});
+
+    // Sync profile data
+    useEffect(() => {
+        if (currentUser) {
+            setProfileData(currentUser);
+            setTempProfileData(currentUser);
+        } else if (profileDataResponse?.data) {
+            setProfileData(profileDataResponse.data);
+            setTempProfileData(profileDataResponse.data);
+        }
+    }, [currentUser, profileDataResponse]);
+
+    // Profile handlers
+    const handleEditProfile = () => {
+        setIsEditingProfile(true);
+        setTempProfileData({ ...profileData });
+    };
+
+    const handleSaveProfile = () => {
+        updateProfile(tempProfileData, {
+            onSuccess: () => {
+                setProfileData(tempProfileData);
+                setIsEditingProfile(false);
             }
-          }
-          @media (min-width: 640px) and (max-width: 1290px) {
-            .user-profile-container {
-              padding-left: 5px !important;
-              padding-right: 5px !important;
-            }
-          }
-        `}</style>
-        <div className="user-profile-container w-full min-h-[800px] px-4 pt-4 pb-20 lg:px-16 lg:py-16" style={{ padding: '10px' }}>
-          <div className="mx-auto ">
-            {/* Back Button */}
-            <button
-              onClick={() => navigate(-1)}
-              className="sm:hidden flex items-center gap-2 mb-4 sm:mb-6 text-gray-700 transition-colors cursor-pointer hover:text-gray-900"
-              style={{ fontFamily: 'Gyrotrope', fontSize: '14px', fontWeight: 500, marginBottom: '1.5rem' }}
-            >
-              <ArrowLeft size={18} className="sm:w-5 sm:h-5" />
-              
-            </button>
+        });
+    };
 
-            {/* Header Section */}
-            <div className="p-4 mb-6 shadow-lg bg-linear-to-r from-emerald-500 to-teal-500 rounded-2xl md:p-8" style={{ padding: '10px' }}>
-              <ProfileHeader profileData={profileData} onLogout={handleLogout} />
-              <ProfileStats stats={stats} />
+    const handleCancelProfile = () => {
+        setTempProfileData({ ...profileData });
+        setIsEditingProfile(false);
+    };
+
+    const handleProfileChange = (field, value) => {
+        setTempProfileData(prev => ({
+            ...prev,
+            [field]: value
+        }));
+    };
+
+    const sections = [
+        { id: 'overview', label: 'Overview', icon: User, desc: 'Personal details' },
+        { id: 'orders', label: 'Orders', icon: ShoppingBag, desc: 'Track & Buy again' },
+        { id: 'addresses', label: 'Addresses', icon: MapPin, desc: 'Manage locations' },
+        { id: 'account', label: 'Settings', icon: Settings, desc: 'Account actions' }
+    ];
+
+    if (isLoading) {
+        return (
+            <div className="min-h-screen flex items-center justify-center bg-gray-50">
+                <div className="flex flex-col items-center gap-4">
+                    <div className="w-12 h-12 border-4 border-emerald-500 rounded-full border-t-transparent animate-spin"></div>
+                    <p className="text-gray-600 font-medium">Loading your profile...</p>
+                </div>
             </div>
+        );
+    }
 
-            {/* Tabs */}
-            <ProfileTabs tabs={tabs} activeTab={activeTab} setActiveTab={setActiveTab} />
+    return (
+        <div className="min-h-screen w-full bg-gray-50 font-sans flex flex-col">
+            <ProfileHeader profileData={profileData} />
 
-            {/* Profile Tab Content */}
-            {activeTab === 'profile' && (
-              <PersonalInfoForm
-                profileData={profileData}
-                tempData={tempData}
-                isEditing={isEditing}
-                setIsEditing={setIsEditing}
-                setTempData={setTempData}
-                handleEdit={handleEdit}
-                handleSave={handleSave}
-                handleCancel={handleCancel}
-                handleInputChange={handleInputChange}
-                isSaving={isUpdating}
-              />
-            )}
+            {/* Main Content Area - flex-1 ensures it takes available space */}
+            <main className="flex-1 w-full mx-auto px-4 sm:px-6 lg:px-8 py-8"  style={{ maxWidth: '1280px', margin: '10px auto' }}>
+                <div className="grid grid-cols-1 lg:grid-cols-12 gap-8">
 
-            {/* Orders Tab Content */}
-            {activeTab === 'orders' && <OrdersList />}
+                    <ProfileSidebar 
+                        profileData={profileData} 
+                        activeSection={activeSection} 
+                        setActiveSection={setActiveSection} 
+                        sections={sections} 
+                    />
 
-            {/* Addresses Tab Content */}
-            {activeTab === 'addresses' && <AddressesList />}
+                    {/* Right Content Area */}
+                    <div className="lg:col-span-9">
+                        <AnimatePresence mode="wait">
+                            <Motion.div
+                                key={activeSection}
+                                initial={{ opacity: 0, x: 10 }}
+                                animate={{ opacity: 1, x: 0 }}
+                                exit={{ opacity: 0, x: -10 }}
+                                transition={{ duration: 0.2 }}
+                            >
+                                {activeSection === 'overview' && (
+                                    <div className="space-y-6">
+                                        <PersonalInfoForm
+                                            profileData={profileData}
+                                            tempData={tempProfileData}
+                                            isEditing={isEditingProfile}
+                                            handleEdit={handleEditProfile}
+                                            handleSave={handleSaveProfile}
+                                            handleCancel={handleCancelProfile}
+                                            handleInputChange={handleProfileChange}
+                                            isSaving={isUpdating}
+                                        />
+                                        <div className="">
+                                            <OrdersPreview />
+                                            
+                                        </div>
+                                    </div>
+                                )}
 
-            {/* Security Tab Content */}
-            {activeTab === 'security' && <SecuritySettings />}
-          </div>
+                                {activeSection === 'orders' && (
+                                    <div className="space-y-6">
+                                       <OrdersList />
+                                    </div>
+                                )}
+                                
+                                {activeSection === 'addresses' && <AddressesList />}
+                                {activeSection === 'account' && <AccountActions />}
+                            </Motion.div>
+                        </AnimatePresence>
+                    </div>
+
+                </div>
+            </main>
+            
+            <Footer />
         </div>
-      </main>
-      <Footer />
-    </div>
-  );
+    );
 };
 
 export default UserProfile;

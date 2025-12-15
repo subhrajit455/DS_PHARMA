@@ -1,7 +1,7 @@
 import React, { useState, useEffect } from 'react';
 import { useSearchParams } from 'react-router-dom';
 import { Filter, SlidersHorizontal, X } from 'lucide-react';
-import { AnimatePresence } from 'framer-motion';
+import { AnimatePresence, motion } from 'framer-motion';
 import searchService from '@/services/api/searchService';
 import useDebounce from '@/hooks/useDebounce';
 import SearchResults from '@/components/features/search/SearchResults';

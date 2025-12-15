@@ -1,6 +1,6 @@
 import React, { useState, useEffect } from 'react';
 import { useNavigate } from 'react-router-dom';
-import { Plus, Search, Edit, Trash2, Filter, MoreHorizontal } from 'lucide-react';
+import { Plus, Search, Edit, Trash2, Filter, MoreHorizontal, Sparkles } from 'lucide-react';
 import { toast } from 'react-hot-toast';
 import { Button } from '../../components/ui/Button';
 import { Input } from '../../components/ui/Input';
@@ -99,10 +99,13 @@ const ProductsList = () => {
   }
 
   return (
-        <div className="flex flex-col h-full space-y-4 sm:space-y-6" style={{ padding: '10px', background: 'linear-gradient(135deg, #f0fdf4 0%, #ecfdf5 50%, #f0fdfa 100%)' }}>
-            <div className="flex flex-row justify-between items-start sm:items-center gap-3 sm:gap-4" style={{ paddingBottom: '10px' }}>
+        <div className="flex flex-col h-full space-y-4 sm:space-y-6 max-w-full overflow-x-hidden" style={{ padding: '10px 10px 0px 10px', background: 'linear-gradient(135deg, #f0fdf4 0%, #ecfdf5 50%, #f0fdfa 100%)' }}>
+            <div className="flex flex-row justify-between items-start sm:items-center gap-3 sm:gap-4" style={{ paddingBottom: '10px 10px 0px 10px' }}>
                 <div>
-                    <h2 className="text-xl sm:text-2xl md:text-3xl font-bold tracking-tight">Products</h2>
+                    <h2 className="text-xl sm:text-2xl md:text-4xl font-bold bg-gradient-to-r from-gray-900 via-emerald-800 to-teal-800 bg-clip-text text-transparent flex items-center gap-2">
+                      Products
+                      <Sparkles className="h-6 w-6 sm:h-7 sm:w-7 lg:h-8 lg:w-8 text-emerald-500" />
+                    </h2>
                     <p className="text-gray-500 text-[10px] sm:text-[8px] sm:text-xs md:text-sm mt-0.5">Manage your pharmacy inventory</p>
                 </div>
                 <Button onClick={() => navigate('/admin/products/new')} className="text-[10px] sm:text-[8px] sm:text-xs md:text-sm h-7 sm:h-9 md:h-10" style={{ padding: '0px 10px' }}>

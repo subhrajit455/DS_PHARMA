@@ -1,5 +1,5 @@
 import React, { useState, useEffect } from 'react';
-import { Search, Star, StarOff, Package } from 'lucide-react';
+import { Search, Star, StarOff, Package, Sparkles } from 'lucide-react';
 import { toast } from 'react-hot-toast';
 import { Button } from '../../components/ui/Button';
 import { Input } from '../../components/ui/Input';
@@ -12,10 +12,11 @@ import {
   TableHeader,
   TableRow,
 } from '../../components/ui/Table';
+import { Pagination } from '../../components/ui/Pagination';
 import { productService } from '../../api/productService'; // Assuming we can reuse this service or mock it
 
 const FeaturedProducts = () => {
-    const [itemsPerPage] = useState(10);
+    const [itemsPerPage, setItemsPerPage] = useState(10);
     const [currentPage, setCurrentPage] = useState(1);
     const [isAddModalOpen, setIsAddModalOpen] = useState(false);
     const [allProducts, setAllProducts] = useState([]); // For the add modal
@@ -91,14 +92,17 @@ const FeaturedProducts = () => {
     const paginatedProducts = products.slice((currentPage - 1) * itemsPerPage, currentPage * itemsPerPage);
 
     return (
-        <div className="h-full flex flex-col space-y-4 p-2 sm:p-4 bg-gradient-to-br from-gray-50 via-emerald-50/20 to-teal-50/30">
+        <div className="h-full flex flex-col space-y-4 p-2 sm:p-4" style={{ background: 'linear-gradient(135deg, #f0fdf4 0%, #ecfdf5 50%, #f0fdfa 100%)', padding: '10px 10px 0px 10px'}}>
              <div className="flex flex-col sm:flex-row justify-between items-start sm:items-center gap-3 sm:gap-4 shrink-0">
                 <div>
-                   <h2 className="text-xl sm:text-2xl md:text-3xl font-bold tracking-tight text-gray-900">Highlighted Products</h2>
+                   <h2 className="text-xl sm:text-2xl md:text-4xl font-bold bg-gradient-to-r from-gray-900 via-emerald-800 to-teal-800 bg-clip-text text-transparent flex items-center gap-2">
+                     Highlighted Products
+                     <Sparkles className="h-6 w-6 sm:h-7 sm:w-7 lg:h-8 lg:w-8 text-emerald-500" />
+                   </h2>
                    <p className="text-gray-500 text-[10px] sm:text-[8px] sm:text-xs md:text-sm mt-0.5">Manage products highlighted on the home page</p>
                 </div>
-                <Button onClick={() => setIsAddModalOpen(true)} className="gap-2">
-                    <Package className="h-4 w-4" /> <span className="hidden sm:inline">Add Product</span><span className="sm:hidden">Add</span>
+                <Button onClick={() => setIsAddModalOpen(true)} className="gap-1" style={{ padding: '0px 5px'}}>
+                    <Package className="h-4 w-4" /> <span className="hidden sm:inline" style={{ marginTop: '3px'}}>Add Product</span><span className="sm:hidden">Add</span>
                 </Button>
              </div>
 
@@ -160,9 +164,9 @@ const FeaturedProducts = () => {
                                                     variant="ghost" 
                                                     size="sm"
                                                     onClick={() => handleRemove(product)}
-                                                    className="text-red-500 hover:text-red-700 hover:bg-red-50 text-[8px] sm:text-sm h-7 sm:h-8"
+                                                    className="text-red-500 hover:text-red-700 gap-1 hover:bg-red-50 text-[8px] sm:text-sm h-7 sm:h-8"
                                                 >
-                                                    <StarOff className="h-3 w-3 sm:h-4 sm:w-4 mr-0 sm:mr-2" /> <span className="hidden sm:inline">Remove</span>
+                                                    <StarOff className="h-3 w-3 sm:h-4 sm:w-4 mr-0 sm:mr-2" /> <span className="hidden sm:inline" style={{ marginTop: '7px' }}>Remove</span>
                                                 </Button>
                                             </TableCell>
                                         </TableRow>
@@ -180,32 +184,16 @@ const FeaturedProducts = () => {
 
                      {!isLoading && products.length > 0 && (
                         <div className="shrink-0 mt-4 border-t pt-4">
-                           {/* Simple Pagination or re-use explicit component */}
-                           <div className="flex items-center justify-between">
-                                <div className="text-[8px] sm:text-sm text-gray-500">
-                                    Showing {((currentPage - 1) * itemsPerPage) + 1} to {Math.min(currentPage * itemsPerPage, products.length)} of {products.length} results
-                                </div>
-                                <div className="flex gap-2">
-                                    <Button 
-                                        variant="outline" 
-                                        size="sm" 
-                                        onClick={() => setCurrentPage(p => Math.max(1, p - 1))}
-                                        disabled={currentPage === 1}
-                                        className="text-[8px] sm:text-sm h-7 sm:h-8"
-                                    >
-                                        Previous
-                                    </Button>
-                                    <Button 
-                                        variant="outline" 
-                                        size="sm" 
-                                        onClick={() => setCurrentPage(p => Math.min(totalPages, p + 1))}
-                                        disabled={currentPage === totalPages}
-                                        className="text-[8px] sm:text-sm h-7 sm:h-8"
-                                    >
-                                        Next
-                                    </Button>
-                                </div>
-                           </div>
+                            <Pagination
+                                currentPage={currentPage}
+                                totalPages={Math.ceil(products.length / itemsPerPage)}
+                                onPageChange={(page) => setCurrentPage(page)}
+                                itemsPerPage={itemsPerPage}
+                                onItemsPerPageChange={(val) => {
+                                    setItemsPerPage(val);
+                                    setCurrentPage(1);
+                                }}
+                            />
                         </div>
                     )}
                 </CardContent>
@@ -213,8 +201,8 @@ const FeaturedProducts = () => {
 
              {/* Add Modal */}
              {isAddModalOpen && (
-                 <div className="fixed inset-0 z-50 flex items-center justify-center p-4 bg-black/50 backdrop-blur-sm">
-                     <div className="bg-white rounded-lg shadow-xl w-full max-w-2xl p-4 sm:p-6 flex flex-col max-h-[80vh]">
+                 <div className="fixed inset-0 z-50 flex items-center justify-center p-4 bg-black/50 backdrop-blur-sm" >
+                     <div className="bg-white rounded-lg shadow-xl w-full max-w-2xl p-4 sm:p-6 flex flex-col max-h-[80vh]" style={{ padding: '10px'}}>
                          <div className="flex justify-between items-center mb-4 shrink-0">
                              <h3 className="text-lg font-bold">Select Product to Highlight</h3>
                              <Button variant="ghost" size="sm" onClick={() => setIsAddModalOpen(false)}>Close</Button>
@@ -227,11 +215,11 @@ const FeaturedProducts = () => {
                             onChange={(e) => setAddSearchQuery(e.target.value)}
                          />
 
-                         <div className="flex-1 overflow-auto border rounded-md">
+                         <div className="flex-1 overflow-auto rounded-md" style={{ marginTop: '10px'}}>
                             <Table>
                                 <TableBody>
                                     {filteredAddProducts.map(p => (
-                                        <TableRow key={p.id} className="hover:bg-gray-50">
+                                        <TableRow key={p.id} className="hover:bg-gray-50" >
                                             <TableCell className="text-[8px] sm:text-sm">{p.name}</TableCell>
                                             <TableCell className="text-[8px] sm:text-sm">₹{p.price}</TableCell>
                                             <TableCell className="text-right">

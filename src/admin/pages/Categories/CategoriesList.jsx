@@ -1,9 +1,9 @@
 import React, { useState } from 'react';
-import { Plus, Edit, Trash2, Search, ArrowRight, Tag } from 'lucide-react';
+import { Plus, Edit, Trash2, Search, Tag, Sparkles } from 'lucide-react';
 import { toast } from 'react-hot-toast';
 import { Button } from '../../components/ui/Button';
 import { Input } from '../../components/ui/Input';
-import { Card, CardContent, CardHeader, CardTitle, CardDescription } from '../../components/ui/Card';
+import { Card, CardContent } from '../../components/ui/Card';
 import {
   Table,
   TableBody,
@@ -89,14 +89,17 @@ const CategoriesList = () => {
     };
 
     return (
-        <div className="h-full flex flex-col space-y-4 p-2 sm:p-4 bg-gradient-to-br from-gray-50 via-emerald-50/20 to-teal-50/30">
-             <div className="flex flex-col sm:flex-row justify-between items-start sm:items-center gap-3 sm:gap-4 shrink-0">
+        <div className="flex-1 h-full flex flex-col space-y-4 p-2 sm:p-4 lg:p-6 animate-in fade-in slide-in-from-bottom-6 duration-700" style={{ background: 'linear-gradient(135deg, #f0fdf4 0%, #ecfdf5 50%, #f0fdfa 100%)' }}>
+             <div className="flex sm:flex-row justify-between items-start sm:items-center gap-2 sm:gap-4 shrink-0" style={{ padding: '5px' }}>
                 <div>
-                   <h2 className="text-xl sm:text-2xl md:text-3xl font-bold tracking-tight text-gray-900">Categories</h2>
-                   <p className="text-gray-500 text-[10px] sm:text-[8px] sm:text-xs md:text-sm mt-0.5">Manage product categories</p>
+                   <h2 className="text-2xl sm:text-3xl lg:text-4xl font-bold bg-gradient-to-r from-gray-900 via-emerald-800 to-teal-800 bg-clip-text text-transparent flex items-center gap-2 sm:gap-3">
+                    Categories
+                    <Sparkles className="h-6 w-6 sm:h-7 sm:w-7 lg:h-8 lg:w-8 text-emerald-500" />
+                   </h2>
+                   <p className="text-[8px] sm:text-sm text-gray-600 mt-1 sm:mt-2 font-medium">Manage product categories</p>
                 </div>
-                <Button onClick={() => { resetForm(); setIsModalOpen(true); }} className="gap-2">
-                   <Plus className="h-4 w-4" /> <span className="hidden sm:inline">Add Category</span><span className="sm:hidden">Add</span>
+                <Button onClick={() => { resetForm(); setIsModalOpen(true); }} className="gap-1" style={{ background: 'linear-gradient(135deg, #10b981, #059669)' , padding: '0px 5px', color: 'white' }}>
+                   <Plus className="h-4 w-4" /> <span className="hidden sm:inline" style={{ marginTop: '3px'}}>Add Category</span><span className="sm:hidden" style={{marginTop: '3px'}}>Add</span>
                 </Button>
              </div>
 
@@ -114,15 +117,16 @@ const CategoriesList = () => {
                         </div>
                     </div>
 
+                    {/* Table Container - Takes available space */}
                     <div className="flex-1 overflow-auto rounded-md border border-gray-200">
                         <Table>
                             <TableHeader>
                                 <TableRow style={{ background: 'linear-gradient(to right, #f0fdf4, #f0fdfa)' }}>
-                                    <TableHead className="font-semibold text-gray-700 text-[8px] sm:text-sm" style={{ padding: '8px 5px' }}>Name</TableHead>
-                                    <TableHead className="font-semibold text-gray-700 text-[8px] sm:text-sm hidden sm:table-cell" style={{ padding: '8px 5px' }}>Slug</TableHead>
-                                    <TableHead className="font-semibold text-gray-700 text-[8px] sm:text-sm hidden md:table-cell" style={{ padding: '8px 5px' }}>Products</TableHead>
-                                    <TableHead className="font-semibold text-gray-700 text-[8px] sm:text-sm" style={{ padding: '8px 5px' }}>Status</TableHead>
-                                    <TableHead className="text-right font-semibold text-gray-700 text-[8px] sm:text-sm" style={{ padding: '8px 5px' }}>Actions</TableHead>
+                    <TableHead className="font-semibold text-gray-700 text-[8px] sm:text-sm" style={{ padding: '8px 5px', background: 'rgba(16, 185, 129, 0.1)' }}>Name</TableHead>
+                    <TableHead className="font-semibold text-gray-700 text-[8px] sm:text-sm hidden sm:table-cell" style={{ padding: '8px 5px', background: 'rgba(16, 185, 129, 0.1)' }}>Slug</TableHead>
+                    <TableHead className="font-semibold text-gray-700 text-[8px] sm:text-sm hidden md:table-cell" style={{ padding: '8px 5px', background: 'rgba(16, 185, 129, 0.1)' }}>Products</TableHead>
+                    <TableHead className="font-semibold text-gray-700 text-[8px] sm:text-sm" style={{ padding: '8px 5px', background: 'rgba(16, 185, 129, 0.1)' }}>Status</TableHead>
+                    <TableHead className="text-right font-semibold text-gray-700 text-[8px] sm:text-sm" style={{ padding: '8px 5px', background: 'rgba(16, 185, 129, 0.1)' }}>Actions</TableHead>
                                 </TableRow>
                             </TableHeader>
                             <TableBody>
@@ -165,9 +169,9 @@ const CategoriesList = () => {
                                 )}
                             </TableBody>
                         </Table>
-
                     </div>
 
+                    {/* Pagination - Fixed at bottom */}
                     {filteredCategories.length > 0 && (
                         <div className="shrink-0 mt-4 border-t pt-4">
                             <Pagination
@@ -187,8 +191,8 @@ const CategoriesList = () => {
 
              {/* Add/Edit Modal (Simplified inline) */}
              {isModalOpen && (
-                 <div className="fixed inset-0 z-50 flex items-center justify-center p-4 bg-black/50 backdrop-blur-sm">
-                     <div className="bg-white rounded-lg shadow-xl w-full max-w-md p-4 sm:p-6">
+                 <div className="fixed inset-0 z-50 flex items-center justify-center p-4 bg-black/50 backdrop-blur-sm" style={{ padding: '10px'}}>
+                     <div className="bg-white rounded-lg shadow-xl w-full max-w-md p-4 sm:p-6" style={{ padding: '5px 10px'}}>
                          <h3 className="text-lg font-bold mb-4">{isEditing ? 'Edit Category' : 'Add Category'}</h3>
                          <div className="space-y-4">
                              <div>
@@ -203,6 +207,7 @@ const CategoriesList = () => {
                              <div>
                                  <label className="text-[8px] sm:text-sm font-medium text-gray-700">Status</label>
                                  <select 
+                                     style={{ padding: '8px 5px' }}
                                      value={currentCategory.status}
                                      onChange={(e) => setCurrentCategory({...currentCategory, status: e.target.value })}
                                      className="w-full mt-1 rounded-md border border-gray-200 p-2 text-[8px] sm:text-sm"

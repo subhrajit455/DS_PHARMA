@@ -121,7 +121,7 @@ const ProductForm = () => {
                                 value={formData.name}
                                 onChange={handleChange}
                                 icon={Package}
-                                style={{ padding: '10px 5px' }}
+                                style={{ padding: '10px 35px' }}
                              />
                         </div>
                         <div className="grid grid-cols-1 sm:grid-cols-2 gap-3 sm:gap-4" style={{ marginBottom: '20px' }}>
@@ -136,7 +136,7 @@ const ProductForm = () => {
                                     value={formData.sku}
                                     onChange={handleChange}
                                     icon={Tag}
-                                    style={{ padding: '10px 5px' }}
+                                    style={{ padding: '10px 35px' }}
                                 />
                             </div>
                             <div className="grid gap-2">
@@ -216,7 +216,7 @@ const ProductForm = () => {
                                 value={formData.price}
                                 onChange={handleChange}
                                 icon={DollarSign}
-                                style={{ padding: '20px 10px' }}
+                                style={{ padding: '20px 30px' }}
                              />
                         </div>
                         <div className="grid gap-2">
@@ -230,7 +230,7 @@ const ProductForm = () => {
                                 value={formData.stock}
                                 onChange={handleChange}
                                 icon={Box}
-                                style={{ padding: '20px 10px' }}
+                                style={{ padding: '20px 35px' }}
                              />
                         </div>
                     </CardContent>

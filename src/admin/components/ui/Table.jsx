@@ -2,10 +2,10 @@ import React from 'react';
 import { cn } from '../../utils/cn';
 
 const Table = React.forwardRef(({ className, ...props }, ref) => (
-  <div className="relative w-full overflow-auto">
+  <div className="relative w-full overflow-x-auto max-w-full">
     <table
       ref={ref}
-      className={cn("w-full caption-bottom text-sm", className)}
+      className={cn("w-full caption-bottom text-sm min-w-max", className)}
       {...props}
     />
   </div>
@@ -46,7 +46,7 @@ const TableRow = React.forwardRef(({ className, ...props }, ref) => (
   <tr
     ref={ref}
     className={cn(
-      "border-b border-gray-100 transition-colors hover:bg-emerald-50/30 data-[state=selected]:bg-emerald-50",
+      "border-b text-[8px] sm:text-xs border-gray-100 transition-colors hover:bg-emerald-50/30 data-[state=selected]:bg-emerald-50",
       className
     )}
     {...props}
@@ -70,7 +70,7 @@ const TableCell = React.forwardRef(({ className, ...props }, ref) => (
   <td
     ref={ref}
     className={cn(
-      "p-6 align-middle [&:has([role=checkbox])]:pr-0 text-gray-700",
+      "p-2 sm:p-3 md:p-6 align-middle [&:has([role=checkbox])]:pr-0 text-gray-700 whitespace-nowrap max-sm:whitespace-normal",
       className
     )}
     {...props}

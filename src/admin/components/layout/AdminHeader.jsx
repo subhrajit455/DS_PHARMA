@@ -67,7 +67,7 @@ const AdminHeader = ({ onMobileMenuToggle }) => {
             <DropdownMenuTrigger className="flex items-center gap-x-0.5 sm:gap-x-1 md:gap-x-2 p-0.5 sm:p-1 md:p-2 outline-none rounded-lg transition-all duration-200" style={{ background: 'linear-gradient(135deg, #f0fdf4, #ecfdf5)', border: '1px solid #d1fae5', padding: '3px 6px' }}>
                 <div className="flex items-center gap-x-0.5 sm:gap-x-1 md:gap-x-2 cursor-pointer">
                     <Avatar 
-                        className="h-6 w-6 sm:h-7 sm:w-7 md:h-8 md:w-8 text-white ring-2 ring-emerald-200 shadow-lg shadow-emerald-500/30"
+                        className="h-8 w-10 sm:h-8 sm:w-10 md:h-8 md:w-10 text-white ring-2 ring-emerald-200 shadow-lg shadow-emerald-500/30"
                         style={{ background: 'linear-gradient(to bottom right, #10b981, #0d9488)' }}
                         fallback="AD"
                     />

@@ -1,12 +1,12 @@
 import React from 'react';
 import { motion as Motion } from 'framer-motion';
-import { Edit2, Save, X } from 'lucide-react';
+import { Edit2, Save, X, User, Mail, Phone, Calendar, Users } from 'lucide-react';
 
 const PersonalInfoForm = ({
     profileData,
     tempData,
     isEditing,
-        handleEdit,
+    handleEdit,
     handleSave,
     handleCancel,
     handleInputChange,
@@ -20,230 +20,183 @@ const PersonalInfoForm = ({
     const currentFirstName = isEditing ? (tempData.firstName !== undefined ? tempData.firstName : getFirstName(tempData)) : getFirstName(profileData);
     const currentLastName = isEditing ? (tempData.lastName !== undefined ? tempData.lastName : getLastName(tempData)) : getLastName(profileData);
 
+    const inputClasses = "w-full text-xs pl-11 pr-4 py-3 bg-gray-50 border border-gray-200 rounded-xl focus:outline-none focus:ring-2 focus:ring-emerald-500/20 focus:border-emerald-500 focus:bg-white transition-all disabled:opacity-60 disabled:cursor-not-allowed hover:border-emerald-300";
+    const labelClasses = "block mb-2 text-sm font-medium text-gray-700";
+
     return (
         <Motion.div
-            initial={{ opacity: 0, y: 20 }}
+            initial={{ opacity: 0, y: 10 }}
             animate={{ opacity: 1, y: 0 }}
-            className="bg-white rounded-xl shadow-sm p-6"
+            className="bg-gradient-to-br from-white to-emerald-50/20 rounded-2xl border border-gray-100 shadow-sm overflow-hidden"
+            style={{marginTop: '20px', padding: '10px', marginBottom: '10px'}}
         >
-            <div className="flex justify-between items-center mb-6" style={{ padding: '10px' }}>
-                <h2
-                    className="text-lg md:text-2xl font-semibold"
-                    style={{
-                        fontFamily: 'Gyrotrope',
-                        color: '#000000'
-                    }}
-                >
-                    Personal Information
-                </h2>
+            <div className="p-6 border-b border-gray-100 flex justify-between items-center bg-gradient-to-r from-emerald-50/50 to-white" style={{ marginBottom: '15px'}}>
+                <div>
+                    <h2 className="text-lg font-bold text-gray-900">Personal Information</h2>
+                    <p className="text-sm text-gray-500 mt-1">Manage your personal details</p>
+                </div>
+                
                 {!isEditing ? (
                     <button
                         onClick={handleEdit}
-                        className="flex items-center gap-1 md:gap-2 px-2 py-1 md:px-4 md:py-2 text-[8px] sm:text-xs md:text-sm font-semibold text-white transition-colors bg-teal-500 rounded-lg cursor-pointer hover:bg-teal-600"
-                        style={{ fontFamily: 'Gyrotrope', padding: '5px 10px' }}
+                        className="flex items-center gap-1 px-4 py-2 text-sm font-medium text-emerald-600 bg-emerald-50 rounded-lg hover:bg-emerald-100 transition-colors"
+                        style={{ padding: '2px 10px'}}
                     >
-                        <Edit2 className="w-3 h-3 md:w-4 md:h-4" />
-                        <span className="hidden sm:inline">Edit Profile</span>
-                        <span className="sm:hidden">Edit</span>
+                        <Edit2 className="w-4 h-4" />
+                        <span style={{ marginTop: '3px'}}>Edit Details</span>
                     </button>
                 ) : (
-                    <div className="gap-1 md:gap-2" style={{ padding: '5px 0px' }}>
+                    <div className="flex items-center gap-2">
+                         <button
+                            onClick={handleCancel}
+                            className="flex items-center gap-2 px-4 py-2 text-sm font-medium text-gray-600 bg-white border border-gray-200 rounded-lg hover:bg-gray-50 transition-colors"
+                            style={{ padding: '2px 10px'}}
+                        >
+                            <X className="w-4 h-4" />
+                            <span style={{ marginTop: '3px'}}>Cancel</span>
+                        </button>
                         <button
                             onClick={handleSave}
                             disabled={isSaving}
-                            className={`flex items-center gap-1 md:gap-2 px-2 py-1 md:px-4 md:py-2 text-[8px] sm:text-xs md:text-sm font-semibold text-white transition-colors bg-green-500 rounded-lg cursor-pointer hover:bg-green-600 ${isSaving ? 'opacity-50 cursor-not-allowed' : ''}`}
-                            style={{ fontFamily: 'Gyrotrope', padding: '2px 5px' }}
+                            className="flex items-center gap-2 px-4 py-2 text-sm font-medium text-white bg-emerald-600 rounded-lg hover:bg-emerald-700 disabled:opacity-50 disabled:cursor-not-allowed transition-colors shadow-sm"
+                            style={{ padding: '2px 10px'}}
                         >
                             {isSaving ? (
-                                <div className="w-3 h-3 md:w-4 md:h-4 border-2 border-white border-t-transparent rounded-full animate-spin"></div>
+                                <div className="w-4 h-4 border-2 border-white border-t-transparent rounded-full animate-spin" />
                             ) : (
-                                <Save className="w-3 h-3 md:w-4 md:h-4" />
+                                <Save className="w-4 h-4" />
                             )}
-                            <span className="hidden sm:inline">{isSaving ? 'Saving...' : 'Save'}</span>
-                            <span className="sm:hidden">{isSaving ? '...' : 'Save'}</span>
-                        </button>
-                        <button
-                            onClick={handleCancel}
-                            className="flex items-center gap-1 md:gap-2 px-2 py-1 md:px-4 md:py-2 text-[8px] sm:text-xs md:text-sm font-semibold text-white transition-colors bg-gray-500 rounded-lg cursor-pointer hover:bg-gray-600"
-                            style={{ fontFamily: 'Gyrotrope', padding: '2px 5px' }}
-                        >
-                            <X className="w-3 h-3 md:w-4 md:h-4" />
-                            <span className="hidden sm:inline">Cancel</span>
-                            <span className="sm:hidden">Cancel</span>
+                            <span style={{ marginTop: '3px'}}>Save Changes</span>
                         </button>
                     </div>
                 )}
             </div>
 
-            <div className="grid grid-cols-1 md:grid-cols-2 gap-6" style={{ padding: ' 5px 15px' }}>
-                {/* Form Fields */}
-                <div>
-                    <label className="block mb-1 text-[12px] font-semibold text-gray-700" style={{ fontFamily: 'Gyrotrope' }}>
-                        First Name
-                    </label>
-                    <input
-                        type="text"
-                        value={currentFirstName}
-                        onChange={(e) => {
-                            const newFirst = e.target.value;
-                            handleInputChange('firstName', newFirst);
-                            // Also update full name for store consistency
-                            const currentLast = tempData.lastName !== undefined ? tempData.lastName : getLastName(tempData);
-                            handleInputChange('name', `${newFirst} ${currentLast}`.trim());
-                        }}
-                        disabled={!isEditing}
-                        className="w-full px-3 py-2 text-[12px] border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-teal-500 disabled:bg-gray-50"
-                        style={{ fontFamily: 'Gyrotrope' }}
-                    />
+            <div className="p-6 grid grid-cols-1 md:grid-cols-2 gap-6">
+                {/* First Name */}
+                <div className="relative">
+                    <label className={labelClasses}>First Name</label>
+                    <div className="relative">
+                        <div className="absolute left-2 top-[45%] -translate-y-1/2 text-gray-400 pointer-events-none z-10">
+                            <User size={16} />
+                        </div>
+                        <input
+                            style={{ padding:'8px 30px'}}
+                            type="text"
+                            value={currentFirstName}
+                            onChange={(e) => {
+                                const newFirst = e.target.value;
+                                handleInputChange('firstName', newFirst);
+                                const currentLast = tempData.lastName !== undefined ? tempData.lastName : getLastName(tempData);
+                                handleInputChange('name', `${newFirst} ${currentLast}`.trim());
+                            }}
+                            disabled={!isEditing}
+                            className={inputClasses}
+                            placeholder="Enter first name"
+                        />
+                    </div>
                 </div>
 
-                <div>
-                    <label className="block mb-1 text-[12px] font-semibold text-gray-700" style={{ fontFamily: 'Gyrotrope' }}>
-                        Last Name
-                    </label>
-                    <input
-                        type="text"
-                        value={currentLastName}
-                        onChange={(e) => {
-                            const newLast = e.target.value;
-                            handleInputChange('lastName', newLast);
-                             // Also update full name for store consistency
-                             const currentFirst = tempData.firstName !== undefined ? tempData.firstName : getFirstName(tempData);
-                             handleInputChange('name', `${currentFirst} ${newLast}`.trim());
-                        }}
-                        disabled={!isEditing}
-                        className="w-full px-3 py-2 text-[12px] border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-teal-500 disabled:bg-gray-50"
-                        style={{ fontFamily: 'Gyrotrope' }}
-                    />
+                {/* Last Name */}
+                <div className="relative">
+                    <label className={labelClasses}>Last Name</label>
+                    <div className="relative">
+                        <div className="absolute left-2 top-[45%] -translate-y-1/2 text-gray-400 pointer-events-none z-10">
+                            <User size={16} />
+                        </div>
+                        <input
+                            style={{ padding:'8px 30px'}}
+                            type="text"
+                            value={currentLastName}
+                            onChange={(e) => {
+                                const newLast = e.target.value;
+                                handleInputChange('lastName', newLast);
+                                 const currentFirst = tempData.firstName !== undefined ? tempData.firstName : getFirstName(tempData);
+                                 handleInputChange('name', `${currentFirst} ${newLast}`.trim());
+                            }}
+                            disabled={!isEditing}
+                            className={inputClasses}
+                            placeholder="Enter last name"
+                        />
+                    </div>
                 </div>
 
-                <div>
-                    <label className="block mb-1 text-[12px] font-semibold text-gray-700" style={{ fontFamily: 'Gyrotrope' }}>
-                        Email Address
-                    </label>
-                    <input
-                        type="email"
-                        value={isEditing ? tempData.email : profileData.email}
-                        onChange={(e) => handleInputChange('email', e.target.value)}
-                        disabled={!isEditing}
-                        className="w-full px-3 py-2 text-[12px] border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-teal-500 disabled:bg-gray-50"
-                        style={{ fontFamily: 'Gyrotrope' }}
-                    />
+                {/* Email Address */}
+                <div className="relative">
+                    <label className={labelClasses}>Email Address</label>
+                    <div className="relative">
+                        <div className="absolute left-2 top-[45%] -translate-y-1/2 text-gray-400 pointer-events-none z-10">
+                            <Mail size={16} />
+                        </div>
+                        <input
+                            style={{ padding:'8px 30px'}}
+                            type="email"
+                            value={isEditing ? tempData.email : profileData.email}
+                            onChange={(e) => handleInputChange('email', e.target.value)}
+                            disabled={!isEditing}
+                            className={inputClasses}
+                            placeholder="name@example.com"
+                        />
+                    </div>
                 </div>
 
-                <div>
-                    <label className="block mb-1 text-[12px] font-semibold text-gray-700" style={{ fontFamily: 'Gyrotrope' }}>
-                        Phone Number
-                    </label>
-                    <input
-                        type="tel"
-                        value={isEditing ? tempData.phone : profileData.phone}
-                        onChange={(e) => handleInputChange('phone', e.target.value)}
-                        disabled={!isEditing}
-                        className="w-full px-3 py-2 text-[12px] border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-teal-500 disabled:bg-gray-50"
-                        style={{ fontFamily: 'Gyrotrope' }}
-                    />
+                {/* Phone Number */}
+                <div className="relative">
+                    <label className={labelClasses}>Phone Number</label>
+                    <div className="relative">
+                        <div className="absolute left-2 top-[45%] -translate-y-1/2 text-gray-400 pointer-events-none z-10">
+                            <Phone size={16} />
+                        </div>
+                        <input
+                            style={{ padding:'8px 30px'}}
+                            type="tel"
+                            value={isEditing ? tempData.phone : profileData.phone}
+                            onChange={(e) => handleInputChange('phone', e.target.value)}
+                            disabled={!isEditing}
+                            className={inputClasses}
+                            placeholder="+91 99999 99999"
+                        />
+                    </div>
                 </div>
 
-                <div>
-                    <label className="block mb-1 text-[12px] font-semibold text-gray-700" style={{ fontFamily: 'Gyrotrope' }}>
-                        Date of Birth
-                    </label>
-                    <input
-                        type="date"
-                        value={isEditing ? tempData.dateOfBirth : profileData.dateOfBirth}
-                        onChange={(e) => handleInputChange('dateOfBirth', e.target.value)}
-                        disabled={!isEditing}
-                        className="w-full px-3 py-2 text-[12px] border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-teal-500 disabled:bg-gray-50"
-                        style={{ fontFamily: 'Gyrotrope' }}
-                    />
+                {/* Date of Birth */}
+                <div className="relative">
+                    <label className={labelClasses}>Date of Birth</label>
+                    <div className="relative">
+                        <div className="absolute left-2 top-[45%] -translate-y-1/2 text-gray-400 pointer-events-none z-10">
+                            <Calendar size={16} />
+                        </div>
+                        <input
+                            style={{ padding:'8px 30px'}}
+                            type="date"
+                            value={isEditing ? tempData.dateOfBirth : profileData.dateOfBirth}
+                            onChange={(e) => handleInputChange('dateOfBirth', e.target.value)}
+                            disabled={!isEditing}
+                            className={inputClasses}
+                        />
+                    </div>
                 </div>
 
-                <div>
-                    <label className="block mb-1 text-[12px] font-semibold text-gray-700" style={{ fontFamily: 'Gyrotrope' }}>
-                        Gender
-                    </label>
-                    <select
-                        value={isEditing ? tempData.gender : profileData.gender}
-                        onChange={(e) => handleInputChange('gender', e.target.value)}
-                        disabled={!isEditing}
-                        className="w-full px-3 py-2 text-[12px] border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-teal-500 disabled:bg-gray-50 cursor-pointer"
-                        style={{ fontFamily: 'Gyrotrope' }}
-                    >
-                        <option value="Male">Male</option>
-                        <option value="Female">Female</option>
-                        <option value="Other">Other</option>
-                    </select>
-                </div>
-
-                <div className="md:col-span-2">
-                    <label className="block mb-1 text-[12px] font-semibold text-gray-700" style={{ fontFamily: 'Gyrotrope' }}>
-                        Street Address
-                    </label>
-                    <input
-                        type="text"
-                        value={isEditing ? (tempData.address?.street || '') : (profileData.address?.street || '')}
-                        onChange={(e) => handleInputChange('address.street', e.target.value)}
-                        disabled={!isEditing}
-                        className="w-full px-3 py-2 text-[12px] border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-teal-500 disabled:bg-gray-50"
-                        style={{ fontFamily: 'Gyrotrope' }}
-                    />
-                </div>
-
-                <div>
-                    <label className="block mb-1 text-[12px] font-semibold text-gray-700" style={{ fontFamily: 'Gyrotrope' }}>
-                        City
-                    </label>
-                    <input
-                        type="text"
-                        value={isEditing ? (tempData.address?.city || '') : (profileData.address?.city || '')}
-                        onChange={(e) => handleInputChange('address.city', e.target.value)}
-                        disabled={!isEditing}
-                        className="w-full px-3 py-2 text-[12px] border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-teal-500 disabled:bg-gray-50"
-                        style={{ fontFamily: 'Gyrotrope' }}
-                    />
-                </div>
-
-                <div>
-                    <label className="block mb-1 text-[12px] font-semibold text-gray-700" style={{ fontFamily: 'Gyrotrope' }}>
-                        State
-                    </label>
-                    <input
-                        type="text"
-                        value={isEditing ? (tempData.address?.state || '') : (profileData.address?.state || '')}
-                        onChange={(e) => handleInputChange('address.state', e.target.value)}
-                        disabled={!isEditing}
-                        className="w-full px-3 py-2 text-[12px] border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-teal-500 disabled:bg-gray-50"
-                        style={{ fontFamily: 'Gyrotrope' }}
-                    />
-                </div>
-
-                <div>
-                    <label className="block mb-1 text-[12px] font-semibold text-gray-700" style={{ fontFamily: 'Gyrotrope' }}>
-                        Pincode
-                    </label>
-                    <input
-                        type="text"
-                        value={isEditing ? (tempData.address?.pincode || '') : (profileData.address?.pincode || '')}
-                        onChange={(e) => handleInputChange('address.pincode', e.target.value)}
-                        disabled={!isEditing}
-                        className="w-full px-3 py-2 text-[12px] border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-teal-500 disabled:bg-gray-50"
-                        style={{ fontFamily: 'Gyrotrope' }}
-                    />
-                </div>
-
-                <div>
-                    <label className="block mb-1 text-[12px] font-semibold text-gray-700" style={{ fontFamily: 'Gyrotrope' }}>
-                        Country
-                    </label>
-                    <input
-                        type="text"
-                        value={isEditing ? (tempData.address?.country || '') : (profileData.address?.country || '')}
-                        onChange={(e) => handleInputChange('address.country', e.target.value)}
-                        disabled={!isEditing}
-                        className="w-full px-3 py-2 text-[12px] border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-teal-500 disabled:bg-gray-50"
-                        style={{ fontFamily: 'Gyrotrope', marginBottom: '15px' }}
-                    />
+                {/* Gender */}
+                <div className="relative">
+                    <label className={labelClasses}>Gender</label>
+                    <div className="relative">
+                        <div className="absolute left-2 top-[45%] -translate-y-1/2 text-gray-400 pointer-events-none z-10">
+                            <Users size={16} />
+                        </div>
+                        <select
+                            style={{ padding:'10px 30px'}}
+                            value={isEditing ? tempData.gender : profileData.gender}
+                            onChange={(e) => handleInputChange('gender', e.target.value)}
+                            disabled={!isEditing}
+                            className={inputClasses}
+                        >
+                            <option value="">Select Gender</option>
+                            <option value="Male">Male</option>
+                            <option value="Female">Female</option>
+                            <option value="Other">Other</option>
+                        </select>
+                    </div>
                 </div>
             </div>
         </Motion.div>

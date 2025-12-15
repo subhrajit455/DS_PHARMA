@@ -10,7 +10,7 @@ const Input = React.forwardRef(({ className, type, error, ...props }, ref) => {
         </div>
       )}
       <input
-        style={{ paddingLeft: props.icon ? '45px' : '15px' }}
+        style={{ paddingLeft:'15px'}}
         type={type}
         className={cn(
           "flex h-8 w-full rounded-lg border bg-white py-2 text-[12px] shadow-sm transition-all duration-200",

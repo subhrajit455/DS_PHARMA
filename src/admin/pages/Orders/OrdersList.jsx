@@ -1,6 +1,6 @@
 import React, { useState, useEffect } from 'react';
 import { useNavigate } from 'react-router-dom';
-import { Search, Filter, Eye, ArrowRight } from 'lucide-react';
+import { Search, Filter, Eye, ArrowRight, Sparkles } from 'lucide-react';
 import { toast } from 'react-hot-toast';
 import { Button } from '../../components/ui/Button';
 import { Input } from '../../components/ui/Input';
@@ -58,11 +58,16 @@ const OrdersList = () => {
   };
 
   return (
-    <div className="h-full flex flex-col space-y-4 p-2 sm:p-4 bg-gradient-to-br from-gray-50 via-emerald-50/20 to-teal-50/30">
+    <div className="h-full flex flex-col space-y-4 p-2 sm:p-4" style={{ background: 'linear-gradient(135deg, #f0fdf4 0%, #ecfdf5 50%, #f0fdfa 100%)', padding: '10px 10px 0px 10px' }}>
       <div className="flex flex-col sm:flex-row justify-between items-start sm:items-center gap-3 sm:gap-4 shrink-0">
         <div>
-           <h2 className="text-xl sm:text-2xl md:text-3xl font-bold tracking-tight">Orders</h2>
+          <div>
+           <h2 className="text-xl sm:text-2xl md:text-4xl font-bold bg-gradient-to-r from-gray-900 via-emerald-800 to-teal-800 bg-clip-text text-transparent flex items-center gap-2">
+             Orders
+             <Sparkles className="h-6 w-6 sm:h-7 sm:w-7 lg:h-8 lg:w-8 text-emerald-500" />
+           </h2>
            <p className="text-gray-500 text-[10px] sm:text-[8px] sm:text-xs md:text-sm mt-0.5">Manage and track customer orders</p>
+          </div>
         </div>
       </div>
 
@@ -70,7 +75,7 @@ const OrdersList = () => {
         <CardContent className="flex-1 flex flex-col p-2 sm:p-3 md:p-4 min-h-0">
             <div className="flex flex-col lg:flex-row gap-2 sm:gap-3 md:gap-4 justify-between items-center mb-2 sm:mb-3 md:mb-4 shrink-0" style={{ paddingBottom: '5px' }}>
                 {/* Status Tabs */}
-                <div className="flex gap-1 sm:gap-2 p-1 bg-gray-100 rounded-lg overflow-x-auto max-w-full no-scrollbar">
+                <div className="flex gap-1 sm:gap-2 p-1 bg-gray-100 rounded-lg overflow-x-auto max-w-full no-scrollbar scrollbar-hide">
                 {statuses.map(status => (
                     <button
                         style={{padding:'2px 5px'}}

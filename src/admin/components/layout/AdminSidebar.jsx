@@ -85,8 +85,8 @@ const AdminSidebar = ({ isCollapsed, toggleCollapse, isMobile, onCloseMobile }) 
       className={cn(
         "flex min-h-screen flex-col bg-linear-to-b from-slate-900 via-slate-900 to-slate-950 border-r border-slate-800/50 transition-all duration-300 ease-in-out z-50",
         "before:absolute before:inset-0 before:bg-linear-to-br before:from-emerald-500/5 before:to-teal-500/5 before:pointer-events-none",
-        isCollapsed ? "w-13" : "w-50",
-        isMobile ? "fixed inset-y-0 left-0 w-50 shadow-2xl shadow-emerald-500/10" : "h-screen sticky top-0"
+        isCollapsed ? "w-13 max-lg:w-0" : "w-50 max-lg:w-0",
+        isMobile ? "fixed inset-y-0 left-0 w-64 max-sm:w-56 shadow-2xl shadow-emerald-500/10" : "h-screen sticky top-0"
       )}
     >
       {/* Header */}

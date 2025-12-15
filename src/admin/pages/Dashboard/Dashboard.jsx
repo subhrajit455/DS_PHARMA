@@ -1,6 +1,7 @@
 import React, { useEffect, useState } from 'react';
 import { ShoppingBag, Users, DollarSign, Package, ArrowUpRight, ArrowDownRight, Plus, ExternalLink, TrendingUp, Sparkles } from 'lucide-react';
 import { useNavigate } from 'react-router-dom';
+import useDataStore from '../../../store/useDataStore';
 import { Card, CardContent, CardHeader, CardTitle, CardDescription } from '../../components/ui/Card';
 import { Button } from '../../components/ui/Button';
 import { Badge } from '../../components/ui/Badge';
@@ -53,6 +54,7 @@ const StatCard = ({ title, value, trend, trendUp, description, gradient, icon: I
 
 const Dashboard = () => {
   const navigate = useNavigate();
+  const orders = useDataStore((state) => state.orders);
   const [stats, setStats] = useState({
     sales: 0,
     orders: 0,
@@ -63,45 +65,79 @@ const Dashboard = () => {
   const [isLoading, setIsLoading] = useState(true);
 
   useEffect(() => {
-    const fetchDashboardData = async () => {
+    const fetchInitialData = async () => {
       try {
-        const [productsData, ordersData, customersData] = await Promise.all([
+        const [productsData, customersData] = await Promise.all([
           productService.getProducts({ limit: 100 }), 
-          orderService.getOrders(),
           customerService.getCustomers()
         ]);
 
-        // Calculate Stats
-        const totalSales = ordersData.reduce((sum, order) => sum + (order.paymentBreakdown?.total || order.price || 0), 0);
-        
-        setStats({
-          sales: totalSales.toLocaleString('en-IN', { style: 'currency', currency: 'INR', maximumFractionDigits: 0 }),
-          orders: ordersData.length,
+        // Set initial stats (excluding orders - will be updated by store subscription)
+        setStats(prev => ({
+          ...prev,
           customers: customersData.length,
           products: productsData.total || productsData.data?.length || 0
-        });
-
-        // Recent Orders
-        // Sort by date descending (handle ISO strings or DD MMM YYYY)
-        const sortedOrders = [...ordersData].sort((a, b) => {
-             const dateA = new Date(a.createdAt || a.date);
-             const dateB = new Date(b.createdAt || b.date);
-             if (dateB.getTime() !== dateA.getTime()) {
-                 return dateB.getTime() - dateA.getTime();
-             }
-             // Fallback to ID if dates equal (handle string IDs)
-             return String(b.id).localeCompare(String(a.id), undefined, { numeric: true });
-        }).slice(0, 5);
-        setRecentOrders(sortedOrders);
+        }));
       } catch (error) {
-        console.error('Failed to load dashboard data', error);
+        console.error('Failed to load initial dashboard data', error);
       } finally {
         setIsLoading(false);
       }
     };
 
-    fetchDashboardData();
+    fetchInitialData();
   }, []);
+
+  // Real-time update when orders change in the store
+  useEffect(() => {
+    // Filter out hardcoded/mock orders - only show real orders with ORD- prefix
+    const realOrders = orders.filter(order => 
+      String(order.id).startsWith('ORD-')
+    );
+
+    // Transform orders using the same logic as orderService
+    const transformedOrders = realOrders.map((o) => ({
+      ...o,
+      date: o.timeline?.[0]?.date || "N/A",
+      customer: o.customerName || o.deliveryAddress?.name || o.address?.name || o.customerAddress?.name || "Guest",
+      // Ensure proper total calculation with fallbacks
+      total: o.totals?.total || o.paymentBreakdown?.total || o.price || 0,
+    }));
+
+    // Sort and get latest 5 orders
+    const sortedOrders = [...transformedOrders]
+      .sort((a, b) => {
+        const dateA = new Date(a.createdAt || a.date || 0);
+        const dateB = new Date(b.createdAt || b.date || 0);
+        
+        if (dateB.getTime() !== dateA.getTime()) {
+          return dateB.getTime() - dateA.getTime();
+        }
+        
+        // For ORD- orders, compare numeric parts
+        const idA = String(a.id);
+        const idB = String(b.id);
+        
+        if (idA.startsWith('ORD-') && idB.startsWith('ORD-')) {
+          const numA = parseInt(idA.replace('ORD-', ''));
+          const numB = parseInt(idB.replace('ORD-', ''));
+          return numB - numA;
+        }
+        
+        return idB.localeCompare(idA, undefined, { numeric: true });
+      })
+      .slice(0, 5);
+
+    setRecentOrders(sortedOrders);
+
+    // Update stats based on real orders only
+    const totalSales = transformedOrders.reduce((sum, order) => sum + (order.total || 0), 0);
+    setStats(prev => ({
+      ...prev,
+      sales: totalSales.toLocaleString('en-IN', { style: 'currency', currency: 'INR', maximumFractionDigits: 0 }),
+      orders: transformedOrders.length
+    }));
+  }, [orders]);
 
   const getStatusVariant = (status) => {
     switch(status?.toLowerCase()) {
@@ -224,7 +260,7 @@ const Dashboard = () => {
                           </Badge>
                         </TableCell>
                         <TableCell className="text-right font-bold text-gray-900 text-[8px] sm:text-sm" style={{ padding: '10px 5px' }}>
-                          ₹{order.total || order.paymentBreakdown?.total || order.price}
+                          ₹{(order.total || order.paymentBreakdown?.total || order.price || 0).toFixed(2)}
                         </TableCell>
                       </TableRow>
                     ))}

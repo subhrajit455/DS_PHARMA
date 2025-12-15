@@ -82,18 +82,18 @@ const OrderDetails = () => {
 
       <div className="flex flex-col sm:flex-row justify-between items-start sm:items-center gap-4">
         <div>
-           <h1 className="text-3xl font-bold tracking-tight text-gray-900">Order #{order.id}</h1>
+           <h1 className="text-2xl font-bold tracking-tight text-gray-900">Order #{order.id}</h1>
            <p className="text-gray-500 text-sm mt-1">{order.date} • {order.items?.length || 0} Items</p>
         </div>
         
-        <div className="flex items-center gap-2 bg-white p-2 border rounded-lg shadow-sm">
+        <div className="flex items-center gap-1 bg-transparent p-2 rounded-lg shadow-sm" style={{ padding: '5px 10px' }}>
            <span className="text-sm font-semibold text-gray-700 pl-2">Status:</span>
            <select 
-             className="bg-gray-50 border border-gray-200 text-gray-700 text-sm rounded-md focus:ring-emerald-500 focus:border-emerald-500 block p-2 outline-none"
+             className="bg-transparent text-gray-700 text-sm rounded-md focus:ring-emerald-500 focus:border-emerald-500 block p-2 outline-none"
              value={pendingStatus || order.status}
              onChange={(e) => setPendingStatus(e.target.value)}
              disabled={isUpdating}
-             style={{ padding: '8px' }}
+             style={{ padding: '5px' }}
            >
              {statusOptions.map(option => (
                <option key={option} value={option}>{option}</option>
@@ -213,8 +213,8 @@ const OrderDetails = () => {
       
       {/* Sticky Bottom Bar for Update Action */}
       {pendingStatus && pendingStatus !== order.status && (
-          <div className="fixed bottom-0 right-0 left-0 lg:left-64 bg-white border-t border-gray-200 p-4 shadow-[0_-4px_6px_-1px_rgba(0,0,0,0.1)] z-40 animate-in slide-in-from-bottom-5">
-              <div className="flex justify-between items-center max-w-7xl mx-auto px-4">
+          <div className="fixed bottom-0 right-0 left-0 lg:left-53 bg-white border-t border-gray-200 p-4 shadow-[0_-4px_6px_-1px_rgba(0,0,0,0.1)] z-40 animate-in slide-in-from-bottom-5">
+              <div className="flex justify-between items-center max-w-7xl mx-auto px-4" style={{ padding: ' 0px 10px' }}>
                   <span className="text-sm text-gray-600 hidden sm:block">
                       Status change: <span className="font-semibold text-gray-900">{order.status}</span> → <span className="font-semibold text-emerald-600">{pendingStatus}</span>
                   </span>
