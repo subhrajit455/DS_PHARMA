@@ -10,6 +10,7 @@ import { motion as Motion, AnimatePresence } from 'framer-motion';
 
 // Hooks & Store
 import { useProfile, useUpdateProfile } from '@/hooks/queries/useProfile';
+import { useAddresses, useAddAddress, useUpdateAddress, useDeleteAddress } from '@/hooks/queries/useAddresses';
 import useDataStore from '@/store/useDataStore';
 import { USERS } from '@/data/userData';
 
@@ -39,6 +40,12 @@ const UserProfile = () => {
     // Fetch profile data
     const { data: profileDataResponse, isLoading } = useProfile();
     const { mutate: updateProfile, isPending: isUpdating } = useUpdateProfile();
+
+    // Fetch addresses at parent level to prevent reload on section switch
+    const { data: addressesData, isLoading: isLoadingAddresses } = useAddresses();
+    const { mutate: addAddress, isPending: isAddingAddress } = useAddAddress();
+    const { mutate: updateAddress, isPending: isUpdatingAddress } = useUpdateAddress();
+    const { mutate: deleteAddress, isPending: isDeletingAddress } = useDeleteAddress();
 
     // Dynamic profile data with fallback
     const [profileData, setProfileData] = useState(currentUser || USERS[0]);
@@ -89,7 +96,7 @@ const UserProfile = () => {
         { id: 'account', label: 'Settings', icon: Settings, desc: 'Account actions' }
     ];
 
-    if (isLoading) {
+    if (isLoading || isLoadingAddresses) {
         return (
             <div className="min-h-screen flex items-center justify-center bg-gray-50">
                 <div className="flex flex-col items-center gap-4">
@@ -101,12 +108,12 @@ const UserProfile = () => {
     }
 
     return (
-        <div className="min-h-screen w-full bg-gray-50 font-sans flex flex-col">
+        <div className="min-h-screen w-full bg-gray-50 font-sans flex flex-col" style={{ padding: '5px' }}>
             <ProfileHeader profileData={profileData} />
 
             {/* Main Content Area - flex-1 ensures it takes available space */}
-            <main className="flex-1 w-full mx-auto px-4 sm:px-6 lg:px-8 py-8"  style={{ maxWidth: '1280px', margin: '10px auto' }}>
-                <div className="grid grid-cols-1 lg:grid-cols-12 gap-8">
+            <main className="flex-1 w-full px-2 sm:px-4 md:px-6 lg:px-8 py-4 sm:py-6 md:py-8" style={{ maxWidth: '1280px', margin: '0 auto' }}>
+                <div className="grid grid-cols-1 lg:grid-cols-12 gap-4 sm:gap-6 lg:gap-8">
 
                     <ProfileSidebar 
                         profileData={profileData} 
@@ -115,45 +122,62 @@ const UserProfile = () => {
                         sections={sections} 
                     />
 
-                    {/* Right Content Area */}
+                    {/* Right Content Area with Min-Height for Stability */}
                     <div className="lg:col-span-9">
-                        <AnimatePresence mode="wait">
-                            <Motion.div
-                                key={activeSection}
-                                initial={{ opacity: 0, x: 10 }}
-                                animate={{ opacity: 1, x: 0 }}
-                                exit={{ opacity: 0, x: -10 }}
-                                transition={{ duration: 0.2 }}
-                            >
-                                {activeSection === 'overview' && (
-                                    <div className="space-y-6">
-                                        <PersonalInfoForm
-                                            profileData={profileData}
-                                            tempData={tempProfileData}
-                                            isEditing={isEditingProfile}
-                                            handleEdit={handleEditProfile}
-                                            handleSave={handleSaveProfile}
-                                            handleCancel={handleCancelProfile}
-                                            handleInputChange={handleProfileChange}
-                                            isSaving={isUpdating}
-                                        />
-                                        <div className="">
-                                            <OrdersPreview />
-                                            
+                        {/* Min-height container prevents layout shifts - Responsive */}
+                        <div style={{ 
+                            minHeight: window.innerWidth >= 768 
+                                ? 'calc(100vh - 320px)'  // Desktop/Tablet
+                                : 'calc(100vh - 220px)'   // Mobile - reduced for smaller screens
+                        }}>
+                            <AnimatePresence mode="wait">
+                                <Motion.div
+                                    key={activeSection}
+                                    initial={{ opacity: 0, x: 10 }}
+                                    animate={{ opacity: 1, x: 0 }}
+                                    exit={{ opacity: 0, x: -10 }}
+                                    transition={{ duration: 0.2 }}
+                                >
+                                    {activeSection === 'overview' && (
+                                        <div className="space-y-4 sm:space-y-6">
+                                            <PersonalInfoForm
+                                                profileData={profileData}
+                                                tempData={tempProfileData}
+                                                isEditing={isEditingProfile}
+                                                handleEdit={handleEditProfile}
+                                                handleSave={handleSaveProfile}
+                                                handleCancel={handleCancelProfile}
+                                                handleInputChange={handleProfileChange}
+                                                isSaving={isUpdating}
+                                            />
+                                            <div className="">
+                                                <OrdersPreview />
+                                                
+                                            </div>
                                         </div>
-                                    </div>
-                                )}
+                                    )}
 
-                                {activeSection === 'orders' && (
-                                    <div className="space-y-6">
-                                       <OrdersList />
-                                    </div>
-                                )}
-                                
-                                {activeSection === 'addresses' && <AddressesList />}
-                                {activeSection === 'account' && <AccountActions />}
-                            </Motion.div>
-                        </AnimatePresence>
+                                    {activeSection === 'orders' && (
+                                        <div className="space-y-4 sm:space-y-6">
+                                           <OrdersList />
+                                        </div>
+                                    )}
+                                    
+                                    {activeSection === 'addresses' && (
+                                        <AddressesList 
+                                            addressesData={addressesData}
+                                            addAddress={addAddress}
+                                            updateAddress={updateAddress}
+                                            deleteAddress={deleteAddress}
+                                            isAddingAddress={isAddingAddress}
+                                            isUpdatingAddress={isUpdatingAddress}
+                                            isDeletingAddress={isDeletingAddress}
+                                        />
+                                    )}
+                                    {activeSection === 'account' && <AccountActions />}
+                                </Motion.div>
+                            </AnimatePresence>
+                        </div>
                     </div>
 
                 </div>

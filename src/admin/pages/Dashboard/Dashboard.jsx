@@ -35,7 +35,7 @@ const StatCard = ({ title, value, trend, trendUp, description, gradient, icon: I
         </div>
       </CardHeader>
       <CardContent className="relative z-10">
-        <div className="text-2xl sm:text-3xl font-bold bg-gradient-to-r from-gray-900 to-gray-700 bg-clip-text text-transparent">
+        <div className="text-2xl sm:text-3xl font-bold bg-linear-to-r from-gray-900 to-gray-700 bg-clip-text text-transparent">
           {value}
         </div>
         <div className="flex items-center mt-2 text-[8px] sm:text-xs">
@@ -167,7 +167,7 @@ const Dashboard = () => {
       {/* Header with gradient text */}
       <div className="flex flex-col sm:flex-row justify-between items-start sm:items-center gap-2 sm:gap-4" style={{ padding: '5px' }}>
         <div>
-          <h1 className="text-2xl sm:text-3xl lg:text-4xl font-bold bg-gradient-to-r from-gray-900 via-emerald-800 to-teal-800 bg-clip-text text-transparent flex items-center gap-2 sm:gap-3">
+          <h1 className="text-2xl sm:text-3xl lg:text-4xl font-bold bg-linear-to-r from-gray-900 via-emerald-800 to-teal-800 bg-clip-text text-transparent flex items-center gap-2 sm:gap-3">
             Dashboard
             <Sparkles className="h-6 w-6 sm:h-7 sm:w-7 lg:h-8 lg:w-8 text-emerald-500" />
           </h1>

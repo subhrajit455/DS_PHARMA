@@ -1,6 +1,6 @@
 import React, { useState, useEffect } from 'react';
-import { useSearchParams } from 'react-router-dom';
-import { Filter, SlidersHorizontal, X } from 'lucide-react';
+import { useSearchParams, useNavigate } from 'react-router-dom';
+import { Filter, SlidersHorizontal, X, ArrowLeft } from 'lucide-react';
 import { AnimatePresence, motion } from 'framer-motion';
 import searchService from '@/services/api/searchService';
 import useDebounce from '@/hooks/useDebounce';
@@ -9,6 +9,7 @@ import { SearchFilters, SortDropdown } from '@/components/features/search/Search
 
 const SearchPage = () => {
   const [searchParams, setSearchParams] = useSearchParams();
+  const navigate = useNavigate();
   const [products, setProducts] = useState([]);
   const [facets, setFacets] = useState({});
   const [isLoading, setIsLoading] = useState(true);
@@ -96,8 +97,18 @@ const SearchPage = () => {
           }}
           className="flex flex-col md:flex-row justify-between items-start md:justify-items-center gap-4 mb-8 sticky md:sticky top-[40px] sm:top-[60px] md:top-0"
         >
-          <div>
-             <h1 className="text-2xl font-bold text-gray-900 tracking-tight">
+          <div className="flex items-center gap-4">
+            {/* Back Button */}
+            <button
+              onClick={() => navigate(-1)}
+              className="flex items-center gap-2 text-gray-600 hover:text-gray-900 transition-colors font-medium p-2 rounded-lg hover:bg-gray-100"
+              aria-label="Go back to previous page"
+            >
+              <ArrowLeft size={20} />
+            </button>
+            
+            <div>
+              <h1 className="text-2xl font-bold text-gray-900 tracking-tight">
                {query ? (
                   <>Results for <span className="text-emerald-600">"{query}"</span></>
                ) : 'All Products'}
@@ -105,6 +116,7 @@ const SearchPage = () => {
              <p className="text-gray-500 text-sm mt-1.5 font-medium">
                {isLoading ? 'Searching...' : `${products.length} items found`}
              </p>
+            </div>
           </div>
 
           <div className="flex items-center gap-1 sm:gap-3 w-full md:w-auto">

@@ -70,17 +70,19 @@ const AccountActions = () => {
             initial={{ opacity: 0, y: 10 }}
             animate={{ opacity: 1, y: 0 }}
             className="space-y-6"
+            style={{ marginTop: window.innerWidth >= 640 ? '30px' : '0' }}
         >
-            <div className="bg-white rounded-2xl border border-gray-100 shadow-sm overflow-hidden">
-                <div className="p-6 border-b border-gray-100 bg-gray-50/30">
+            <div className="bg-white rounded-2xl border border-gray-100 shadow-sm overflow-hidden" style={{ padding: '10px' }}>
+                <div className="p-6 border-b border-gray-100 bg-gray-50/30" style={{ marginBottom: '10px'}}>
                     <h2 className="text-lg font-bold text-gray-900">Account Actions</h2>
-                    <p className="text-sm text-gray-500">Manage your account access and data</p>
+                    <p className="text-xs sm:text-sm text-gray-500">Manage your account access and data</p>
                 </div>
                 
                 <div className="p-6 space-y-4">
                     {/* Change Password Section */}
                     {!showChangePassword ? (
                         <button
+                            style={{ padding: '2px 5px', marginBottom: '5px' }}
                             onClick={() => setShowChangePassword(true)}
                             className="w-full flex items-center justify-between p-4 rounded-xl border border-gray-200 hover:border-emerald-200 hover:bg-emerald-50/30 transition-all group"
                         >
@@ -90,57 +92,92 @@ const AccountActions = () => {
                                 </div>
                                 <div className="text-left">
                                     <h4 className="font-bold text-gray-900">Change Password</h4>
-                                    <p className="text-sm text-gray-500">Update your account password</p>
+                                    <p className="text-xs sm:text-sm text-gray-500">Update your account password</p>
                                 </div>
                             </div>
-                            <span className="text-sm font-medium text-emerald-600 group-hover:text-emerald-700">Update</span>
+                            <span className="text-xs sm:text-sm font-medium text-emerald-600 group-hover:text-emerald-700">Update</span>
                         </button>
                     ) : (
                         <Motion.div
                             initial={{ opacity: 0, height: 0 }}
                             animate={{ opacity: 1, height: 'auto' }}
                             className="p-5 rounded-xl border border-emerald-200 bg-emerald-50/30 space-y-4"
+                            style={{ padding: '10px', marginBottom: '5px' }}
                         >
-                            <h4 className="font-bold text-gray-900 mb-2">Change Password</h4>
-                            <div className="space-y-3">
-                                <input
-                                    type="password"
-                                    placeholder="Current Password"
-                                    value={passwordData.current}
-                                    onChange={e => setPasswordData({...passwordData, current: e.target.value})}
-                                    className="w-full px-4 py-2 bg-white border border-emerald-200 rounded-lg focus:outline-none focus:ring-2 focus:ring-emerald-500/20"
-                                />
-                                <div className="grid grid-cols-2 gap-3">
-                                    <input
-                                        type="password"
-                                        placeholder="New Password"
-                                        value={passwordData.new}
-                                        onChange={e => setPasswordData({...passwordData, new: e.target.value})}
-                                        className="w-full px-4 py-2 bg-white border border-emerald-200 rounded-lg focus:outline-none focus:ring-2 focus:ring-emerald-500/20"
-                                    />
-                                    <input
-                                        type="password"
-                                        placeholder="Confirm Password"
-                                        value={passwordData.confirm}
-                                        onChange={e => setPasswordData({...passwordData, confirm: e.target.value})}
-                                        className="w-full px-4 py-2 bg-white border border-emerald-200 rounded-lg focus:outline-none focus:ring-2 focus:ring-emerald-500/20"
-                                    />
+                            <h4 className="font-bold text-gray-900 mb-2" style={{ padding: '5px' }}>Change Password</h4>
+                            <div className="space-y-3" style={{ padding: '5px' }}>
+                                {/* Current Password */}
+                                <div className="relative" style={{ marginBottom: '15px' }}>
+                                    <label className="block mb-2 text-xs sm:text-sm font-medium text-gray-700">Current Password</label>
+                                    <div className="relative">
+                                        <div className="absolute left-2 top-[45%] -translate-y-1/2 text-gray-400 pointer-events-none z-10">
+                                            <Lock size={16} />
+                                        </div>
+                                        <input
+                                            type="password"
+                                            placeholder="Enter current password"
+                                            value={passwordData.current}
+                                            onChange={e => setPasswordData({...passwordData, current: e.target.value})}
+                                            className="w-full text-xs pl-11 pr-4 py-3 bg-white border border-emerald-200 rounded-xl focus:outline-none focus:ring-2 focus:ring-emerald-500/20 focus:border-emerald-500 focus:bg-white transition-all hover:border-emerald-300"
+                                            style={{ padding: '8px 30px' }}
+                                        />
+                                    </div>
+                                </div>
+
+                                <div className="grid grid-cols-1 md:grid-cols-2 gap-3">
+                                    {/* New Password */}
+                                    <div className="relative">
+                                        <label className="block mb-2 text-xs sm:text-sm font-medium text-gray-700">New Password</label>
+                                        <div className="relative">
+                                            <div className="absolute left-2 top-[45%] -translate-y-1/2 text-gray-400 pointer-events-none z-10">
+                                                <Lock size={16} />
+                                            </div>
+                                            <input
+                                                type="password"
+                                                placeholder="Enter new password"
+                                                value={passwordData.new}
+                                                onChange={e => setPasswordData({...passwordData, new: e.target.value})}
+                                                className="w-full text-xs pl-11 pr-4 py-3 bg-white border border-emerald-200 rounded-xl focus:outline-none focus:ring-2 focus:ring-emerald-500/20 focus:border-emerald-500 focus:bg-white transition-all hover:border-emerald-300"
+                                                style={{ padding: '8px 30px' }}
+                                            />
+                                        </div>
+                                    </div>
+
+                                    {/* Confirm Password */}
+                                    <div className="relative">
+                                        <label className="block mb-2 text-xs sm:text-sm font-medium text-gray-700">Confirm Password</label>
+                                        <div className="relative">
+                                            <div className="absolute left-2 top-[45%] -translate-y-1/2 text-gray-400 pointer-events-none z-10">
+                                                <Lock size={16} />
+                                            </div>
+                                            <input
+                                                type="password"
+                                                placeholder="Re-enter new password"
+                                                value={passwordData.confirm}
+                                                onChange={e => setPasswordData({...passwordData, confirm: e.target.value})}
+                                                className="w-full text-xs pl-11 pr-4 py-3 bg-white border border-emerald-200 rounded-xl focus:outline-none focus:ring-2 focus:ring-emerald-500/20 focus:border-emerald-500 focus:bg-white transition-all hover:border-emerald-300"
+                                                style={{ padding: '8px 30px' }}
+                                            />
+                                        </div>
+                                    </div>
                                 </div>
                             </div>
-                            <div className="flex justify-end gap-3 mt-2">
+                            <div className="flex justify-end gap-3 mt-2" style={{ padding: '5px' }}>
                                 <button
+                                    style={{ padding: '2px 5px' }}
                                     onClick={() => setShowChangePassword(false)}
-                                    className="px-4 py-2 text-sm font-medium text-gray-600 bg-white border border-gray-200 rounded-lg hover:bg-gray-50"
+                                    className="px-4 py-2 text-xs sm:text-sm font-medium text-gray-600 bg-white border border-gray-200 rounded-xl hover:bg-gray-50 transition-colors"
                                 >
-                                    Cancel
+                                    <span style={{ marginTop: '3px' }}>Cancel</span>
                                 </button>
                                 <button
+                                    style={{ padding: '2px 5px' }}
                                     onClick={handlePasswordChange}
                                     disabled={isChangingPassword}
-                                    className="flex items-center gap-2 px-4 py-2 text-sm font-medium text-white bg-emerald-600 rounded-lg hover:bg-emerald-700 disabled:opacity-50"
+                                    className="flex items-center gap-1 px-4 py-2 text-xs sm:text-sm font-medium text-white bg-emerald-600 rounded-xl hover:bg-emerald-700 disabled:opacity-50 transition-colors shadow-sm"
                                 >
                                     {isChangingPassword ? <Loader2 className="w-4 h-4 animate-spin" /> : <Save className="w-4 h-4" />}
-                                    Save Password
+                                    <span style={{ marginTop: '3px' }}>Save Password</span>
                                 </button>
                             </div>
                         </Motion.div>
@@ -150,6 +187,7 @@ const AccountActions = () => {
                     <button
                         onClick={handleLogout}
                         className="w-full flex items-center justify-between p-4 rounded-xl border border-gray-200 hover:border-gray-300 hover:bg-gray-50 transition-all group"
+                        style={{ padding: '2px 5px', marginBottom: '5px' }}
                     >
                         <div className="flex items-center gap-3">
                             <div className="p-2 bg-gray-100 rounded-lg group-hover:bg-white transition-colors">
@@ -157,10 +195,10 @@ const AccountActions = () => {
                             </div>
                             <div className="text-left">
                                 <h4 className="font-bold text-gray-900">Sign Out</h4>
-                                <p className="text-sm text-gray-500">Sign out of your active session</p>
+                                <p className="text-xs sm:text-sm text-gray-500">Sign out of your active session</p>
                             </div>
                         </div>
-                        <span className="text-sm font-medium text-gray-600 group-hover:text-gray-900">Sign Out</span>
+                        <span className="text-xs sm:text-sm font-medium text-gray-600 group-hover:text-gray-900">Sign Out</span>
                     </button>
 
                     {/* Delete Account Button */}
@@ -168,6 +206,7 @@ const AccountActions = () => {
                         <button
                             onClick={() => setShowDeleteConfirm(true)}
                             className="w-full flex items-center justify-between p-4 rounded-xl border border-red-100 bg-red-50/10 hover:bg-red-50 hover:border-red-200 transition-all group"
+                            style={{ padding: '2px 5px', marginBottom: '5px' }}
                         >
                             <div className="flex items-center gap-3">
                                 <div className="p-2 bg-red-100 rounded-lg">
@@ -175,10 +214,10 @@ const AccountActions = () => {
                                 </div>
                                 <div className="text-left">
                                     <h4 className="font-bold text-red-900">Delete Account</h4>
-                                    <p className="text-sm text-red-600/80">Permanently remove your account and data</p>
+                                    <p className="text-xs sm:text-sm text-red-600/80">Permanently remove your account and data</p>
                                 </div>
                             </div>
-                            <span className="text-sm font-medium text-red-600">Delete</span>
+                            <span className="text-xs sm:text-sm font-medium text-red-600">Delete</span>
                         </button>
                     ) : (
                         <Motion.div
@@ -190,7 +229,7 @@ const AccountActions = () => {
                                 <AlertTriangle className="w-6 h-6 text-red-600 shrink-0" />
                                 <div>
                                     <h4 className="font-bold text-red-900">Are you absolutely sure?</h4>
-                                    <p className="text-sm text-red-700 mt-1">
+                                    <p className="text-xs sm:text-sm text-red-700 mt-1">
                                         This action cannot be undone. This will permanently delete your account and remove your data from our servers.
                                     </p>
                                 </div>
@@ -198,13 +237,13 @@ const AccountActions = () => {
                              <div className="flex gap-3 justify-end">
                                 <button
                                     onClick={() => setShowDeleteConfirm(false)}
-                                    className="px-4 py-2 text-sm font-medium text-gray-700 bg-white border border-gray-300 rounded-lg hover:bg-gray-50 transition-colors"
+                                    className="px-4 py-2 text-xs sm:text-sm font-medium text-gray-700 bg-white border border-gray-300 rounded-lg hover:bg-gray-50 transition-colors"
                                 >
                                     Cancel
                                 </button>
                                 <button
                                     onClick={handleDeleteAccount}
-                                    className="px-4 py-2 text-sm font-medium text-white bg-red-600 rounded-lg hover:bg-red-700 transition-colors"
+                                    className="px-4 py-2 text-xs sm:text-sm font-medium text-white bg-red-600 rounded-lg hover:bg-red-700 transition-colors"
                                 >
                                     Yes, delete my account
                                 </button>

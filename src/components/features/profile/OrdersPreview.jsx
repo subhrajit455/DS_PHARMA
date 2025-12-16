@@ -37,7 +37,7 @@ const OrdersPreview = () => {
         return (
             <div 
                 className="bg-white rounded-2xl border border-gray-100 shadow-sm p-6"
-                style={{marginTop: '10px', padding: '10px', marginBottom: '30px'}}
+                style={{ marginTop: window.innerWidth >= 640 ? '10px' : '0', padding: '10px', marginBottom: '30px'}}
             >
                  <div className="h-6 w-32 bg-gray-100 rounded mb-6 animate-pulse" />
                  <div className="space-y-4">
@@ -54,7 +54,7 @@ const OrdersPreview = () => {
             initial={{ opacity: 0, y: 10 }}
             animate={{ opacity: 1, y: 0 }}
             className="bg-white rounded-2xl border border-gray-100 shadow-sm overflow-hidden"
-            style={{marginTop: '10px', padding: '10px', marginBottom: '30px'}}
+            style={{ marginTop: window.innerWidth >= 640 ? '10px' : '0', padding: '10px', marginBottom: '30px'}}
         >
             <div className="p-6 border-b border-gray-100 flex justify-between items-center bg-gray-50/30" style={{ marginBottom: '10px'}}>
                 <div>

@@ -11,7 +11,7 @@ const ProfileSidebar = ({
     const navigate = useNavigate();
 
     return (
-        <aside className="lg:col-span-3 lg:sticky lg:top-24 self-start space-y-6 md:min-h-[calc(100vh-260px)]">
+        <aside className="lg:col-span-3 lg:sticky lg:top-24 self-start space-y-6 md:min-h-[calc(100vh-200px)]" style={{ marginTop: window.innerWidth >= 640 ? '30px' : '0' }}>
             {/* User Mini Profile Card */}
             <div className="bg-white p-6 rounded-2xl shadow-sm border border-gray-100 flex flex-col items-center text-center" style={{ marginBottom: '10px', padding: '5px'}}>
                 <div className="relative mb-4 group cursor-pointer">
@@ -29,8 +29,8 @@ const ProfileSidebar = ({
                 <h2 className="text-lg font-bold text-gray-900">
                     {profileData.firstName} {profileData.lastName}
                 </h2>
-                <p className="text-sm text-gray-500 mb-4">{profileData.email}</p>
-                <div className="w-full pt-4 border-t border-gray-100 flex justify-between text-sm">
+                <p className="text-xs sm:text-sm text-gray-500 mb-4">{profileData.email}</p>
+                <div className="w-full pt-4 border-t border-gray-100 flex justify-between text-xs sm:text-sm">
                     <span className="text-gray-500">Member since</span>
                     <span className="font-medium text-gray-900">2023</span>
                 </div>
@@ -56,7 +56,7 @@ const ProfileSidebar = ({
                                 <section.icon className="w-5 h-5" />
                             </div>
                             <div className="text-left">
-                                <span className="block font-bold text-sm">{section.label}</span>
+                                <span className="block font-bold text-xs sm:text-sm">{section.label}</span>
                                 <span className="block text-xs opacity-70 font-medium">{section.desc}</span>
                             </div>
                         </div>
@@ -72,19 +72,19 @@ const ProfileSidebar = ({
                         <div className="p-2 rounded-lg bg-red-100 text-red-600">
                             <LogOut className="w-5 h-5" />
                         </div>
-                        <span className="font-bold text-sm">Sign Out</span>
+                        <span className="font-bold text-xs sm:text-sm">Sign Out</span>
                     </button>
                 </div>
             </nav>
 
             {/* Mobile Navigation Tabs */}
-            <div className="lg:hidden flex overflow-x-auto pb-4 gap-2 no-scrollbar" style={{ padding: '5px'}}>
+            <div className="lg:hidden flex overflow-x-auto pb-4 gap-4 no-scrollbar" style={{ padding: '2px 5px'}}>
                 {sections.map((section) => (
                     <button
                         style={{padding: '2px 5px'}}
                         key={section.id}
                         onClick={() => setActiveSection(section.id)}
-                        className={`flex-none px-4 py-2 rounded-full text-sm font-medium whitespace-nowrap transition-colors ${
+                        className={`flex-none px-4 py-2 rounded-full text-xs font-medium whitespace-nowrap transition-colors ${
                             activeSection === section.id
                                 ? 'bg-emerald-600 text-white'
                                 : 'bg-white text-gray-600 border border-gray-200'

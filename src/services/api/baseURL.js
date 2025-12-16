@@ -39,4 +39,11 @@ export const API_ENDPOINTS = {
   BANNERS: "/content/banners",
   REVIEWS: "/reviews",
   PRODUCT_REVIEWS: (id) => `/products/${id}/reviews`,
+
+  // Addresses (TODO: Implement on backend when ready)
+  ADDRESSES: "/addresses",
+  ADDRESS_DETAILS: (id) => `/addresses/${id}`,
+  ADD_ADDRESS: "/addresses",
+  UPDATE_ADDRESS: (id) => `/addresses/${id}`,
+  DELETE_ADDRESS: (id) => `/addresses/${id}`,
 };

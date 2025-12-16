@@ -1,5 +1,4 @@
 import React from 'react';
-import { motion as Motion } from 'framer-motion';
 import { useNavigate } from 'react-router-dom';
 import { Heart } from 'lucide-react';
 import { useAddToCart } from '../../../../hooks/mutations/useAddToCart';
@@ -87,13 +86,9 @@ const PharmacyProductCard = ({
   };
 
   return (
-    <Motion.div
-      className={`bg-transparent overflow-hidden rounded-lg cursor-pointer transition-all duration-300 hover:shadow-lg w-full ${className} ${!isAvailable ? 'opacity-60' : ''}`}
+    <div
+      className={`bg-white overflow-hidden rounded-lg cursor-pointer transition-all duration-200 shadow-sm hover:shadow-md w-full ${className} ${!isAvailable ? 'opacity-60' : ''}`}
       style={{ maxWidth: '300px', padding: '10px' }}
-      initial={{ opacity: 0, y: 20 }}
-      animate={{ opacity: 1, y: 0 }}
-      whileHover={{ y: -2 }}
-      whileTap={{ scale: 0.98 }}
       onClick={handleCardClick}
       role="button"
       tabIndex={0}
@@ -121,7 +116,7 @@ const PharmacyProductCard = ({
         {/* Wishlist Button */}
         <button
           onClick={handleWishlistToggle}
-          className="absolute top-2 right-2 p-1.5 rounded-full bg-white/80 hover:bg-white shadow-sm transition-all"
+          className="absolute top-2 right-2 p-1.5 rounded-full bg-white/90 hover:bg-white shadow-sm transition-colors duration-150"
           aria-label={isInWishlist ? 'Remove from wishlist' : 'Add to wishlist'}
           style={{ padding: '5px' }}
         >
@@ -178,30 +173,11 @@ const PharmacyProductCard = ({
           </span>
         </div>
 
-        <style>{`
-          .neumorphic-cart-btn {
-            transition: all 300ms cubic-bezier(0.23, 1, 0.32, 1);
-            box-shadow: 0 10px 15px -3px rgba(0, 0, 0, 0.4), inset 0 -2px 3px -1px rgba(0, 0, 0, 0.2), 0 -5px 8px -1px rgba(255, 255, 255, 0.6), inset 0 2px 3px -1px rgba(255, 255, 255, 0.2), inset 0 0 3px 1px rgba(255, 255, 255, 0.8), inset 0 10px 15px 0 rgba(255, 255, 255, 0.2);
-            border-radius: 50%;
-            background: #eaeaea;
-            color: #333;
-          }
-          .neumorphic-cart-btn:active {
-            filter: blur(0.5px);
-            box-shadow: 0 8px 15px -3px rgba(0, 0, 0, 0.3), inset 0 -5px 15px 1px rgba(255, 255, 255, 0.9), 0 -5px 8px -1px rgba(255, 255, 255, 0.6), inset 0 5px 15px 0 rgba(0, 0, 0, 0.3), inset 0 0 5px 1px rgba(255, 255, 255, 0.6);
-            transform: translateY(-50%) scale(0.95);
-          }
-          .neumorphic-cart-btn:disabled {
-            opacity: 0.5;
-            cursor: not-allowed;
-          }
-        `}</style>
-        
         {/* Cart Icon - Positioned absolutely */}
         <button
           onClick={handleAddToCart}
           disabled={isPending || !isAvailable}
-          className={`absolute flex items-center justify-center -translate-y-1/2 cursor-pointer right-0 top-1/2 focus:outline-none w-6 h-6 sm:w-8 sm:h-8 neumorphic-cart-btn`}
+          className="absolute flex items-center justify-center -translate-y-1/2 cursor-pointer right-0 top-1/2 focus:outline-none w-6 h-6 sm:w-8 sm:h-8 bg-gray-100 hover:bg-gray-200 rounded-full transition-colors duration-150"
           aria-label={isAvailable ? `Add ${name} to cart` : 'Out of stock'}
         >
           <img
@@ -215,7 +191,7 @@ const PharmacyProductCard = ({
           />
         </button>
       </div>
-    </Motion.div>
+    </div>
   );
 };
 

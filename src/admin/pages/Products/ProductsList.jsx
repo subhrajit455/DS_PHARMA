@@ -285,7 +285,7 @@ const ProductsList = () => {
                     </div>
 
                     {!isLoading && products.length > 0 && (
-                        <div className="shrink-0 mt-auto border-t pt-4">
+                        <div className="shrink-0 mt-auto pt-4" style={{bottom:'0', marginTop:'10px'}}>
                         <Pagination
                             currentPage={currentPage}
                             totalPages={Math.ceil(products.length / itemsPerPage)}

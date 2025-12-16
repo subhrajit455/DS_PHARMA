@@ -103,7 +103,7 @@ const CategoriesList = () => {
                 </Button>
              </div>
 
-             <Card className="flex-1 flex flex-col min-h-0 shadow-sm border-gray-200/60 bg-white/50 backdrop-blur-xl">
+             <Card className="flex-1 flex flex-col min-h-0 shadow-sm border-gray-200/60 bg-white/50 backdrop-blur-xl" style={{ padding: '5px 10px' }}>
                 <CardContent className="flex-1 flex flex-col p-2 sm:p-3 md:p-4 min-h-0">
                     <div className="flex items-center gap-4 mb-2 sm:mb-3 md:mb-4 shrink-0" style={{ paddingBottom: '5px' }}>
                         <div className="relative w-full lg:w-72">
@@ -173,7 +173,7 @@ const CategoriesList = () => {
 
                     {/* Pagination - Fixed at bottom */}
                     {filteredCategories.length > 0 && (
-                        <div className="shrink-0 mt-4 border-t pt-4">
+                        <div className="shrink-0 mt-4 pt-4" style={{bottom:'0', marginTop:'10px'}}>
                             <Pagination
                                 currentPage={currentPage}
                                 totalPages={Math.ceil(filteredCategories.length / itemsPerPage)}

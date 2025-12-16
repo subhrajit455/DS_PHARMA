@@ -1,49 +1,30 @@
 import React from 'react';
 import { motion as Motion } from 'framer-motion';
+import authBg from '../../../assets/images/auth-bg-2.png'; // Page Background (Liquid)
+import cardBgTexture from '../../../assets/images/auth-bg.png'; // Card Texture (Geometric)
 
 const AuthCard = ({ children, title, subtitle, className = '' }) => {
     return (
         <div 
-            className="min-h-screen flex items-center justify-center relative overflow-hidden"
-            style={{
-                background: 'linear-gradient(108deg, #E6D4F1 0%, #C4EBF5 50%, #A8EEDF 100%)',
-            }}
+            className="min-h-screen flex items-center justify-center relative overflow-hidden bg-gray-50"
+            style={{ padding: '5px' }}
         >
-            {/* Background Pattern - Premium Overlay */}
-            <div className="absolute inset-0 bg-white/30 backdrop-blur-[2px]" />
-            <div className="absolute inset-0 bg-[linear-gradient(to_right,#80808012_1px,transparent_1px),linear-gradient(to_bottom,#80808012_1px,transparent_1px)] bg-[size:24px_24px]" />
+            {/* Page Background Layer - Soft liquid theme */}
+            <div 
+                className="absolute inset-0 z-0"
+                style={{
+                    backgroundImage: `url(${cardBgTexture})`,
+                    backgroundSize: 'cover',
+                    backgroundPosition: 'center',
+                    filter: 'blur(0px) saturate(1.05) brightness(1.02)', // Removed blur completely, kept slight enhancement
+                    transform: 'scale(1.0)',
+                    opacity: 1
+                }}
+            />
             
-            {/* Ambient Gradients - Floating Orbs for extra premium feel */}
-            <div className="absolute inset-0 overflow-hidden pointer-events-none">
-                <Motion.div
-                    animate={{
-                        scale: [1, 1.2, 1],
-                        opacity: [0.4, 0.6, 0.4],
-                        rotate: [0, 45, 0],
-                    }}
-                    transition={{
-                        duration: 15,
-                        repeat: Infinity,
-                        ease: "easeInOut"
-                    }}
-                    className="absolute -top-[10%] -left-[5%] w-[60vh] h-[60vh] rounded-full bg-white/40 blur-[80px] mix-blend-overlay"
-                />
-                <Motion.div 
-                    animate={{
-                        scale: [1, 1.1, 1],
-                        x: [0, 30, 0],
-                        opacity: [0.3, 0.5, 0.3],
-                    }}
-                    transition={{
-                        duration: 20,
-                        repeat: Infinity,
-                        ease: "easeInOut",
-                        delay: 1
-                    }}
-                    className="absolute top-[40%] -right-[10%] w-[50vh] h-[50vh] rounded-full bg-purple-100/40 blur-[80px] mix-blend-overlay"
-                />
-            </div>
-
+            {/* Gradient Overlays - Reduced intensity to show image better */}
+            <div className="absolute inset-0 z-0 bg-gradient-to-br from-emerald-50/50 via-transparent to-teal-50/50 mix-blend-overlay" />
+            
             <Motion.div
                 initial={{ opacity: 0, scale: 0.95, y: 20 }}
                 animate={{ opacity: 1, scale: 1, y: 0 }}
@@ -53,26 +34,29 @@ const AuthCard = ({ children, title, subtitle, className = '' }) => {
                 }}
                 className="w-full max-w-2xl px-4 relative z-10"
             >
-                {/* Premium Glass Card */}
+                {/* Premium Glass Card with Texture */}
                 <div 
                     className={`
-                        backdrop-blur-3xl
-                        rounded-[32px]
-                        shadow-[0_8px_32px_rgba(31,38,135,0.07)]
-                        border border-white/60
-                        p-8 sm:p-10 md:p-12
-                        relative overflow-hidden
-                        ring-1 ring-white/50
-                        ${className}
-                    `}
-                    style={{
-                        background: 'linear-gradient(to bottom right, rgba(255,255,255,), rgba(255,255,255,)), linear-gradient(108deg, #E6D4F1 0%, #C4EBF5 50%, #A8EEDF 100%)',
-                        boxShadow: '0 20px 40px -15px rgba(0,0,0,0.1), inset 0 0 0 1px rgba(255,255,255,0.6)'
-                    }}
+                    rounded-2xl
+                    shadow-2xl
+                    border border-gray-100/80
+                    p-8 sm:p-10 md:p-12
+                    relative overflow-hidden
+                    backdrop-blur-sm
+                    ${className}
+                `}
+                style={{
+                    // Significantly reduced white overlay (0.85 -> 0.4) to make texture VERY visible
+                    background: `linear-gradient(to bottom, rgba(255,255,255,0.6), rgba(255,255,255,0.4)), url(${authBg})`,
+                    backgroundSize: 'cover',
+                    backgroundPosition: 'center',
+                    boxShadow: '0 25px 50px -12px rgba(0, 0, 0, 0.15), 0 0 0 1px rgba(255, 255, 255, 0.9)',
+                    backdropFilter: 'none' // Removed blur completely
+                }}
                 >
-                     {/* Top Premium Shine */}
-                     <div className="absolute top-0 inset-x-0 h-px bg-gradient-to-r from-transparent via-white/80 to-transparent" />
-                     <div className="absolute inset-0 bg-gradient-to-b from-white/40 to-transparent pointer-events-none" />
+                     {/* Subtle top shine for premium accent */}
+                     <div className="absolute top-0 inset-x-0 h-px bg-gradient-to-r from-transparent via-emerald-400/30 to-transparent" />
+                     <div className="absolute inset-0 bg-gradient-to-b from-white/20 to-transparent pointer-events-none" />
                      
                     <div className="text-center mb-8" style={{ padding: '10px 0px' }}>
                         {/* Title */}
