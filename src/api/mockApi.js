@@ -13,6 +13,7 @@ export const mockApi = {
     maxPrice,
     inStock,
     isHighlighted,
+    isFeatured,
   } = {}) => {
     await delay();
     let products = useDataStore.getState().products;
@@ -51,10 +52,15 @@ export const mockApi = {
       products = products.filter((p) => !!p.inStock === stockValue);
     }
 
-    // Highlighted Filter
+    // Highlighted / Featured Filter
     if (isHighlighted !== undefined && isHighlighted !== null) {
       const highlightedValue = String(isHighlighted) === "true";
       products = products.filter((p) => !!p.isHighlighted === highlightedValue);
+    }
+
+    if (isFeatured !== undefined && isFeatured !== null) {
+      const featuredValue = String(isFeatured) === "true";
+      products = products.filter((p) => !!p.isFeatured === featuredValue);
     }
 
     // Sorting (optional default: newest first if created field existed, currently just id reverse)

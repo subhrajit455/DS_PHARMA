@@ -12,6 +12,7 @@ import SuggestedItemsSection from "@/components/sections/SuggestedItemsSection";
 import { useOrderDetails } from "@/hooks/queries/useOrders";
 
 import { useProducts } from '@/hooks/queries/useProducts';
+import { useCancelOrder } from '@/hooks/mutations/useCancelOrder';
 
 const OrderDetails = () => {
   const navigate = useNavigate();
@@ -21,12 +22,30 @@ const OrderDetails = () => {
   // Fetch order details using React Query
   const { data: orderResponse, isLoading, isError } = useOrderDetails(id);
   
+  // Hooks must be called before any conditional returns
+  const { mutate: cancelOrder, isPending: isCancelling } = useCancelOrder();
+  
   // Use fetched data first, fall back to navigation state (instant load)
   const order = orderResponse?.data || location.state?.order;
   
   // Suggestions
   const { data: suggestionsData } = useProducts({ limit: 5 });
   const suggestedItems = suggestionsData?.data || [];
+
+  // Normalize customer address (handle both customerAddress and deliveryAddress)
+  const customerAddress = order?.customerAddress || order?.deliveryAddress || {
+    name: order?.customerName || 'N/A',
+    phone: order?.phone || 'N/A',
+    address: order?.address || 'N/A'
+  };
+
+  // Local state for address (in case it changes)
+  const [currentAddress, setCurrentAddress] = React.useState(customerAddress);
+  
+  // Sync if prop changes
+  React.useEffect(() => {
+    if (customerAddress) setCurrentAddress(customerAddress);
+  }, [customerAddress?.name, customerAddress?.address]); // use primitive dependencies to avoid loops
 
   // Only show loading if we have NO data to show
   if (isLoading && !order) return (
@@ -52,15 +71,28 @@ const OrderDetails = () => {
     total: 0
   };
 
-  // Normalize customer address (handle both customerAddress and deliveryAddress)
-  const customerAddress = order.customerAddress || order.deliveryAddress || {
-    name: order.customerName || 'N/A',
-    phone: order.phone || 'N/A',
-    address: order.address || 'N/A'
+  const handleCancelOrder = () => {
+      // Check if order can be cancelled
+      if (order.status === 'Delivered' || order.status === 'Cancelled' || order.status === 'Out for Delivery') {
+        alert("This order cannot be cancelled at this stage.");
+        return;
+      }
+
+      if (window.confirm("Are you sure you want to cancel this order?")) {
+        cancelOrder(order.id, {
+          onSuccess: () => {
+             // Optional: Force a refresh or simply navigate/show toast
+             // The useCancelOrder hook invalidates queries, so data should refresh
+          }
+        });
+      }
   };
 
-  const handleCancelOrder = () => navigate("/orders");
-  const handleChangeAddress = () => console.log("Change address");
+  const handleChangeAddress = (newAddress) => {
+      setCurrentAddress(newAddress);
+      // In a real app, we would make an API call here to update the order's address
+      console.log("Address updated to:", newAddress);
+  };
   const handleShareDetails = () => console.log("Share details");
   const handleDownloadReceipt = () => console.log("Download receipt");
 
@@ -156,7 +188,7 @@ const OrderDetails = () => {
               <div className="py-2">
                 <div className="flex flex-col space-y-4 lg:space-y-0 lg:gap-4">
                   <DeliveryAddressCard
-                    address={customerAddress}
+                    address={currentAddress}
                     onChangeAddress={handleChangeAddress}
                   />
                   <AppliedCouponCard coupon={order.appliedCoupon} />

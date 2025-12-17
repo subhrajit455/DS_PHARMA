@@ -73,7 +73,7 @@ const WhyChooseUsSection = () => {
 
       <div className="w-full max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 text-center relative z-10">
         <div
-          className="relative z-10 sm:max-w-7xl mx-auto grid grid-cols-1 lg:grid-cols-2 items-center justify-center px-4 sm:px-6 sm:mx-[50px] sm:ml-[50px] gap-8"
+          className="relative z-10 sm:max-w-7xl mx-auto flex items-center justify-center px-4 sm:px-6 sm:mx-[50px] sm:ml-[50px] gap-8"
           style={{
             paddingTop: '2rem',
             paddingBottom: '2rem',
@@ -81,7 +81,7 @@ const WhyChooseUsSection = () => {
           }}
         >
           {/* Left Content */}
-          <div className="flex flex-col justify-center">
+          <div className="flex flex-col justify-center md:w-[60%]">
             <div className=''>
               <div className='left-0 top-0 text-left'>
                 <Motion.h2
@@ -149,7 +149,7 @@ const WhyChooseUsSection = () => {
                     <span
                       style={{
                         fontFamily: 'Gyrotrope',
-                        fontSize: 'clamp(14px, 3vw, 16px)',
+                        fontSize: 'clamp(12px, 3vw, 16px)',
                         fontWeight: 600,
                         lineHeight: '1.4',
                         letterSpacing: '-0.01em',
@@ -164,7 +164,7 @@ const WhyChooseUsSection = () => {
             </div>
           </div>
           {/* Right Images - Pixel Perfect Positioning */}
-          <div className="relative hidden lg:flex items-center justify-end">
+          <div className="relative hidden lg:flex items-center justify-end md:w-[40%]">
             <div
               className="relative w-full"
               style={{
@@ -179,7 +179,7 @@ const WhyChooseUsSection = () => {
                   right: '0px',
                   top: '55%',
                   transform: 'translateY(-50%)',
-                  width: '280px',
+                  width: '250px',
                   maxWidth: '290px',
                   height: 'auto',
                   zIndex: 14,
@@ -239,7 +239,7 @@ const WhyChooseUsSection = () => {
                 transition={{ duration: 0.55, delay: 0.15, ease: 'easeOut' }}
                 className="absolute"
                 style={{
-                  left: '280px',
+                  left: '200px',
                   top: '',
                   width: '180px',
                   zIndex: 13,

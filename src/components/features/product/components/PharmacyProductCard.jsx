@@ -85,9 +85,13 @@ const PharmacyProductCard = ({
     onCardClick({ id, name, price, quantity, unit });
   };
 
+  // Check if transparent variant is requested via className or props (could be extended)
+  const isTransparent = className.includes('bg-transparent');
+  const baseBgClass = isTransparent ? '' : 'bg-white';
+  
   return (
     <div
-      className={`bg-white overflow-hidden rounded-lg cursor-pointer transition-all duration-200 shadow-sm hover:shadow-md w-full ${className} ${!isAvailable ? 'opacity-60' : ''}`}
+      className={`${baseBgClass} overflow-hidden rounded-lg cursor-pointer transition-all duration-200 shadow-sm hover:shadow-md w-full ${className} ${!isAvailable ? 'opacity-60' : ''}`}
       style={{ maxWidth: '300px', padding: '10px' }}
       onClick={handleCardClick}
       role="button"

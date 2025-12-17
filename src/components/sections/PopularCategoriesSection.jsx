@@ -160,11 +160,10 @@ const PopularCategoriesSection = ({
 
               {/* Category Name */}
               <h3
-                className="text-center w-full px-1"
+                className="text-center w-full px-1 text-xs sm:text-sm"
                 style={{
                   fontFamily: 'Gyrotrope',
                   fontWeight: 500,
-                  fontSize: '12px',
                   marginTop: '8px',
                   lineHeight: '1.2',
                   color: '#000000',

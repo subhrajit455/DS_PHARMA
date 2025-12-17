@@ -118,10 +118,9 @@ const OrderSummary = ({
         <div className="flex gap-2 relative">
           <button
             onClick={onAddNewAddress}
-            className="flex-1 transition-colors cursor-pointer hover:opacity-90"
+            className="flex-1 text-[12px] sm:text-xs transition-colors cursor-pointer hover:opacity-90"
             style={{
               fontFamily: "Gyrotrope",
-              fontSize: "11px",
               fontWeight: 600,
               backgroundColor: "#A5E8DC",
               color: "#000000",
@@ -137,10 +136,9 @@ const OrderSummary = ({
           <div className="relative">
             <button
               onClick={() => setIsDropdownOpen(!isDropdownOpen)}
-              className="transition-colors cursor-pointer hover:bg-gray-50 flex items-center gap-1"
+              className="transition-colors text-[12px] sm:text-xs cursor-pointer hover:bg-gray-50 flex items-center gap-1"
               style={{
                 fontFamily: "Gyrotrope",
-                fontSize: "11px",
                 fontWeight: 600,
                 color: "#000000",
                 border: "1px solid #D1D5DB",

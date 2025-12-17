@@ -7,7 +7,26 @@ import WhyChooseUsSection from '../components/sections/WhyChooseUsSection';
 import AboutUsSection from '../components/sections/AboutUsSection';
 import AlertBanner from '../components/sections/alerts/AlertBanner';
 
+import { useCategories } from '@/hooks/queries/useProducts';
+import Loading from '@/components/common/Loading';
+import ErrorState from '@/components/common/ErrorState';
+
 const Home = () => {
+  const { data: categoryData, isLoading, isError } = useCategories();
+  
+  // Get categories from API source
+  // We filter out any "All" or empty categories if necessary
+  const allCategories = categoryData?.data || [];
+  const validCategories = allCategories.filter(c => c !== "All");
+
+  // Dynamic layout logic: Split categories into two chunks
+  const midIndex = Math.ceil(validCategories.length / 2);
+  const firstHalfCategories = validCategories.slice(0, midIndex);
+  const secondHalfCategories = validCategories.slice(midIndex);
+
+  if (isLoading) return <Loading className="h-screen" />;
+  if (isError) return <ErrorState message="Failed to load homepage" />;
+
   return (
     <>
       {/* Top Alerts */}
@@ -23,27 +42,23 @@ const Home = () => {
         <PopularCategoriesSection />
       </section>
 
-      {/* Pharmacy Products Showcase */}
-      <section className="py-2 my-2 sm:py-12 sm:my-8">
-        <PharmacyProductsShowcase />
-      </section>
+      {/* First Block of Pharmacy Products (Top Half of Categories) */}
+      <PharmacyProductsShowcase categories={firstHalfCategories} />
 
       {/* Banner Section */}
       <section className="py-2 my-2 sm:py-12 sm:my-8">
         <BannerSection />
       </section>
 
-      {/* Highlighted Category Section */}
+      {/* Highlighted / Featured Category Section (Admin Controlled) */}
       <section className="py-2 my-2 sm:py-12 sm:my-8">
         <HighlightedCategorySection />
       </section>
 
-      {/* Pharmacy Products Showcase */}
-      <section className="py-2 my-2 sm:py-12 sm:my-8">
-        <PharmacyProductsShowcase />
-      </section>
+      {/* Second Block of Pharmacy Products (Bottom Half of Categories) */}
+      <PharmacyProductsShowcase categories={secondHalfCategories} />
 
-      {/* Banner Section */}
+      {/* Second Banner Section (Optional - kept if original layout had multiple banners) */}
       <section className="py-2 my-2 sm:py-12 sm:my-8">
         <BannerSection />
       </section>

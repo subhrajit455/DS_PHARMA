@@ -40,6 +40,14 @@ const getFilteredProducts = (query, filters, sort) => {
     results = results.filter((p) => p.inStock);
   }
 
+  if (filters?.isHighlighted) {
+    results = results.filter((p) => p.isHighlighted);
+  }
+
+  if (filters?.isFeatured) {
+    results = results.filter((p) => p.isFeatured);
+  }
+
   // 3. Sorting
   if (sort) {
     switch (sort) {

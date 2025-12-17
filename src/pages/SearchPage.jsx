@@ -1,7 +1,7 @@
 import React, { useState, useEffect } from 'react';
 import { useSearchParams, useNavigate } from 'react-router-dom';
 import { Filter, SlidersHorizontal, X, ArrowLeft } from 'lucide-react';
-import { AnimatePresence, motion } from 'framer-motion';
+import { AnimatePresence } from 'framer-motion';
 import searchService from '@/services/api/searchService';
 import useDebounce from '@/hooks/useDebounce';
 import SearchResults from '@/components/features/search/SearchResults';
@@ -23,6 +23,7 @@ const SearchPage = () => {
      categories: searchParams.getAll('category'),
      priceRangeStr: null, 
      inStock: searchParams.get('instock') === 'true',
+     isFeatured: searchParams.get('featured') === 'true',
   });
   
   // Temporary filters state for mobile drawer
@@ -55,6 +56,19 @@ const SearchPage = () => {
     fetchResults();
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [debouncedQuery, JSON.stringify(filters), sort]);
+
+  // Sync state with URL params when they change (controls navigation-driven updates)
+  useEffect(() => {
+    setFilters(prev => ({
+      ...prev,
+      categories: searchParams.getAll('category'),
+      inStock: searchParams.get('instock') === 'true',
+      isFeatured: searchParams.get('featured') === 'true',
+      isHighlighted: searchParams.get('highlighted') === 'true',
+      // We generally preserve other local filters unless explicitly cleared or overwritten, 
+      // but for "View All" links that replace the URL, this ensures we pick up the new intent.
+    }));
+  }, [searchParams]);
 
   const handleSortChange = (newSort) => {
      setSearchParams(prev => {

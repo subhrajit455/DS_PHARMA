@@ -183,7 +183,7 @@ const FeaturedProducts = () => {
                     </div>
 
                      {!isLoading && products.length > 0 && (
-                        <div className="shrink-0 mt-4 border-t pt-4">
+                        <div className="shrink-0 mt-4 pt-4" style={{ paddingTop: '10px' }}>
                             <Pagination
                                 currentPage={currentPage}
                                 totalPages={Math.ceil(products.length / itemsPerPage)}

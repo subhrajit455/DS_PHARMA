@@ -78,8 +78,8 @@ const OrderProductCard = ({ order, onCancel }) => {
 
       {/* Action Button */}
         <div className="flex justify-end pt-4" style={{ marginTop: '5px' }}>
-          <Button variant="outline" size="sm" onClick={onCancel} style={{ padding: '6px 16px' }}>
-            <span style={{ fontFamily: 'Gyrotrope', fontSize: '12px' }}>
+          <Button variant="outline" size="sm" onClick={onCancel} style={{ padding: '5px 10px' }}>
+            <span className="text-[8px] sm:text-xs" style={{ fontFamily: 'Gyrotrope' }}>
               Cancel Order
             </span>
           </Button>

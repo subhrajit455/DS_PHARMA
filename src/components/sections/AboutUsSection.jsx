@@ -78,20 +78,20 @@ const AboutUsSection = () => {
               whileInView={{ opacity: 1 }}
               viewport={{ once: true }}
               transition={{ duration: 0.5, delay: 0.15 }}
-              className="text-left mt-12 sm:mt-14 lg:mt-16 max-w-full sm:max-w-[85%] lg:max-w-[75%]"
+              className="text-start sm:text-left mt-12 sm:mt-14 lg:mt-16 max-w-full sm:max-w-[85%] lg:max-w-[75%]"
               style={{
                 padding: '2rem 0rem',
                 height: '100%',
               }}
             >
-              <p className="text-[8px] sm:text-md lg:text-base text-gray-700 leading-relaxed font-medium">
+              <p className="text-[12px] sm:text-md lg:text-base text-gray-700 leading-relaxed font-medium">
                 At <span className="font-bold text-emerald-600">DS Pharma</span>, we are committed to providing high-quality healthcare products and services. 
                 Our mission is to make health and wellness accessible to everyone. 
                 With a wide range of medicines, personal care items, and medical equipment, we are your trusted partner in health.
               </p>
               
               <div className="text-left mt-4 lg:mt-6">
-                <button className="text-[8px] sm:text-sm font-bold text-emerald-700 hover:text-emerald-800 underline underline-offset-4 transition-colors">
+                <button className="text-[10px] sm:text-sm font-bold text-emerald-700 hover:text-emerald-800 transition-colors">
                   Learn more about our journey →
                 </button>
               </div>

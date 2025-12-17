@@ -10,10 +10,14 @@ import ErrorState from '@/components/common/ErrorState';
 const HighlightedCategorySection = () => {
   const navigate = useNavigate();
   
-  // Fetch highlighted products
-  const { data, isLoading, isError } = useProducts({ isHighlighted: true, limit: 10 });
+  // Fetch featured products (Admin controlled)
+  const { data, isLoading, isError } = useProducts({ isFeatured: true, limit: 20 });
   
-  const products = (data?.data || []).map(p => ({
+  // Filter for visibility on Home Page only (View All shows all)
+  const allFeatured = data?.data || [];
+  const visibleProducts = allFeatured.filter(p => p.isVisible !== false);
+
+  const products = visibleProducts.map(p => ({
      ...p,
      quantity: '1',
      unit: 'box',
@@ -22,7 +26,7 @@ const HighlightedCategorySection = () => {
   }));
 
   if (isLoading) return <Loading className="py-20" />;
-  if (isError) return <ErrorState message="Failed to load highlighted items" />;
+  if (isError) return <ErrorState message="Failed to load featured items" />;
 
 
   const containerVariants = {
@@ -52,8 +56,9 @@ const HighlightedCategorySection = () => {
     navigate(`/product/${product.id}`);
   };
 
+  // View All ignores visibility restriction (shows all featured)
   const handleViewAll = () => {
-    navigate('/products?highlighted=true');
+    navigate('/products?featured=true');
   };
 
   return (
@@ -93,7 +98,7 @@ const HighlightedCategorySection = () => {
               lineHeight: '100%',
               letterSpacing: '0%',
               color: '#111827',
-              marginBottom: '5px',
+              marginBottom: '15px',
               display: 'flex',
               alignItems: 'center',
             }}
@@ -114,12 +119,11 @@ const HighlightedCategorySection = () => {
           </h2>
           <button
             onClick={handleViewAll}
-            className="bg-linear-to-r from-orange-500 to-orange-600 hover:from-orange-600 hover:to-orange-700 text-white px-6 py-2 sm:px-10 sm:py-3 lg:px-12 lg:py-3.5 rounded-md shadow-md hover:shadow-lg transition-all duration-200 transform hover:scale-105 focus:outline-none focus:ring-2 focus:ring-orange-500 focus:ring-offset-2 whitespace-nowrap"
+            className="bg-linear-to-r text-[10px] sm:text-xs from-orange-500 to-orange-600 hover:from-orange-600 hover:to-orange-700 text-white px-6 py-2 sm:px-10 sm:py-3 lg:px-12 lg:py-3.5 rounded-md shadow-md hover:shadow-lg transition-all duration-200 transform hover:scale-105 focus:outline-none focus:ring-2 focus:ring-orange-500 focus:ring-offset-2 whitespace-nowrap"
             aria-label="View all products"
             style={{
               fontFamily: 'Gyrotrope',
               fontWeight: 600,
-              fontSize: '12px',
               lineHeight: '100%',
               letterSpacing: '0%',
               padding: '6px 12px'
@@ -157,7 +161,8 @@ const HighlightedCategorySection = () => {
                 <PharmacyProductCard
                   {...product}
                   onCardClick={handleProductClick}
-                  className="h-full w-full"
+                  className="h-full w-full bg-transparent"
+
                 />
               </Motion.div>
             ))}
