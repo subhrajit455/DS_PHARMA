@@ -135,7 +135,7 @@ const Orders = () => {
                     placeholder="Search by Order ID, Product, Status"
                     value={searchQuery}
                     onChange={(e) => setSearchQuery(e.target.value)}
-                    className="w-full pr-10 md:pr-12 min-w-[350px] max-w-[400px] focus:outline-none transition-all text-[10px] sm:text-xs md:text-sm"
+                    className="w-full pr-10 md:pr-12 min-w-[350px] max-w-[400px] focus:outline-none transition-all text-[10px] sm:text-xs"
                     style={{
                       fontFamily: 'Gyrotrope',
                       color: '#000000',

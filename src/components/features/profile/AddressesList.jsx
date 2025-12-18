@@ -1,200 +1,17 @@
 import React, { useState } from 'react';
 import { motion as Motion, AnimatePresence } from 'framer-motion';
-import { MapPin, Edit2, Plus, Trash2, CheckCircle, X, Home, Briefcase, Save, Loader2, User, Phone } from 'lucide-react';
-
-const AddressForm = ({ initialData, onSave, onCancel, isSaving }) => {
-    const [formData, setFormData] = useState(initialData || {
-        type: 'Home',
-        name: '',
-        phone: '',
-        address: '',
-        city: '',
-        state: '',
-        pincode: '',
-        isDefault: false
-    });
-
-    const handleChange = (field, value) => {
-        setFormData(prev => ({ ...prev, [field]: value }));
-    };
-
-    // Matching PersonalInfoForm styling exactly
-    const inputClasses = "w-full text-xs pl-11 pr-4 py-3 bg-gray-50 border border-gray-200 rounded-xl focus:outline-none focus:ring-2 focus:ring-emerald-500/20 focus:border-emerald-500 focus:bg-white transition-all disabled:opacity-60 disabled:cursor-not-allowed hover:border-emerald-300";
-    const labelClasses = "block mb-2 text-xs sm:text-sm font-medium text-gray-700";
-
-    return (
-        <Motion.div
-            initial={{ opacity: 0, height: 0 }}
-            animate={{ opacity: 1, height: 'auto' }}
-            exit={{ opacity: 0, height: 0 }}
-            className="bg-gradient-to-br from-white to-emerald-50/20 rounded-2xl border border-gray-100 shadow-sm p-6 mb-6"
-            style={{ margin: '20px 0px' }}
-        >
-            <div className="flex justify-between items-center mb-6" style={{ padding: '5px' }}>
-                <h3 className="text-lg font-bold text-gray-900">{initialData ? 'Edit Address' : 'Add New Address'}</h3>
-                <button onClick={onCancel} className="p-2 hover:bg-gray-200 rounded-full transition-colors">
-                    <X className="w-5 h-5 text-gray-500" />
-                </button>
-            </div>
-
-            <div className="grid grid-cols-1 md:grid-cols-2 gap-6" style={{ padding: '5px' }}>
-                <div className="md:col-span-2">
-                    <label className={labelClasses}>Address Type</label>
-                    <div className="flex gap-4">
-                        {['Home', 'Work', 'Other'].map(type => (
-                            <button
-                                style={{ padding: '0px 5px' }}
-                                key={type}
-                                onClick={() => handleChange('type', type)}
-                                className={`flex items-center gap-1 px-4 py-2.5 rounded-xl border transition-all ${
-                                    formData.type === type 
-                                    ? 'bg-emerald-50 border-emerald-500 text-emerald-700 shadow-sm' 
-                                    : 'bg-white border-gray-200 text-gray-600 hover:bg-gray-50 hover:border-emerald-300'
-                                }`}
-                            >
-                                {type === 'Home' && <Home className="w-4 h-4" />}
-                                {type === 'Work' && <Briefcase className="w-4 h-4" />}
-                                {type === 'Other' && <MapPin className="w-4 h-4" />}
-                                {type}
-                            </button>
-                        ))}
-                    </div>
-                </div>
-
-                {/* Name Input with Icon */}
-                <div className="relative">
-                    <label className={labelClasses}>Recipient Name</label>
-                    <div className="relative">
-                        <div className="absolute left-2 top-[45%] -translate-y-1/2 text-gray-400 pointer-events-none z-10">
-                            <User size={16} />
-                        </div>
-                        <input
-                            type="text"
-                            value={formData.name}
-                            onChange={(e) => handleChange('name', e.target.value)}
-                            className={inputClasses}
-                            placeholder="Receiver's Name"
-                            style={{ padding: '8px 30px' }}
-                        />
-                    </div>
-                </div>
-
-                {/* Phone Input with Icon */}
-                <div className="relative">
-                    <label className={labelClasses}>Phone Number</label>
-                    <div className="relative">
-                        <div className="absolute left-2 top-[45%] -translate-y-1/2 text-gray-400 pointer-events-none z-10">
-                            <Phone size={16} />
-                        </div>
-                        <input
-                            type="tel"
-                            value={formData.phone}
-                            onChange={(e) => handleChange('phone', e.target.value)}
-                            className={inputClasses}
-                            placeholder="10-digit mobile number"
-                            style={{ padding: '8px 30px' }}
-                        />
-                    </div>
-                </div>
-
-                {/* Address Input with Icon */}
-                <div className="md:col-span-2 relative">
-                    <label className={labelClasses}>Address (House No, Building, Street)</label>
-                    <div className="relative">
-                        <div className="absolute left-2 top-2 text-gray-400 pointer-events-none z-10">
-                            <MapPin size={16} />
-                        </div>
-                        <textarea
-                            value={formData.address}
-                            onChange={(e) => handleChange('address', e.target.value)}
-                            className={inputClasses}
-                            rows="2"
-                            placeholder="Full address"
-                            style={{ padding: '8px 30px' }}
-                        />
-                    </div>
-                </div>
-
-                {/* City Input with Icon */}
-                <div className="relative">
-                    <label className={labelClasses}>City</label>
-                    <div className="relative">
-                        <div className="absolute left-2 top-[45%] -translate-y-1/2 text-gray-400 pointer-events-none z-10">
-                            <MapPin size={16} />
-                        </div>
-                        <input
-                            type="text"
-                            value={formData.city}
-                            onChange={(e) => handleChange('city', e.target.value)}
-                            className={inputClasses}
-                            placeholder="City"
-                            style={{ padding: '8px 30px' }}
-                        />
-                    </div>
-                </div>
-
-                {/* State Input with Icon */}
-                <div className="relative">
-                    <label className={labelClasses}>State</label>
-                    <div className="relative">
-                        <div className="absolute left-2 top-[45%] -translate-y-1/2 text-gray-400 pointer-events-none z-10">
-                            <MapPin size={16} />
-                        </div>
-                        <input
-                            type="text"
-                            value={formData.state}
-                            onChange={(e) => handleChange('state', e.target.value)}
-                            className={inputClasses}
-                            placeholder="State"
-                            style={{ padding: '8px 30px' }}
-                        />
-                    </div>
-                </div>
-
-                {/* Pincode Input with Icon */}
-                <div className="relative">
-                    <label className={labelClasses}>Pincode</label>
-                    <div className="relative">
-                        <div className="absolute left-2 top-[45%] -translate-y-1/2 text-gray-400 pointer-events-none z-10">
-                            <MapPin size={16} />
-                        </div>
-                        <input
-                            type="text"
-                            value={formData.pincode}
-                            onChange={(e) => handleChange('pincode', e.target.value)}
-                            className={inputClasses}
-                            placeholder="6-digit pincode"
-                            style={{ padding: '8px 30px' }}
-                        />
-                    </div>
-                </div>
-            </div>
-
-            <div className="flex justify-end gap-3 mt-6" style={{ padding: '10px 5px' }}>
-                <button
-                    style={{ padding: '2px 5px' }}
-                    onClick={onCancel}
-                    className="px-6 py-2.5 text-xs sm:text-sm font-medium text-gray-600 bg-white border border-gray-200 rounded-xl hover:bg-gray-50 transition-colors"
-                >
-                    Cancel
-                </button>
-                <button
-                    style={{ padding: '2px 5px' }}
-                    onClick={() => onSave(formData)}
-                    disabled={isSaving}
-                    className="flex items-center gap-1 px-6 py-2.5 text-xs sm:text-sm font-medium text-white bg-emerald-600 rounded-xl hover:bg-emerald-700 disabled:opacity-50 disabled:cursor-not-allowed transition-colors shadow-sm"
-                >
-                    {isSaving ? (
-                        <Loader2 className="w-4 h-4 animate-spin" />
-                    ) : (
-                        <Save className="w-4 h-4" />
-                    )}
-                    <span style={{ marginTop: '5px' }}>Save Address</span>
-                </button>
-            </div>
-        </Motion.div>
-    );
-};
+import { 
+    MapPin, 
+    Edit2, 
+    Plus, 
+    Trash2, 
+    CheckCircle, 
+    X, 
+    Home, 
+    Briefcase,
+    Loader2 
+} from 'lucide-react';
+import AddressForm from '../../common/AddressForm';
 
 const AddressesList = ({ 
     addressesData,
@@ -210,7 +27,7 @@ const AddressesList = ({
     
     const displayAddresses = addressesData?.data || [];
     const isSaving = isAddingAddress || isUpdatingAddress;
-    const isLoading = !addressesData; // Only show loading if no data at all
+    const isLoading = !addressesData;
 
     const handleSave = (data) => {
         if (editingId) {

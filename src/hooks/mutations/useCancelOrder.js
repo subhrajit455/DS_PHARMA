@@ -7,12 +7,7 @@ export const useCancelOrder = () => {
   const { success, error } = useToastStore();
 
   return useMutation({
-    mutationFn: (orderId) => {
-      // Only mock implementation for now as service might not have it
-      return new Promise((resolve) =>
-        setTimeout(() => resolve({ id: orderId, status: "Cancelled" }), 500)
-      );
-    },
+    mutationFn: (orderId) => orderService.cancelOrder(orderId),
 
     onSuccess: () => {
       success("Order cancelled successfully");

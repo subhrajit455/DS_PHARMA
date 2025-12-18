@@ -120,7 +120,7 @@ export const mockApi = {
     if (status && status !== "All") {
       const statusMap = {
         Processing: ["In Process", "Confirmed", "Order Placed"],
-        Shipped: ["On the Way", "Waiting For Pick Up", "Out For Delivery"],
+        Shipped: ["On the Way", "Out For Delivery"],
         Delivered: ["Delivered"],
         Cancelled: ["Returned", "Cancelled"],
       };

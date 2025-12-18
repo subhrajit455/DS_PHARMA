@@ -114,7 +114,9 @@ const OrdersPreview = () => {
                                     </div>
                                 </div>
                                 <div className="text-right">
-                                    <p className="font-bold text-gray-900">₹{(order.total || order.totalAmount || 0).toFixed(2)}</p>
+                                    <p className="font-bold text-gray-900">
+                                        ₹{(order.total || order.paymentBreakdown?.total || order.totalAmount || order.price || 0).toFixed(2)}
+                                    </p>
                                     <span className="text-xs font-semibold text-emerald-600 group-hover:underline">View Details</span>
                                 </div>
                             </div>

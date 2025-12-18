@@ -53,7 +53,7 @@ const OrdersList = () => {
     const s = status?.toLowerCase() || '';
     if (['delivered', 'completed'].includes(s)) return 'success'; // Green
     if (['cancelled', 'returned', 'failed'].includes(s)) return 'destructive'; // Red
-    if (['shipped', 'on the way', 'out for delivery', 'waiting for pick up'].includes(s)) return 'warning'; // Yellow
+    if (['shipped', 'on the way', 'out for delivery'].includes(s)) return 'warning'; // Yellow
     return 'secondary'; // Gray (Processing, Placed, etc)
   };
 
@@ -130,26 +130,26 @@ const OrdersList = () => {
                                     className="hover:bg-emerald-50/50 cursor-pointer transition-all duration-200 border-b border-gray-100"
                                     onClick={() => navigate(`/admin/orders/${order.id}`)}
                                 >
-                                    <TableCell className="font-medium text-[8px] sm:text-sm" style={{ padding: '8px 5px' }}>#{order.id}</TableCell>
-                                    <TableCell className="text-gray-500 text-[8px] sm:text-sm hidden md:table-cell" style={{ padding: '8px 5px' }}>{order.date}</TableCell>
-                                    <TableCell className="hidden sm:table-cell" style={{ padding: '8px 5px' }}>
-                                        <div className="font-medium text-gray-900 text-[8px] sm:text-sm">{order.customer || order.customerName}</div>
+                                    <TableCell className="font-medium text-[8px] sm:text-xs" style={{ padding: '6px 5px' }}>#{order.id}</TableCell>
+                                    <TableCell className="text-gray-500 text-[8px] sm:text-xs hidden md:table-cell" style={{ padding: '6px 5px' }}>{order.date}</TableCell>
+                                    <TableCell className="hidden sm:table-cell" style={{ padding: '6px 5px' }}>
+                                        <div className="font-medium text-gray-900 text-[8px] sm:text-xs">{order.customer || order.customerName}</div>
                                         <div className="text-[8px] sm:text-xs text-gray-500">{order.email}</div>
                                     </TableCell>
-                                    <TableCell className="text-gray-500 text-[8px] sm:text-sm hidden lg:table-cell" style={{ padding: '8px 5px' }}>{order.items} items</TableCell>
-                                    <TableCell className="font-bold text-[8px] sm:text-sm" style={{ padding: '8px 5px' }}>₹{order.total || order.paymentBreakdown?.total}</TableCell>
-                                    <TableCell className="hidden xl:table-cell" style={{ padding: '8px 5px' }}>
-                                        <Badge variant={order.payment === 'Paid' ? 'success' : 'secondary'} className="font-normal text-[8px] sm:text-xs">
+                                    <TableCell className="text-gray-500 text-[8px] sm:text-xs hidden lg:table-cell" style={{ padding: '6px 5px' }}>{order.items} items</TableCell>
+                                    <TableCell className="font-bold text-[8px] sm:text-xs text-center" style={{ padding: '6px 5px' }}>₹{order.total || order.paymentBreakdown?.total}</TableCell>
+                                    <TableCell className="hidden xl:table-cell" style={{ padding: '6px 5px 6px 20px' }}>
+                                        <Badge variant={order.payment === 'Paid' ? 'success' : 'secondary'} className=" font-normal text-[8px] sm:text-xs">
                                             {order.payment}
                                         </Badge>
                                     </TableCell>
-                                    <TableCell className="" style={{ padding: '8px 5px' }}>
+                                    <TableCell className="" style={{ padding: '6px 5px' }}>
                                         <Badge variant={getStatusVariant(order.status)} className="text-[8px] sm:text-xs">
                                             {order.status}
                                         </Badge>
                                     </TableCell>
-                                    <TableCell className="text-right" style={{ padding: '8px 5px' }}>
-                                         <Button variant="ghost" size="sm" className="text-[8px] sm:text-sm h-7 sm:h-8" onClick={(e) => { e.stopPropagation(); navigate(`/admin/orders/${order.id}`); }}>
+                                    <TableCell className="text-center" style={{ padding: '6px 5px' }}>
+                                         <Button variant="ghost" size="sm" className="text-[8px] sm:text-xs h-7 sm:h-8" onClick={(e) => { e.stopPropagation(); navigate(`/admin/orders/${order.id}`); }}> 
                                             <span className="hidden sm:inline" style={{marginTop:'3px', paddingRight:'3px'}}>Details</span>
                                             <Eye className="text-center h-3 w-3 sm:h-4 sm:w-4 sm:ml-2" />
                                          </Button>
@@ -158,7 +158,7 @@ const OrdersList = () => {
                             ))
                         ) : (
                             <TableRow>
-                                <TableCell colSpan={8} className="h-24 text-center text-gray-500">No orders found.</TableCell>
+                                <TableCell colSpan={8} className="h-24 text-center text-[8px] sm:text-xs text-gray-500">No orders found.</TableCell>
                             </TableRow>
                         )}
                     </TableBody>

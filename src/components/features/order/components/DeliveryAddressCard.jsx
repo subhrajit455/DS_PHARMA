@@ -14,7 +14,7 @@ const DeliveryAddressCard = ({ address, onChangeAddress, className }) => {
   if (!currentAddress) return null;
 
   return (
-    <Card className={`p-3 sm:p-4 mb-[10px] lg:mb-0 relative ${className || ''}`} style={{ padding: '10px 5px' }}>
+    <Card className={`p-3 sm:p-4 mb-[10px] lg:mb-0 relative ${className || ''}`} style={{ padding: '10px 5px', marginBottom: '5px' }}>
       <div className="flex flex-col h-full justify-between">
         <div className="flex-1">
           <h3 className="mb-2 sm:mb-3 text-[10px] md:text-base font-semibold text-[#34B485]" style={{ fontFamily: 'Gyrotrope', margin: '5px 8px' }}>
@@ -24,7 +24,7 @@ const DeliveryAddressCard = ({ address, onChangeAddress, className }) => {
           <div className="mb-2 sm:mb-3 text-[8px] sm:text-xs leading-relaxed text-gray-700" style={{ fontFamily: 'Gyrotrope', margin: '5px 8px' }}>
             <p className="mb-1 font-semibold flex items-center gap-2">
               {currentAddress.name} - {currentAddress.phone}
-              <span className="px-2 py-0.5 bg-gray-100 text-gray-600 rounded-full font-medium border border-gray-200">
+              <span className="px-2 py-0.5 bg-gray-100 text-gray-600 rounded-full font-medium border border-gray-200" style={{ padding: '0px 6px' }}>
                 {currentAddress.type || 'Home'}
               </span>
             </p>

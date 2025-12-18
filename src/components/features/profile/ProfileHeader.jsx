@@ -7,11 +7,11 @@ const ProfileHeader = ({ profileData }) => {
 
     return (
         <div className="bg-white border-b border-gray-200 sticky top-0 z-30 shadow-sm w-full">
-            <div className=" mx-auto px-4 sm:px-6 lg:px-8 h-16 flex items-center justify-between" style={{ maxWidth: '1280px', margin: 'auto' }}>
+            <div className="mx-auto px-4 sm:px-6 lg:px-8 h-16 flex items-center justify-between" style={{ maxWidth: '1280px', margin: 'auto' }}>
                 <div className="flex items-center gap-4" style={{ padding: '10px'}}>
                     <button 
                         onClick={() => navigate(-1)}
-                        className="p-2 -ml-2 hover:bg-gray-100 rounded-full text-gray-600 lg:hidden"
+                        className="p-2 hover:bg-gray-100 rounded text-gray-600"
                     >
                         <ChevronRight className="w-5 h-5 rotate-180" />
                     </button>

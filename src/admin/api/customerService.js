@@ -1,4 +1,5 @@
 import mockApi from "../../api/mockApi";
+import useDataStore from "../../store/useDataStore";
 
 export const customerService = {
   getCustomers: async (params) => {
@@ -28,17 +29,6 @@ export const customerService = {
       });
     }
 
-    // In a real app we would join orders here via API,
-    // but the store holds them separately. Let's fetch orders to calculate stats.
-    // Optimization: Store could return enriched users, but let's keep it simple.
-    // Ideally we assume the user object already has 'orders' array or we skip detailed stats for list view.
-    // But existing UI might expect totals.
-    // Let's rely on the user object in the store having an 'orders' array if we implemented that link,
-    // OR we fetch orders to map.
-    // Given the complexity of joining in frontend, let's assume specific User structure or fetch orders.
-
-    // Quick Fix: Let's fetch all orders once to map stats if needed, or skip for performance.
-    // The previous implementation did a join.
     const allOrders = await mockApi.getOrders();
 
     return filtered.map((u) => {
@@ -67,6 +57,13 @@ export const customerService = {
       (o) => o.customerName === user.name || o.customerId === user.id
     );
 
+    // Enrich with addresses from global store if available
+    const globalAddresses = useDataStore.getState().addresses;
+    // Find the default address for this specific user if possible,
+    // or just use the first one as 'Default'.
+    const defaultAddr =
+      globalAddresses.find((a) => a.isDefault) || globalAddresses[0];
+
     return {
       ...user,
       status: "Active",
@@ -82,7 +79,9 @@ export const customerService = {
         total: o.paymentBreakdown?.total || o.price || 0,
         status: o.status,
       })),
-      address: user.address
+      address: defaultAddr
+        ? `${defaultAddr.address}, ${defaultAddr.city}, ${defaultAddr.state} - ${defaultAddr.pincode}`
+        : user.address?.street
         ? `${user.address.street}, ${user.address.city}, ${user.address.state}`
         : "N/A",
     };

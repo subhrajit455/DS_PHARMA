@@ -5,14 +5,13 @@ import { useNavigate } from "react-router-dom";
 
 export const usePlaceOrder = () => {
   const queryClient = useQueryClient();
-  const { success, error } = useToastStore();
+  const { error } = useToastStore();
   const navigate = useNavigate();
 
   return useMutation({
     mutationFn: (orderData) => mockApi.placeOrder(orderData),
 
     onSuccess: (response) => {
-      success("Order placed successfully!");
       queryClient.invalidateQueries({ queryKey: ["orders"] });
       queryClient.invalidateQueries({ queryKey: ["cart"] });
 

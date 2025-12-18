@@ -90,21 +90,12 @@ const OrdersList = () => {
                                         📦 {Array.isArray(order.items) ? order.items.length : (order.items || 1)} items
                                     </span>
                                     <span className="flex items-center gap-1 font-semibold text-gray-800">
-                                        💰 ₹{(order.total || order.price || 0).toFixed(2)}
+                                        💰 ₹{(order.total || order.paymentBreakdown?.total || order.price || 0).toFixed(2)}
                                     </span>
                                 </div>
                             </div>
-                            <div className="flex gap-2 ml-8 md:ml-0">
-                                <button 
-                                    style={{ padding: '2px 10px', fontSize: window.innerWidth >= 640 ? '14px' : '11px' }}
-                                    onClick={(e) => {
-                                        e.stopPropagation();
-                                        // Track order logic
-                                    }}
-                                    className="px-4 py-2 font-medium text-teal-600 border border-teal-600 rounded-lg hover:bg-teal-50 transition-colors"
-                                >
-                                    Track Order
-                                </button>
+                            <div className="ml-8 md:ml-0">
+                                
                                 <button 
                                     style={{ padding: '2px 10px', fontSize: window.innerWidth >= 640 ? '14px' : '11px' }}
                                     onClick={(e) => {

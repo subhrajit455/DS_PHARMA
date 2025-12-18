@@ -44,6 +44,17 @@ export const orderService = {
     }
     return apiClient.get(API_ENDPOINTS.ORDER_BY_ID(id));
   },
+
+  cancelOrder: async (id) => {
+    if (USE_MOCK) {
+      const updatedOrder = await mockApi.updateOrderStatus(id, "Cancelled");
+      return { data: updatedOrder };
+    }
+    // real API would be something like .patch() or .post()
+    return apiClient.patch(API_ENDPOINTS.ORDER_STATUS(id), {
+      status: "Cancelled",
+    });
+  },
 };
 
 export default orderService;

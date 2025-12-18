@@ -1,6 +1,6 @@
 import React, { useState, useEffect } from 'react';
 import { useNavigate } from 'react-router-dom';
-import { Plus, Search, Edit, Trash2, Filter, MoreHorizontal, Sparkles } from 'lucide-react';
+import { Plus, Search, Edit, Trash2, Filter, Sparkles, Eye, EyeOff, Package } from 'lucide-react';
 import { toast } from 'react-hot-toast';
 import { Button } from '../../components/ui/Button';
 import { Input } from '../../components/ui/Input';
@@ -31,9 +31,26 @@ const ProductsList = () => {
   const [showFilters, setShowFilters] = useState(false);
   const [currentPage, setCurrentPage] = useState(1);
   const [itemsPerPage, setItemsPerPage] = useState(10);
+  
+  // Dynamic Categories
+  const [categories, setCategories] = useState(["All"]);
 
-  // Categories for dropdown (In real app, fetch from API)
-  const categories = ["All", "Fever & Pain", "Antibiotics", "Vitamins & Supplements", "Stomach Care", "Skin Care", "Devices"];
+  const fetchCategories = async () => {
+      try {
+          const { data } = await productService.getCategories();
+          // Map to names, handling if data is objects or strings
+          const categoryNames = data.map(c => c.name || c);
+          // Deduplicate just in case
+          const uniqueCategories = [...new Set(categoryNames)];
+          setCategories(["All", ...uniqueCategories]);
+      } catch (error) {
+          console.error("Failed to fetch categories", error);
+      }
+  }
+
+  useEffect(() => {
+    fetchCategories();
+  }, []);
 
   const fetchProducts = async () => {
     setIsLoading(true);
@@ -74,6 +91,22 @@ const ProductsList = () => {
         console.error(error);
         toast.error('Failed to delete product');
       }
+    }
+  };
+
+  const handleToggleVisibility = async (product) => {
+    try {
+        // If undefined, it's visible by default, so toggle to false
+        const currentVisibility = product.isVisible !== undefined ? product.isVisible : true;
+        const newVisibility = !currentVisibility;
+        
+        await productService.updateProduct(product.id, { isVisible: newVisibility });
+        
+        toast.success(`Product ${newVisibility ? 'visible' : 'hidden'} on website`);
+        fetchProducts(); // Refresh list to reflect changes
+    } catch (error) {
+        console.error("Failed to toggle visibility", error);
+        toast.error("Failed to update visibility");
     }
   };
 
@@ -216,13 +249,14 @@ const ProductsList = () => {
                                     <TableHead className="font-semibold text-gray-700 text-[8px] sm:text-sm" style={{ padding: '6px 8px' }}>Price</TableHead>
                                     <TableHead className="font-semibold text-gray-700 text-[8px] sm:text-sm hidden lg:table-cell" style={{ padding: '6px 8px' }}>Stock</TableHead>
                                     <TableHead className="font-semibold text-gray-700 text-[8px] sm:text-sm hidden sm:table-cell" style={{ padding: '6px 8px' }}>Status</TableHead>
+                                    <TableHead className="font-semibold text-gray-700 text-[8px] sm:text-sm" style={{ padding: '6px 8px' }}>Visibility</TableHead>
                                     <TableHead className="text-right font-semibold text-gray-700 text-[8px] sm:text-sm" style={{ padding: '6px 8px' }}>Actions</TableHead>
                                 </TableRow>
                             </TableHeader>
                             <TableBody>
                                 {isLoading ? (
                                     <TableRow>
-                                        <TableCell colSpan={7} className="h-24 text-center">
+                                        <TableCell colSpan={8} className="h-24 text-center">
                                             <div className="flex items-center justify-center gap-2 text-emerald-600">
                                                 <div className="w-4 h-4 border-2 border-emerald-600 border-t-transparent rounded-full animate-spin"/>
                                                 <span>Loading products...</span>
@@ -244,21 +278,35 @@ const ProductsList = () => {
                                                     <span className="text-[8px] text-gray-400 sm:hidden">{product.manufacturer}</span>
                                                 </div>
                                             </TableCell>
-                                            <TableCell className="font-mono text-[8px] sm:text-xs text-gray-500 hidden md:table-cell" style={{ padding: '8px' }}>{product.id}</TableCell>
-                                            <TableCell className="text-gray-600 text-[8px] sm:text-sm hidden sm:table-cell" style={{ padding: '8px' }}>{product.category}</TableCell>
-                                            <TableCell className="text-[8px] sm:text-sm font-semibold text-emerald-600" style={{ padding: '8px' }}>₹{product.price}</TableCell>
-                                            <TableCell className="text-[8px] sm:text-sm hidden lg:table-cell" style={{ padding: '8px' }}>
+                                            <TableCell className="font-mono text-[8px] sm:text-xs text-gray-500 hidden md:table-cell" style={{ padding: '6px' }}>{product.id}</TableCell>
+                                            <TableCell className="text-gray-600 text-[8px] sm:text-xs hidden sm:table-cell" style={{ padding: '6px' }}>{product.category}</TableCell>
+                                            <TableCell className="text-[8px] sm:text-xs font-semibold text-emerald-600" style={{ padding: '6px' }}>₹{product.price}</TableCell>
+                                            <TableCell className="text-[8px] sm:text-xs hidden lg:table-cell" style={{ padding: '6px' }}>
                                                 <span className={product.stock < 10 ? 'text-red-600 font-bold' : 'text-gray-600'}>
                                                     {product.stock} units
                                                 </span>
                                             </TableCell>
-                                            <TableCell className="hidden sm:table-cell" style={{ padding: '8px' }}>
+                                            <TableCell className="hidden sm:table-cell text-center" style={{ padding: '6px' }}>
                                                 <Badge variant={getStatusVariant(product.status, product.stock)} className="text-[8px] sm:text-xs">
                                                     {getStatusText(product.status, product.stock)}
                                                 </Badge>
                                             </TableCell>
-                                            <TableCell className="text-right" style={{ padding: '8px' }}>
-                                                <div className="flex items-center justify-end gap-1 sm:gap-2 opacity-100">
+                                            <TableCell className="text-[8px] sm:text-xs text-center" style={{ padding: '6px' }}>
+                                                <Button 
+                                                    variant="ghost" 
+                                                    size="icon" 
+                                                    className="h-6 w-6 hover:bg-gray-100"
+                                                    title={product.isVisible !== false ? "Hide from website" : "Show on website"}
+                                                    onClick={() => handleToggleVisibility(product)}
+                                                >
+                                                    {product.isVisible !== false 
+                                                        ? <Eye className="h-4 w-4 text-emerald-600" /> 
+                                                        : <EyeOff className="h-4 w-4 text-gray-400" />
+                                                    }
+                                                </Button>
+                                            </TableCell>
+                                            <TableCell className="text-right" style={{ padding: '6px' }}>
+                                                <div className="flex items-center justify-center gap-1 sm:gap-2 opacity-100">
                                                     <Button variant="ghost" size="icon" className="h-7 w-7 sm:h-8 sm:w-8 hover:bg-blue-50" onClick={() => navigate(`/admin/products/${product.id}/edit`)}>
                                                         <Edit className="h-3 w-3 sm:h-4 sm:w-4 text-blue-600" />
                                                     </Button>
@@ -271,7 +319,7 @@ const ProductsList = () => {
                                     ))
                                 ) : (
                                     <TableRow>
-                                        <TableCell colSpan={7} className="h-32 text-center text-gray-500">
+                                        <TableCell colSpan={8} className="h-32 text-center text-gray-500">
                                             <div className="flex flex-col items-center justify-center gap-2">
                                                 <Package className="w-8 h-8 text-gray-300" />
                                                 <p>No products found matching your search.</p>

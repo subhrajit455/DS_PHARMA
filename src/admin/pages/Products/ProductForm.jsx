@@ -1,14 +1,16 @@
 import React, { useState, useEffect } from 'react';
 import { useNavigate, useParams } from 'react-router-dom';
-import { Save, ArrowLeft, Upload, Package, Tag, DollarSign, Box } from 'lucide-react';
+import { Save, ArrowLeft, Package, Tag, DollarSign, Box, Eye, EyeOff } from 'lucide-react';
 import { toast } from 'react-hot-toast';
 import { useQueryClient } from '@tanstack/react-query';
 import { productService } from '../../api/productService';
 import { Button } from '../../components/ui/Button';
 import { Input } from '../../components/ui/Input';
 import { Label } from '../../components/ui/Label';
+import { Switch } from '../../components/ui/Switch';
 import { Card, CardContent, CardHeader, CardTitle, CardDescription } from '../../components/ui/Card';
 import ConfirmationModal from '../../components/ui/ConfirmationModal';
+import ImageUpload from '../../../components/common/ImageUpload';
 
 const ProductForm = () => {
   const navigate = useNavigate();
@@ -16,8 +18,8 @@ const ProductForm = () => {
   const queryClient = useQueryClient();
   const isEditMode = Boolean(id);
   const [isLoading, setIsLoading] = useState(false);
-  
   const [isModalOpen, setIsModalOpen] = useState(false);
+  const [categories, setCategories] = useState([]);
 
   const [formData, setFormData] = useState({
     name: '',
@@ -27,9 +29,25 @@ const ProductForm = () => {
     stock: '',
     description: '',
     status: 'active',
-    image: null
+    isVisible: true,
+    images: [] 
   });
 
+  // Fetch Categories
+  useEffect(() => {
+    const fetchCategories = async () => {
+        try {
+            const { data } = await productService.getCategories();
+            // Handle both simple string array or object array structure
+            setCategories(data);
+        } catch (error) {
+            console.error("Failed to load categories", error);
+        }
+    };
+    fetchCategories();
+  }, []);
+
+  // Fetch Product Details
   useEffect(() => {
     if (isEditMode) {
       const fetchProduct = async () => {
@@ -37,13 +55,17 @@ const ProductForm = () => {
           const product = await productService.getProduct(id);
           setFormData({
             name: product.name,
-            sku: product.sku,
+            sku: product.sku || '',
             category: product.category,
             price: product.price,
             stock: product.stock,
             description: product.description || '',
             status: product.status || 'active',
-            image: null 
+            isVisible: product.isVisible !== undefined ? product.isVisible : true,
+            // Ensure backward compatibility: use images array or fallback to single image wrapped in array
+            images: product.images && product.images.length > 0 
+                ? product.images 
+                : (product.image ? [product.image] : [])
           });
         } catch (error) {
           console.error(error);
@@ -60,6 +82,10 @@ const ProductForm = () => {
     setFormData(prev => ({ ...prev, [name]: value }));
   };
 
+  const handleImageChange = (newImages) => {
+    setFormData(prev => ({ ...prev, images: newImages }));
+  };
+
   const handleSubmit = (e) => {
     e.preventDefault();
     setIsModalOpen(true);
@@ -68,12 +94,22 @@ const ProductForm = () => {
   const handleConfirm = async () => {
     setIsLoading(true);
 
+    // Prepare payload
+    const payload = {
+        ...formData,
+        // Ensure the primary 'image' field is set for legacy compatibility (using first image)
+        image: formData.images.length > 0 ? formData.images[0] : null,
+        // Ensure numeric values
+        price: Number(formData.price),
+        stock: Number(formData.stock),
+    };
+
     try {
       if (isEditMode) {
-        await productService.updateProduct(id, formData);
+        await productService.updateProduct(id, payload);
         toast.success('Product updated successfully');
       } else {
-        await productService.createProduct(formData);
+        await productService.createProduct(payload);
         toast.success('Product created successfully');
       }
       
@@ -130,7 +166,6 @@ const ProductForm = () => {
                                 <Input 
                                     id="sku"
                                     name="sku"
-                                    required
                                     className="font-mono text-[12px] h-10 sm:h-auto"
                                     placeholder="e.g. MED-001"
                                     value={formData.sku}
@@ -151,35 +186,48 @@ const ProductForm = () => {
                                     style={{ padding: '10px 5px' }}
                                 >
                                     <option value="">Select Category</option>
-                                    <option value="Fever & Pain">Fever & Pain</option>
-                                    <option value="Antibiotics">Antibiotics</option>
-                                    <option value="Vitamins & Supplements">Vitamins & Supplements</option>
-                                    <option value="Diabetes Care">Diabetes Care</option>
-                                    <option value="Skin Care">Skin Care</option>
-                                    <option value="Stomach Care">Stomach Care</option>
-                                    <option value="First Aid">First Aid</option>
-                                    <option value="Devices">Devices</option>
-                                    <option value="Personal Care">Personal Care</option>
+                                    {categories.map((cat, idx) => (
+                                        <option key={idx} value={cat.name || cat}>{cat.name || cat}</option>
+                                    ))}
                                 </select>
                             </div>
                         </div>
-                        <div className="grid gap-2" style={{ marginBottom: '20px' }}>
-                            <Label htmlFor="status">Status</Label>
-                            <select 
-                                id="status"
-                                name="status"
-                                required
-                                className="flex h-auto w-full rounded-md border border-gray-200 bg-white px-3 py-2 text-[12px] shadow-sm transition-colors file:border-0 file:bg-transparent file:text-sm file:font-medium placeholder:text-gray-400 focus-visible:outline-none focus-visible:ring-1 focus-visible:ring-emerald-600 disabled:cursor-not-allowed disabled:opacity-50"
-                                value={formData.status}
-                                onChange={handleChange}
-                                style={{ padding: '10px 5px' }}
-                            >
-                                <option value="active">Active</option>
-                                <option value="inactive">Inactive</option>
-                                <option value="draft">Draft</option>
-                                <option value="out_of_stock">Out of Stock</option>
-                            </select>
+                        
+                        {/* Status and Visibility Row */}
+                        <div className="grid grid-cols-1 sm:grid-cols-2 gap-4 items-center" style={{ marginBottom: '20px' }}>
+                            <div className="grid gap-2">
+                                <Label htmlFor="status">Status</Label>
+                                <select 
+                                    id="status"
+                                    name="status"
+                                    required
+                                    className="flex h-10 w-full rounded-md border border-gray-200 bg-white px-3 py-2 text-[12px] shadow-sm transition-colors file:border-0 file:bg-transparent file:text-sm file:font-medium placeholder:text-gray-400 focus-visible:outline-none focus-visible:ring-1 focus-visible:ring-emerald-600 disabled:cursor-not-allowed disabled:opacity-50"
+                                    value={formData.status}
+                                    onChange={handleChange}
+                                    style={{ padding: '10px 5px' }}
+                                >
+                                    <option value="active">Active</option>
+                                    <option value="inactive">Inactive</option>
+                                    <option value="draft">Draft</option>
+                                    <option value="out_of_stock">Out of Stock</option>
+                                </select>
+                            </div>
+                            
+                            <div className="flex flex-col gap-2 p-3 bg-gray-50 rounded-lg border border-gray-100">
+                                <Label className="text-gray-600 font-medium text-xs">Website Visibility</Label>
+                                <div className="flex items-center justify-between">
+                                    <span className="text-[10px] text-gray-500 flex items-center gap-1">
+                                        {formData.isVisible ? <Eye className="w-3 h-3 text-emerald-600" /> : <EyeOff className="w-3 h-3 text-gray-400" />}
+                                        {formData.isVisible ? 'Visible to Customers' : 'Hidden from Website'}
+                                    </span>
+                                    <Switch 
+                                        checked={formData.isVisible}
+                                        onCheckedChange={(checked) => setFormData(prev => ({...prev, isVisible: checked}))}
+                                    />
+                                </div>
+                            </div>
                         </div>
+
                         <div className="grid gap-2" style={{ marginBottom: '20px' }}>
                             <Label htmlFor="description">Description</Label>
                             <textarea
@@ -238,19 +286,15 @@ const ProductForm = () => {
 
                 <Card>
                     <CardHeader>
-                        <CardTitle>Product Image</CardTitle>
+                        <CardTitle>Product Images</CardTitle>
+                        <CardDescription>Upload one or more images.</CardDescription>
                     </CardHeader>
                     <CardContent>
-                        <div className="border-2 border-dashed border-gray-200 rounded-lg p-6 text-center hover:bg-gray-50 transition-colors cursor-pointer group" style={{ padding: '20px 10px' }}>
-                             <div className="w-full mx-auto flex items-center justify-center">
-                              <div className="h-10 w-10 bg-gray-100 rounded-full flex items-center justify-center mx-auto mb-3 group-hover:bg-white transition-colors">
-                                <Upload className="h-5 w-5 text-gray-400 group-hover:text-emerald-600 transition-colors" />
-                             </div>
-                             </div>
-                             <div className="text-sm font-medium text-gray-900">Click to upload</div>
-                             <div className="text-[8px] sm:text-xs text-gray-500 mt-1">SVG, PNG, JPG (max. 2MB)</div>
-                             <input type="file" className="hidden" />
-                        </div>
+                        <ImageUpload 
+                            images={formData.images}
+                            onChange={handleImageChange}
+                            maxFiles={5}
+                        />
                     </CardContent>
                 </Card>
             </div>

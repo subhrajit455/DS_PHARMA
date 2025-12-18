@@ -48,9 +48,9 @@ const TimelineStep = ({ step, isLast }) => (
       }}
     />
 
-    {/* Status Label */}
+    {/* Status Label */}  
     <p
-      className="text-[9px] font-medium text-center max-w-[100px] my-1"
+      className="text-[8px] sm:text-[10px] text-center max-w-[120px] my-1"
       style={{
         fontFamily: 'Gyrotrope',
         color: step.completed || step.active ? '#000000' : '#9CA3AF',
@@ -63,7 +63,7 @@ const TimelineStep = ({ step, isLast }) => (
     {/* Date Label - Show with step if available */}
     {step.date && (
       <p
-        className="text-[8px] sm:text-xs text-center text-green-700"
+        className="text-[8px] sm:text-[10px] text-center text-green-700"
         style={{ fontFamily: 'Gyrotrope', marginTop: '5px' }}
       >
         {step.date}

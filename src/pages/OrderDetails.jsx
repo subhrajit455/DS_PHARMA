@@ -1,4 +1,4 @@
-import React from "react";
+import React, { useMemo } from "react";
 import { useNavigate, useParams, useLocation } from "react-router-dom";
 import { Card, Button } from "@/components/ui";
 import {
@@ -13,6 +13,7 @@ import { useOrderDetails } from "@/hooks/queries/useOrders";
 
 import { useProducts } from '@/hooks/queries/useProducts';
 import { useCancelOrder } from '@/hooks/mutations/useCancelOrder';
+import { useToastStore } from '@/store/useToastStore';
 
 const OrderDetails = () => {
   const navigate = useNavigate();
@@ -23,7 +24,8 @@ const OrderDetails = () => {
   const { data: orderResponse, isLoading, isError } = useOrderDetails(id);
   
   // Hooks must be called before any conditional returns
-  const { mutate: cancelOrder, isPending: isCancelling } = useCancelOrder();
+  const { mutate: cancelOrder } = useCancelOrder();
+  const { error: toastError } = useToastStore();
   
   // Use fetched data first, fall back to navigation state (instant load)
   const order = orderResponse?.data || location.state?.order;
@@ -33,11 +35,11 @@ const OrderDetails = () => {
   const suggestedItems = suggestionsData?.data || [];
 
   // Normalize customer address (handle both customerAddress and deliveryAddress)
-  const customerAddress = order?.customerAddress || order?.deliveryAddress || {
+  const customerAddress = useMemo(() => order?.customerAddress || order?.deliveryAddress || {
     name: order?.customerName || 'N/A',
     phone: order?.phone || 'N/A',
     address: order?.address || 'N/A'
-  };
+  }, [order?.customerAddress, order?.deliveryAddress, order?.customerName, order?.phone, order?.address]);
 
   // Local state for address (in case it changes)
   const [currentAddress, setCurrentAddress] = React.useState(customerAddress);
@@ -45,7 +47,7 @@ const OrderDetails = () => {
   // Sync if prop changes
   React.useEffect(() => {
     if (customerAddress) setCurrentAddress(customerAddress);
-  }, [customerAddress?.name, customerAddress?.address]); // use primitive dependencies to avoid loops
+  }, [customerAddress]); // Sync with full address object
 
   // Only show loading if we have NO data to show
   if (isLoading && !order) return (
@@ -74,15 +76,15 @@ const OrderDetails = () => {
   const handleCancelOrder = () => {
       // Check if order can be cancelled
       if (order.status === 'Delivered' || order.status === 'Cancelled' || order.status === 'Out for Delivery') {
-        alert("This order cannot be cancelled at this stage.");
+        toastError(`This order cannot be cancelled as it is already ${order.status.toLowerCase()}.`);
         return;
       }
 
       if (window.confirm("Are you sure you want to cancel this order?")) {
         cancelOrder(order.id, {
           onSuccess: () => {
-             // Optional: Force a refresh or simply navigate/show toast
-             // The useCancelOrder hook invalidates queries, so data should refresh
+             // Mutation hook already shows success toast
+             navigate('/orders', { state: { activeSection: 'orders' } });
           }
         });
       }

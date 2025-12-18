@@ -26,7 +26,7 @@ export const UserProfileButton = ({ isAuthenticated, user, className = '', showN
       </div>
       {showName && (
         <span 
-          className="font-sans text-sm font-medium text-black tracking-[0.01em]"
+          className="font-sans text-md font-medium text-black tracking-[0.01em]"
           style={{ paddingRight: '1rem' }}
         >
           {getDisplayName()}

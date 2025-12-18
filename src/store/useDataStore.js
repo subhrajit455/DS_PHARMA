@@ -2,6 +2,7 @@ import { create } from "zustand";
 import { persist, createJSONStorage } from "zustand/middleware";
 import { PRODUCTS, BANNERS, CATEGORY_DETAILS } from "../data/sampleData";
 import { USERS, MOCK_ORDERS, INITIAL_USER_STATE } from "../data/userData";
+import { MOCK_ADDRESSES } from "../data/addressData";
 
 // Unique name for localStorage key
 const STORE_NAME = "ds-pharma-store";
@@ -15,6 +16,7 @@ const useDataStore = create(
       users: USERS || [],
       banners: BANNERS || [],
       categories: CATEGORY_DETAILS || [],
+      addresses: MOCK_ADDRESSES || [],
 
       // --- User Session State ---
       currentUser: null,
@@ -22,6 +24,43 @@ const useDataStore = create(
       cart: [],
       wishlist: [],
       notifications: [],
+
+      // --- Actions: Addresses ---
+      setAddresses: (addresses) => set({ addresses }),
+      addAddress: (address) =>
+        set((state) => {
+          let updatedAddresses = state.addresses;
+          if (address.isDefault) {
+            updatedAddresses = state.addresses.map((a) => ({
+              ...a,
+              isDefault: false,
+            }));
+          }
+          const newAddress = {
+            ...address,
+            id: address.id || `addr-${Date.now()}`,
+          };
+          return { addresses: [...updatedAddresses, newAddress] };
+        }),
+      updateAddress: (id, data) =>
+        set((state) => {
+          let updatedAddresses = state.addresses;
+          if (data.isDefault) {
+            updatedAddresses = state.addresses.map((a) => ({
+              ...a,
+              isDefault: false,
+            }));
+          }
+          return {
+            addresses: updatedAddresses.map((a) =>
+              a.id === id ? { ...a, ...data } : a
+            ),
+          };
+        }),
+      deleteAddress: (id) =>
+        set((state) => ({
+          addresses: state.addresses.filter((a) => a.id !== id),
+        })),
 
       // --- Actions: Products ---
       setProducts: (products) => set({ products }),
@@ -56,7 +95,6 @@ const useDataStore = create(
         set((state) => {
           const updatedOrders = state.orders.map((order) => {
             if (order.id === orderId) {
-              // Create timeline entry
               const newTimeline = [
                 ...(order.timeline || []),
                 {
@@ -69,7 +107,7 @@ const useDataStore = create(
                     year: "numeric",
                   }),
                 },
-              ].map((t) => ({ ...t, active: t.status === status })); // Activate only new status
+              ].map((t) => ({ ...t, active: t.status === status }));
 
               return { ...order, status, timeline: newTimeline };
             }
@@ -131,7 +169,7 @@ const useDataStore = create(
       addToWishlist: (product) =>
         set((state) => {
           const exists = state.wishlist.find((item) => item.id === product.id);
-          if (exists) return state; // Already in wishlist
+          if (exists) return state;
           return { wishlist: [...state.wishlist, product] };
         }),
       removeFromWishlist: (productId) =>
@@ -143,12 +181,10 @@ const useDataStore = create(
           const product = state.wishlist.find((item) => item.id === productId);
           if (!product) return state;
 
-          // Remove from wishlist
           const newWishlist = state.wishlist.filter(
             (item) => item.id !== productId
           );
 
-          // Add to cart (or increment if exists)
           const existingCartItem = state.cart.find(
             (item) => item.id === productId
           );
@@ -167,9 +203,6 @@ const useDataStore = create(
         }),
 
       // --- Sync Helpers ---
-      // This function effectively "reloads" the state from storage if called manually,
-      // but zustand/persist handles most hydration automatically.
-      // We can expose a reset/init if needed.
       resetToDefaults: () =>
         set({
           products: PRODUCTS,
@@ -177,15 +210,14 @@ const useDataStore = create(
           users: USERS,
           banners: BANNERS,
           categories: CATEGORY_DETAILS,
+          addresses: MOCK_ADDRESSES,
           ...INITIAL_USER_STATE,
         }),
     }),
     {
-      name: STORE_NAME, // unique name in localStorage
-      storage: createJSONStorage(() => localStorage), // explicitly use localStorage
+      name: STORE_NAME,
+      storage: createJSONStorage(() => localStorage),
       partialize: (state) => ({
-        // Persist everything EXCEPT session-specific UI states if any.
-        // For now, persist ALL data to ensure full sync.
         products: state.products,
         orders: state.orders,
         users: state.users,
@@ -193,12 +225,12 @@ const useDataStore = create(
         isAuthenticated: state.isAuthenticated,
         cart: state.cart,
         wishlist: state.wishlist,
+        addresses: state.addresses,
       }),
     }
   )
 );
 
-// Enable cross-tab sync via storage event
 if (typeof window !== "undefined") {
   window.addEventListener("storage", (e) => {
     if (e.key === STORE_NAME) {

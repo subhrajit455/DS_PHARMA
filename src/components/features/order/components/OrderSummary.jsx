@@ -1,4 +1,4 @@
-import React, { useState, useEffect } from "react";
+import React, { useState } from "react";
 import {
   ChevronDown,
   Check,
@@ -7,30 +7,6 @@ import {
   Banknote,
   Smartphone,
 } from "lucide-react";
-
-const sampleAddresses = [
-  {
-    id: 1,
-    name: "Gourav Gupta",
-    phone: "+91 98765 43210",
-    address: "123, Tech Park, Sector 5, Bangalore, Karnataka - 560001",
-    type: "Work",
-  },
-  {
-    id: 2,
-    name: "Gourav Gupta",
-    phone: "+91 98765 43210",
-    address: "45/A, Green Avenue, Indiranagar, Bangalore, Karnataka - 560038",
-    type: "Home",
-  },
-  {
-    id: 3,
-    name: "Gourav Gupta",
-    phone: "+91 98765 43210",
-    address: "789, Lake View Apartments, Hebbal, Bangalore, Karnataka - 560024",
-    type: "Other",
-  },
-];
 
 const OrderSummary = ({
   deliveryAddress,
@@ -44,29 +20,11 @@ const OrderSummary = ({
   isPlacingOrder = false,
   cartItems = [],
 }) => {
-  const [currentAddress, setCurrentAddress] = useState(deliveryAddress);
-  const [isDropdownOpen, setIsDropdownOpen] = useState(false);
   const [paymentMethod, setPaymentMethod] = useState("online");
-
-  // Sync with prop if it changes initially
-  useEffect(() => {
-    if (deliveryAddress && !currentAddress) {
-      setCurrentAddress(deliveryAddress);
-    }
-    // eslint-disable-next-line react-hooks/exhaustive-deps
-  }, [deliveryAddress]);
-
-  const handleAddressSelect = (address) => {
-    setCurrentAddress(address);
-    setIsDropdownOpen(false);
-    if (onChangeAddress) {
-      onChangeAddress(address);
-    }
-  };
 
   return (
     <div className="sticky top-32 space-y-3">
-      {/* Delivery Address */}
+      {/* Delivery Address Summary */}
       <div
         style={{
           backgroundColor: "#FFFFFF",
@@ -90,9 +48,9 @@ const OrderSummary = ({
           >
             Delivery Address
           </h3>
-          {currentAddress?.type && (
+          {deliveryAddress?.type && (
             <span className="text-[10px] font-semibold px-2 py-0.5 rounded bg-gray-100 text-gray-600 border border-gray-200">
-              {currentAddress.type}
+              {deliveryAddress.type}
             </span>
           )}
         </div>
@@ -107,15 +65,19 @@ const OrderSummary = ({
             marginBottom: "12px",
           }}
         >
-          <div
-            style={{ fontWeight: 600, marginBottom: "2px", color: "#000000" }}
-          >
-            {currentAddress?.name || "Select Address"} - {currentAddress?.phone}
-          </div>
-          <div className="line-clamp-2">{currentAddress?.address}</div>
+          {deliveryAddress ? (
+            <>
+              <div style={{ fontWeight: 600, marginBottom: "2px", color: "#000000" }}>
+                {deliveryAddress.name} - {deliveryAddress.phone}
+              </div>
+              <div className="line-clamp-2">{deliveryAddress.address}, {deliveryAddress.city}</div>
+            </>
+          ) : (
+            <div className="text-gray-400 italic">No address selected</div>
+          )}
         </div>
 
-        <div className="flex gap-2 relative">
+        <div className="flex gap-2">
           <button
             onClick={onAddNewAddress}
             className="flex-1 text-[12px] sm:text-xs transition-colors cursor-pointer hover:opacity-90"
@@ -130,80 +92,25 @@ const OrderSummary = ({
               height: "30px",
             }}
           >
-            + Add New Address
+            + Add New Adderss
           </button>
 
-          <div className="relative">
-            <button
-              onClick={() => setIsDropdownOpen(!isDropdownOpen)}
-              className="transition-colors text-[12px] sm:text-xs cursor-pointer hover:bg-gray-50 flex items-center gap-1"
-              style={{
-                fontFamily: "Gyrotrope",
-                fontWeight: 600,
-                color: "#000000",
-                border: "1px solid #D1D5DB",
-                borderRadius: "8px",
-                padding: "6px 10px",
-                height: "30px",
-                backgroundColor: "transparent",
-              }}
-            >
-              Change Address
-              <ChevronDown
-                size={14}
-                className={`transition-transform duration-200 ${
-                  isDropdownOpen ? "rotate-180" : ""
-                }`}
-              />
-            </button>
-
-            {isDropdownOpen && (
-              <div
-                className="absolute right-0 top-full mt-2 w-72 bg-white rounded-xl shadow-xl border border-gray-100 z-50 overflow-hidden"
-                style={{ animation: "fadeIn 0.2s ease-out" }}
-              >
-                <div className="p-2 bg-gray-50 border-b border-gray-100">
-                  <span className="text-[8px] sm:text-xs font-semibold text-gray-500 px-2">
-                    Select Delivery Location
-                  </span>
-                </div>
-                <div className="max-h-64 overflow-y-auto py-1">
-                  {sampleAddresses.map((addr) => (
-                    <button
-                      key={addr.id}
-                      onClick={() => handleAddressSelect(addr)}
-                      className="w-full text-left px-4 py-3 hover:bg-gray-50 transition-colors border-b border-gray-50 last:border-0 group relative"
-                    >
-                      <div className="flex items-start gap-3">
-                        <div
-                          className={`mt-0.5 p-1.5 rounded-full ${
-                            currentAddress?.id === addr.id
-                              ? "bg-emerald-100 text-emerald-600"
-                              : "bg-gray-100 text-gray-400"
-                          }`}
-                        >
-                          <MapPin size={14} />
-                        </div>
-                        <div className="flex-1">
-                          <div className="flex justify-between items-center mb-0.5">
-                            <span className="font-semibold text-[8px] sm:text-xs text-gray-900">
-                              {addr.type}
-                            </span>
-                            {currentAddress?.id === addr.id && (
-                              <Check size={14} className="text-emerald-600" />
-                            )}
-                          </div>
-                          <p className="text-[8px] sm:text-xs text-gray-600 line-clamp-2 leading-relaxed">
-                            {addr.address}
-                          </p>
-                        </div>
-                      </div>
-                    </button>
-                  ))}
-                </div>
-              </div>
-            )}
-          </div>
+          <button
+            onClick={onChangeAddress}
+            className="flex-1 transition-colors text-[12px] sm:text-xs cursor-pointer hover:bg-gray-50 flex items-center justify-center gap-1"
+            style={{
+              fontFamily: "Gyrotrope",
+              fontWeight: 600,
+              color: "#000000",
+              border: "1px solid #D1D5DB",
+              borderRadius: "8px",
+              padding: "6px 10px",
+              height: "30px",
+              backgroundColor: "transparent",
+            }}
+          >
+            Change Address
+          </button>
         </div>
       </div>
 

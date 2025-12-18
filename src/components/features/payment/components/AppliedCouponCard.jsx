@@ -14,7 +14,7 @@ const AppliedCouponCard = ({ coupon, className }) => {
         Applied Coupon
       </h3>
       <p
-        className="text-[10px] sm:text-[8px] sm:text-xs text-gray-700 px-2 pb-2 sm:px-3 sm:pb-3 mb-2 sm:mb-3"
+        className="text-[10px] sm:text-sm text-gray-700 px-2 pb-2 sm:px-3 sm:pb-3 mb-2 sm:mb-3"
         style={{
           fontFamily: 'Gyrotrope',
         }}

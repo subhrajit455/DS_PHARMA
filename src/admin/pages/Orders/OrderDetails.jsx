@@ -28,7 +28,7 @@ const OrderDetails = () => {
   const [isModalOpen, setIsModalOpen] = useState(false);
   const [pendingStatus, setPendingStatus] = useState(null);
 
-  const statusOptions = ['Order Placed', 'Confirmed', 'In Process', 'Waiting For Pick Up', 'On the Way', 'Out For Delivery', 'Delivered', 'Returned', 'Cancelled'];
+  const statusOptions = ['Order Placed', 'Confirmed', 'In Process', 'On the Way', 'Out For Delivery', 'Delivered', 'Returned', 'Cancelled'];
 
   useEffect(() => {
     const fetchOrder = async () => {
