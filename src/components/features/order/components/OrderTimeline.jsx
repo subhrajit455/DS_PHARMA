@@ -1,8 +1,8 @@
 import React from 'react';
 
 const OrderTimeline = ({ timeline = [], deliveryPartner }) => {
-  // Filter to show only 4 main steps (remove 'Expected Delivery' middle step)
-  const filteredTimeline = timeline.filter((_, index) => index !== 2);
+  // Filter out the 'Expected Delivery' step which is sometimes added in the middle
+  const filteredTimeline = timeline.filter(step => step.status !== 'Expected Delivery');
 
   return (
     <div className="w-full min-h-[80px]">

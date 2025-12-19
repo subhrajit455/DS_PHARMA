@@ -1,7 +1,7 @@
 import React from 'react';
 import { X } from 'lucide-react';
 
-const Modal = ({ isOpen, onClose, title, children, size = 'md' }) => {
+const Modal = ({ isOpen, onClose, title, children, size = 'lg' }) => {
   if (!isOpen) return null;
 
   const sizes = {
@@ -12,10 +12,17 @@ const Modal = ({ isOpen, onClose, title, children, size = 'md' }) => {
   };
 
   return (
-    <div className="fixed inset-0 z-50 flex items-center justify-center p-4 bg-black bg-opacity-50">
-      <div className={`bg-white rounded-lg shadow-xl ${sizes[size]} w-full max-h-[90vh] overflow-y-auto`}>
+    <div className="fixed inset-0 z-50 flex items-center justify-center p-4">
+      {/* Backdrop */}
+      <div 
+        className="absolute inset-0 bg-black/30 backdrop-blur-xs transition-opacity duration-300" 
+        onClick={onClose}
+      />
+      
+      {/* Modal Container */}
+      <div className={`relative bg-white/90 backdrop-blur-md rounded-2xl shadow-2xl border border-white/20 ${sizes[size]} w-full max-h-[90vh] overflow-y-auto animate-in fade-in zoom-in duration-300`}>
         {/* Header */}
-        <div className="flex items-center justify-between p-6 border-b border-gray-200">
+        <div className="flex items-center justify-between p-5 border-b border-gray-100/50" style={{ padding: '10px 10px 0px 10px' }}>
           <h2
             className="text-xl font-bold text-gray-900"
             style={{ fontFamily: 'Gyrotrope' }}

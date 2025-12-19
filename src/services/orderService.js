@@ -46,14 +46,36 @@ export const orderService = {
   },
 
   cancelOrder: async (id) => {
-    if (USE_MOCK) {
-      const updatedOrder = await mockApi.updateOrderStatus(id, "Cancelled");
-      return { data: updatedOrder };
+    try {
+      if (USE_MOCK) {
+        const response = await mockApi.updateOrderStatus(id, "CANCELLED");
+        return { data: response };
+      }
+      return apiClient.patch(API_ENDPOINTS.ORDER_STATUS(id), {
+        status: "CANCELLED",
+      });
+    } catch (error) {
+      console.error("Cancel Order Error:", error);
+      throw error;
     }
-    // real API would be something like .patch() or .post()
-    return apiClient.patch(API_ENDPOINTS.ORDER_STATUS(id), {
-      status: "Cancelled",
-    });
+  },
+
+  returnOrder: async (id) => {
+    try {
+      if (USE_MOCK) {
+        const response = await mockApi.updateOrderStatus(
+          id,
+          "RETURN_REQUESTED"
+        );
+        return { data: response };
+      }
+      return apiClient.patch(API_ENDPOINTS.ORDER_STATUS(id), {
+        status: "RETURN_REQUESTED",
+      });
+    } catch (error) {
+      console.error("Return Order Error:", error);
+      throw error;
+    }
   },
 };
 

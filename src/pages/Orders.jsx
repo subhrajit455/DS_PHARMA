@@ -1,6 +1,5 @@
 import React, { useState } from 'react';
 import { Search } from 'lucide-react';
-import { PharmacyProductCard } from '@/components/features/product';
 import { OrderCard } from '@/components/features/order';
 import SuggestedItemsSection from '@/components/sections/SuggestedItemsSection';
 import { useOrders } from '@/hooks/queries/useOrders';
@@ -44,7 +43,7 @@ const Orders = () => {
         year: "numeric"
       }),
       // Normalize status for filtering
-      normalizedStatus: (order.status || 'Pending').toLowerCase()
+      normalizedStatus: (order.status || 'PLACED').toUpperCase()
     };
   });
 
@@ -55,7 +54,7 @@ const Orders = () => {
       order.id?.toString().toLowerCase().includes(searchQuery.toLowerCase()) ||
       order.status?.toLowerCase().includes(searchQuery.toLowerCase());
       
-    const matchesStatus = statusFilter === 'All' || order.normalizedStatus === statusFilter.toLowerCase();
+    const matchesStatus = statusFilter === 'All' || order.normalizedStatus === statusFilter.toUpperCase();
     
     let matchesDate = true;
     if (dateFilter !== 'All') {
@@ -83,8 +82,6 @@ const Orders = () => {
     setDateFilter('All');
   };
 
-  // Use products from sampleData for suggestions
-  // Suggestions
   const { data: suggestionsData } = useProducts({ limit: 5 });
   const suggestedItems = suggestionsData?.data || [];
 
@@ -185,8 +182,6 @@ const Orders = () => {
                       <path d="M2 4h12M4 8h8M6 12h4" stroke="currentColor" strokeWidth="2" strokeLinecap="round" />
                     </svg>
                   </button>
-
-                  
                 </div>
               </div>
             </div>
@@ -206,14 +201,13 @@ const Orders = () => {
                     onChange={(e) => setStatusFilter(e.target.value)}
                     className="w-full text-xs p-2 rounded-lg border border-gray-200 focus:border-teal-400 focus:ring-2 focus:ring-teal-100 outline-none bg-white font-gyrotrope"
                   >
-                    <option value="All">All Statuses</option>
-                    <option value="Pending">Pending</option>
-                    <option value="Order Placed">Order Placed</option>
-                    <option value="Confirmed">Confirmed</option>
-                    <option value="Shipped">Shipped</option>
-                    <option value="Out for Delivery">Out for Delivery</option>
-                    <option value="Delivered">Delivered</option>
-                    <option value="Cancelled">Cancelled</option>
+                    <option value="All">All Status</option>
+                    <option value="PLACED">Placed</option>
+                    <option value="CONFIRMED">Confirmed</option>
+                    <option value="SHIPPED">Shipped</option>
+                    <option value="DELIVERED">Delivered</option>
+                    <option value="CANCELLED">Cancelled</option>
+                    <option value="RETURN_REQUESTED">Return Requested</option>
                   </select>
                 </div>
                 <div>
@@ -234,7 +228,6 @@ const Orders = () => {
               </div>
               <div className="w-full flex justify-end">
                 <button
-
                   onClick={clearFilters}
                   className="transition-all duration-200 hover:text-red-600 whitespace-nowrap cursor-pointer text-[10px] sm:text-xs font-medium text-gray-500"
                   style={{ fontFamily: 'Gyrotrope', padding: '5px 10px', marginRight: '10px' }}
@@ -254,13 +247,13 @@ const Orders = () => {
               minHeight: '600px',
               overflowY: 'auto',
               paddingRight: '5px',
-              scrollbarWidth: 'none', // Firefox
-              msOverflowStyle: 'none', // IE and Edge
+              scrollbarWidth: 'none',
+              msOverflowStyle: 'none',
             }}
           >
             <style>{`
               .space-y-3::-webkit-scrollbar {
-                display: none; /* Chrome, Safari, Opera */
+                display: none;
               }
             `}</style>
             {filteredOrders.map((order, index) => (
@@ -286,6 +279,3 @@ const Orders = () => {
 };
 
 export default Orders;
-
-
-

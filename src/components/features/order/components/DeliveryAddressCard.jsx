@@ -1,7 +1,7 @@
 import React, { useState, useEffect } from 'react';
 import { Card } from '@/components/ui';
 
-const DeliveryAddressCard = ({ address, onChangeAddress, className }) => {
+const DeliveryAddressCard = ({ address, className }) => {
   const [currentAddress, setCurrentAddress] = useState(address);
 
   // Sync with prop if it changes initially or externally

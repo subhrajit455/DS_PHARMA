@@ -95,19 +95,33 @@ const useDataStore = create(
         set((state) => {
           const updatedOrders = state.orders.map((order) => {
             if (order.id === orderId) {
-              const newTimeline = [
-                ...(order.timeline || []),
-                {
-                  status: status,
-                  completed: true,
-                  active: true,
-                  date: new Date().toLocaleDateString("en-GB", {
-                    day: "numeric",
-                    month: "short",
-                    year: "numeric",
-                  }),
-                },
-              ].map((t) => ({ ...t, active: t.status === status }));
+              // Prevent duplicate status updates in timeline
+              const statusExists = (order.timeline || []).some(
+                (t) => t.status === status
+              );
+              let newTimeline = order.timeline || [];
+
+              if (!statusExists) {
+                newTimeline = [
+                  ...newTimeline,
+                  {
+                    status: status,
+                    completed: true,
+                    active: true,
+                    date: new Date().toLocaleDateString("en-GB", {
+                      day: "numeric",
+                      month: "short",
+                      year: "numeric",
+                    }),
+                  },
+                ];
+              }
+
+              // Update active state for all steps
+              newTimeline = newTimeline.map((t) => ({
+                ...t,
+                active: t.status === status,
+              }));
 
               return { ...order, status, timeline: newTimeline };
             }

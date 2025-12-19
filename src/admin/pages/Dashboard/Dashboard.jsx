@@ -252,14 +252,14 @@ const Dashboard = () => {
                         }}
                         onClick={() => navigate(`/admin/orders/${order.id}`)}
                       >
-                        <TableCell className="font-bold text-gray-900 text-[8px] sm:text-sm" style={{ padding: '10px 2px' }}>#{order.id}</TableCell>
-                        <TableCell className="text-gray-700 font-medium text-[8px] sm:text-sm table-cell" style={{ padding: '12px 8px' }}>{order.customer || order.customerName}</TableCell>
-                        <TableCell style={{ padding: '12px 8px' }}>
+                        <TableCell className="font-bold text-gray-900 text-[8px] sm:text-xs" style={{ padding: '10px 2px' }}>#{order.id}</TableCell>
+                        <TableCell className="text-gray-700 font-medium text-[8px] sm:text-xs table-cell" style={{ padding: '10px 2px' }}>{order.customer || order.customerName}</TableCell>
+                        <TableCell style={{ padding: '10px 2px' }}>
                           <Badge variant={getStatusVariant(order.status)} glow className="text-[8px] sm:text-xs">
                             {order.status}
                           </Badge>
                         </TableCell>
-                        <TableCell className="text-right font-bold text-gray-900 text-[8px] sm:text-sm" style={{ padding: '10px 5px' }}>
+                        <TableCell className="text-right font-bold text-gray-900 text-[8px] sm:text-xs" style={{ padding: '10px 2px' }}>
                           ₹{(order.total || order.paymentBreakdown?.total || order.price || 0).toFixed(2)}
                         </TableCell>
                       </TableRow>

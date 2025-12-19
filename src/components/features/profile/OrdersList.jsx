@@ -77,6 +77,8 @@ const OrdersList = () => {
                                     </p>
                                     <span className={`px-3 py-1 rounded-full text-[8px] sm:text-xs font-semibold ${order.statusColor === 'green' || order.status === 'Delivered'
                                             ? 'bg-green-100 text-green-700'
+                                            : order.status === 'Return Requested'
+                                            ? 'bg-orange-100 text-orange-700'
                                             : 'bg-blue-100 text-blue-700'
                                         }`}>
                                         {order.status}

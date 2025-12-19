@@ -26,7 +26,7 @@ const OrdersList = () => {
   const [currentPage, setCurrentPage] = useState(1);
   const [itemsPerPage, setItemsPerPage] = useState(10);
 
-  const statuses = ['All', 'Processing', 'Shipped', 'Delivered', 'Cancelled'];
+  const statuses = ['All', 'PLACED', 'CONFIRMED', 'SHIPPED', 'DELIVERED', 'CANCELLED', 'RETURN_REQUESTED'];
 
   const fetchOrders = async () => {
     setIsLoading(true);
@@ -50,11 +50,12 @@ const OrdersList = () => {
   }, [activeStatus, searchQuery]);
 
   const getStatusVariant = (status) => {
-    const s = status?.toLowerCase() || '';
-    if (['delivered', 'completed'].includes(s)) return 'success'; // Green
-    if (['cancelled', 'returned', 'failed'].includes(s)) return 'destructive'; // Red
-    if (['shipped', 'on the way', 'out for delivery'].includes(s)) return 'warning'; // Yellow
-    return 'secondary'; // Gray (Processing, Placed, etc)
+    const s = status?.toUpperCase() || '';
+    if (['DELIVERED', 'RETURN_COMPLETED'].includes(s)) return 'success'; // Green
+    if (['CANCELLED', 'FAILED'].includes(s)) return 'destructive'; // Red
+    if (['SHIPPED', 'RETURN_REQUESTED'].includes(s)) return 'warning'; // Yellow
+    if (['CONFIRMED', 'RETURN_APPROVED'].includes(s)) return 'primary'; // Blue (using primary as a proxy for info/blue)
+    return 'secondary'; // Gray (PLACED, etc)
   };
 
   return (
@@ -62,7 +63,7 @@ const OrdersList = () => {
       <div className="flex flex-col sm:flex-row justify-between items-start sm:items-center gap-3 sm:gap-4 shrink-0">
         <div>
           <div>
-           <h2 className="text-xl sm:text-2xl md:text-4xl font-bold bg-gradient-to-r from-gray-900 via-emerald-800 to-teal-800 bg-clip-text text-transparent flex items-center gap-2">
+           <h2 className="text-xl sm:text-2xl md:text-4xl font-bold bg-linear-to-r from-gray-900 via-emerald-800 to-teal-800 bg-clip-text text-transparent flex items-center gap-2">
              Orders
              <Sparkles className="h-6 w-6 sm:h-7 sm:w-7 lg:h-8 lg:w-8 text-emerald-500" />
            </h2>

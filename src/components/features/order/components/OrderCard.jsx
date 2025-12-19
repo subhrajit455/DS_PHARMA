@@ -8,14 +8,14 @@ const OrderCard = ({ order, index }) => {
 
   const getStatusColor = (status) => {
     const statusColors = {
-      'Order Placed': '#10B981',
-      'Confirmed': '#3B82F6',
-      'On The Way': '#F59E0B',
-      'In Process': '#FF7A59',
-      'Out For Delivery': '#8B5CF6',
-      'Delivered': '#059669',
-      'Cancelled': '#EF4444',
-      'Returned': '#DC2626',
+      'PLACED': '#E58564',
+      'CONFIRMED': '#3B82F6',
+      'SHIPPED': '#F59E0B',
+      'DELIVERED': '#059669',
+      'CANCELLED': '#ef4444ff',
+      'RETURN_REQUESTED': '#f59f0bb6',
+      'RETURN_APPROVED': '#3b83f6a1',
+      'RETURN_COMPLETED': '#dc26268e',
     };
     return statusColors[status] || order.statusBg || '#6B7280';
   };
@@ -77,7 +77,7 @@ const OrderCard = ({ order, index }) => {
 
           {/* Status Badge */}
           <div 
-            className="px-3 py-1.5 rounded-full text-[8px] sm:text-xs font-semibold text-white"
+            className="px-3 py-1.5 rounded-md text-[8px] sm:text-xs font-semibold text-white"
             style={{
               backgroundColor: getStatusColor(order.status),
               fontFamily: 'Gyrotrope',

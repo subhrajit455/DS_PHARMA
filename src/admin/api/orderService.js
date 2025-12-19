@@ -15,9 +15,14 @@ export const orderService = {
         o.customerAddress?.name ||
         "Guest",
       email: o.email || o.deliveryAddress?.email || "demo@dspharma.com", // Mock email usually missing in mock data
-      items: o.quantity || 1,
-      total: o.paymentBreakdown?.total || o.price,
-      payment: "Paid",
+      items: o.items
+        ? o.items.reduce((sum, item) => sum + (item.quantity || 1), 0)
+        : o.quantity || 1,
+      total:
+        o.totals?.total ||
+        o.paymentBreakdown?.total ||
+        o.price * (o.quantity || 1),
+      payment: o.paymentMethod === "cod" ? "Cash on Delivery" : "Paid",
     }));
   },
 
@@ -81,6 +86,7 @@ export const orderService = {
         order.price ||
         0,
       products: productsArray,
+      totalItems: productsArray.reduce((sum, p) => sum + p.qty, 0),
     };
   },
 

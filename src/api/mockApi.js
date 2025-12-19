@@ -63,9 +63,6 @@ export const mockApi = {
       products = products.filter((p) => !!p.isFeatured === featuredValue);
     }
 
-    // Sorting (optional default: newest first if created field existed, currently just id reverse)
-    // products.sort((a,b) => b.id.localeCompare(a.id));
-
     if (limit) {
       products = products.slice(0, limit);
     }
@@ -116,13 +113,18 @@ export const mockApi = {
     await delay(400);
     let orders = useDataStore.getState().orders;
 
-    // Status Filter (Mapping UI status to Internal status if needed)
+    // Status Filter
     if (status && status !== "All") {
       const statusMap = {
-        Processing: ["In Process", "Confirmed", "Order Placed"],
-        Shipped: ["On the Way", "Out For Delivery"],
-        Delivered: ["Delivered"],
-        Cancelled: ["Returned", "Cancelled"],
+        PLACED: ["PLACED", "CONFIRMED"],
+        SHIPPED: ["SHIPPED"],
+        DELIVERED: ["DELIVERED"],
+        CANCELLED: [
+          "CANCELLED",
+          "RETURN_REQUESTED",
+          "RETURN_APPROVED",
+          "RETURN_COMPLETED",
+        ],
       };
       const validStatuses = statusMap[status] || [status];
       orders = orders.filter((o) => validStatuses.includes(o.status));
@@ -137,9 +139,6 @@ export const mockApi = {
       );
     }
 
-    // Transform for UI consistency if needed
-    // The Store holds raw data, but UI might expect specific fields.
-    // Ideally, we standardize data in the store, but for now we pass raw.
     return orders;
   },
 
@@ -160,7 +159,6 @@ export const mockApi = {
     await delay(800);
     const { cart, currentUser } = useDataStore.getState();
 
-    // Use provided items or cart
     const orderItems =
       orderData.items ||
       cart.map((item) => ({
@@ -176,7 +174,6 @@ export const mockApi = {
       throw new Error("No items to order");
     }
 
-    // Use provided totals or calculate
     const totals = orderData.totals || {
       totalCartValue: orderItems.reduce(
         (sum, item) => sum + item.price * item.quantity,
@@ -189,7 +186,7 @@ export const mockApi = {
           0.18
       ),
       deliveryCharges: 40,
-      total: 0, // Will be calculated below
+      total: 0,
     };
 
     if (!orderData.totals) {
@@ -201,7 +198,6 @@ export const mockApi = {
         totals.deliveryCharges;
     }
 
-    // Create new order with consistent structure
     const newOrder = {
       id: "ORD-" + Date.now(),
       customerName: orderData.customerName || currentUser?.name || "Guest",
@@ -213,7 +209,7 @@ export const mockApi = {
         phone: orderData.phone || currentUser?.phone || "",
         address: orderData.address || "N/A",
       },
-      status: "Order Placed",
+      status: "PLACED",
       statusColor: "#3B82F6",
       date: new Date().toLocaleDateString("en-GB", {
         day: "numeric",
@@ -227,14 +223,14 @@ export const mockApi = {
         month: "short",
         year: "numeric",
       }),
-      items: orderItems, // ← CRITICAL: Use 'items' not 'products'
+      items: orderItems,
       totals: totals,
-      paymentBreakdown: totals, // Alias for compatibility
+      paymentBreakdown: totals,
       paymentMethod: orderData.paymentMethod || "cod",
       appliedCoupon: orderData.appliedCoupon || null,
       timeline: [
         {
-          status: "Order Placed",
+          status: "PLACED",
           completed: true,
           active: true,
           date: new Date().toLocaleDateString("en-GB", {
@@ -247,13 +243,11 @@ export const mockApi = {
       createdAt: new Date().toISOString(),
     };
 
-    // Add to store
     useDataStore.getState().placeOrder(newOrder);
 
     return { data: newOrder };
   },
 
-  // --- Users / Auth ---
   login: async (email, password) => {
     await delay(800);
     const user = useDataStore
@@ -261,7 +255,6 @@ export const mockApi = {
       .users.find((u) => u.email === email && u.password === password);
     if (!user) throw new Error("Invalid credentials");
 
-    // Generate simulated token
     const token = "mock-jwt-" + Date.now();
     useDataStore.getState().login(user);
 
@@ -270,7 +263,6 @@ export const mockApi = {
 
   getCustomers: async () => {
     await delay(400);
-    // Return users who are NOT admin
     return useDataStore.getState().users.filter((u) => u.role !== "admin");
   },
 

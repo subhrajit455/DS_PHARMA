@@ -23,6 +23,8 @@ import AccountActions from '@/components/features/profile/AccountActions';
 import OrdersList from '@/components/features/profile/OrdersList';
 import ProfileSidebar from '@/components/features/profile/ProfileSidebar';
 import ProfileHeader from '@/components/features/profile/ProfileHeader';
+import WishlistSection from '@/components/features/profile/WishlistSection';
+import { Heart } from 'lucide-react';
 
 const UserProfile = () => {
     const navigate = useNavigate();
@@ -92,6 +94,7 @@ const UserProfile = () => {
     const sections = [
         { id: 'overview', label: 'Overview', icon: User, desc: 'Personal details' },
         { id: 'orders', label: 'Orders', icon: ShoppingBag, desc: 'Track & Buy again' },
+        { id: 'wishlist', label: 'Wishlist', icon: Heart, desc: 'Saved for later' },
         { id: 'addresses', label: 'Addresses', icon: MapPin, desc: 'Manage locations' },
         { id: 'account', label: 'Settings', icon: Settings, desc: 'Account actions' }
     ];
@@ -162,6 +165,8 @@ const UserProfile = () => {
                                            <OrdersList />
                                         </div>
                                     )}
+                                    
+                                    {activeSection === 'wishlist' && <WishlistSection />}
                                     
                                     {activeSection === 'addresses' && (
                                         <AddressesList 

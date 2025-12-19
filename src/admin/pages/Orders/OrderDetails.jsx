@@ -28,7 +28,7 @@ const OrderDetails = () => {
   const [isModalOpen, setIsModalOpen] = useState(false);
   const [pendingStatus, setPendingStatus] = useState(null);
 
-  const statusOptions = ['Order Placed', 'Confirmed', 'In Process', 'On the Way', 'Out For Delivery', 'Delivered', 'Returned', 'Cancelled'];
+  const statusOptions = ['PLACED', 'CONFIRMED', 'SHIPPED', 'DELIVERED', 'CANCELLED', 'RETURN_REQUESTED', 'RETURN_APPROVED', 'RETURN_COMPLETED'];
 
   useEffect(() => {
     const fetchOrder = async () => {
@@ -83,7 +83,7 @@ const OrderDetails = () => {
       <div className="flex flex-col sm:flex-row justify-between items-start sm:items-center gap-4">
         <div>
            <h1 className="text-2xl font-bold tracking-tight text-gray-900">Order #{order.id}</h1>
-           <p className="text-gray-500 text-sm mt-1">{order.date} • {order.items?.length || 0} Items</p>
+            <p className="text-gray-500 text-sm mt-1">{order.date} • {order.totalItems || 0} Items</p>
         </div>
         
         <div className="flex items-center gap-1 bg-transparent p-2 rounded-lg shadow-sm" style={{ padding: '5px 10px' }}>
@@ -223,6 +223,7 @@ const OrderDetails = () => {
                       <Button 
                         onClick={() => setIsModalOpen(true)}
                         className="bg-emerald-600 hover:bg-emerald-700 text-white shadow-md hover:shadow-lg transition-all"
+                        style={{ padding: '0px 16px' }}
                       >
                         Update Status
                       </Button>

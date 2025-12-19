@@ -9,11 +9,15 @@ import {
 } from "@/components/features/order";
 import { AppliedCouponCard } from "@/components/features/payment";
 import SuggestedItemsSection from "@/components/sections/SuggestedItemsSection";
+import ConfirmationModal from "@/components/common/ConfirmationModal";
 import { useOrderDetails } from "@/hooks/queries/useOrders";
+import { AlertCircle, RefreshCw, Printer, Share2 } from 'lucide-react';
 
 import { useProducts } from '@/hooks/queries/useProducts';
 import { useCancelOrder } from '@/hooks/mutations/useCancelOrder';
+import { useReturnOrder } from '@/hooks/mutations/useReturnOrder';
 import { useToastStore } from '@/store/useToastStore';
+import { canCancelOrder, canReturnOrder } from '@/utils/orderHelpers';
 
 const OrderDetails = () => {
   const navigate = useNavigate();
@@ -24,8 +28,20 @@ const OrderDetails = () => {
   const { data: orderResponse, isLoading, isError } = useOrderDetails(id);
   
   // Hooks must be called before any conditional returns
-  const { mutate: cancelOrder } = useCancelOrder();
-  const { error: toastError } = useToastStore();
+  const { mutate: cancelOrder, isPending: isCancelling } = useCancelOrder();
+  const { mutate: returnOrder, isPending: isReturning } = useReturnOrder();
+  const { error: toastError, success: toastSuccess } = useToastStore();
+
+  // Modal State
+  const [modalConfig, setModalConfig] = React.useState({
+    isOpen: false,
+    title: "",
+    message: "",
+    onConfirm: () => {},
+    confirmText: "",
+    confirmVariant: "primary",
+    icon: AlertCircle
+  });
   
   // Use fetched data first, fall back to navigation state (instant load)
   const order = orderResponse?.data || location.state?.order;
@@ -41,9 +57,13 @@ const OrderDetails = () => {
     address: order?.address || 'N/A'
   }, [order?.customerAddress, order?.deliveryAddress, order?.customerName, order?.phone, order?.address]);
 
+  // Use helpers for status logic
+  const showCancel = canCancelOrder(order);
+  const showReturn = canReturnOrder(order);
+
   // Local state for address (in case it changes)
   const [currentAddress, setCurrentAddress] = React.useState(customerAddress);
-  
+
   // Sync if prop changes
   React.useEffect(() => {
     if (customerAddress) setCurrentAddress(customerAddress);
@@ -74,20 +94,196 @@ const OrderDetails = () => {
   };
 
   const handleCancelOrder = () => {
-      // Check if order can be cancelled
-      if (order.status === 'Delivered' || order.status === 'Cancelled' || order.status === 'Out for Delivery') {
-        toastError(`This order cannot be cancelled as it is already ${order.status.toLowerCase()}.`);
+      // If order can be returned
+      if (showReturn) {
+        setModalConfig({
+          isOpen: true,
+          title: "Request a return?",
+          message: "Initiate a return for this order. Our team will review your request within 24-48 hours.",
+          confirmText: "Request Return",
+          confirmVariant: "primary",
+          icon: RefreshCw,
+          onConfirm: () => {
+            returnOrder(order.id, {
+              onSuccess: () => {
+                setModalConfig(prev => ({ ...prev, isOpen: false }));
+              }
+            });
+          }
+        });
         return;
       }
 
-      if (window.confirm("Are you sure you want to cancel this order?")) {
-        cancelOrder(order.id, {
-          onSuccess: () => {
-             // Mutation hook already shows success toast
-             navigate('/orders', { state: { activeSection: 'orders' } });
+      // If order can be cancelled
+      if (showCancel) {
+        setModalConfig({
+          isOpen: true,
+          title: "Cancel this order?",
+          message: "This action cannot be undone. Are you sure you want to cancel your order and get a refund?",
+          confirmText: "Cancel Order",
+          confirmVariant: "danger",
+          icon: AlertCircle,
+          onConfirm: () => {
+            cancelOrder(order.id, {
+              onSuccess: () => {
+                 setModalConfig(prev => ({ ...prev, isOpen: false }));
+                 navigate('/orders', { state: { activeSection: 'orders' } });
+              }
+            });
           }
         });
+        return;
       }
+
+      toastError("This action is not allowed for the current order status.");
+  };
+
+  const handleShareDetails = async () => {
+    const shareData = {
+      title: `Order #${order.id} Details`,
+      text: `Order Summary:\nOrder ID: #${order.id}\nStatus: ${order.status}\nTotal Items: ${order.items}\nTotal Amount: ₹${paymentBreakdown.total}\nDate: ${order.date}`,
+      url: window.location.href
+    };
+
+    try {
+      if (navigator.share) {
+        await navigator.share(shareData);
+      } else {
+        await navigator.clipboard.writeText(shareData.text);
+        toastSuccess("Order details copied to clipboard!");
+      }
+    } catch (err) {
+      console.error("Error sharing:", err);
+    }
+  };
+
+  const handleDownloadReceipt = () => {
+    // Basic printable layout
+    const printWindow = window.open('', '_blank');
+    
+    // Calculate line totals for products
+    const productsHtml = order.products?.map(p => {
+      const lineTotal = (p.price * (p.quantity || 1)).toLocaleString('en-IN');
+      return `
+        <tr>
+          <td style="padding: 12px 8px; border-bottom: 1px solid #f1f5f9;">
+            <div style="font-weight: 600; color: #1e293b;">${p.name}</div>
+            <div style="font-size: 0.8em; color: #64748b;">Unit Price: ₹${p.price.toLocaleString('en-IN')}</div>
+          </td>
+          <td style="padding: 12px 8px; border-bottom: 1px solid #f1f5f9; text-align: center; color: #1e293b;">${p.quantity}</td>
+          <td style="padding: 12px 8px; border-bottom: 1px solid #f1f5f9; text-align: right; font-weight: 600; color: #1e293b;">₹${lineTotal}</td>
+        </tr>
+      `;
+    }).join('') || '<tr><td colspan="3" style="padding: 20px; text-align: center; color: #64748b;">No products found</td></tr>';
+
+    const content = `
+      <!DOCTYPE html>
+      <html>
+        <head>
+          <title>Invoice - #${order.id}</title>
+          <style>
+            @import url('https://fonts.googleapis.com/css2?family=Inter:wght@400;600;700&display=swap');
+            * { box-sizing: border-box; }
+            body { font-family: 'Inter', sans-serif; padding: 50px; color: #1e293b; background: white; margin: 0; line-height: 1.5; }
+            .receipt-container { max-width: 800px; margin: 0 auto; }
+            .header { display: flex; justify-content: space-between; align-items: flex-start; margin-bottom: 50px; border-bottom: 2px solid #f1f5f9; padding-bottom: 30px; }
+            .brand { color: #059669; font-size: 28px; font-weight: 800; letter-spacing: -0.025em; }
+            .invoice-label { font-size: 32px; font-weight: 700; color: #0f172a; margin-bottom: 5px; }
+            .order-meta { color: #64748b; font-size: 14px; }
+            .grid { display: grid; grid-template-columns: 1fr 1fr; gap: 40px; margin-bottom: 40px; }
+            .section-title { font-size: 12px; font-weight: 700; text-transform: uppercase; letter-spacing: 0.05em; color: #94a3b8; margin-bottom: 12px; border-bottom: 1px solid #f1f5f9; padding-bottom: 4px; }
+            .address-box { font-size: 14px; color: #334155; }
+            .address-name { font-weight: 700; color: #0f172a; margin-bottom: 4px; display: block; }
+            table { width: 100%; border-collapse: collapse; margin-top: 20px; }
+            th { text-align: left; background: #f8fafc; padding: 12px 8px; font-size: 12px; font-weight: 700; text-transform: uppercase; letter-spacing: 0.05em; color: #64748b; border-top: 1px solid #e2e8f0; border-bottom: 1px solid #e2e8f0; }
+            .summary { margin-top: 40px; display: flex; justify-content: flex-end; }
+            .summary-box { width: 320px; background: #f8fafc; padding: 24px; rounded: 12px; border: 1px solid #e2e8f0; }
+            .summary-row { display: flex; justify-content: space-between; margin-bottom: 10px; font-size: 14px; }
+            .summary-total { margin-top: 15px; padding-top: 15px; border-top: 2px solid #e2e8f0; font-weight: 800; font-size: 18px; color: #059669; }
+            .footer { margin-top: 60px; text-align: center; color: #94a3b8; font-size: 13px; border-top: 1px solid #f1f5f9; padding-top: 30px; }
+            .badge { display: inline-block; padding: 4px 12px; background: #ecfdf5; color: #059669; border-radius: 99px; font-size: 12px; font-weight: 600; margin-top: 8px; }
+            @media print {
+              body { padding: 0; }
+              .receipt-container { max-width: 100%; }
+            }
+          </style>
+        </head>
+        <body>
+          <div class="receipt-container">
+            <div class="header">
+              <div>
+                <div class="brand">DS PHARMA</div>
+                <div class="badge">${order.status.toUpperCase()}</div>
+              </div>
+              <div style="text-align: right">
+                <div class="invoice-label">INVOICE</div>
+                <div class="order-meta">#${order.id}</div>
+                <div class="order-meta">${order.date}</div>
+              </div>
+            </div>
+            
+            <div class="grid">
+              <div>
+                <div class="section-title">Shipping To</div>
+                <div class="address-box">
+                  <span class="address-name">${currentAddress.name}</span>
+                  ${currentAddress.address}<br>
+                  Phone: ${currentAddress.phone}
+                </div>
+              </div>
+              <div style="text-align: right">
+                <div class="section-title">Payment Details</div>
+                <div class="address-box">
+                  <span class="address-name">Method</span>
+                  Prepaid / Digital Payment<br>
+                  Status: <span style="color: #059669">Successful</span>
+                </div>
+              </div>
+            </div>
+
+            <div class="section-title">Order Items</div>
+            <table>
+              <thead>
+                <tr>
+                  <th>Item Description</th>
+                  <th style="text-align: center">Qty</th>
+                  <th style="text-align: right">Amount</th>
+                </tr>
+              </thead>
+              <tbody>
+                ${productsHtml}
+              </tbody>
+            </table>
+
+            <div class="summary">
+              <div class="summary-box">
+                <div class="summary-row"><span>Subtotal</span> <span>₹${paymentBreakdown.totalCartValue.toLocaleString('en-IN')}</span></div>
+                <div class="summary-row" style="color: #059669"><span>Discount</span> <span>-₹${paymentBreakdown.discount.toLocaleString('en-IN')}</span></div>
+                <div class="summary-row" style="color: #059669"><span>Coupon</span> <span>-₹${paymentBreakdown.coupon.toLocaleString('en-IN')}</span></div>
+                <div class="summary-row"><span>Shipping</span> <span>₹${paymentBreakdown.deliveryCharges.toLocaleString('en-IN')}</span></div>
+                <div class="summary-row summary-total"><span>Total Amount</span> <span>₹${paymentBreakdown.total.toLocaleString('en-IN')}</span></div>
+              </div>
+            </div>
+
+            <div class="footer">
+              <p style="font-weight: 600; color: #475569; margin-bottom: 5px;">Thank you for choosing DS Pharma!</p>
+              <p>For support, contact care@dspharma.com</p>
+              <p style="font-size: 11px; margin-top: 15px;">THIS IS A COMPUTER GENERATED INVOICE. NO SIGNATURE REQUIRED.</p>
+            </div>
+          </div>
+          
+          <script>
+            window.onload = () => {
+              window.print();
+              setTimeout(() => window.close(), 500);
+            };
+          </script>
+        </body>
+      </html>
+    `;
+    
+    printWindow.document.write(content);
+    printWindow.document.close();
   };
 
   const handleChangeAddress = (newAddress) => {
@@ -95,8 +291,6 @@ const OrderDetails = () => {
       // In a real app, we would make an API call here to update the order's address
       console.log("Address updated to:", newAddress);
   };
-  const handleShareDetails = () => console.log("Share details");
-  const handleDownloadReceipt = () => console.log("Download receipt");
 
   return (
     <div style={{ paddingTop: '20px' }}>
@@ -153,6 +347,7 @@ const OrderDetails = () => {
               {/* Left Section */}
               <div>
                 <OrderProductCard order={order} onCancel={handleCancelOrder} />
+                
                 {/* Contact Section */}
                 <Card className="mt-6 w-full" style={{ marginTop: '10px' }}>
                   <div className="flex flex-col gap-3 p-3 sm:gap-4 sm:p-4 sm:flex-row sm:items-center sm:justify-between" style={{ padding: '3px 8px' }}>
@@ -167,18 +362,20 @@ const OrderDetails = () => {
                         variant="success"
                         size="sm"
                         onClick={handleShareDetails}
-                        className="text-[10px] sm:text-sm h-6 sm:h-8"
-                        style={{ padding: '0 8px' }}
+                        className="text-[10px] sm:text-sm h-6 sm:h-8 flex items-center gap-1.5"
+                        style={{ padding: '0 12px' }}
                       >
+                        <Share2 size={14} className="sm:w-4 sm:h-4" />
                         Share Order Details
                       </Button>
                       <Button
                         variant="primary"
                         size="sm"
                         onClick={handleDownloadReceipt}
-                        className="text-[10px] sm:text-sm h-6 sm:h-8"
-                        style={{ padding: '0 8px' }}
+                        className="text-[10px] sm:text-sm h-6 sm:h-8 flex items-center gap-1.5"
+                        style={{ padding: '0 12px' }}
                       >
+                        <Printer size={14} className="sm:w-4 sm:h-4" />
                         Download Receipt
                       </Button>
                     </div>
@@ -208,6 +405,19 @@ const OrderDetails = () => {
                 marginTop: '40px'
               }}
               containerStyle={{ marginBottom: '20px' }}
+            />
+
+            {/* Confirmation Modal */}
+            <ConfirmationModal 
+              isOpen={modalConfig.isOpen}
+              onClose={() => setModalConfig(prev => ({ ...prev, isOpen: false }))}
+              onConfirm={modalConfig.onConfirm}
+              title={modalConfig.title}
+              message={modalConfig.message}
+              confirmText={modalConfig.confirmText}
+              confirmVariant={modalConfig.confirmVariant}
+              icon={modalConfig.icon}
+              isLoading={isCancelling || isReturning}
             />
           </div>
         </div>

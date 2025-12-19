@@ -1,6 +1,7 @@
 import React from 'react';
 import { Card, Button } from '@/components/ui';
 import OrderTimeline from './OrderTimeline';
+import { canCancelOrder, canReturnOrder } from '@/utils/orderHelpers';
 
 const OrderProductCard = ({ order, onCancel }) => {
   // Handle both single item and multiple items
@@ -13,6 +14,9 @@ const OrderProductCard = ({ order, onCancel }) => {
 
   const totalItems = items.reduce((sum, item) => sum + item.quantity, 0);
   const totalAmount = items.reduce((sum, item) => sum + (item.price * item.quantity), 0);
+
+  const showCancel = canCancelOrder(order);
+  const showReturn = canReturnOrder(order);
 
   return (
     <Card className="min-h-[330px]">
@@ -78,11 +82,18 @@ const OrderProductCard = ({ order, onCancel }) => {
 
       {/* Action Button */}
         <div className="flex justify-end pt-4" style={{ marginTop: '5px' }}>
-          <Button variant="outline" size="sm" onClick={onCancel} style={{ padding: '5px 10px' }}>
-            <span className="text-[8px] sm:text-xs" style={{ fontFamily: 'Gyrotrope' }}>
-              Cancel Order
-            </span>
-          </Button>
+          {(showCancel || showReturn) && (
+            <Button 
+              variant="outline" 
+              size="sm" 
+              onClick={onCancel} 
+              style={{ padding: '5px 10px' }}
+            >
+              <span className="text-[8px] sm:text-xs" style={{ fontFamily: 'Gyrotrope' }}>
+                {showReturn ? 'Return Order' : 'Cancel Order'}
+              </span>
+            </Button>
+          )}
         </div>
       </div>
     </Card>

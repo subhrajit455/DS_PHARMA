@@ -12,17 +12,16 @@ export const useOrderStore = create(
         const newOrder = {
           id: `ORD${Date.now()}`,
           ...orderData,
-          status: "Order Placed",
+          status: "PLACED",
           statusColor: "#10B981",
           statusBg: "#10B981",
           createdAt: new Date().toISOString(),
           expectedDelivery: getExpectedDelivery(),
           timeline: [
-            { status: "Order Placed", completed: true, active: true },
-            { status: "Confirmed", completed: false },
-            { status: "On The Way", completed: false },
-            { status: "Out For Delivery", completed: false },
-            { status: "Delivered", completed: false },
+            { status: "PLACED", completed: true, active: true },
+            { status: "CONFIRMED", completed: false },
+            { status: "SHIPPED", completed: false },
+            { status: "DELIVERED", completed: false },
           ],
         };
 

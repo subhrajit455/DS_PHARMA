@@ -37,11 +37,11 @@ export const mockOrderService = {
     const newOrder = {
       id: `ORD-${Math.floor(Math.random() * 100000)}`,
       date: new Date().toISOString(),
-      status: "Pending",
+      status: "PLACED",
       ...orderData,
       timeline: [
         {
-          status: "Order Placed",
+          status: "PLACED",
           date: new Date().toLocaleDateString("en-US", {
             day: "numeric",
             month: "short",
@@ -50,20 +50,14 @@ export const mockOrderService = {
           completed: true,
           active: true,
         },
-        { status: "Confirmed", date: "", completed: false, active: false },
+        { status: "CONFIRMED", date: "", completed: false, active: false },
         {
-          status: "Expected Delivery",
+          status: "SHIPPED",
           date: "Within 5 days",
           completed: false,
           active: false,
         },
-        {
-          status: "Out for Delivery",
-          date: "",
-          completed: false,
-          active: false,
-        },
-        { status: "Delivered", date: "", completed: false, active: false },
+        { status: "DELIVERED", date: "", completed: false, active: false },
       ],
     };
     orders.unshift(newOrder); // Add to beginning
