@@ -32,7 +32,7 @@ const PharmacyProductCard = ({
   const isInWishlist = wishlist.some((item) => item.id === id);
 
   // Handle image prop variation (image vs imageUrl)
-  const displayImage = imageUrl || image || '/src/assets/images/medicine.jpeg';
+  const displayImage = imageUrl || image || "https://images.unsplash.com/photo-1587854692152-cbe660dbde88?auto=format&fit=crop&w=600&q=80";
   
   // Use mrp or originalPrice for comparison price
   const comparisonPrice = mrp || originalPrice;
@@ -113,7 +113,7 @@ const PharmacyProductCard = ({
           loading="lazy"
           onError={(e) => {
             e.target.onerror = null; 
-            e.target.src = '/src/assets/images/medicine.jpeg';
+            e.target.src = "https://images.unsplash.com/photo-1587854692152-cbe660dbde88?auto=format&fit=crop&w=600&q=80";
           }}
         />
         

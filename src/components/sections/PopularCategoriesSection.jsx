@@ -167,7 +167,7 @@ const PopularCategoriesSection = ({
                     loading="lazy"
                     onError={(e) => {
                       e.target.onerror = null;
-                      e.target.src = '/src/assets/images/medicine.jpeg';
+                      e.target.src = "https://images.unsplash.com/photo-1587854692152-cbe660dbde88?auto=format&fit=crop&w=600&q=80";
                     }}
                   />
                 </div>

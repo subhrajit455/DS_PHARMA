@@ -96,7 +96,7 @@ const BannerSection = () => {
                           loading="lazy"
                           onError={(e) => {
                             e.target.onerror = null;
-                            e.target.src = '/src/assets/images/medicine.jpeg';
+                            e.target.src = "https://images.unsplash.com/photo-1587854692152-cbe660dbde88?w=1200";
                           }}
                         />
 
@@ -224,7 +224,7 @@ const BannerSection = () => {
                         loading="lazy"
                         onError={(e) => {
                           e.target.onerror = null;
-                          e.target.src = '/src/assets/images/medicine.jpeg';
+                          e.target.src = "https://images.unsplash.com/photo-1587854692152-cbe660dbde88?w=1200";
                         }}
                       />
 

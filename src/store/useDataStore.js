@@ -1,17 +1,17 @@
 import { create } from "zustand";
 import { persist, createJSONStorage } from "zustand/middleware";
-import { PRODUCTS, BANNERS, CATEGORY_DETAILS } from "../data/sampleData";
+import { VALID_PRODUCTS, BANNERS, CATEGORY_DETAILS } from "../data/sampleData";
 import { USERS, MOCK_ORDERS, INITIAL_USER_STATE } from "../data/userData";
 import { MOCK_ADDRESSES } from "../data/addressData";
 
 // Unique name for localStorage key
-const STORE_NAME = "ds-pharma-store";
+const STORE_NAME = "ds-pharma-store-v5";
 
 const useDataStore = create(
   persist(
     (set) => ({
       // --- Data State ---
-      products: PRODUCTS || [],
+      products: VALID_PRODUCTS || [],
       orders: MOCK_ORDERS || [],
       users: USERS || [],
       banners: BANNERS || [],
@@ -60,6 +60,31 @@ const useDataStore = create(
       deleteAddress: (id) =>
         set((state) => ({
           addresses: state.addresses.filter((a) => a.id !== id),
+        })),
+
+      // --- Actions: Categories ---
+      setCategories: (categories) => set({ categories }),
+      addCategory: (category) =>
+        set((state) => ({
+          categories: [
+            ...state.categories,
+            {
+              ...category,
+              id: category.id || `cat-${Date.now()}`,
+              isVisible:
+                category.isVisible !== undefined ? category.isVisible : true,
+            },
+          ],
+        })),
+      updateCategory: (id, updates) =>
+        set((state) => ({
+          categories: state.categories.map((c) =>
+            c.id === id ? { ...c, ...updates } : c
+          ),
+        })),
+      deleteCategory: (id) =>
+        set((state) => ({
+          categories: state.categories.filter((c) => c.id !== id),
         })),
 
       // --- Actions: Products ---
@@ -209,7 +234,7 @@ const useDataStore = create(
       // --- Sync Helpers ---
       resetToDefaults: () =>
         set({
-          products: PRODUCTS,
+          products: VALID_PRODUCTS,
           orders: MOCK_ORDERS,
           users: USERS,
           banners: BANNERS,

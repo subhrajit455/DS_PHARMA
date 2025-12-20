@@ -1,7 +1,7 @@
 import mockApi from "../../api/mockApi";
 
 export const productService = {
-  getProducts: async ({ search, category, page = 1, limit = 10 } = {}) => {
+  getProducts: async ({ search, category, page = 1, limit = 10000 } = {}) => {
     // Note: Search/Filtering logic is currently basic in mockApi.
     // We can enhance mockApi or do client-side filtering here if needed.
     // For now, let's delegate to mockApi.

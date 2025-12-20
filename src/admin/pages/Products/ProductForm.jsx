@@ -12,6 +12,8 @@ import { Card, CardContent, CardHeader, CardTitle, CardDescription } from '../..
 import ConfirmationModal from '../../components/ui/ConfirmationModal';
 import ImageUpload from '../../../components/common/ImageUpload';
 
+import useDataStore from '@/store/useDataStore';
+
 const ProductForm = () => {
   const navigate = useNavigate();
   const { id } = useParams();
@@ -19,8 +21,10 @@ const ProductForm = () => {
   const isEditMode = Boolean(id);
   const [isLoading, setIsLoading] = useState(false);
   const [isModalOpen, setIsModalOpen] = useState(false);
-  const [categories, setCategories] = useState([]);
-
+  
+  // Use simple list of categories from store
+  const categories = useDataStore((state) => state.categories);
+  
   const [formData, setFormData] = useState({
     name: '',
     sku: '',
@@ -33,19 +37,8 @@ const ProductForm = () => {
     images: [] 
   });
 
-  // Fetch Categories
-  useEffect(() => {
-    const fetchCategories = async () => {
-        try {
-            const { data } = await productService.getCategories();
-            // Handle both simple string array or object array structure
-            setCategories(data);
-        } catch (error) {
-            console.error("Failed to load categories", error);
-        }
-    };
-    fetchCategories();
-  }, []);
+  // No need for separate useEffect to fetch categories anymore
+
 
   // Fetch Product Details
   useEffect(() => {

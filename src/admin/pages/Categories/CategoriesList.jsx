@@ -15,26 +15,35 @@ import {
 import ConfirmationModal from '../../components/ui/ConfirmationModal';
 import { Pagination } from '../../components/ui/Pagination';
 
+import useDataStore from '@/store/useDataStore';
+
 const CategoriesList = () => {
-    // Mock initial data
-    const [categories, setCategories] = useState([
-        { id: 1, name: 'Fever & Pain', slug: 'fever-pain', products: 120, status: 'Active' },
-        { id: 2, name: 'Antibiotics', slug: 'antibiotics', products: 85, status: 'Active' },
-        { id: 3, name: 'Vitamins & Supplements', slug: 'vitamins-supplements', products: 240, status: 'Active' },
-        { id: 4, name: 'Stomach Care', slug: 'stomach-care', products: 65, status: 'Active' },
-        { id: 5, name: 'Skin Care', slug: 'skin-care', products: 180, status: 'Active' },
-        { id: 6, name: 'Devices', slug: 'devices', products: 45, status: 'Active' },
-    ]);
+    // Connect to Store
+    const categories = useDataStore((state) => state.categories);
+    const products = useDataStore((state) => state.products);
+    const addCategory = useDataStore((state) => state.addCategory);
+    const updateCategory = useDataStore((state) => state.updateCategory);
+    const deleteCategory = useDataStore((state) => state.deleteCategory);
 
     const [isModalOpen, setIsModalOpen] = useState(false);
     const [isDeleteModalOpen, setIsDeleteModalOpen] = useState(false);
-    const [currentCategory, setCurrentCategory] = useState({ name: '', slug: '', status: 'Active' });
+    // Use isVisible instead of status string for better logic control
+    const [currentCategory, setCurrentCategory] = useState({ name: '', slug: '', isVisible: true });
     const [isEditing, setIsEditing] = useState(false);
     const [searchQuery, setSearchQuery] = useState('');
     const [currentPage, setCurrentPage] = useState(1);
     const [itemsPerPage, setItemsPerPage] = useState(10);
 
-    const filteredCategories = categories.filter(cat => 
+    // Compute products count for each category
+    const categoriesWithCounts = categories.map(cat => {
+        // Match exact name string
+        const count = products.filter(p => p.category === cat.name).length;
+        // Generate slug if missing
+        const slug = cat.slug || cat.name.toLowerCase().replace(/[^a-z0-9]+/g, '-').replace(/(^-|-$)+/g, '');
+        return { ...cat, products: count, slug };
+    });
+
+    const filteredCategories = categoriesWithCounts.filter(cat => 
         cat.name.toLowerCase().includes(searchQuery.toLowerCase())
     );
 
@@ -50,16 +59,15 @@ const CategoriesList = () => {
         }
 
         if (isEditing) {
-            setCategories(prev => prev.map(cat => cat.id === currentCategory.id ? { ...cat, ...currentCategory } : cat));
+            updateCategory(currentCategory.id, currentCategory);
             toast.success('Category updated successfully');
         } else {
             const newCategory = {
-                id: Date.now(),
                 ...currentCategory,
-                products: 0,
+                products: 0, // In a real app, this would be computed or 0 for new
                 slug: currentCategory.name.toLowerCase().replace(/\s+/g, '-')
             };
-            setCategories(prev => [...prev, newCategory]);
+            addCategory(newCategory);
             toast.success('Category created successfully');
         }
         setIsModalOpen(false);
@@ -67,7 +75,7 @@ const CategoriesList = () => {
     };
 
     const handleDelete = () => {
-        setCategories(prev => prev.filter(cat => cat.id !== currentCategory.id));
+        deleteCategory(currentCategory.id);
         setIsDeleteModalOpen(false);
         toast.success('Category deleted successfully');
     };
@@ -84,7 +92,7 @@ const CategoriesList = () => {
     };
 
     const resetForm = () => {
-        setCurrentCategory({ name: '', slug: '', status: 'Active' });
+        setCurrentCategory({ name: '', slug: '', isVisible: true });
         setIsEditing(false);
     };
 
@@ -125,7 +133,7 @@ const CategoriesList = () => {
                     <TableHead className="font-semibold text-gray-700 text-[8px] sm:text-sm" style={{ padding: '8px 5px', background: 'rgba(16, 185, 129, 0.1)' }}>Name</TableHead>
                     <TableHead className="font-semibold text-gray-700 text-[8px] sm:text-sm hidden sm:table-cell" style={{ padding: '8px 5px', background: 'rgba(16, 185, 129, 0.1)' }}>Slug</TableHead>
                     <TableHead className="font-semibold text-gray-700 text-[8px] sm:text-sm hidden md:table-cell" style={{ padding: '8px 5px', background: 'rgba(16, 185, 129, 0.1)' }}>Products</TableHead>
-                    <TableHead className="font-semibold text-gray-700 text-[8px] sm:text-sm" style={{ padding: '8px 5px', background: 'rgba(16, 185, 129, 0.1)' }}>Status</TableHead>
+                    <TableHead className="font-semibold text-gray-700 text-[8px] sm:text-sm" style={{ padding: '8px 5px', background: 'rgba(16, 185, 129, 0.1)' }}>Visibility</TableHead>
                     <TableHead className="text-right font-semibold text-gray-700 text-[8px] sm:text-sm" style={{ padding: '8px 5px', background: 'rgba(16, 185, 129, 0.1)' }}>Actions</TableHead>
                                 </TableRow>
                             </TableHeader>
@@ -144,8 +152,8 @@ const CategoriesList = () => {
                                             <TableCell className="text-gray-500 text-[8px] sm:text-sm hidden sm:table-cell" style={{ padding: '8px 5px' }}>{category.slug}</TableCell>
                                             <TableCell className="text-gray-900 text-[8px] sm:text-sm hidden md:table-cell" style={{ padding: '8px 5px' }}>{category.products}</TableCell>
                                             <TableCell style={{ padding: '8px 5px' }}>
-                                                <span className={`px-2 py-1 text-[8px] sm:text-xs font-medium rounded-full ${category.status === 'Active' ? 'bg-green-100 text-green-700' : 'bg-gray-100 text-gray-700'}`}>
-                                                    {category.status}
+                                                <span className={`px-2 py-1 text-[8px] sm:text-xs font-medium rounded-full ${category.isVisible ? 'bg-green-100 text-green-700' : 'bg-gray-100 text-gray-700'}`}>
+                                                    {category.isVisible ? 'Visible' : 'Hidden'}
                                                 </span>
                                             </TableCell>
                                             <TableCell className="text-right" style={{ padding: '8px 5px' }}>
@@ -205,15 +213,15 @@ const CategoriesList = () => {
                                  />
                              </div>
                              <div>
-                                 <label className="text-[8px] sm:text-sm font-medium text-gray-700">Status</label>
+                                 <label className="text-[8px] sm:text-sm font-medium text-gray-700">Visibility</label>
                                  <select 
                                      style={{ padding: '8px 5px' }}
-                                     value={currentCategory.status}
-                                     onChange={(e) => setCurrentCategory({...currentCategory, status: e.target.value })}
+                                     value={currentCategory.isVisible}
+                                     onChange={(e) => setCurrentCategory({...currentCategory, isVisible: e.target.value === 'true' })}
                                      className="w-full mt-1 rounded-md border border-gray-200 p-2 text-[8px] sm:text-sm"
                                  >
-                                     <option value="Active">Active</option>
-                                     <option value="Inactive">Inactive</option>
+                                     <option value={true}>Visible</option>
+                                     <option value={false}>Hidden</option>
                                  </select>
                              </div>
                              <div className="flex justify-end gap-3 mt-6">

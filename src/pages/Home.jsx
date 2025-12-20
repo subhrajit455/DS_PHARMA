@@ -7,17 +7,30 @@ import WhyChooseUsSection from '../components/sections/WhyChooseUsSection';
 import AboutUsSection from '../components/sections/AboutUsSection';
 import AlertBanner from '../components/sections/alerts/AlertBanner';
 
+import useDataStore from '@/store/useDataStore';
 import { useCategories } from '@/hooks/queries/useProducts';
 import Loading from '@/components/common/Loading';
 import ErrorState from '@/components/common/ErrorState';
 
 const Home = () => {
-  const { data: categoryData, isLoading, isError } = useCategories();
+  // Use categories from store to check visibility (Source of Truth)
+  const storeCategories = useDataStore(state => state.categories);
   
   // Get categories from API source
-  // We filter out any "All" or empty categories if necessary
+  const { data: categoryData, isLoading, isError } = useCategories();
+  
+  // We filter out any "All" or empty categories AND hidden categories
   const allCategories = categoryData?.data || [];
-  const validCategories = allCategories.filter(c => c !== "All");
+  const validCategories = allCategories.filter(c => {
+      const catName = typeof c === 'string' ? c : c.name;
+      if (catName === 'All') return false;
+      
+      // Check if this category is visible in the store
+      const storeCat = storeCategories.find(sc => sc.name === catName);
+      // Default to true if not found (legacy safety), otherwise respect isVisible
+      const isVisible = storeCat ? (storeCat.isVisible !== false) : true;
+      return isVisible;
+  });
 
   // Dynamic layout logic: Split categories into two chunks
   const midIndex = Math.ceil(validCategories.length / 2);

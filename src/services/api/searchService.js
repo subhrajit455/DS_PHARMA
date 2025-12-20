@@ -1,20 +1,22 @@
 import apiClient from "./apiClient";
 import { API_ENDPOINTS } from "./baseURL";
 
-import { PRODUCTS as MOCK_PRODUCTS } from "@/data/sampleData";
-
 // Helper to filter products locally
+import useDataStore from "@/store/useDataStore";
+
 const getFilteredProducts = (query, filters, sort) => {
-  let results = [...MOCK_PRODUCTS];
+  // Use store as source of truth
+  let results = useDataStore.getState().products || [];
 
   // 1. Text Search
   if (query) {
     const q = query.toLowerCase();
     results = results.filter(
       (p) =>
-        p.name.toLowerCase().includes(q) ||
-        p.genericName.toLowerCase().includes(q) ||
-        p.manufacturer.toLowerCase().includes(q)
+        p.name?.toLowerCase().includes(q) ||
+        p.genericName?.toLowerCase().includes(q) ||
+        p.manufacturer?.toLowerCase().includes(q) ||
+        p.category?.toLowerCase().includes(q) // Added category search for better UX
     );
   }
 
@@ -78,9 +80,9 @@ const searchService = {
       await new Promise((resolve) => setTimeout(resolve, 200));
       if (!query) return [];
       const q = query.toLowerCase();
-      const suggestions = MOCK_PRODUCTS.filter((p) =>
-        p.name.toLowerCase().includes(q)
-      )
+      const allProducts = useDataStore.getState().products || [];
+      const suggestions = allProducts
+        .filter((p) => p.name?.toLowerCase().includes(q))
         .map((p) => ({
           id: p.id,
           name: p.name,

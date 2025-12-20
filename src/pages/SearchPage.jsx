@@ -40,7 +40,7 @@ const SearchPage = () => {
           filters,
           sort,
           page: 1,
-          limit: 50
+          limit: 1000
         });
         setProducts(response?.data?.products || []);
         setFacets(response?.data?.facets || {});

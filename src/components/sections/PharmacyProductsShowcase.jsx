@@ -11,7 +11,9 @@ const CategorySectionItem = ({ categoryName }) => {
   const navigate = useNavigate();
   // Fetch products for this specific category
   const { data, isLoading, isError } = useProducts({ category: categoryName, limit: 10 });
-  const products = data?.data || [];
+  
+  // Filter out hidden products
+  const products = (data?.data || []).filter(p => p.isVisible !== false);
 
   const handleProductClick = (product) => {
     navigate(`/product/${product.id}`);
