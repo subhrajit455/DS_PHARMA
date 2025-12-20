@@ -56,27 +56,16 @@ const OrdersPreview = () => {
             className="bg-white rounded-2xl border border-gray-100 shadow-sm overflow-hidden"
             style={{ marginTop: window.innerWidth >= 640 ? '10px' : '0', padding: '10px', marginBottom: '30px'}}
         >
-            <div className="p-6 border-b border-gray-100 flex justify-between items-center bg-gray-50/30" style={{ marginBottom: '10px'}}>
-                <div>
-                    <h2 className="text-lg font-bold text-gray-900">Recent Orders</h2>
-                    <p className="text-sm text-gray-500 mt-1">Track your recent activity</p>
-                </div>
-                <button 
-                    onClick={() => navigate('/orders')}
-                    className="flex items-center gap-1 text-sm font-semibold text-emerald-600 hover:text-emerald-700 transition-colors"
-                >
-                    View All
-                    <ArrowRight className="w-4 h-4" />
-                </button>
-            </div>
+            
 
             <div className="p-6">
                 {recentOrders.length === 0 ? (
-                    <div className="text-center py-8">
+                    <div className="text-center gap-2 flex flex-col items-center justify-center py-8">
                         <Package className="w-12 h-12 text-gray-300 mx-auto mb-3" />
                         <p className="text-gray-500">No orders placed yet</p>
                         <button 
-                            onClick={() => navigate('/products')}
+                            style={{ padding: '2px 10px'}}
+                            onClick={() => navigate('/')}
                             className="mt-4 px-6 py-2 bg-emerald-600 text-white rounded-lg text-sm font-medium hover:bg-emerald-700 transition-colors"
                         >
                             Start Shopping

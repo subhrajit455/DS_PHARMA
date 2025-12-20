@@ -151,21 +151,11 @@ const useDataStore = create(
         })),
 
       // --- Actions: Cart ---
-      addToCart: (product, quantity = 1) =>
+      addToCart: (product) =>
         set((state) => {
-          const existingItem = state.cart.find(
-            (item) => item.id === product.id
-          );
-          if (existingItem) {
-            return {
-              cart: state.cart.map((item) =>
-                item.id === product.id
-                  ? { ...item, quantity: item.quantity + quantity }
-                  : item
-              ),
-            };
-          }
-          return { cart: [...state.cart, { ...product, quantity }] };
+          const exists = state.cart.some((item) => item.id === product.id);
+          if (exists) return state;
+          return { cart: [...state.cart, { ...product, quantity: 1 }] };
         }),
       removeFromCart: (productId) =>
         set((state) => ({

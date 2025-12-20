@@ -1,8 +1,7 @@
 import React, { useState } from 'react';
 import { motion as Motion, AnimatePresence } from 'framer-motion';
 import { LogOut, Trash2, AlertTriangle, Lock, Save, X, Loader2 } from 'lucide-react';
-import { useNavigate } from 'react-router-dom';
-import useDataStore from '@/store/useDataStore';
+import { useLogout } from '@/hooks/useLogout';
 import { useToastStore } from '@/store/useToastStore';
 
 // Mock Password Update Service (Replace with actual API call)
@@ -10,14 +9,13 @@ const updatePasswordService = async (currentPassword, newPassword) => {
     return new Promise((resolve, reject) => {
         setTimeout(() => {
             if (currentPassword === 'wrong') reject({ message: 'Incorrect current password' });
-            else resolve({ success: true });
+            else resolve({ success: true, newPassword });
         }, 1500);
     });
 };
 
 const AccountActions = () => {
-    const navigate = useNavigate();
-    const logout = useDataStore((state) => state.logout);
+    const logout = useLogout();
     const { success, error } = useToastStore();
     
     const [showDeleteConfirm, setShowDeleteConfirm] = useState(false);
@@ -25,9 +23,9 @@ const AccountActions = () => {
     const [passwordData, setPasswordData] = useState({ current: '', new: '', confirm: '' });
     const [isChangingPassword, setIsChangingPassword] = useState(false);
 
-    const handleLogout = () => {
+    const handleLogout = (e) => {
+        e?.preventDefault();
         logout();
-        navigate('/login');
     };
 
     const handleDeleteAccount = () => {
@@ -35,7 +33,6 @@ const AccountActions = () => {
         // Usually requires an API call
         console.log('Account deleted');
         logout();
-        navigate('/');
     };
 
     const handlePasswordChange = async () => {
@@ -185,6 +182,7 @@ const AccountActions = () => {
 
                     {/* Logout Button */}
                     <button
+                        type="button"
                         onClick={handleLogout}
                         className="w-full flex items-center justify-between p-4 rounded-xl border border-gray-200 hover:border-gray-300 hover:bg-gray-50 transition-all group"
                         style={{ padding: '2px 5px', marginBottom: '5px' }}
@@ -224,6 +222,7 @@ const AccountActions = () => {
                             initial={{ opacity: 0, height: 0 }}
                             animate={{ opacity: 1, height: 'auto' }}
                             className="p-5 rounded-xl border border-red-200 bg-red-50"
+                            style={{ padding: '10px' }}
                         >
                             <div className="flex items-start gap-3 mb-4">
                                 <AlertTriangle className="w-6 h-6 text-red-600 shrink-0" />
@@ -236,12 +235,14 @@ const AccountActions = () => {
                             </div>
                              <div className="flex gap-3 justify-end">
                                 <button
+                                    style={{ padding: '2px 10px' }}
                                     onClick={() => setShowDeleteConfirm(false)}
-                                    className="px-4 py-2 text-xs sm:text-sm font-medium text-gray-700 bg-white border border-gray-300 rounded-lg hover:bg-gray-50 transition-colors"
+                                    className="px-4 py-2 text-xs sm:text-sm font-medium text-gray-700 bg-transparent border border-gray-300 rounded-lg hover:bg-gray-50 transition-colors"
                                 >
                                     Cancel
                                 </button>
                                 <button
+                                    style={{ padding: '2px 10px' }}
                                     onClick={handleDeleteAccount}
                                     className="px-4 py-2 text-xs sm:text-sm font-medium text-white bg-red-600 rounded-lg hover:bg-red-700 transition-colors"
                                 >

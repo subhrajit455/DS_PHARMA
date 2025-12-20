@@ -10,18 +10,24 @@ export const useAddToCart = () => {
   const { success, error } = useToastStore();
 
   return useMutation({
-    mutationFn: async ({ product, quantity = 1 }) => {
-      // Direct update to Global Data Store
-      // Mimics API + Store update in one go for this architecture
-      useDataStore.getState().addToCart(product, quantity);
+    mutationFn: async ({ product }) => {
+      const cart = useDataStore.getState().cart;
+      const exists = cart.some((item) => item.id === product.id);
 
-      // Simulate network delay if desired, or return immediate success
-      return { success: true };
+      if (exists) {
+        return { alreadyInCart: true, name: product.name };
+      }
+
+      useDataStore.getState().addToCart(product);
+      return { success: true, name: product.name };
     },
 
-    onSuccess: (data, variables) => {
-      success(`Added ${variables.product.name} to cart!`);
-      // Invalidate if we had other queries, but here store is the source
+    onSuccess: (data) => {
+      if (data.alreadyInCart) {
+        success(`${data.name} is already in your cart!`);
+      } else {
+        success(`Added ${data.name} to cart!`);
+      }
       queryClient.invalidateQueries({ queryKey: ["cart"] });
     },
 

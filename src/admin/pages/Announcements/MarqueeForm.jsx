@@ -100,7 +100,7 @@ const MarqueeForm = () => {
   };
 
   return (
-    <div className="max-w-7xl mx-auto space-y-6 min-h-screen" style={{ padding: '5px', background: 'linear-gradient(135deg, #f0fdf4 0%, #ecfdf5 50%, #f0fdfa 100%)' }}>
+    <div className="max-w-7xl mx-auto space-y-6 h-full overflow-y-auto custom-scrollbar" style={{ padding: '5px', background: 'linear-gradient(135deg, #f0fdf4 0%, #ecfdf5 50%, #f0fdfa 100%)' }}>
       <Button
         variant="ghost"
         className="pl-0 text-gray-500 hover:text-gray-900"

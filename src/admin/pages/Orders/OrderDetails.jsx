@@ -168,6 +168,7 @@ const OrderDetails = () => {
                         <h4 className="font-semibold text-gray-900">{order.customer || 'Guest User'}</h4>
                         <p className="text-sm text-gray-500 mt-0.5">{order.email}</p>
                         <p className="text-sm text-gray-500 mt-0.5">{order.phone || '+91 9999999999'}</p>
+                        {order.altPhone && <p className="text-sm text-gray-500 mt-0.5">Alt: {order.altPhone}</p>}
                     </div>
                  </div>
               </CardContent>

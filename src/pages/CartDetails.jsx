@@ -1,4 +1,5 @@
 import React, { useState, useMemo } from 'react';
+import { useLocation, useNavigate } from 'react-router-dom';
 import { PharmacyProductCard } from '@/components/features/product';
 import { CartItem } from '@/components/features/cart';
 import { OrderSummary } from '@/components/features/order';
@@ -14,6 +15,8 @@ import { X, MapPin, Home, Briefcase, Plus } from 'lucide-react';
 import { useToastStore } from '@/store/useToastStore';
 
 const CartDetails = () => {
+  const navigate = useNavigate();
+  const location = useLocation();
   // Use global data store
   const cartItems = useDataStore((state) => state.cart);
   const currentUser = useDataStore((state) => state.currentUser);
@@ -126,7 +129,12 @@ const CartDetails = () => {
     }, 0);
     
     const gst = Math.round(totalCartValue * 0.18);
-    let deliveryCharges = totalCartValue > 500 ? 0 : 40;
+    
+    // Delivery Charge Logic
+    // 1. Empty Cart -> 0
+    // 2. Cart Value > 500 -> 0 (Free Shipping)
+    // 3. Else -> 40 (Standard Fee)
+    let deliveryCharges = (cartItems.length > 0 && totalCartValue <= 500) ? 40 : 0;
     let couponDiscount = 0;
 
     if (appliedCoupon) {
@@ -151,6 +159,11 @@ const CartDetails = () => {
   }, [cartItems, appliedCoupon]);
 
   const handlePlaceOrder = (paymentMethod) => {
+    if (!currentUser) {
+      toastError('Please login to place your order');
+      navigate(`/login?redirect=${encodeURIComponent(location.pathname)}`);
+      return;
+    }
     if (cartItems.length === 0) {
       alert('Your cart is empty!');
       return;
@@ -194,7 +207,7 @@ const CartDetails = () => {
                  {/* Modal Header */}
                  <div className="flex justify-between items-center p-6 border-b border-gray-100 bg-gray-50/50" style={{paddingBottom: '10px'}}>
                      <h3 className="text-xl font-bold text-gray-900">
-                        {modalMode === 'add' ? '' : 'Select Delivery Address'}
+                        {modalMode === 'add' ? 'Add New Address' : 'Select Delivery Address'}
                      </h3>
                      <button 
                         onClick={() => setShowAddressModal(false)}
@@ -272,7 +285,7 @@ const CartDetails = () => {
                                          </div>
                                      ))
                                  ) : (
-                                     <div className="text-center py-12">
+                                     <div className="text-center flex flex-col items-center justify-center py-12">
                                          <MapPin size={40} className="mx-auto text-gray-300 mb-3" />
                                          <p className="text-gray-500">No saved addresses found</p>
                                          <button 

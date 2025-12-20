@@ -106,8 +106,8 @@ const AddressesList = ({
                 </AnimatePresence>
 
                 {displayAddresses.length === 0 && !isAdding ? (
-                     <div className="text-center py-12 bg-gray-50 rounded-xl border border-dashed border-gray-200">
-                        <MapPin className="w-12 h-12 text-gray-300 mx-auto mb-3" />
+                     <div className="text-center flex flex-col items-center justify-center py-12 bg-gray-50 rounded-xl border border-dashed border-gray-200" style={{ padding: '10px' }}>
+                        <div className='text-center'> <MapPin className="w-12 h-12 text-gray-300 mx-auto mb-3" /></div>
                         <h3 className="text-gray-900 font-medium mb-1">No addresses found</h3>
                         <p className="text-gray-500 text-sm mb-4">Add an address to speed up checkout</p>
                         <button
@@ -116,6 +116,7 @@ const AddressesList = ({
                         >
                             Add your first address
                         </button>
+                        
                     </div>
                 ) : (
                     <div className="grid grid-cols-1 lg:grid-cols-2 gap-4" style={{ padding: '5px' }}>
@@ -169,11 +170,14 @@ const AddressesList = ({
                                 <div className="space-y-1 mb-5 pl-13" style={{ paddingLeft: '33px' }}>
                                      <p className="text-xs text-gray-600 leading-relaxed">
                                          {addr.address}<br />
+                                         {addr.landmark && <span className="block text-emerald-600 font-medium text-[10px] mt-0.5 mb-0.5">Landmark: {addr.landmark}</span>}
                                          {addr.city}, {addr.state} - <span className="font-medium text-gray-900">{addr.pincode}</span>
                                      </p>
-                                     <p className="text-xs text-gray-500 mt-2">
-                                         Mobile: <span className="font-medium text-gray-700">{addr.phone}</span>
-                                     </p>
+                                     <div className="text-xs text-gray-500 mt-2 space-y-0.5">
+                                         <p>Mobile: <span className="font-medium text-gray-700">{addr.phone}</span></p>
+                                         {addr.altPhone && <p>Alt Phone: <span className="font-medium text-gray-700">{addr.altPhone}</span></p>}
+                                         {addr.email && <p>Email: <span className="font-medium text-gray-700">{addr.email}</span></p>}
+                                     </div>
                                 </div>
                                 
                                 <div className="flex items-end justify-end gap-2 pl-13 pt-3 border-t border-gray-100 opacity-60 group-hover:opacity-100 transition-opacity">

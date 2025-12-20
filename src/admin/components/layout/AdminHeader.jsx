@@ -1,5 +1,6 @@
 import React from 'react';
-import { Search, Bell, User, Menu, LogOut, Settings } from 'lucide-react';
+import { useNavigate } from 'react-router-dom';
+import { Search, Bell, User, Menu, LogOut, Settings, ExternalLink } from 'lucide-react';
 import { Button } from '../ui/Button';
 import { Input } from '../ui/Input';
 import { Avatar } from '../ui/Avatar';
@@ -14,6 +15,7 @@ import {
 import useAdminStore from '../../context/useAdminStore';
 
 const AdminHeader = ({ onMobileMenuToggle }) => {
+  const navigate = useNavigate();
   const logout = useAdminStore((state) => state.logout);
 
   return (
@@ -30,6 +32,17 @@ const AdminHeader = ({ onMobileMenuToggle }) => {
         <Menu className="h-3.5 w-3.5 sm:h-4 sm:w-4 md:h-5 md:w-5" />
         <span className="sr-only">Open sidebar</span>
       </Button>
+      {/* Go to Website Button */}
+          <Button
+            variant="ghost"
+            size="sm"
+            onClick={() => navigate('/')}
+            className=" sm:flex items-center gap-2 text-emerald-700 hover:text-emerald-800 hover:bg-emerald-50/50"
+            style={{ padding: '0 8px', height: '32px' }}
+          >
+            <span className=" sm:block text-[10px] sm:text-lg font-medium" style={{marginTop:'3px'}}>DS Pharma</span>
+            <ExternalLink className=" hidden md:block h-2.5 w-2.5 sm:h-4 sm:w-4 md:h-5" />
+          </Button>
 
       <div className="flex flex-1 gap-x-2 sm:gap-x-4 self-stretch items-center lg:gap-x-6 relative z-10 justify-end">
 

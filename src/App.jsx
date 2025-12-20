@@ -48,9 +48,6 @@ function App() {
             <Route path="/admin/*" element={<AdminRouter />} />
             
             {/* Standalone Routes (No Layout) */}
-            <Route path="/profile" element={<UserProfile />} />
-
-
               <Route path="/order-confirmation/:orderId" element={<OrderConfirmation />} />
 
             {/* Protected/Main Routes (With Layout) */}
@@ -62,6 +59,7 @@ function App() {
               <Route path="/orders" element={<Orders />} />
               <Route path="/orders/:id" element={<OrderDetails />} />
               <Route path="/search" element={<SearchPage />} />
+              <Route path="/profile" element={<UserProfile />} />
 
             </Route>
 

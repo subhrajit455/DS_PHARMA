@@ -50,14 +50,7 @@ const OrdersList = () => {
                 <h2 className="text-xl md:text-2xl font-bold" style={{ fontFamily: 'Gyrotrope', color: '#1F2937' }}>
                     Order History
                 </h2>
-                <button 
-                    onClick={() => navigate('/orders')}
-                    className="text-teal-600 hover:text-teal-700 font-medium flex items-center gap-1"
-                    style={{ fontSize: window.innerWidth >= 640 ? '14px' : '11px' }}
-                >
-                    View All
-                    <span>→</span>
-                </button>
+                
             </div>
             <div className="space-y-4">
                 {orders.map((order) => (

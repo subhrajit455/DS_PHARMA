@@ -24,8 +24,13 @@ export const useLogin = () => {
 
       success("Login successful!");
 
-      // Redirect based on role if needed, or just home
-      if (user.role === "admin") {
+      // Check for redirect parameter in URL
+      const params = new URLSearchParams(window.location.search);
+      const redirectPath = params.get("redirect");
+
+      if (redirectPath) {
+        navigate(redirectPath);
+      } else if (user.role === "admin") {
         navigate("/admin/dashboard");
       } else {
         navigate("/");

@@ -1,6 +1,6 @@
 import React from 'react';
 import { User, Camera, ChevronRight, LogOut } from 'lucide-react';
-import { useNavigate } from 'react-router-dom';
+import { useLogout } from '@/hooks/useLogout';
 
 const ProfileSidebar = ({ 
     profileData, 
@@ -8,7 +8,11 @@ const ProfileSidebar = ({
     setActiveSection, 
     sections 
 }) => {
-    const navigate = useNavigate();
+    const logout = useLogout();
+
+    const handleLogout = () => {
+        logout();
+    };
 
     return (
         <aside className="lg:col-span-3 lg:sticky lg:top-24 self-start space-y-6 md:min-h-[calc(100vh-200px)]" style={{ marginTop: window.innerWidth >= 640 ? '30px' : '0' }}>
@@ -66,13 +70,15 @@ const ProfileSidebar = ({
 
                 <div className="mt-2 pt-2 border-t border-gray-100" style={{ padding: '5px 10px', marginTop: '10px'}}>
                     <button
-                        onClick={() => navigate('/logout')}
+                        onClick={handleLogout}
                         className="w-full flex items-center gap-3 p-3 rounded-xl text-red-600 hover:bg-red-50 transition-colors"
                     >
+                    <div className='w-full flex items-center gap-3 p-3 rounded-xl text-red-600 hover:bg-red-50 transition-colors'>
                         <div className="p-2 rounded-lg bg-red-100 text-red-600">
                             <LogOut className="w-5 h-5" />
                         </div>
                         <span className="font-bold text-xs sm:text-sm">Sign Out</span>
+                    </div>
                     </button>
                 </div>
             </nav>

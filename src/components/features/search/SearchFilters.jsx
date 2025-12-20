@@ -1,6 +1,6 @@
 import React, { useState } from 'react';
-import { ChevronDown, SlidersHorizontal, ArrowUpDown, Tag, Banknote, Percent, ShoppingBag } from 'lucide-react';
-import { motion, AnimatePresence } from 'framer-motion';
+import { ChevronDown, SlidersHorizontal, ArrowUpDown, Tag, Banknote, Percent, ShoppingBag, Check } from 'lucide-react';
+import { motion as Motion, AnimatePresence } from 'framer-motion';
 
 export const SortDropdown = ({ currentSort, onSortChange }) => {
   const [isOpen, setIsOpen] = useState(false);
@@ -27,7 +27,7 @@ export const SortDropdown = ({ currentSort, onSortChange }) => {
 
       <AnimatePresence>
         {isOpen && (
-          <motion.div
+          <Motion.div
             initial={{ opacity: 0, scale: 0.95, y: 5 }}
             animate={{ opacity: 1, scale: 1, y: 0 }}
             exit={{ opacity: 0, scale: 0.95, y: 5 }}
@@ -53,7 +53,7 @@ export const SortDropdown = ({ currentSort, onSortChange }) => {
                    </button>
                 ))}
              </div>
-          </motion.div>
+          </Motion.div>
         )}
       </AnimatePresence>
       
@@ -79,7 +79,7 @@ const FilterSection = ({ title, icon: Icon, isOpen, onToggle, children }) => {
          </button>
          <AnimatePresence>
             {isOpen && (
-               <motion.div
+               <Motion.div
                  initial={{ height: 0, opacity: 0 }}
                  animate={{ height: "auto", opacity: 1 }}
                  exit={{ height: 0, opacity: 0 }}
@@ -88,7 +88,7 @@ const FilterSection = ({ title, icon: Icon, isOpen, onToggle, children }) => {
                   <div className="pb-5 px-1 space-y-3">
                      {children}
                   </div>
-               </motion.div>
+               </Motion.div>
             )}
          </AnimatePresence>
       </div>
@@ -102,6 +102,20 @@ export const SearchFilters = ({ filters = {}, selectedFilters = {}, onFilterChan
      availability: true,
      type: true
   });
+
+  const [minPrice, setMinPrice] = useState('');
+  const [maxPrice, setMaxPrice] = useState('');
+
+  // Sync local inputs with selectedFilters
+  React.useEffect(() => {
+     if (selectedFilters.priceRange && Array.isArray(selectedFilters.priceRange)) {
+        setMinPrice(selectedFilters.priceRange[0] || '');
+        setMaxPrice(selectedFilters.priceRange[1] || '');
+     } else {
+        setMinPrice('');
+        setMaxPrice('');
+     }
+  }, [selectedFilters.priceRange]);
 
   const toggleSection = (section) => {
      setOpenSections(prev => ({...prev, [section]: !prev[section]}));
@@ -130,11 +144,16 @@ export const SearchFilters = ({ filters = {}, selectedFilters = {}, onFilterChan
   
   const handlePriceChange = (range) => {
     if (selectedFilters.priceRangeStr === range.value) {
-       const { priceRangeStr: _p, priceRange: _r, ...rest } = selectedFilters;
+       const { priceRangeStr: _p, priceRange: _r, customPrice: _c, ...rest } = selectedFilters;
        onFilterChange(rest);
     } else {
        const [min, max] = range.value.split('-').map(Number);
-       onFilterChange({ ...selectedFilters, priceRangeStr: range.value, priceRange: [min, max] });
+       onFilterChange({ 
+         ...selectedFilters, 
+         priceRangeStr: range.value, 
+         priceRange: [min, max],
+         customPrice: null 
+       });
     }
   };
 
@@ -175,22 +194,74 @@ export const SearchFilters = ({ filters = {}, selectedFilters = {}, onFilterChan
          isOpen={openSections.price} 
          onToggle={() => toggleSection('price')}
        >
-          {priceRanges.map(range => (
-            <label key={range.value} className="flex items-center gap-3 cursor-pointer group hover:bg-gray-50 p-1.5 rounded-lg -mx-1.5 transition-colors">
-              <div className="relative flex items-center">
-                 <input
-                    type="radio"
-                    name="price_range"
-                    checked={selectedFilters.priceRangeStr === range.value}
-                    onChange={() => handlePriceChange(range)}
-                    className="peer h-4 w-4 border-gray-300 text-emerald-600 focus:ring-emerald-500 cursor-pointer"
-                  />
-              </div>
-              <span className="text-[12px] text-gray-600 group-hover:text-gray-900 transition-colors" style={{ marginTop: '5px' }}>
-                {range.label}
-              </span>
-            </label>
-          ))}
+          <div className="space-y-3">
+             {priceRanges.map(range => (
+               <label key={range.value} className="flex items-center gap-3 cursor-pointer group hover:bg-gray-50 p-1.5 rounded-lg -mx-1.5 transition-colors">
+                 <div className="relative flex items-center">
+                    <input
+                     
+                       type="radio"
+                       name="price_range"
+                       checked={selectedFilters.priceRangeStr === range.value}
+                       onChange={() => handlePriceChange(range)}
+                       className="peer h-4 w-4 border-gray-300 text-emerald-600 focus:ring-emerald-500 cursor-pointer"
+                     />
+                 </div>
+                 <span className="text-[12px] text-gray-600 group-hover:text-gray-900 transition-colors" style={{ marginTop: '5px' }}>
+                   {range.label}
+                 </span>
+               </label>
+             ))}
+
+             {/* Custom Price Range Inputs */}
+             <div className="pt-2 border-t border-gray-50" style={{ padding: '5px' }}>
+                <p className="text-[10px] text-gray-400 uppercase font-bold mb-2 tracking-wider">Custom Range</p>
+                <div className="flex items-center gap-2">
+                   <div className="flex-1 relative">
+                      <span className="absolute left-2 top-1/2 -translate-y-1/2 text-gray-400 font-bold text-[13px]">₹</span>
+                      <input 
+                        style={{ padding: '3px 0px 3px 20px' }}
+                         type="number"
+                         placeholder="Min"
+                         value={minPrice}
+                         onChange={(e) => setMinPrice(e.target.value)}
+                         className="w-full pl-5 pr-2 py-1.5 bg-gray-50 border border-gray-200 rounded-lg text-[10px] sm:text-xs focus:ring-1 focus:ring-emerald-500 focus:border-emerald-500 outline-hidden"
+                      />
+                   </div>
+                   <span className="text-gray-400 text-xs">-</span>
+                   <div className="flex-1 relative">
+                      <span className="absolute left-2 top-1/2 -translate-y-1/2 text-gray-400 font-bold text-[13px]">₹</span>
+                      <input 
+                        style={{ padding: '3px 0px 3px 20px' }}
+                         type="number"
+                         placeholder="Max"
+                         value={maxPrice}
+                         onChange={(e) => setMaxPrice(e.target.value)}
+                         className="w-full pl-5 pr-2 py-1.5 bg-gray-50 border border-gray-200 rounded-lg text-[10px] sm:text-xs focus:ring-1 focus:ring-emerald-500 focus:border-emerald-500 outline-hidden"
+                      />
+                   </div>
+                   <button
+                     style={{ padding: '3px 5px' }}
+                     onClick={() => {
+                        const min = Number(minPrice) || 0;
+                        const max = Number(maxPrice) || 10000;
+                        if (min > max) {
+                           alert('Min price cannot be greater than Max price');
+                           return;
+                        }
+                        onFilterChange({ 
+                           ...selectedFilters, 
+                           priceRangeStr: null,
+                           priceRange: [min, max]
+                        });
+                     }}
+                     className="p-2 bg-emerald-50 text-emerald-600 rounded-lg hover:bg-emerald-100 transition-colors"
+                   >
+                      <Check className="w-3 h-3 sm:w-4 sm:h-4" />
+                   </button>
+                </div>
+             </div>
+          </div>
        </FilterSection>
 
        <FilterSection 

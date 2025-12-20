@@ -23,7 +23,7 @@ const SearchResults = ({ products, isLoading, query, onReset }) => {
   }
 
   if (!safeProducts || safeProducts.length === 0) {
-    return (
+    return (  
       <div className="flex flex-col items-center justify-center min-h-[calc(100vh-72px)] py-20 bg-white rounded-3xl border border-gray-100 shadow-sm text-center px-4">
         <div className="w-20 h-20 bg-gray-50 rounded-full flex items-center justify-center mb-6">
            <X size={40} className="text-gray-300" />
@@ -52,23 +52,40 @@ const SearchResults = ({ products, isLoading, query, onReset }) => {
           }
         }
       `}</style>
-      <div className="search-results-grid grid grid-cols-2 md:grid-cols-3 lg:grid-cols-4 gap-4 sm:gap-6">
-        {safeProducts && safeProducts.length > 0 && safeProducts.map((product) => {
-          if (!product || !product.id) return null;
-          return (
-            <PharmacyProductCard
-              key={product.id}
-              id={product.id}
-              name={product.name || ''}
-              price={product.price || 0}
-              originalPrice={product.mrp}
-              quantity="1"
-              unit="strip"
-              imageUrl={product.image}
-              className="h-full hover:-translate-y-1 transition-transform"
-            />
-          );
-        })}
+      <div 
+        className="search-results-container space-y-3"
+        style={{
+          maxHeight: '700px',
+          minHeight: '600px',
+          overflowY: 'auto',
+          paddingRight: '5px',
+          scrollbarWidth: 'none',
+          msOverflowStyle: 'none',
+        }}
+      >
+        <style>{`
+          .search-results-container::-webkit-scrollbar {
+            display: none;
+          }
+        `}</style>
+        <div className="search-results-grid grid grid-cols-2 md:grid-cols-3 lg:grid-cols-4 gap-4 sm:gap-6">
+          {safeProducts && safeProducts.length > 0 && safeProducts.map((product) => {
+            if (!product || !product.id) return null;
+            return (
+              <PharmacyProductCard
+                key={product.id}
+                id={product.id}
+                name={product.name || ''}
+                price={product.price || 0}
+                originalPrice={product.mrp}
+                quantity="1"
+                unit="strip"
+                imageUrl={product.image}
+                className="h-full hover:-translate-y-1 transition-transform"
+              />
+            );
+          })}
+        </div>
       </div>
     </>
   );

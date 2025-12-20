@@ -1,7 +1,7 @@
 import React, { useState, useEffect } from 'react';
 import { useSearchParams, useNavigate } from 'react-router-dom';
-import { Filter, SlidersHorizontal, X, ArrowLeft } from 'lucide-react';
-import { AnimatePresence } from 'framer-motion';
+import { SlidersHorizontal, X, ArrowLeft } from 'lucide-react';
+import { AnimatePresence, motion as Motion } from 'framer-motion';
 import searchService from '@/services/api/searchService';
 import useDebounce from '@/hooks/useDebounce';
 import SearchResults from '@/components/features/search/SearchResults';
@@ -96,7 +96,18 @@ const SearchPage = () => {
   };
 
   return (
-    <div className="min-h-screen bg-gray-50/50 pt-6 pb-20">
+    <div className="search-page-wrapper min-h-screen bg-gray-50/50">
+      <style>{`
+        .search-page-wrapper {
+          padding-top: 60px;
+          padding-bottom: 80px;
+        }
+        @media (min-width: 768px) {
+          .search-page-wrapper {
+            padding-top: 80px !important;
+          }
+        }
+      `}</style>
       <div className="px-4 sm:px-6 lg:px-8" style={{ width: '100%', maxWidth: '1280px', margin: '0 auto', padding:'10px' }}>
         
         {/* Header */}
@@ -109,7 +120,7 @@ const SearchPage = () => {
             paddingBottom: '1rem',
             marginTop: '-1rem' // Compensate for padding to maintain visual flow
           }}
-          className="flex flex-col md:flex-row justify-between items-start md:justify-items-center gap-4 mb-8 sticky md:sticky top-[40px] sm:top-[60px] md:top-0"
+          className="flex flex-col md:flex-row justify-between items-start md:justify-items-center gap-4 mb-8 sticky top-[50px] sm:top-[60px] md:top-[85px]"
         >
           <div className="flex items-center gap-4">
             {/* Back Button */}
@@ -166,14 +177,14 @@ const SearchPage = () => {
            <AnimatePresence>
              {isMobileFiltersOpen && (
                 <>
-                  <motion.div 
+                  <Motion.div 
                      initial={{ opacity: 0 }}
                      animate={{ opacity: 1 }}
                      exit={{ opacity: 0 }}
                      onClick={() => setIsMobileFiltersOpen(false)}
                      className="fixed inset-0 z-60 bg-black/40 backdrop-blur-sm lg:hidden"
                   />
-                  <motion.div
+                  <Motion.div
                      initial={{ x: '100%' }}
                      animate={{ x: 0 }}
                      exit={{ x: '100%' }}
@@ -207,7 +218,7 @@ const SearchPage = () => {
                            </button>
                         </div>
                      </div>
-                  </motion.div>
+                  </Motion.div>
                 </>
              )}
            </AnimatePresence>

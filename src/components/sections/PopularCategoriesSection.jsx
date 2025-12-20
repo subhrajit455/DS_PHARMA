@@ -8,7 +8,7 @@ import ErrorState from '@/components/common/ErrorState';
 const PopularCategoriesSection = ({
   categories: propCategories = [], // Accept categories from backend
 }) => {
-  const [, setHoveredCategory] = useState(null);
+  const [hoveredCategory, setHoveredCategory] = useState(null);
   const navigate = useNavigate();
   const { data: categoryData, isLoading, isError } = useCategories();
 
@@ -108,7 +108,7 @@ const PopularCategoriesSection = ({
             <Motion.div
               key={category.id || `category-${category.name}-${index}`}
               variants={itemVariants}
-              className="flex flex-col items-center group cursor-pointer shrink-0 sm:shrink sm:w-auto max-w-[100px]"
+              className="flex flex-col items-center group cursor-pointer shrink-0 sm:shrink sm:w-auto max-w-[100px] relative"
               style={{
                 // Mobile width handled by class or default behavior
               }}
@@ -125,6 +125,21 @@ const PopularCategoriesSection = ({
                 }
               }}
             >
+              {/* Tooltip */}
+              {hoveredCategory === category.id && (
+                 <Motion.div
+                  initial={{ opacity: 0, y: 10 }}
+                  animate={{ opacity: 1, y: 0 }}
+                  exit={{ opacity: 0, y: 10 }}
+                  transition={{ duration: 0.15 }}
+                  className="absolute top-full mb-2 left-1/2 -translate-x-1/2 px-3 py-1.5 bg-transparent bg-white-100 backdrop-blur-sm text-black text-[10px] sm:text-sm rounded-md shadow-xl z-50 whitespace-nowrap hidden sm:block pointer-events-none border border-white/10"
+                  style={{ fontFamily: 'Gyrotrope', padding: '2px 5px', marginTop: '2px'}}
+                >
+                  {category.name}
+                  {/* Arrow */}
+                  <div className="absolute bottom-full left-1/2 -translate-x-1/2 border-4 border-transparent border-b-gray-900/90" />
+                </Motion.div>
+              )}
               {/* Mobile Width Controller */}
               <div className="sm:hidden" style={{ width: '22vw', minWidth: '80px', height: '0' }}></div>
 

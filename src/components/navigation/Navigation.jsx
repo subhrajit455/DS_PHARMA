@@ -114,7 +114,6 @@ const Navigation = () => {
       `}</style>
 
       {/* Desktop Navigation */}
-      {location.pathname !== '/search' && (
         <DesktopNavigation
           activeItem={activeItem}
           onNavClick={handleNavClick}
@@ -122,7 +121,6 @@ const Navigation = () => {
           isAuthenticated={isAuthenticated}
           user={currentUser}
         />
-      )}
 
       {/* Mobile Top Bar */}
       <MobileTopBar

@@ -71,12 +71,19 @@ export const orderService = {
         order.address?.name ||
         order.customerAddress?.name ||
         "Guest",
-      email: order.email || order.deliveryAddress?.email || "demo@dspharma.com",
+      email: order.deliveryAddress?.email || order.email || "demo@dspharma.com",
+      phone: order.deliveryAddress?.phone || order.phone,
+      altPhone: order.deliveryAddress?.altPhone || order.altPhone,
+      landmark: order.deliveryAddress?.landmark || order.landmark,
       shippingAddress:
         typeof order.deliveryAddress === "object"
-          ? `${order.deliveryAddress.address}, ${
-              order.deliveryAddress.city || ""
-            }`
+          ? `${order.deliveryAddress.address}${
+              order.deliveryAddress.landmark
+                ? ` (Landmark: ${order.deliveryAddress.landmark})`
+                : ""
+            }, ${order.deliveryAddress.city || ""}, ${
+              order.deliveryAddress.state || ""
+            } - ${order.deliveryAddress.pincode || ""}`
           : order.address || order.shippingAddress || "N/A",
       payment:
         order.paymentMethod === "cod" ? "Cash on Delivery" : "Paid Online",

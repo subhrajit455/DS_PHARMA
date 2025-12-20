@@ -15,14 +15,12 @@ import useDataStore from '@/store/useDataStore';
 import { USERS } from '@/data/userData';
 
 // Components
-import Footer from '@/components/sections/Footer';
 import PersonalInfoForm from '@/components/features/profile/PersonalInfoForm';
 import AddressesList from '@/components/features/profile/AddressesList';
 import OrdersPreview from '@/components/features/profile/OrdersPreview';
 import AccountActions from '@/components/features/profile/AccountActions';
 import OrdersList from '@/components/features/profile/OrdersList';
 import ProfileSidebar from '@/components/features/profile/ProfileSidebar';
-import ProfileHeader from '@/components/features/profile/ProfileHeader';
 import WishlistSection from '@/components/features/profile/WishlistSection';
 import { Heart } from 'lucide-react';
 
@@ -35,7 +33,13 @@ const UserProfile = () => {
     // Redirect if not authenticated
     useEffect(() => {
         if (!isAuthenticated) {
-            navigate('/login');
+            // Debounce redirect to allow logout action (which navigates to /) to complete
+            // This prevents race conditions where logout -> state clear -> redirect to /login happens
+            // instead of logout -> redirect to /
+            const timer = setTimeout(() => {
+                navigate('/login', { replace: true });
+            }, 500);
+            return () => clearTimeout(timer);
         }
     }, [isAuthenticated, navigate]);
 
@@ -111,11 +115,25 @@ const UserProfile = () => {
     }
 
     return (
-        <div className="min-h-screen w-full bg-gray-50 font-sans flex flex-col" style={{ padding: '5px' }}>
-            <ProfileHeader profileData={profileData} />
-
+        <div className="profile-page-wrapper min-h-screen w-full bg-gray-50 font-sans flex flex-col">
+            <style>{`
+                .profile-page-wrapper {
+                    padding-top: 60px;
+                }
+                @media (min-width: 768px) {
+                    .profile-page-wrapper {
+                        padding-top: 80px !important;
+                    }
+                }
+                @media (max-width: 639px) {
+                    .profile-container {
+                        padding-left: 5px !important;
+                        padding-right: 5px !important;
+                    }
+                }
+            `}</style>
             {/* Main Content Area - flex-1 ensures it takes available space */}
-            <main className="flex-1 w-full px-2 sm:px-4 md:px-6 lg:px-8 py-4 sm:py-6 md:py-8" style={{ maxWidth: '1280px', margin: '0 auto' }}>
+            <main className="profile-container flex-1 w-full px-2 sm:px-4 md:px-6 lg:px-8 py-4 sm:py-6 md:py-8" style={{ maxWidth: '1280px', margin: '0 auto' }}>
                 <div className="grid grid-cols-1 lg:grid-cols-12 gap-4 sm:gap-6 lg:gap-8">
 
                     <ProfileSidebar 
@@ -187,8 +205,6 @@ const UserProfile = () => {
 
                 </div>
             </main>
-            
-            <Footer />
         </div>
     );
 };

@@ -12,12 +12,7 @@ export const USERS = [
     password: "demo123",
     phone: "+91 9876543210",
     role: "admin",
-    address: {
-      street: "123 Tech Park",
-      city: "Bangalore",
-      state: "Karnataka",
-      pincode: "560001",
-    },
+    address: null,
     orders: [],
   },
 ];

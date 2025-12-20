@@ -15,7 +15,7 @@ export const usePlaceOrder = () => {
       queryClient.invalidateQueries({ queryKey: ["orders"] });
       queryClient.invalidateQueries({ queryKey: ["cart"] });
 
-      // Navigate to order confirmation
+      // Navigate directly to Order Details
       if (response?.data?.id) {
         navigate(`/order-confirmation/${response.data.id}`);
       } else {
