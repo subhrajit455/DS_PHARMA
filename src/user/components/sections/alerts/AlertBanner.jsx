@@ -72,7 +72,7 @@ const AlertBanner = ({ position = 'top'}) => {
   };
 
   return (
-    <div className={`${position === 'top' ? 'mb-4' : 'mt-4'}`}>
+    <div className='absolute z-50' style={position === 'top' ? { marginBottom: '40px' } : { marginTop: '100px' }}>
       {positionAlerts.map(alert => {
         const styles = getAlertStyles(alert.type);
         return (
@@ -96,7 +96,7 @@ const AlertBanner = ({ position = 'top'}) => {
               {alert.dismissible && (
                 <button
                   onClick={() => handleDismiss(alert.id)}
-                  className="text-current opacity-50 hover:opacity-100 transition-opacity flex-shrink-0"
+                  className="text-current opacity-50 hover:opacity-100 transition-opacity shrink-0"
                   aria-label="Dismiss alert"
                 >
                   <X className="h-4 w-4" />

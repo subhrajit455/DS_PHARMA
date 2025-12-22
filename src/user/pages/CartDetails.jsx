@@ -35,6 +35,7 @@ const CartDetails = () => {
   const [appliedCoupon, setAppliedCoupon] = useState(null);
   const [showAddressModal, setShowAddressModal] = useState(false);
   const [modalMode, setModalMode] = useState('select'); // 'select' or 'add'
+  const [validationError, setValidationError] = useState(null);
   const { success: toastSuccess, error: toastError } = useToastStore();
 
   // Use addresses hook
@@ -159,20 +160,50 @@ const CartDetails = () => {
   }, [cartItems, appliedCoupon]);
 
   const handlePlaceOrder = (paymentMethod) => {
+    // Clear previous validation errors
+    setValidationError(null);
+    
+    // 1. Validate user authentication
     if (!currentUser) {
       toastError('Please login to place your order');
       navigate(`/login?redirect=${encodeURIComponent(location.pathname)}`);
       return;
     }
+    
+    // 2. Validate cart is not empty
     if (cartItems.length === 0) {
-      alert('Your cart is empty!');
+      setValidationError('Your cart is empty. Add items to continue shopping.');
       return;
     }
+    
+    // 3. Validate delivery address exists
     if (!deliveryAddress) {
-        alert('Please select a delivery address');
-        setShowAddressModal(true);
-        return;
+      setValidationError('Please select a delivery address to continue.');
+      setShowAddressModal(true);
+      return;
     }
+    
+    // 4. Validate address completeness
+    if (!deliveryAddress.name || !deliveryAddress.phone || !deliveryAddress.address) {
+      setValidationError('Selected address is incomplete. Please choose or add a complete address.');
+      setShowAddressModal(true);
+      return;
+    }
+    
+    // 5. Validate cart items data integrity
+    const invalidItems = cartItems.filter(item => !item.id || !item.price || !item.name);
+    if (invalidItems.length > 0) {
+      setValidationError('Some items in your cart have invalid data. Please refresh the page and try again.');
+      return;
+    }
+    
+    // 6. Validate totals
+    if (!totals || totals.total < 0) {
+      setValidationError('Order total calculation failed. Please refresh and try again.');
+      return;
+    }
+    
+    // All validations passed - prepare and place order
     const orderData = {
         items: cartItems.map(item => ({
           id: item.id,
@@ -190,6 +221,8 @@ const CartDetails = () => {
         phone: deliveryAddress.phone,
         address: deliveryAddress.address,
     };
+    
+    // Place order - usePlaceOrder hook handles navigation on success
     placeOrder(orderData);
   };
 
@@ -313,6 +346,20 @@ const CartDetails = () => {
                 Cart Items ({cartItems.length})
               </h1>
             </div>
+
+            {/* Validation Error Display */}
+            {validationError && (
+              <div className="mb-4 p-4 bg-red-50 border-l-4 border-red-500 rounded-lg animate-in fade-in slide-in-from-top-2 duration-200">
+                <div className="flex items-center">
+                  <svg className="w-5 h-5 text-red-500 mr-2 flex-shrink-0" fill="currentColor" viewBox="0 0 20 20">
+                    <path fillRule="evenodd" d="M10 18a8 8 0 100-16 8 8 0 000 16zM8.707 7.293a1 1 0 00-1.414 1.414L8.586 10l-1.293 1.293a1 1 0 101.414 1.414L10 11.414l1.293 1.293a1 1 0 001.414-1.414L11.414 10l1.293-1.293a1 1 0 00-1.414-1.414L10 8.586 8.707 7.293z" clipRule="evenodd" />
+                  </svg>
+                  <p className="text-red-800 text-sm font-medium" style={{ fontFamily: 'Gyrotrope' }}>
+                    {validationError}
+                  </p>
+                </div>
+              </div>
+            )}
 
             <div className="space-y-3" style={{ maxHeight: '750px', overflowY: 'auto', paddingRight: '5px', scrollbarWidth: 'none', msOverflowStyle: 'none' }}>
               <style>{`.space-y-3::-webkit-scrollbar { display: none; }`}</style>
