@@ -2,7 +2,7 @@
 // ============================================================
 // Updated to use useDataStore as the single source of truth
 
-import useDataStore from "../store/useDataStore";
+import useDataStore from "@/store/useDataStore";
 
 // Simulate async API call delay for realistic UX
 const delay = (ms) => new Promise((resolve) => setTimeout(resolve, ms));

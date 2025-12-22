@@ -8,8 +8,8 @@
 // OLD: cartService.getCart()
 // NEW: const cart = useDataStore((state) => state.cart)
 
-import apiClient from "./api/apiClient";
-import { API_ENDPOINTS } from "./api/baseURL";
+import apiClient from "@/services/api/apiClient";
+import { API_ENDPOINTS } from "@/services/api/baseURL";
 
 const USE_MOCK = import.meta.env.VITE_USE_MOCK === "true" || true;
 

@@ -1,8 +1,8 @@
 import React, { useEffect, useState } from 'react';
 import { Outlet, useNavigate } from 'react-router-dom';
-import AdminSidebar from './AdminSidebar';
-import AdminHeader from './AdminHeader';
-import useDataStore from '../../../store/useDataStore';
+import AdminSidebar from '@/admin/components/layout/AdminSidebar';
+import AdminHeader from '@/admin/components/layout/AdminHeader';
+import useDataStore from '@/store/useDataStore';
 
 const AdminLayout = () => {
   const [sidebarOpen, setSidebarOpen] = useState(false);

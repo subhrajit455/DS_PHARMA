@@ -3,9 +3,9 @@ import { useParams, useNavigate } from 'react-router-dom';
 import { ArrowLeft, User, MapPin, CreditCard, Truck } from 'lucide-react';
 import { toast } from 'react-hot-toast';
 import { useQueryClient } from '@tanstack/react-query';
-import { Button } from '../../components/ui/Button';
-import { Card, CardContent, CardHeader, CardTitle } from '../../components/ui/Card';
-import { Avatar } from '../../components/ui/Avatar';
+import { Button } from '@/admin/components/ui/Button';
+import { Card, CardContent, CardHeader, CardTitle } from '@/admin/components/ui/Card';
+import { Avatar } from '@/admin/components/ui/Avatar';
 import {
   Table,
   TableBody,
@@ -13,9 +13,9 @@ import {
   TableHead,
   TableHeader,
   TableRow,
-} from '../../components/ui/Table';
-import { orderService } from '../../api/orderService';
-import ConfirmationModal from '../../components/ui/ConfirmationModal';
+} from '@/admin/components/ui/Table';
+import { orderService } from '@/services/admin/api/orderService';
+import ConfirmationModal from '@/admin/components/ui/ConfirmationModal';
 
 const OrderDetails = () => {
   const { id } = useParams();

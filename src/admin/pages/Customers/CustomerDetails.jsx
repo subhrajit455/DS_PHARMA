@@ -2,10 +2,10 @@ import React, { useEffect, useState } from 'react';
 import { useParams, useNavigate } from 'react-router-dom';
 import { ArrowLeft, Mail, Phone, MapPin, Calendar, CreditCard } from 'lucide-react';
 import { toast } from 'react-hot-toast';
-import { Button } from '../../components/ui/Button';
-import { Card, CardContent, CardHeader, CardTitle } from '../../components/ui/Card';
-import { Avatar } from '../../components/ui/Avatar';
-import { Badge } from '../../components/ui/Badge';
+import { Button } from '@/admin/components/ui/Button';
+import { Card, CardContent, CardHeader, CardTitle } from '@/admin/components/ui/Card';
+import { Avatar } from '@/admin/components/ui/Avatar';
+import { Badge } from '@/admin/components/ui/Badge';
 import {
   Table,
   TableBody,
@@ -13,8 +13,8 @@ import {
   TableHead,
   TableHeader,
   TableRow,
-} from '../../components/ui/Table';
-import { customerService } from '../../api/customerService';
+} from '@/admin/components/ui/Table';
+import { customerService } from '@/services/admin/api/customerService';
 
 const CustomerDetails = () => {
   const { id } = useParams();

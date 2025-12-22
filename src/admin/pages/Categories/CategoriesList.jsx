@@ -1,9 +1,9 @@
 import React, { useState } from 'react';
 import { Plus, Edit, Trash2, Search, Tag, Sparkles } from 'lucide-react';
 import { toast } from 'react-hot-toast';
-import { Button } from '../../components/ui/Button';
-import { Input } from '../../components/ui/Input';
-import { Card, CardContent } from '../../components/ui/Card';
+import { Button } from '@/admin/components/ui/Button';
+import { Input } from '@/admin/components/ui/Input';
+import { Card, CardContent } from '@/admin/components/ui/Card';
 import {
   Table,
   TableBody,
@@ -11,9 +11,9 @@ import {
   TableHead,
   TableHeader,
   TableRow,
-} from '../../components/ui/Table';
-import ConfirmationModal from '../../components/ui/ConfirmationModal';
-import { Pagination } from '../../components/ui/Pagination';
+} from '@/admin/components/ui/Table';
+import ConfirmationModal from '@/admin/components/ui/ConfirmationModal';
+import { Pagination } from '@/admin/components/ui/Pagination';
 
 import useDataStore from '@/store/useDataStore';
 

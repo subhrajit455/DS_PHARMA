@@ -2,10 +2,10 @@ import React, { useEffect, useState } from 'react';
 import { useParams, useNavigate } from 'react-router-dom';
 import { Edit, Trash2, ArrowLeft, Package, User } from 'lucide-react';
 import { toast } from 'react-hot-toast';
-import { productService } from '../../api/productService';
-import { Button } from '../../components/ui/Button';
-import { Card, CardContent, CardHeader, CardTitle, CardDescription } from '../../components/ui/Card';
-import { Badge } from '../../components/ui/Badge';
+import { productService } from '@/services/admin/api/productService';
+import { Button } from '@/admin/components/ui/Button';
+import { Card, CardContent, CardHeader, CardTitle, CardDescription } from '@/admin/components/ui/Card';
+import { Badge } from '@/admin/components/ui/Badge';
 
 const ProductDetails = () => {
   const { id } = useParams();

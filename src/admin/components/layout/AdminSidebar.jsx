@@ -14,9 +14,9 @@ import {
   Tags,
   Star
 } from 'lucide-react';
-import { cn } from '../../utils/cn';
-import { Button } from '../ui/Button';
-import useDataStore from '../../../store/useDataStore';
+import { cn } from '@/admin/utils/cn';
+import Button from '@/shared/components/ui/Button';
+import useDataStore from '@/store/useDataStore';
 
 const AdminSidebar = ({ isCollapsed, toggleCollapse, isMobile, onCloseMobile }) => {
   const location = useLocation();

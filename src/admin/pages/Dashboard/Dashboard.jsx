@@ -1,10 +1,10 @@
 import React, { useEffect, useState } from 'react';
 import { ShoppingBag, Users, DollarSign, Package, ArrowUpRight, ArrowDownRight, Plus, ExternalLink, TrendingUp, Sparkles } from 'lucide-react';
 import { useNavigate } from 'react-router-dom';
-import useDataStore from '../../../store/useDataStore';
-import { Card, CardContent, CardHeader, CardTitle, CardDescription } from '../../components/ui/Card';
-import { Button } from '../../components/ui/Button';
-import { Badge } from '../../components/ui/Badge';
+import useDataStore from '@/store/useDataStore';
+import { Card, CardContent, CardHeader, CardTitle, CardDescription } from '@/admin/components/ui/Card';
+import { Button } from '@/admin/components/ui/Button';
+import { Badge } from '@/admin/components/ui/Badge';
 import {
   Table,
   TableBody,
@@ -12,10 +12,10 @@ import {
   TableHead,
   TableHeader,
   TableRow,
-} from '../../components/ui/Table';
-import { productService } from '../../api/productService';
-import { orderService } from '../../api/orderService';
-import { customerService } from '../../api/customerService';
+} from '@/admin/components/ui/Table';
+import { productService } from '@/services/admin/api/productService';
+import { orderService } from '@/services/admin/api/orderService';
+import { customerService } from '@/services/admin/api/customerService';
 
 const StatCard = ({ title, value, trend, trendUp, description, gradient, icon: Icon }) => {
   // Ensure Icon is a valid component - provide fallback

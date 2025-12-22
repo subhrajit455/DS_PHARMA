@@ -2,10 +2,10 @@
 // ============================================================
 // Handles all product-related API calls
 
-import apiClient from "./api/apiClient";
-import { API_ENDPOINTS } from "./api/baseURL";
-import mockApi from "../api/mockApi";
-import useDataStore from "../store/useDataStore";
+import apiClient from "@/services/api/apiClient";
+import { API_ENDPOINTS } from "@/services/api/baseURL";
+import mockApi from "@/services/api/mockApi";
+import useDataStore from "@/store/useDataStore";
 
 const USE_MOCK = import.meta.env.VITE_USE_MOCK === "true" || true; // Default to true for now
 

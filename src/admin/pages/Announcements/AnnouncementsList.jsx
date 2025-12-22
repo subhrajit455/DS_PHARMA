@@ -1,12 +1,12 @@
 import React, { useState } from 'react';
 import { useNavigate } from 'react-router-dom';
 import { Plus, Edit2, Trash2, Image as ImageIcon, MessageSquare, Bell, Sparkles, Star } from 'lucide-react';
-import { useAnnouncements } from '../../../contexts/AnnouncementContext';
-import { Button } from '../../components/ui/Button';
-import { Card, CardContent, CardHeader, CardTitle, CardDescription } from '../../components/ui/Card';
-import { Switch } from '../../components/ui/Switch';
-import { Badge } from '../../components/ui/Badge';
-import { Pagination } from '../../components/ui/Pagination';
+import { useAnnouncements } from '@/shared/contexts/AnnouncementContext';
+import { Button } from '@/admin/components/ui/Button';
+import { Card, CardContent, CardHeader, CardTitle, CardDescription } from '@/admin/components/ui/Card';
+import { Switch } from '@/admin/components/ui/Switch';
+import { Badge } from '@/admin/components/ui/Badge';
+import { Pagination } from '@/admin/components/ui/Pagination';
 
 const AnnouncementsList = () => {
   const navigate = useNavigate();

@@ -2,10 +2,10 @@ import React, { useState, useEffect } from 'react';
 import { useNavigate } from 'react-router-dom';
 import { Plus, Search, Edit, Trash2, Filter, Sparkles, Eye, EyeOff, Package } from 'lucide-react';
 import { toast } from 'react-hot-toast';
-import { Button } from '../../components/ui/Button';
-import { Input } from '../../components/ui/Input';
-import { Badge } from '../../components/ui/Badge';
-import { Card, CardContent } from '../../components/ui/Card';
+import { Button } from '@/admin/components/ui/Button';
+import { Input } from '@/admin/components/ui/Input';
+import { Badge } from '@/admin/components/ui/Badge';
+import { Card, CardContent } from '@/admin/components/ui/Card';
 import {
   Table,
   TableBody,
@@ -13,9 +13,9 @@ import {
   TableHead,
   TableHeader,
   TableRow,
-} from '../../components/ui/Table';
-import { productService } from '../../api/productService';
-import { Pagination } from '../../components/ui/Pagination';
+} from '@/admin/components/ui/Table';
+import { productService } from '@/services/admin/api/productService';
+import { Pagination } from '@/admin/components/ui/Pagination';
 
 const ProductsList = () => {
   const navigate = useNavigate();

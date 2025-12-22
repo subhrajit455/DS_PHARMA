@@ -1,9 +1,9 @@
 import React, { useState, useEffect } from 'react';
 import { Search, Star, StarOff, Package, Sparkles } from 'lucide-react';
 import { toast } from 'react-hot-toast';
-import { Button } from '../../components/ui/Button';
-import { Input } from '../../components/ui/Input';
-import { Card, CardContent } from '../../components/ui/Card';
+import { Button } from '@/admin/components/ui/Button';
+import { Input } from '@/admin/components/ui/Input';
+import { Card, CardContent } from '@/admin/components/ui/Card';
 import {
   Table,
   TableBody,
@@ -11,9 +11,9 @@ import {
   TableHead,
   TableHeader,
   TableRow,
-} from '../../components/ui/Table';
-import { Pagination } from '../../components/ui/Pagination';
-import { productService } from '../../api/productService'; // Assuming we can reuse this service or mock it
+} from '@/admin/components/ui/Table';
+import { Pagination } from '@/admin/components/ui/Pagination';
+import { productService } from '@/services/admin/api/productService'; // Assuming we can reuse this service or mock it
 
 const FeaturedProducts = () => {
     const [itemsPerPage, setItemsPerPage] = useState(10);

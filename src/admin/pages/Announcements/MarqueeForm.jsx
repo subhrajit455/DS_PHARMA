@@ -2,11 +2,11 @@ import React, { useState, useEffect } from 'react';
 import { useNavigate, useParams } from 'react-router-dom';
 import { ArrowLeft, Save, Plus, X } from 'lucide-react';
 import { toast } from 'react-hot-toast';
-import { useAnnouncements } from '../../../contexts/AnnouncementContext';
-import { Button } from '../../components/ui/Button';
-import { Input } from '../../components/ui/Input';
-import { Label } from '../../components/ui/Label';
-import { Card, CardContent, CardHeader, CardTitle, CardDescription } from '../../components/ui/Card';
+import { useAnnouncements } from '@/shared/contexts/AnnouncementContext';
+import { Button } from '@/admin/components/ui/Button';
+import { Input } from '@/admin/components/ui/Input';
+import { Label } from '@/admin/components/ui/Label';
+import { Card, CardContent, CardHeader, CardTitle, CardDescription } from '@/admin/components/ui/Card';
 
 const MarqueeForm = () => {
   const navigate = useNavigate();

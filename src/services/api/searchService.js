@@ -1,5 +1,5 @@
-import apiClient from "./apiClient";
-import { API_ENDPOINTS } from "./baseURL";
+import apiClient from "@/services/api/apiClient";
+import { API_ENDPOINTS } from "@/services/api/baseURL";
 
 // Helper to filter products locally
 import useDataStore from "@/store/useDataStore";

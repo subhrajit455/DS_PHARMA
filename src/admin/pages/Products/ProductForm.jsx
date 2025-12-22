@@ -3,14 +3,14 @@ import { useNavigate, useParams } from 'react-router-dom';
 import { Save, ArrowLeft, Package, Tag, DollarSign, Box, Eye, EyeOff } from 'lucide-react';
 import { toast } from 'react-hot-toast';
 import { useQueryClient } from '@tanstack/react-query';
-import { productService } from '../../api/productService';
-import { Button } from '../../components/ui/Button';
-import { Input } from '../../components/ui/Input';
-import { Label } from '../../components/ui/Label';
-import { Switch } from '../../components/ui/Switch';
-import { Card, CardContent, CardHeader, CardTitle, CardDescription } from '../../components/ui/Card';
-import ConfirmationModal from '../../components/ui/ConfirmationModal';
-import ImageUpload from '../../../components/common/ImageUpload';
+import { productService } from '@/services/admin/api/productService';
+import { Button } from '@/admin/components/ui/Button';
+import { Input } from '@/admin/components/ui/Input';
+import { Label } from '@/admin/components/ui/Label';
+import { Switch } from '@/admin/components/ui/Switch';
+import { Card, CardContent, CardHeader, CardTitle, CardDescription } from '@/admin/components/ui/Card';
+import ConfirmationModal from '@/admin/components/ui/ConfirmationModal';
+import ImageUpload from '@/shared/components/common/ImageUpload';
 
 import useDataStore from '@/store/useDataStore';
 

@@ -1,23 +1,23 @@
 import { BrowserRouter as Router, Routes, Route } from 'react-router-dom';
 import { QueryClient, QueryClientProvider } from '@tanstack/react-query';
 import { ReactQueryDevtools } from '@tanstack/react-query-devtools';
-import { ToastContainer } from './components/ui/ToastContainer';
-import Home from './pages/Home';
-import CartDetails from './pages/CartDetails';
-import ProductDetails from './pages/ProductDetails';
-import Orders from './pages/Orders';
-import OrderDetails from "./pages/OrderDetails";
-import OrderConfirmation from "./pages/OrderConfirmation";
-import CategoryProducts from "./pages/CategoryProducts";
-import UserProfile from "./pages/UserProfile";
-import LoginPage from "./pages/LoginPage";
-import SignupPage from "./pages/SignupPage";
-import ForgotPasswordPage from "./pages/ForgotPasswordPage";
-import ResetPasswordPage from "./pages/ResetPasswordPage";
-import SearchPage from "./pages/SearchPage";
+import { ToastContainer } from './shared/components/ui/ToastContainer';
+import Home from './user/pages/Home';
+import CartDetails from './user/pages/CartDetails';
+import ProductDetails from './user/pages/ProductDetails';
+import Orders from './user/pages/Orders';
+import OrderDetails from "./user/pages/OrderDetails";
+import OrderConfirmation from "./user/pages/OrderConfirmation";
+import CategoryProducts from "./user/pages/CategoryProducts";
+import UserProfile from "./user/pages/UserProfile";
+import LoginPage from "./user/pages/LoginPage";
+import SignupPage from "./user/pages/SignupPage";
+import ForgotPasswordPage from "./user/pages/ForgotPasswordPage";
+import ResetPasswordPage from "./user/pages/ResetPasswordPage";
+import SearchPage from "./user/pages/SearchPage";
 import AdminRouter from "./admin/AdminRouter";
-import Layout from "@/components/layout/Layout.jsx";
-import { AnnouncementProvider } from './contexts/AnnouncementContext';
+import Layout from "@/user/components/layout/Layout.jsx";
+import { AnnouncementProvider } from '@/shared/contexts/AnnouncementContext';
 
 // Create React Query client
 const queryClient = new QueryClient({

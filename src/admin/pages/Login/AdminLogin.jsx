@@ -1,12 +1,12 @@
 import React, { useState } from 'react';
 import { useNavigate } from 'react-router-dom';
-import useAdminStore from '../../context/useAdminStore';
+import useAdminStore from '@/store/useAdminStore';
 import { toast } from 'react-hot-toast';
-import { USERS } from '../../../data/userData';
-import { Button } from '../../components/ui/Button';
-import { Input } from '../../components/ui/Input';
-import { Label } from '../../components/ui/Label';
-import { Card, CardContent, CardHeader, CardTitle, CardDescription, CardFooter } from '../../components/ui/Card';
+import { USERS } from '@/shared/data/userData';
+import { Button } from '@/admin/components/ui/Button';
+import { Input } from '@/admin/components/ui/Input';
+import { Label } from '@/admin/components/ui/Label';
+import { Card, CardContent, CardHeader, CardTitle, CardDescription, CardFooter } from '@/admin/components/ui/Card';
 import { ShieldCheck, Sparkles, Mail, Lock } from 'lucide-react';
 
 const AdminLogin = () => {

@@ -1,6 +1,6 @@
-import apiClient from "../api/axios.config";
-import { ENDPOINTS } from "../api/endpoints";
-import mockApi from "../api/mockApi";
+import apiClient from "@/services/api/apiClient";
+import { ENDPOINTS } from "@/services/api/endpoints";
+import mockApi from "@/services/api/mockApi";
 
 // Use mock service for local development
 const USE_MOCK = import.meta.env.VITE_USE_MOCK === "true" || true;
