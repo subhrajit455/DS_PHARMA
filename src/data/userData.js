@@ -12,7 +12,20 @@ export const USERS = [
     password: "demo123",
     phone: "+91 9876543210",
     role: "admin",
+    profileImage: null, // Profile picture URL or base64
     address: null,
+    orders: [],
+  },
+  {
+    id: 2,
+    name: "Priya Sharma",
+    email: "priya@example.com",
+    password: "password123",
+    phone: "+91 9876543211",
+    role: "user",
+    profileImage:
+      "https://images.unsplash.com/photo-1494790108377-be9c29b29330?auto=format&fit=crop&w=150&q=80",
+    address: "45 Green Way, Mumbai, 400001",
     orders: [],
   },
 ];

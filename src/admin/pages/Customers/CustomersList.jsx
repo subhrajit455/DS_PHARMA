@@ -189,6 +189,7 @@ const CustomersList = () => {
                           <div className="flex items-center gap-2 sm:gap-3">
                             <Avatar 
                               className="h-7 w-7 sm:h-8 sm:w-8 bg-emerald-100 text-emerald-800 text-[8px] sm:text-[8px] sm:text-xs" 
+                              src={customer.profileImage}
                               fallback={getInitials(customer.name)} 
                             />
                             <div className="font-medium text-gray-900 text-[8px] sm:text-sm">

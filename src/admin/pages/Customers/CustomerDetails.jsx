@@ -51,7 +51,11 @@ const CustomerDetails = () => {
       {/* Header Profile */}
       <Card style={{ padding: '10px', marginBottom: '10px' }}>
           <CardContent className="p-3 sm:p-6 flex flex-col md:flex-row items-center md:items-start gap-4 sm:gap-6">
-            <Avatar className="h-20 w-20 sm:h-24 sm:w-24 bg-gray-100 text-gray-500 text-xl sm:text-2xl font-bold" fallback={customer.name.substring(0, 2).toUpperCase()} />
+            <Avatar 
+              className="h-20 w-20 sm:h-24 sm:w-24 bg-gray-100 text-gray-500 text-xl sm:text-2xl font-bold" 
+              src={customer.profileImage}
+              fallback={customer.name.substring(0, 2).toUpperCase()} 
+            />
             
             <div className="flex-1 text-center md:text-left space-y-2">
                 <h1 className="text-lg sm:text-xl md:text-2xl font-bold text-gray-900">{customer.name}</h1>

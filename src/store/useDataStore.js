@@ -175,6 +175,29 @@ const useDataStore = create(
               : state.currentUser,
         })),
 
+      // --- Actions: Profile Image ---
+      updateUserProfileImage: (userId, imageUrl) =>
+        set((state) => ({
+          users: state.users.map((u) =>
+            u.id === userId ? { ...u, profileImage: imageUrl } : u
+          ),
+          currentUser:
+            state.currentUser?.id === userId
+              ? { ...state.currentUser, profileImage: imageUrl }
+              : state.currentUser,
+        })),
+
+      removeUserProfileImage: (userId) =>
+        set((state) => ({
+          users: state.users.map((u) =>
+            u.id === userId ? { ...u, profileImage: null } : u
+          ),
+          currentUser:
+            state.currentUser?.id === userId
+              ? { ...state.currentUser, profileImage: null }
+              : state.currentUser,
+        })),
+
       // --- Actions: Cart ---
       addToCart: (product) =>
         set((state) => {

@@ -72,6 +72,7 @@ const PersonalInfoForm = ({
                 )}
             </div>
 
+            {/* Personal Info Grid */}
             <div className="p-6 grid grid-cols-1 md:grid-cols-2 gap-6">
                 {/* First Name */}
                 <div className="relative">
