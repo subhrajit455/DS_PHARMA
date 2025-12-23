@@ -1,11 +1,17 @@
-import { Home, Package, Info, Phone } from "lucide-react";
+import { Home, Package, LayoutGrid, ShoppingBag } from "lucide-react";
 
 // Navigation menu items
 export const NAV_ITEMS = [
-  { name: "Home", href: "/", icon: Home },
-  { name: "Orders", href: "/orders", icon: Package },
-  { name: "About Us", href: "#about", icon: Info },
-  { name: "Contact Us", href: "#contact", icon: Phone },
+  { name: "Home", href: "/", icon: Home, guest: true, auth: true },
+  { name: "Shop", href: "/", icon: ShoppingBag, guest: true, auth: true },
+  {
+    name: "Categories",
+    href: "#categories",
+    icon: LayoutGrid,
+    guest: true,
+    auth: true,
+  },
+  { name: "Orders", href: "/orders", icon: Package, guest: false, auth: true },
 ];
 
 // Mock product data for search suggestions

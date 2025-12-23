@@ -34,10 +34,8 @@ const UserProfile = () => {
     useEffect(() => {
         if (!isAuthenticated) {
             // Debounce redirect to allow logout action (which navigates to /) to complete
-            // This prevents race conditions where logout -> state clear -> redirect to /login happens
-            // instead of logout -> redirect to /
             const timer = setTimeout(() => {
-                navigate('/login', { replace: true });
+                navigate(`/login?redirect=${encodeURIComponent(window.location.pathname)}`, { replace: true });
             }, 500);
             return () => clearTimeout(timer);
         }

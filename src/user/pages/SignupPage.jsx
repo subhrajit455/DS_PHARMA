@@ -172,7 +172,7 @@ const SignupPage = () => {
                 <div className="mt-6 text-center text-sm" style={{ padding: '10px' }}>
                     <span className="text-gray-600">Already have an account? </span>
                     <Link
-                        to="/login"
+                        to={`/login${window.location.search}`}
                         className="font-medium text-emerald-600 hover:text-emerald-400"
                         style={{ textDecoration: 'none' }}
                     >

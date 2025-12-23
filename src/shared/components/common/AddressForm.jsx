@@ -120,8 +120,9 @@ const AddressForm = ({ initialData, onSave, onCancel, isSaving, title }) => {
                             className={`${inputClasses} ${errors.name ? 'border-red-500 ring-1 ring-red-500/20' : ''}`}
                             placeholder="Receiver's Name"
                         />
-                         {errors.name && <p className="text-red-500 text-[10px] mt-1 ml-1">{errors.name}</p>}
+                         
                     </div>
+                    {errors.name && <p className="text-red-500 text-[10px] mt-1 ml-1">{errors.name}</p>}
                 </div>
 
                 <div className="relative">
@@ -141,8 +142,9 @@ const AddressForm = ({ initialData, onSave, onCancel, isSaving, title }) => {
                             className={`${inputClasses} ${errors.phone ? 'border-red-500 ring-1 ring-red-500/20' : ''}`}
                             placeholder="10-digit mobile number"
                         />
-                         {errors.phone && <p className="text-red-500 text-[10px] mt-1 ml-1">{errors.phone}</p>}
+                         
                     </div>
+                    {errors.phone && <p className="text-red-500 text-[10px] mt-1 ml-1">{errors.phone}</p>}
                 </div>
 
                 <div className="relative">
@@ -162,8 +164,9 @@ const AddressForm = ({ initialData, onSave, onCancel, isSaving, title }) => {
                             className={`${inputClasses} ${errors.altPhone ? 'border-red-500 ring-1 ring-red-500/20' : ''}`}
                             placeholder="Alt mobile number"
                         />
-                         {errors.altPhone && <p className="text-red-500 text-[10px] mt-1 ml-1">{errors.altPhone}</p>}
+                         
                     </div>
+                    {errors.altPhone && <p className="text-red-500 text-[10px] mt-1 ml-1">{errors.altPhone}</p>}
                 </div>
 
                 <div className="md:col-span-2 relative">
@@ -180,8 +183,9 @@ const AddressForm = ({ initialData, onSave, onCancel, isSaving, title }) => {
                             className={`${inputClasses} ${errors.email ? 'border-red-500 ring-1 ring-red-500/20' : ''}`}
                             placeholder="example@gmail.com"
                         />
-                         {errors.email && <p className="text-red-500 text-[10px] mt-1 ml-1">{errors.email}</p>}
+                         
                     </div>
+                    {errors.email && <p className="text-red-500 text-[10px] mt-1 ml-1">{errors.email}</p>}
                 </div>
 
                 <div className="md:col-span-2 relative">
@@ -197,8 +201,9 @@ const AddressForm = ({ initialData, onSave, onCancel, isSaving, title }) => {
                             className={`${inputClasses} min-h-[80px] pt-3 ${errors.address ? 'border-red-500 ring-1 ring-red-500/20' : ''}`}
                             placeholder="Full address"
                         />
-                         {errors.address && <p className="text-red-500 text-[10px] mt-1 ml-1">{errors.address}</p>}
+                        
                     </div>
+                    {errors.address && <p className="text-red-500 text-[10px] mt-1 ml-1">{errors.address}</p>}
                 </div>
 
                 <div className="md:col-span-2 relative">
@@ -232,8 +237,9 @@ const AddressForm = ({ initialData, onSave, onCancel, isSaving, title }) => {
                             className={`${inputClasses} ${errors.city ? 'border-red-500 ring-1 ring-red-500/20' : ''}`}
                             placeholder="City"
                         />
-                        {errors.city && <p className="text-red-500 text-[10px] mt-1 ml-1">{errors.city}</p>}
+                        
                     </div>
+                    {errors.city && <p className="text-red-500 text-[10px] mt-1 ml-1">{errors.city}</p>}
                 </div>
 
                 <div className="relative">
@@ -250,8 +256,9 @@ const AddressForm = ({ initialData, onSave, onCancel, isSaving, title }) => {
                             className={`${inputClasses} ${errors.state ? 'border-red-500 ring-1 ring-red-500/20' : ''}`}
                             placeholder="State"
                         />
-                         {errors.state && <p className="text-red-500 text-[10px] mt-1 ml-1">{errors.state}</p>}
+                        
                     </div>
+                    {errors.state && <p className="text-red-500 text-[10px] mt-1 ml-1">{errors.state}</p>}
                 </div>
 
                 <div className="relative">
@@ -268,8 +275,9 @@ const AddressForm = ({ initialData, onSave, onCancel, isSaving, title }) => {
                             className={`${inputClasses} ${errors.pincode ? 'border-red-500 ring-1 ring-red-500/20' : ''}`}
                             placeholder="6-digit pincode"
                         />
-                         {errors.pincode && <p className="text-red-500 text-[10px] mt-1 ml-1">{errors.pincode}</p>}
+                        
                     </div>
+                    {errors.pincode && <p className="text-red-500 text-[10px] mt-1 ml-1">{errors.pincode}</p>}
                 </div>
                 
                 <div className="flex items-center gap-2 top-5" style={{marginTop: '20px'}}>

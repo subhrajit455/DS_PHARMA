@@ -51,7 +51,16 @@ export const useSignup = () => {
       storeLogin(newUser);
 
       success("Account created successfully!");
-      navigate("/");
+
+      // Check for redirect parameter in URL
+      const params = new URLSearchParams(window.location.search);
+      const redirectPath = params.get("redirect");
+
+      if (redirectPath) {
+        navigate(redirectPath);
+      } else {
+        navigate("/");
+      }
     },
 
     onError: (err) => {

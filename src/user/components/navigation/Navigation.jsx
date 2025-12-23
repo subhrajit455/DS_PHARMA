@@ -1,16 +1,16 @@
-import { useNavigate, useLocation } from 'react-router-dom';
+import { useNavigate } from 'react-router-dom';
 import useDataStore from '@/store/useDataStore';
 import { useActiveNavItem } from '@/user/components/navigation/hooks/useActiveNavItem';
 import { DesktopNavigation } from '@/user/components/navigation/DesktopNavigation';
 import { MobileTopBar } from '@/user/components/navigation/MobileTopBar';
 import { MobileBottomNav } from '@/user/components/navigation/MobileBottomNav';
+import { NAV_ITEMS } from '@/user/components/navigation/constants';
 
 /**
  * Main Navigation component - orchestrates all navigation sub-components
  */
 const Navigation = () => {
   const navigate = useNavigate();
-  const location = useLocation();
   
   // Connect to Global Data Store
   const { currentUser, isAuthenticated, cart } = useDataStore();
@@ -19,19 +19,26 @@ const Navigation = () => {
   const totalCartItems = cart.reduce((sum, item) => sum + (item.quantity || 1), 0);
   
   const activeItem = useActiveNavItem();
+  
+  // Filter navigation items based on authentication status
+  const filteredNavItems = NAV_ITEMS.filter(item => 
+    (isAuthenticated && item.auth) || (!isAuthenticated && item.guest)
+  );
 
   const handleNavClick = (itemName, href) => {
     if (href.startsWith('/')) {
       navigate(href);
     } else if (href.startsWith('#')) {
-      const element = document.querySelector(href);
-      if (element) {
-        element.scrollIntoView({ behavior: 'smooth', block: 'start' });
+      if (window.location.pathname === '/') {
+        const element = document.querySelector(href);
+        if (element) {
+          element.scrollIntoView({ behavior: 'smooth', block: 'start' });
+        }
+      } else {
+        navigate(`/${href}`);
       }
     }
   };
-
-
 
   return (
     <>
@@ -120,19 +127,19 @@ const Navigation = () => {
           totalCartItems={totalCartItems}
           isAuthenticated={isAuthenticated}
           user={currentUser}
+          navItems={filteredNavItems}
         />
 
       {/* Mobile Top Bar */}
       <MobileTopBar
         totalCartItems={totalCartItems}
-        isAuthenticated={isAuthenticated}
-        user={currentUser}
       />
 
       {/* Mobile Bottom Navigation */}
       <MobileBottomNav
         activeItem={activeItem}
         onNavClick={handleNavClick}
+        navItems={filteredNavItems}
       />
     </>
   );

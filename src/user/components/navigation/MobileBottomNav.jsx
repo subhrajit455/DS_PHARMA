@@ -1,16 +1,21 @@
 import { motion as Motion } from 'framer-motion';
-import { NAV_ITEMS } from './constants';
+import { User } from 'lucide-react';
 
 /**
  * Mobile bottom navigation component (React Native style)
  */
-export const MobileBottomNav = ({ activeItem, onNavClick }) => {
+export const MobileBottomNav = ({ activeItem, onNavClick, navItems }) => {
   const handleKeyDown = (event, itemName, href) => {
     if (event.key === 'Enter' || event.key === ' ') {
       event.preventDefault();
       onNavClick(itemName, href);
     }
   };
+
+  const allItems = [
+    ...navItems,
+    { name: "Profile", href: "/profile", icon: User }
+  ];
 
   return (
     <Motion.nav
@@ -32,9 +37,9 @@ export const MobileBottomNav = ({ activeItem, onNavClick }) => {
         }}
       >
         <div className="flex items-center justify-around max-w-7xl mx-auto">
-          {NAV_ITEMS.map((item) => {
+          {allItems.map((item) => {
             const IconComponent = item.icon;
-            const isActive = activeItem === item.name;
+            const isActive = activeItem === item.name || (item.name === 'Profile' && window.location.pathname === '/profile');
 
             return (
               <a

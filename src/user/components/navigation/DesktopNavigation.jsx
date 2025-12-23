@@ -1,7 +1,6 @@
 import { motion as Motion } from 'framer-motion';
 import { useState, useRef, useEffect } from 'react';
 import { AnimatePresence } from 'framer-motion';
-import { NAV_ITEMS } from '@/user/components/navigation/constants';
 import { SearchBar } from '@/user/components/navigation/SearchBar';
 import { CartButton } from '@/user/components/navigation/CartButton';
 import { UserProfileButton } from '@/user/components/navigation/UserProfileButton';
@@ -15,20 +14,14 @@ export const DesktopNavigation = ({
   onNavClick,
   totalCartItems,
   isAuthenticated,
-  user
+  user,
+  navItems
 }) => {
   const [isSearchOpen, setIsSearchOpen] = useState(false);
   const searchContainerRef = useRef(null);
 
   useEffect(() => {
     const handleClickOutside = (event) => {
-      // Close if clicking outside the nav (search container is inside nav, so this might be tricky if nav has gaps)
-      // Actually, we want to close if clicking outside the search container AND the toggle button.
-      // Since SearchBar is inside the nav, and search container is inside the nav, clicking anywhere inside nav is "safe"?
-      // But nav has transparency/gaps.
-      // Better: Close if click target is not within searchContainerRef AND not within the toggle button.
-      // NOTE: We'll rely on checking if click is inside the nav container for simplicity, or specific refs.
-      
       const navElement = document.querySelector('.navigation-desktop');
       if (navElement && !navElement.contains(event.target)) {
          setIsSearchOpen(false);
@@ -58,8 +51,6 @@ export const DesktopNavigation = ({
     return () => window.removeEventListener('scroll', handleScroll);
   }, []);
 
-  // ... (handleKeyDown and other logic)
-
   return (
     <Motion.nav
       initial={{ y: -20, opacity: 0 }}
@@ -81,7 +72,7 @@ export const DesktopNavigation = ({
 
         {/* Navigation Links */}
         <div className="nav-links-container flex gap-5 items-center ">
-          {NAV_ITEMS.map((item) => (
+          {navItems.map((item) => (
             <a
               key={item.name}
               href={item.href}

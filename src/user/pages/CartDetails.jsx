@@ -72,25 +72,35 @@ const CartDetails = () => {
     removeCartItem(id);
   };
   
-  // Reactive Coupon Logic - Ensures discount is always accurate
+  // Reactive Coupon Reset - Clear discount if input is emptied
+  React.useEffect(() => {
+    if (!couponCode && appliedCoupon) {
+      setAppliedCoupon(null);
+    }
+  }, [couponCode, appliedCoupon]);
+
   const handleApplyCoupon = () => {
-      if (!couponCode) {
+      if (!couponCode.trim()) {
           toastError('Please enter a coupon code');
+          setAppliedCoupon(null);
           return;
       }
-      const code = couponCode.toUpperCase();
+      
+      const code = couponCode.trim().toUpperCase();
       const cartValue = cartItems.reduce((sum, item) => sum + (item.price * item.quantity), 0);
 
       // Validation logic (Recalculation happens in calculateTotals)
       if (code === 'SAVE10') {
           if (cartValue < 500) {
               toastError('Min order value for SAVE10 is ₹500');
+              setAppliedCoupon(null);
               return;
           }
           setAppliedCoupon({ code, type: '10% Off' });
       } else if (code === 'FLAT50') {
           if (cartValue < 300) {
               toastError('Min order value for FLAT50 is ₹300');
+              setAppliedCoupon(null);
               return;
           }
           setAppliedCoupon({ code, type: 'Flat ₹50 Off' });
@@ -98,6 +108,7 @@ const CartDetails = () => {
           setAppliedCoupon({ code, type: 'Free Shipping' });
       } else {
           toastError('Invalid coupon code');
+          setAppliedCoupon(null);
           return;
       }
       toastSuccess(`Coupon ${code} applied!`);
@@ -106,7 +117,15 @@ const CartDetails = () => {
   // Re-validate coupon when cart changes
   React.useEffect(() => {
       if (appliedCoupon) {
+          // 1. Silent reset if cart is cleared
+          if (cartItems.length === 0) {
+              setAppliedCoupon(null);
+              return;
+          }
+
           const cartValue = cartItems.reduce((sum, item) => sum + (item.price * item.quantity), 0);
+          
+          // 2. Threshold checks with professional feedback
           if (appliedCoupon.code === 'SAVE10' && cartValue < 500) {
               setAppliedCoupon(null);
               toastError('Coupon SAVE10 removed (min order value ₹500 not met)');
@@ -133,9 +152,9 @@ const CartDetails = () => {
     
     // Delivery Charge Logic
     // 1. Empty Cart -> 0
-    // 2. Cart Value > 500 -> 0 (Free Shipping)
+    // 2. Cart Value >= 500 -> 0 (Free Shipping starts at 500)
     // 3. Else -> 40 (Standard Fee)
-    let deliveryCharges = (cartItems.length > 0 && totalCartValue <= 500) ? 40 : 0;
+    let deliveryCharges = (cartItems.length > 0 && totalCartValue < 500) ? 40 : 0;
     let couponDiscount = 0;
 
     if (appliedCoupon) {
@@ -148,14 +167,17 @@ const CartDetails = () => {
         }
     }
 
-    const total = totalCartValue + gst + deliveryCharges - couponDiscount;
+    const totalWithoutCoupon = totalCartValue + gst + deliveryCharges;
+    const finalCouponDiscount = Math.min(couponDiscount, totalWithoutCoupon);
+    const total = totalWithoutCoupon - finalCouponDiscount;
+
     return { 
         totalCartValue, 
         discount: Math.round(productDiscount), 
-        coupon: couponDiscount, 
+        coupon: finalCouponDiscount, 
         gst, 
         deliveryCharges, 
-        total: Math.max(0, total) 
+        total: Math.max(0, Math.round(total)) 
     };
   }, [cartItems, appliedCoupon]);
 
@@ -349,14 +371,14 @@ const CartDetails = () => {
 
             {/* Validation Error Display */}
             {validationError && (
-              <div className="mb-4 p-4 bg-red-50 border-l-4 border-red-500 rounded-lg animate-in fade-in slide-in-from-top-2 duration-200">
-                <div className="flex items-center">
-                  <svg className="w-5 h-5 text-red-500 mr-2 flex-shrink-0" fill="currentColor" viewBox="0 0 20 20">
-                    <path fillRule="evenodd" d="M10 18a8 8 0 100-16 8 8 0 000 16zM8.707 7.293a1 1 0 00-1.414 1.414L8.586 10l-1.293 1.293a1 1 0 101.414 1.414L10 11.414l1.293 1.293a1 1 0 001.414-1.414L11.414 10l1.293-1.293a1 1 0 00-1.414-1.414L10 8.586 8.707 7.293z" clipRule="evenodd" />
-                  </svg>
-                  <p className="text-red-800 text-sm font-medium" style={{ fontFamily: 'Gyrotrope' }}>
+              <div className="mb-4 p-4 bg-red-50 border-l-4 border-red-500 rounded-lg animate-in fade-in slide-in-from-top-2 duration-200" style={{ margin: '10px 0px' }}>
+                <div className="flex items-center flex-row justify-between"> 
+                  <p className="text-red-800 text-sm font-medium" style={{ fontFamily: 'Gyrotrope', marginTop:'5px' }}>
                     {validationError}
                   </p>
+                  <svg className="w-5 h-5 text-red-500 mr-2 shrink-0" fill="currentColor" viewBox="0 0 20 20" style={{margin:'0px 10px'}}>
+                    <path fillRule="evenodd" d="M10 18a8 8 0 100-16 8 8 0 000 16zM8.707 7.293a1 1 0 00-1.414 1.414L8.586 10l-1.293 1.293a1 1 0 101.414 1.414L10 11.414l1.293 1.293a1 1 0 001.414-1.414L11.414 10l1.293-1.293a1 1 0 00-1.414-1.414L10 8.586 8.707 7.293z" clipRule="evenodd" />
+                  </svg>
                 </div>
               </div>
             )}

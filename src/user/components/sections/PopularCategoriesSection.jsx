@@ -43,6 +43,7 @@ const PopularCategoriesSection = ({
 
   return (
     <section
+      id="categories"
       className="w-full py-6 mb-6 flex flex-col items-center"
       style={{
         background: 'linear-gradient(135deg, #A5E8DC 0%, #B8F0E8 100%)',

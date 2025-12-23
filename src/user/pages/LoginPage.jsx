@@ -126,7 +126,7 @@ const LoginPage = () => {
             <div className="mt-6 text-center text-sm" style={{ padding: '10px' }}>
                 <span className="text-gray-600">Don't have an account? </span>
                 <Link
-                    to="/signup"
+                    to={`/signup${window.location.search}`}
                     className="font-medium text-emerald-600 hover:text-emerald-500"
                     style={{ textDecoration: 'none' }}
                 >

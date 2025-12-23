@@ -6,6 +6,9 @@ import { validateImage } from "@/utils/imageValidation";
  * Handles profile picture upload and removal
  */
 
+// Use mock service for local development
+const USE_MOCK = import.meta.env.VITE_USE_MOCK === "true" || true;
+
 export const profileImageService = {
   /**
    * Upload profile image
@@ -19,13 +22,31 @@ export const profileImageService = {
       // Validate file
       validateImage(file);
 
+      if (USE_MOCK) {
+        await new Promise((resolve) => setTimeout(resolve, 800)); // Simulate delay
+        // In mock mode, we'll use a data URL for the preview to persist it in the store
+        const imageUrl = await new Promise((resolve) => {
+          const reader = new FileReader();
+          reader.onloadend = () => resolve(reader.result);
+          reader.readAsDataURL(file);
+        });
+
+        // Save to Zustand store
+        useDataStore.getState().updateUserProfileImage(userId, imageUrl);
+
+        return {
+          success: true,
+          imageUrl,
+          message: "Profile picture updated successfully (Mock)",
+        };
+      }
+
       const formData = new FormData();
       formData.append("image", file);
       formData.append("userId", userId);
 
       const response = await fetch("/api/users/upload-profile-image", {
         method: "POST",
-        // Note: Content-Type is set automatically by the browser for FormData
         body: formData,
       });
 
@@ -56,6 +77,16 @@ export const profileImageService = {
    */
   removeProfileImage: async (userId) => {
     try {
+      if (USE_MOCK) {
+        await new Promise((resolve) => setTimeout(resolve, 600)); // Simulate delay
+        // Remove from Zustand store
+        useDataStore.getState().removeUserProfileImage(userId);
+        return {
+          success: true,
+          message: "Profile picture removed successfully (Mock)",
+        };
+      }
+
       const response = await fetch(
         `/api/users/remove-profile-image/${userId}`,
         {

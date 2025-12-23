@@ -157,11 +157,46 @@ const useDataStore = create(
 
       // --- Actions: Users / Auth ---
       login: (user) =>
-        set({
-          currentUser: user,
-          isAuthenticated: true,
-          cart: user.cart || [],
-          wishlist: user.wishlist || [],
+        set((state) => {
+          // Merge guest cart with user saved cart
+          const guestCart = state.cart || [];
+          const userCart = user.cart || [];
+
+          // Create a Map to handle deduplication and quantity merging efficiently
+          const cartMap = new Map();
+
+          // Add user's saved items first
+          userCart.forEach((item) => {
+            cartMap.set(item.id, { ...item });
+          });
+
+          // Merge guest items
+          guestCart.forEach((guestItem) => {
+            if (cartMap.has(guestItem.id)) {
+              const existingItem = cartMap.get(guestItem.id);
+              existingItem.quantity =
+                (existingItem.quantity || 1) + (guestItem.quantity || 1);
+            } else {
+              cartMap.set(guestItem.id, { ...guestItem });
+            }
+          });
+
+          // Optional: Also merge wishlist
+          const guestWishlist = state.wishlist || [];
+          const userWishlist = user.wishlist || [];
+          const mergedWishlist = [...userWishlist];
+          guestWishlist.forEach((item) => {
+            if (!mergedWishlist.some((w) => w.id === item.id)) {
+              mergedWishlist.push(item);
+            }
+          });
+
+          return {
+            currentUser: user,
+            isAuthenticated: true,
+            cart: Array.from(cartMap.values()),
+            wishlist: mergedWishlist,
+          };
         }),
       logout: () => set(INITIAL_USER_STATE),
       updateUser: (updatedUser) =>

@@ -103,25 +103,25 @@ const ProfileSidebar = ({
                     {!isProcessing && (
                         <>
                             {preview ? (
-                                <div className="absolute -bottom-2 flex gap-2 left-1/2 -translate-x-1/2 z-20">
+                                <div className="absolute -bottom-3 flex gap-2 left-1/2 -translate-x-1/2 z-20" >
                                     <button 
                                         onClick={(e) => { e.stopPropagation(); handleConfirmUpload(); }}
-                                        className="p-1.5 bg-emerald-600 text-white rounded-full shadow-lg border-2 border-white hover:bg-emerald-700 transition-all hover:scale-110"
+                                        className="p-1.5 bg-emerald-600 text-white text-center w-8 rounded-full shadow-lg border-2 border-white hover:bg-emerald-700 transition-all hover:scale-110"
                                         title="Confirm Upload"
                                     >
-                                        <Check className="w-3.5 h-3.5" />
+                                        <Check className="w-3.5 h-3.5" style={{ margin: 'auto' }} />
                                     </button>
                                     <button 
                                         onClick={(e) => { e.stopPropagation(); handleCancelPreview(); }}
-                                        className="p-1.5 bg-red-600 text-white rounded-full shadow-lg border-2 border-white hover:bg-red-700 transition-all hover:scale-110"
+                                        className="p-1.5 bg-red-600 text-white text-center w-8 rounded-full shadow-lg border-2 border-white hover:bg-red-700 transition-all hover:scale-110"
                                         title="Cancel"
                                     >
-                                        <X className="w-3.5 h-3.5" />
+                                        <X className="w-3.5 h-3.5" style={{ margin: 'auto' }} />
                                     </button>
                                 </div>
                             ) : (
                                 <div 
-                                    className="absolute bottom-0 right-0 p-2 bg-emerald-600 rounded-full text-white shadow-lg border-2 border-white cursor-pointer hover:bg-emerald-700 transition-all duration-200 transform group-hover:scale-110"
+                                    className="absolute bottom-0 right-0 p-2 bg-white rounded-full text-emerald-600 shadow-lg border-2 border-white cursor-pointer hover:bg-white transition-all duration-200 transform group-hover:scale-110"
                                     onClick={triggerFileInput}
                                 >
                                     <Camera className="w-4 h-4" />
@@ -141,9 +141,9 @@ const ProfileSidebar = ({
                     />
                 </div>
 
-                <div className="space-y-1">
+                <div className="space-y-1" style={{marginTop: '10px'}}>
                     <h2 className="text-lg font-bold text-gray-900 leading-tight">
-                        {profileData.firstName} {profileData.lastName}
+                        {profileData.firstName || profileData.name?.split(' ')[0] || ''} {profileData.lastName || profileData.name?.split(' ').slice(1).join(' ') || ''}
                     </h2>
                     <p className="text-xs sm:text-sm text-gray-500">{profileData.email}</p>
                 </div>
@@ -151,10 +151,10 @@ const ProfileSidebar = ({
                 {avatarUrl && !isProcessing && (
                     <button
                         onClick={handleRemoveImage}
-                        className="mt-3 flex items-center gap-1.5 text-[10px] font-medium text-red-500 hover:text-red-700 transition-colors py-1 px-3 rounded-full hover:bg-red-50"
+                        className="mt-3 flex items-center gap-1 text-[10px] font-medium text-red-500 hover:text-red-700 transition-colors py-1 px-3 rounded-full hover:bg-red-50"
                     >
                         <Trash2 className="w-3.5 h-3.5" />
-                        Remove Photo
+                        <span style={{marginTop: '3px'}}>Remove Photo</span>
                     </button>
                 )}
 

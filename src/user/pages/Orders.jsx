@@ -1,5 +1,6 @@
 import React, { useState } from 'react';
 import { Search } from 'lucide-react';
+import { useNavigate } from 'react-router-dom';
 import { OrderCard } from '@/user/components/order';
 import SuggestedItemsSection from '@/user/components/sections/SuggestedItemsSection';
 import { useOrders } from '@/shared/hooks/queries/useOrders';
@@ -7,6 +8,7 @@ import { useProducts } from '@/shared/hooks/queries/useProducts';
 import useDataStore from '@/store/useDataStore';
 
 const Orders = () => {
+  const navigate = useNavigate();
   const [searchQuery, setSearchQuery] = useState('');
   const [statusFilter, setStatusFilter] = useState('All');
   const [dateFilter, setDateFilter] = useState('All');
@@ -25,6 +27,13 @@ const Orders = () => {
     order.customerId === currentUser?.id || 
     order.customerName === currentUser?.name
   );
+
+  // Redirect if not authenticated
+  React.useEffect(() => {
+    if (!useDataStore.getState().isAuthenticated) {
+      navigate(`/login?redirect=${encodeURIComponent(window.location.pathname)}`, { replace: true });
+    }
+  }, [navigate]);
   
   // Map orders with correct data
   const allOrders = userOrders.map(order => {

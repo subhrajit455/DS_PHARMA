@@ -1,16 +1,14 @@
-import { Search } from 'lucide-react';
 import { useNavigate } from 'react-router-dom';
 import { useState, useRef, useEffect } from 'react';
 import { motion as Motion, AnimatePresence } from 'framer-motion';
 import { CartButton } from '@/user/components/navigation/CartButton';
-import { UserProfileButton } from '@/user/components/navigation/UserProfileButton';
 import { SearchBar } from '@/user/components/navigation/SearchBar';
 import SearchInput from '@/user/components/search/SearchInput';
 
 /**
  * Mobile top bar component
  */
-export const MobileTopBar = ({ totalCartItems, isAuthenticated, user }) => {
+export const MobileTopBar = ({ totalCartItems }) => {
   const navigate = useNavigate();
   const [isSearchOpen, setIsSearchOpen] = useState(false);
   const searchContainerRef = useRef(null);
@@ -44,12 +42,6 @@ export const MobileTopBar = ({ totalCartItems, isAuthenticated, user }) => {
             />
           
           <CartButton totalCartItems={totalCartItems} className="w-8 h-8" />
-          <UserProfileButton 
-            isAuthenticated={isAuthenticated} 
-            user={user} 
-            className="w-8 h-8 p-0 justify-center" 
-            showName={false}
-          />
         </div>
       </div>
 

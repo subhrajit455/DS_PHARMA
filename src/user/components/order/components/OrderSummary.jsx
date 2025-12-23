@@ -13,6 +13,8 @@ const OrderSummary = ({
   couponCode,
   onCouponChange,
   onApplyCoupon,
+  onRemoveCoupon,
+  appliedCoupon,
   totals,
   onOrderNow,
   onAddNewAddress,
@@ -119,7 +121,7 @@ const OrderSummary = ({
         className="bg-orange-100"
         style={{
           borderRadius: "12px",
-          padding: "16px",
+          padding: "10px 10px 20px 10px",
           boxShadow: "0 1px 2px rgba(0, 0, 0, 0.06)",
           border: "1px solid #F97316",
           marginBottom: "5px",
@@ -131,45 +133,53 @@ const OrderSummary = ({
             fontSize: "16px",
             fontWeight: 600,
             color: "#F97316",
-            marginBottom: "10px",
+            padding:'0px 5px',
+            marginBottom: "6px",
             letterSpacing: "-0.01em",
           }}
         >
           Apply Coupon
         </h3>
         <div className="flex gap-2">
-          <input
-            type="text"
-            value={couponCode}
-            onChange={onCouponChange}
-            placeholder="Enter coupon code"
-            className="flex-1 focus:outline-none focus:ring-2 focus:ring-orange-400"
-            style={{
-              fontFamily: "Gyrotrope",
-              fontSize: "11px",
-              padding: "6px 10px",
-              border: "1px solid #F97316",
-              borderRadius: "8px",
-              height: "30px",
-              background: "#FFFFFF",
-            }}
-          />
+          <div className="relative flex-1">
+            <input
+              type="text"
+              value={couponCode}
+              onChange={onCouponChange}
+              placeholder="Enter coupon code"
+              disabled={!!appliedCoupon}
+              className={`w-full focus:outline-none focus:ring-2 focus:ring-orange-400 ${appliedCoupon ? 'bg-orange-50 border-orange-300' : 'bg-white border-orange-400'}`}
+              style={{
+                fontFamily: "Gyrotrope",
+                fontSize: "11px",
+                padding: "6px 10px",
+                border: "1px solid #F97316",
+                borderRadius: "8px",
+                height: "30px",
+              }}
+            />
+            {appliedCoupon && (
+              <div className="absolute left-0 -bottom-5.5 flex items-center gap-1" style={{padding:'5px 0px'}}>
+                <Check className="w-4 h-3 font-bold text-green-800" />
+                <span className="text-[9px] font-bold text-green-700 capitalize">
+                  {appliedCoupon.code}: {appliedCoupon.type}
+                </span>
+              </div>
+            )}
+          </div>
           <button
-            onClick={onApplyCoupon}
-            className="transition-colors cursor-pointer hover:opacity-90"
+            onClick={appliedCoupon ? onRemoveCoupon : onApplyCoupon}
+            className={`transition-colors cursor-pointer hover:opacity-90 px-3 ${appliedCoupon ? 'bg-orange-500 text-white border-none' : 'bg-white text-black border border-orange-500'}`}
             style={{
               fontFamily: "Gyrotrope",
               fontSize: "11px",
               fontWeight: 600,
-              backgroundColor: "#FFFFFF",
               borderRadius: "8px",
-              padding: "6px 10px",
               height: "30px",
-              border: "1px solid #F97316",
-              color: "black",
+              padding:'0px 5px',
             }}
           >
-            Apply
+            {appliedCoupon ? 'Remove' : 'Apply'}
           </button>
         </div>
       </div>

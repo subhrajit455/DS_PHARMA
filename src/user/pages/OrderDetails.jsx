@@ -18,6 +18,7 @@ import { useCancelOrder } from '@/shared/hooks/mutations/useCancelOrder';
 import { useReturnOrder } from '@/shared/hooks/mutations/useReturnOrder';
 import { useToastStore } from '@/store/useToastStore';
 import { canCancelOrder, canReturnOrder } from '@/shared/utils/orderHelpers';
+import useDataStore from '@/store/useDataStore';
 
 const OrderDetails = () => {
   const navigate = useNavigate();
@@ -31,6 +32,13 @@ const OrderDetails = () => {
   const { mutate: cancelOrder, isPending: isCancelling } = useCancelOrder();
   const { mutate: returnOrder, isPending: isReturning } = useReturnOrder();
   const { error: toastError, success: toastSuccess } = useToastStore();
+
+  // Redirect if not authenticated
+  React.useEffect(() => {
+    if (!useDataStore.getState().isAuthenticated) {
+      navigate(`/login?redirect=${encodeURIComponent(window.location.pathname)}`, { replace: true });
+    }
+  }, [navigate]);
 
   // Modal State
   const [modalConfig, setModalConfig] = React.useState({

@@ -4,7 +4,6 @@ import BannerSection from '@/user/components/sections/BannerSection';
 import HighlightedCategorySection from '@/user/components/sections/HighlightedCategorySection';
 import PharmacyProductsShowcase from '@/user/components/sections/PharmacyProductsShowcase';
 import WhyChooseUsSection from '@/user/components/sections/WhyChooseUsSection';
-import AboutUsSection from '@/user/components/sections/AboutUsSection';
 import AlertBanner from '@/user/components/sections/alerts/AlertBanner';
 
 import useDataStore from '@/store/useDataStore';
@@ -81,10 +80,6 @@ const Home = () => {
         <WhyChooseUsSection />
       </section>
 
-      {/* About Us Section */}
-      <section className="py-2 my-2 sm:py-12 sm:my-8">
-        <AboutUsSection />
-      </section>
 
       {/* Bottom Alerts */}
       <AlertBanner position="bottom" />
