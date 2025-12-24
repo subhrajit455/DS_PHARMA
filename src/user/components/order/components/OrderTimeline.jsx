@@ -5,7 +5,7 @@ const OrderTimeline = ({ timeline = [], deliveryPartner }) => {
   const filteredTimeline = timeline.filter(step => step.status !== 'Expected Delivery');
 
   return (
-    <div className="w-full min-h-[80px]">
+    <div className="w-full min-h-20">
       {/* Progress Bar */}
       <div className="flex items-center justify-between">
         {filteredTimeline.map((step, index) => (

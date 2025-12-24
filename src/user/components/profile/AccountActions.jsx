@@ -69,7 +69,7 @@ const AccountActions = () => {
             className="space-y-6"
             style={{ marginTop: window.innerWidth >= 640 ? '30px' : '0' }}
         >
-            <div className="bg-white rounded-2xl border border-gray-100 shadow-sm overflow-hidden" style={{ padding: '10px' }}>
+            <div className="bg-white rounded-2xl border border-gray-100 shadow-sm overflow-hidden" style={{ padding: '5px 10px' }}>
                 <div className="p-6 border-b border-gray-100 bg-gray-50/30" style={{ marginBottom: '10px'}}>
                     <h2 className="text-lg font-bold text-gray-900">Account Actions</h2>
                     <p className="text-xs sm:text-sm text-gray-500">Manage your account access and data</p>
@@ -88,23 +88,23 @@ const AccountActions = () => {
                                     <Lock className="w-5 h-5 text-emerald-600" />
                                 </div>
                                 <div className="text-left">
-                                    <h4 className="font-bold text-gray-900">Change Password</h4>
-                                    <p className="text-xs sm:text-sm text-gray-500">Update your account password</p>
+                                    <h4 className="text-xs sm:text-sm font-bold text-gray-900">Change Password</h4>
+                                    <p className="text-[10px] sm:text-sm text-gray-500">Update your account password</p>
                                 </div>
                             </div>
-                            <span className="text-xs sm:text-sm font-medium text-emerald-600 group-hover:text-emerald-700">Update</span>
+                            <span className="text-[10px] sm:text-sm font-medium text-emerald-600 group-hover:text-emerald-700">Update</span>
                         </button>
                     ) : (
                         <Motion.div
                             initial={{ opacity: 0, height: 0 }}
                             animate={{ opacity: 1, height: 'auto' }}
                             className="p-5 rounded-xl border border-emerald-200 bg-emerald-50/30 space-y-4"
-                            style={{ padding: '10px', marginBottom: '5px' }}
+                            style={{ padding: '5px 10px', marginBottom: '5px' }}
                         >
-                            <h4 className="font-bold text-gray-900 mb-2" style={{ padding: '5px' }}>Change Password</h4>
+                            <h4 className="text-sm font-bold text-gray-900 mb-2" style={{ padding: '0px 5px' }}>Change Password</h4>
                             <div className="space-y-3" style={{ padding: '5px' }}>
                                 {/* Current Password */}
-                                <div className="relative" style={{ marginBottom: '15px' }}>
+                                <div className="relative" style={{ marginBottom: '10px' }}>
                                     <label className="block mb-2 text-xs sm:text-sm font-medium text-gray-700">Current Password</label>
                                     <div className="relative">
                                         <div className="absolute left-2 top-[45%] -translate-y-1/2 text-gray-400 pointer-events-none z-10">
@@ -192,11 +192,11 @@ const AccountActions = () => {
                                 <LogOut className="w-5 h-5 text-gray-600" />
                             </div>
                             <div className="text-left">
-                                <h4 className="font-bold text-gray-900">Sign Out</h4>
-                                <p className="text-xs sm:text-sm text-gray-500">Sign out of your active session</p>
+                                <h4 className="text-xs sm:text-sm font-bold text-gray-900">Sign Out</h4>
+                                <p className="text-[10px] sm:text-sm text-gray-500">Sign out of your active session</p>
                             </div>
                         </div>
-                        <span className="text-xs sm:text-sm font-medium text-gray-600 group-hover:text-gray-900">Sign Out</span>
+                        <span className="text-[10px] sm:text-sm font-medium text-gray-600 group-hover:text-gray-900">Sign Out</span>
                     </button>
 
                     {/* Delete Account Button */}
@@ -211,8 +211,8 @@ const AccountActions = () => {
                                     <Trash2 className="w-5 h-5 text-red-600" />
                                 </div>
                                 <div className="text-left">
-                                    <h4 className="font-bold text-red-900">Delete Account</h4>
-                                    <p className="text-xs sm:text-sm text-red-600/80">Permanently remove your account and data</p>
+                                    <h4 className="text-xs sm:text-sm font-bold text-red-900">Delete Account</h4>
+                                    <p className="text-[10px] sm:text-sm text-red-600/80">Permanently remove your account and data</p>
                                 </div>
                             </div>
                             <span className="text-xs sm:text-sm font-medium text-red-600">Delete</span>
@@ -227,8 +227,8 @@ const AccountActions = () => {
                             <div className="flex items-start gap-3 mb-4">
                                 <AlertTriangle className="w-6 h-6 text-red-600 shrink-0" />
                                 <div>
-                                    <h4 className="font-bold text-red-900">Are you absolutely sure?</h4>
-                                    <p className="text-xs sm:text-sm text-red-700 mt-1">
+                                    <h4 className="text-xs sm:text-sm font-bold text-red-900">Are you absolutely sure?</h4>
+                                    <p className="text-[10px] sm:text-sm text-red-700 mt-1">
                                         This action cannot be undone. This will permanently delete your account and remove your data from our servers.
                                     </p>
                                 </div>
@@ -237,14 +237,14 @@ const AccountActions = () => {
                                 <button
                                     style={{ padding: '2px 10px' }}
                                     onClick={() => setShowDeleteConfirm(false)}
-                                    className="px-4 py-2 text-xs sm:text-sm font-medium text-gray-700 bg-transparent border border-gray-300 rounded-lg hover:bg-gray-50 transition-colors"
+                                    className="px-4 py-2 text-[10px] sm:text-sm font-medium text-gray-700 bg-transparent border border-gray-300 rounded-lg hover:bg-gray-50 transition-colors"
                                 >
                                     Cancel
                                 </button>
                                 <button
                                     style={{ padding: '2px 10px' }}
                                     onClick={handleDeleteAccount}
-                                    className="px-4 py-2 text-xs sm:text-sm font-medium text-white bg-red-600 rounded-lg hover:bg-red-700 transition-colors"
+                                    className="px-4 py-2 text-[10px] sm:text-sm font-medium text-white bg-red-600 rounded-lg hover:bg-red-700 transition-colors"
                                 >
                                     Yes, delete my account
                                 </button>

@@ -98,18 +98,17 @@ const PopularCategoriesSection = ({
           initial="hidden"
           whileInView="visible"
           viewport={{ once: true }}
-          className="flex overflow-x-auto pb-4 hide-scrollbar w-full grid-col sm:gap-0.5 md:gap-1 sm:max-w-2xl sm:xl:max-w-3xl sm:ml-12 lg:ml-16 sm:overflow-visible sm:pb-0"
+          className="flex overflow-x-auto  pb-4 hide-scrollbar w-full grid-col gap-2 sm:gap-4 sm:max-w-2xl sm:xl:max-w-3xl sm:ml-12 lg:ml-16 sm:overflow-visible sm:pb-0"
           style={{
             scrollbarWidth: 'none',
-            msOverflowStyle: 'none',
-            gap: '1rem' // Gap for mobile flex layout
+            msOverflowStyle: 'none'// Gap for mobile flex layout
           }}
         >
           {displayCategories.map((category, index) => (
             <Motion.div
               key={category.id || `category-${category.name}-${index}`}
               variants={itemVariants}
-              className="flex flex-col items-center group cursor-pointer shrink-0 sm:shrink sm:w-auto max-w-[100px] relative"
+              className="flex flex-col items-center group cursor-pointer shrink-0 sm:shrink max-w-25 sm:min-w-[100px] relative"
               style={{
                 // Mobile width handled by class or default behavior
               }}

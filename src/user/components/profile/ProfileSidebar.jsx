@@ -4,6 +4,8 @@ import { useLogout } from '@/shared/hooks/useLogout';
 import { useUploadProfileImage, useRemoveProfileImage } from '@/shared/hooks/mutations/useProfileImage';
 import useDataStore from '@/store/useDataStore';
 import { validateImage, createImagePreview } from '@/utils/imageValidation';
+import useIsMobile from '@/shared/hooks/useIsMobile';
+
 
 const ProfileSidebar = ({ 
     profileData, 
@@ -16,6 +18,8 @@ const ProfileSidebar = ({
     const fileInputRef = useRef(null);
     const [preview, setPreview] = useState(null);
     const [selectedFile, setSelectedFile] = useState(null);
+    const isMobile = useIsMobile(768);
+
 
     const { mutate: uploadImage, isPending: isUploading } = useUploadProfileImage();
     const { mutate: removeImage, isPending: isRemoving } = useRemoveProfileImage();
@@ -75,14 +79,15 @@ const ProfileSidebar = ({
     const avatarUrl = profileData.avatar || profileData.profileImage;
 
     return (
-        <aside className="lg:col-span-3 lg:sticky lg:top-24 self-start space-y-6 md:min-h-[calc(100vh-200px)]" style={{ marginTop: window.innerWidth >= 640 ? '30px' : '0' }}>
+        <aside className="lg:col-span-3 lg:sticky lg:top-24 self-start space-y-6 md:min-h-[calc(100vh-200px)]" style={{ marginTop: isMobile ? '0px' : '30px' }}>
             {/* User Mini Profile Card */}
-            <div className="bg-white p-6 rounded-2xl shadow-sm border border-gray-100 flex flex-col items-center text-center" style={{ marginBottom: '10px', padding: '5px'}}>
+            <div className="bg-white rounded-2xl shadow-sm border border-gray-100 flex flex-col items-center text-center" style={{ marginBottom: isMobile ? '5px' : '10px', padding: isMobile ? '12px' : '24px'}}>
                 <div className="relative mb-4 group">
                     <div 
-                        className={`w-24 h-24 rounded-full bg-gray-50 flex items-center justify-center border-4 border-white shadow-md overflow-hidden transition-all duration-300 ${!isProcessing ? 'cursor-pointer hover:shadow-lg' : ''}`}
+                        className={`${isMobile ? 'w-20 h-20' : 'w-24 h-24'} rounded-full bg-gray-50 flex items-center justify-center border-4 border-white shadow-md overflow-hidden transition-all duration-300 ${!isProcessing ? 'cursor-pointer hover:shadow-lg' : ''}`}
                         onClick={!isProcessing ? triggerFileInput : undefined}
                     >
+
                         {preview || avatarUrl ? (
                             <img src={preview || avatarUrl} alt="Profile" className="w-full h-full object-cover" />
                         ) : (
@@ -141,12 +146,13 @@ const ProfileSidebar = ({
                     />
                 </div>
 
-                <div className="space-y-1" style={{marginTop: '10px'}}>
-                    <h2 className="text-lg font-bold text-gray-900 leading-tight">
+                <div className="space-y-1" style={{marginTop: isMobile ? '8px' : '10px'}}>
+                    <h2 className={`${isMobile ? 'text-base' : 'text-lg'} font-bold text-gray-900 leading-tight`}>
                         {profileData.firstName || profileData.name?.split(' ')[0] || ''} {profileData.lastName || profileData.name?.split(' ').slice(1).join(' ') || ''}
                     </h2>
-                    <p className="text-xs sm:text-sm text-gray-500">{profileData.email}</p>
+                    <p className={`text-gray-500 ${isMobile ? 'text-[11px]' : 'text-xs sm:text-sm'}`}>{profileData.email}</p>
                 </div>
+
 
                 {avatarUrl && !isProcessing && (
                     <button
@@ -158,17 +164,18 @@ const ProfileSidebar = ({
                     </button>
                 )}
 
-                <div className="w-full mt-4 pt-4 border-t border-gray-50 flex justify-between text-xs sm:text-[11px]">
+                <div className="w-full mt-4 pt-4 border-t border-gray-50 flex justify-between text-xs sm:text-[11px]" style={{ fontSize: isMobile ? '10px' : undefined }}>
                     <span className="text-gray-400">Member since</span>
                     <span className="font-semibold text-gray-700">2023</span>
                 </div>
+
             </div>
 
             {/* Navigation Menu */}
-            <nav className="bg-white rounded-2xl shadow-sm border border-gray-100 overflow-hidden p-2 hidden lg:block" style={{ padding: '5px'}}>
+            <nav className="bg-white rounded-2xl shadow-sm border border-gray-100 overflow-hidden p-2 hidden lg:block" style={{ padding: '0px 5px'}}>
                 {sections.map((section) => (
                     <button
-                        style={{marginBottom: '10px'}}
+                        style={{marginBottom: isMobile ? '5px' : '10px'}}
                         key={section.id}
                         onClick={() => setActiveSection(section.id)}
                         className={`w-full flex items-center justify-between p-3 rounded-xl transition-all mb-1 ${
@@ -192,38 +199,39 @@ const ProfileSidebar = ({
                     </button>
                 ))}
 
-                <div className="mt-2 pt-2 border-t border-gray-100" style={{ padding: '5px 10px', marginTop: '10px'}}>
+                <div className="w-full flex justify-center mt-2 pt-2 border-t border-gray-100" style={{ padding: '5px 10px', marginTop: '5px'}}>
                     <button
                         onClick={handleLogout}
-                        className="w-full flex items-center gap-3 p-3 rounded-xl text-red-600 hover:bg-red-50 transition-colors"
+                        className="flex items-center gap-1 p-3 rounded-xl text-red-600 hover:text-red-300 transition-colors"
                     >
-                    <div className='w-full flex items-center gap-3 p-3 rounded-xl text-red-600 hover:bg-red-50 transition-colors'>
-                        <div className="p-2 rounded-lg bg-red-100 text-red-600">
+                    <div className='w-full flex items-center gap-1 p-3 rounded-xl'>
+                        <div className="p-2 rounded-md ">
                             <LogOut className="w-5 h-5" />
                         </div>
-                        <span className="font-bold text-xs sm:text-sm">Sign Out</span>
+                        <span className="font-bold text-sm sm:text-base" style={{marginTop: '5px'}}>Sign Out</span>
                     </div>
                     </button>
                 </div>
             </nav>
 
             {/* Mobile Navigation Tabs */}
-            <div className="lg:hidden flex overflow-x-auto pb-4 gap-4 no-scrollbar" style={{ padding: '2px 5px'}}>
+            <div className="lg:hidden flex overflow-x-auto pb-4 gap-2 no-scrollbar" style={{ padding: '2px 0px'}}>
                 {sections.map((section) => (
                     <button
-                        style={{padding: '2px 5px'}}
+                        style={{padding: isMobile ? '2px 10px' : '3px 10px'}}
                         key={section.id}
                         onClick={() => setActiveSection(section.id)}
-                        className={`flex-none px-4 py-2 rounded-full text-xs font-medium whitespace-nowrap transition-colors ${
+                        className={`flex-none rounded-md font-medium whitespace-nowrap transition-colors ${isMobile ? 'text-[10px]' : 'text-xs'} ${
                             activeSection === section.id
-                                ? 'bg-emerald-600 text-white'
-                                : 'bg-white text-gray-600 border border-gray-200'
+                                ? 'bg-emerald-600 text-white shadow-sm'
+                                : 'bg-white text-gray-600 border border-gray-200 hover:bg-gray-50'
                         }`}
                     >
                         {section.label}
                     </button>
                 ))}
             </div>
+
         </aside>
     );
 };

@@ -4,11 +4,15 @@ import { Package, ArrowRight, Truck, CheckCircle, Clock } from 'lucide-react';
 import { useNavigate } from 'react-router-dom';
 import { useOrders } from '@/shared/hooks/queries/useOrders';
 import useDataStore from '@/store/useDataStore';
+import useIsMobile from '@/shared/hooks/useIsMobile';
+
 
 const OrdersPreview = () => {
     const navigate = useNavigate();
     const currentUser = useDataStore((state) => state.currentUser);
     const { data: ordersData, isLoading } = useOrders();
+    const isMobile = useIsMobile(768);
+
 
     const allOrders = ordersData?.data || [];
     
@@ -37,8 +41,9 @@ const OrdersPreview = () => {
         return (
             <div 
                 className="bg-white rounded-2xl border border-gray-100 shadow-sm p-6"
-                style={{ marginTop: window.innerWidth >= 640 ? '10px' : '0', padding: '10px', marginBottom: '30px'}}
+                style={{ marginTop: isMobile ? '0' : '10px', padding: isMobile ? '12px' : '24px', marginBottom: isMobile ? '15px' : '30px'}}
             >
+
                  <div className="h-6 w-32 bg-gray-100 rounded mb-6 animate-pulse" />
                  <div className="space-y-4">
                      {[1,2,3].map(i => (
@@ -54,11 +59,13 @@ const OrdersPreview = () => {
             initial={{ opacity: 0, y: 10 }}
             animate={{ opacity: 1, y: 0 }}
             className="bg-white rounded-2xl border border-gray-100 shadow-sm overflow-hidden"
-            style={{ marginTop: window.innerWidth >= 640 ? '10px' : '0', padding: '10px', marginBottom: '30px'}}
+            style={{ marginTop: isMobile ? '0' : '10px', padding: isMobile ? '5px' : '10px', marginBottom: isMobile ? '15px' : '30px'}}
         >
+
             
 
-            <div className="p-6">
+            <div className={isMobile ? 'p-4' : 'p-6'}>
+
                 {recentOrders.length === 0 ? (
                     <div className="text-center gap-2 flex flex-col items-center justify-center py-8">
                         <Package className="w-12 h-12 text-gray-300 mx-auto mb-3" />
@@ -75,40 +82,43 @@ const OrdersPreview = () => {
                     <div className="space-y-4">
                         {recentOrders.map((order) => (
                             <div 
-                            style={{ marginBottom: '5px', padding: '5px'}}
+                                style={{padding: isMobile ? '5px' : '10px', margin: isMobile ? '5px 0px' : ' 10px 0px'}}
                                 key={order.id}
                                 onClick={() => navigate(`/orders/${order.id}`)}
-                                className="group flex items-center justify-between p-4 rounded-xl border border-gray-100 hover:border-emerald-200 hover:shadow-md transition-all cursor-pointer bg-white"
+                                className={`group flex items-center justify-between ${isMobile ? 'p-3' : 'p-4'} rounded-xl border border-gray-100 hover:border-emerald-200 hover:shadow-md transition-all cursor-pointer bg-white`}
                             >
-                                <div className="flex items-center gap-4">
-                                    <div className="p-3 bg-emerald-50 rounded-lg group-hover:bg-emerald-100 transition-colors">
-                                        <Package className="w-6 h-6 text-emerald-600" />
+                                <div className="flex items-center gap-3 sm:gap-4">
+                                    <div className={`${isMobile ? 'p-2' : 'p-3'} bg-emerald-50 rounded-lg group-hover:bg-emerald-100 transition-colors`}>
+                                        <Package className={`${isMobile ? 'w-5 h-5' : 'w-6 h-6'} text-emerald-600`} />
                                     </div>
                                     <div>
-                                        <p className="font-bold text-gray-900 flex items-center gap-2">
+                                        <p className={`${isMobile ? 'text-[8px]' : 'text-base sm:text-lg'} font-bold text-gray-900 flex items-center gap-2`}>
                                             Order #{order.id}
-                                            <span className="text-xs font-normal text-gray-500">
+                                            <span className={`${isMobile ? 'text-[8px]' : 'text-xs'} font-normal text-gray-500`}>
                                                 • {order.date || order.createdAt?.split('T')[0]}
                                             </span>
                                         </p>
-                                        <div className="flex items-center gap-2 mt-1">
-                                            <div className="flex items-center gap-1 text-xs font-medium px-2 py-0.5 rounded-full bg-gray-100 text-gray-700">
+                                        <div className="flex items-center gap-2 mt-0.5">
+                                            <div className={`flex items-center gap-1 ${isMobile ? 'text-[10px]' : 'text-xs'} font-medium ${isMobile ? 'px-1.5' : 'px-2'} py-0.5 rounded-full bg-gray-100 text-gray-700`}>
                                                 {getStatusIcon(order.status)}
-                                                {order.status}
+                                                <span style={{marginTop: isMobile ? '1px' : '3px'}}>
+                                                    {order.status}
+                                                </span>
                                             </div>
-                                            <span className="text-sm text-gray-500">
+                                            <span className={`${isMobile ? 'text-[10px]' : 'text-sm'} text-gray-500`} style={{marginTop: isMobile ? '2px' : '5px'}}>
                                                 {Array.isArray(order.items) ? order.items.length : (order.items || 1)} items
                                             </span>
                                         </div>
                                     </div>
                                 </div>
                                 <div className="text-right">
-                                    <p className="font-bold text-gray-900">
+                                    <p className={`${isMobile ? 'text-xs' : 'text-base sm:text-lg'} font-bold text-gray-900`}>
                                         ₹{(order.total || order.paymentBreakdown?.total || order.totalAmount || order.price || 0).toFixed(2)}
                                     </p>
-                                    <span className="text-xs font-semibold text-emerald-600 group-hover:underline">View Details</span>
+                                    <span className={`${isMobile ? 'text-[10px]' : 'text-xs'} font-semibold text-emerald-600 group-hover:underline`}>View Details</span>
                                 </div>
                             </div>
+
                         ))}
                     </div>
                 )}

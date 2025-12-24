@@ -102,7 +102,7 @@ const ProductCategorySection = ({
                   duration: 0.5,
                   ease: "easeOut"
                 }}
-                className="w-[160px] shrink-0 sm:w-[230px]"
+                className="w-40 shrink-0 sm:w-[230px]"
               >
                 <PharmacyProductCard
                   {...product}

@@ -76,7 +76,7 @@ const PaymentMethodSelector = ({ onProceed, isLoading = false }) => {
                     size="full"
                     onClick={handleProceed}
                     disabled={!selectedMethod || isLoading}
-                    className="!bg-emerald-600 hover:!bg-emerald-700 !shadow-emerald-200 !py-3.5 !text-lg !rounded-xl"
+                    className="bg-emerald-600! hover:bg-emerald-700! shadow-emerald-200! py-3.5! text-lg! rounded-xl!"
                 >
                     {isLoading ? 'Processing...' : 'Proceed to Pay'}
                 </Button>

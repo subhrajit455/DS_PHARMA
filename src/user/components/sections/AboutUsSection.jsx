@@ -20,7 +20,7 @@ const AboutUsSection = () => {
         <div className="relative">
           {/* Main Content Box */}
           <div
-            className="relative overflow-visible pr-6 lg:pr-[240px] min-h-[200px] lg:min-h-[310px] bg-[#68F2EC80] lg:bg-transparent rounded-2xl"
+            className="relative overflow-visible pr-6 lg:pr-60 min-h-[200px] lg:min-h-[310px] bg-[#68F2EC80] lg:bg-transparent rounded-2xl"
             style={{
               height: 'auto',
               paddingTop: '1rem',
@@ -105,7 +105,7 @@ const AboutUsSection = () => {
             whileInView={{ opacity: 1, scale: 1 }}
             viewport={{ once: true }}
             transition={{ duration: 0.5, delay: 0.2 }}
-            className="hidden absolute lg:block right-0 -bottom-5 w-[140px] h-[100px] lg:w-[240px] lg:h-[160px] lg:-bottom-[35px]"
+            className="hidden absolute lg:block right-0 -bottom-5 w-[140px] h-[100px] lg:w-60 lg:h-40 lg:-bottom-[35px]"
             style={{
               zIndex: 5
             }}
@@ -130,7 +130,7 @@ const AboutUsSection = () => {
             whileInView={{ opacity: 1, x: 0, scale: 1 }}
             viewport={{ once: true }}
             transition={{ duration: 0.5, delay: 0.35, ease: [0.25, 0.1, 0.25, 1] }}
-            className="absolute hidden md:block -right-[10px] bottom-[10px] w-[140px] h-[140px] lg:-right-[20px] lg:bottom-[20px] lg:w-[240px] lg:h-[240px]"
+            className="absolute hidden md:block -right-2.5 bottom-2.5 w-[140px] h-[140px] lg:-right-5 lg:bottom-5 lg:w-60 lg:h-60"
             style={{
               zIndex: 10
             }}

@@ -1,6 +1,8 @@
 import React from 'react';
 import { motion as Motion } from 'framer-motion';
 import { Edit2, Save, X, User, Mail, Phone, Calendar, Users } from 'lucide-react';
+import useIsMobile from '@/shared/hooks/useIsMobile';
+
 
 const PersonalInfoForm = ({
     profileData,
@@ -12,6 +14,8 @@ const PersonalInfoForm = ({
     handleInputChange,
     isSaving
 }) => {
+    const isMobile = useIsMobile(768);
+
     // Helper to get first/last name from single name field if needed
     const getFirstName = (data) => data.firstName || data.name?.split(' ')[0] || '';
     const getLastName = (data) => data.lastName || data.name?.split(' ').slice(1).join(' ') || '';
@@ -20,60 +24,66 @@ const PersonalInfoForm = ({
     const currentFirstName = isEditing ? (tempData.firstName !== undefined ? tempData.firstName : getFirstName(tempData)) : getFirstName(profileData);
     const currentLastName = isEditing ? (tempData.lastName !== undefined ? tempData.lastName : getLastName(tempData)) : getLastName(profileData);
 
-    const inputClasses = "w-full text-xs pl-11 pr-4 py-3 bg-gray-50 border border-gray-200 rounded-xl focus:outline-none focus:ring-2 focus:ring-emerald-500/20 focus:border-emerald-500 focus:bg-white transition-all disabled:opacity-60 disabled:cursor-not-allowed hover:border-emerald-300";
-    const labelClasses = "block mb-2 text-xs sm:text-sm font-medium text-gray-700";
+    const inputClasses = `w-full ${isMobile ? 'text-[10px]' : 'text-xs'} pl-11 pr-4 py-3 bg-gray-50 border border-gray-200 rounded-xl focus:outline-none focus:ring-2 focus:ring-emerald-500/20 focus:border-emerald-500 focus:bg-white transition-all disabled:opacity-60 disabled:cursor-not-allowed hover:border-emerald-300`;
+    const labelClasses = `block mb-1 ${isMobile ? 'text-[10px]' : 'text-xs sm:text-sm'} font-medium text-gray-700`;
+
 
     return (
         <Motion.div
             initial={{ opacity: 0, y: 10 }}
             animate={{ opacity: 1, y: 0 }}
             className="bg-gradient-to-br from-white to-emerald-50/20 rounded-2xl border border-gray-100 shadow-sm overflow-hidden"
-            style={{ marginTop: window.innerWidth >= 640 ? '30px' : '0', padding: '10px', marginBottom: '10px'}}
+            style={{ marginTop: isMobile ? '0' : '30px', padding: isMobile ? '5px' : '10px', marginBottom: isMobile ? '5px' : '10px'}}
         >
-            <div className="p-6 border-b border-gray-100 flex justify-between items-center bg-gradient-to-r from-emerald-50/50 to-white" style={{ marginBottom: '15px'}}>
+
+            <div className={`border-b border-gray-100 flex justify-between items-center bg-gradient-to-r from-emerald-50/50 to-white ${isMobile ? 'p-4' : 'p-6'}`} style={{ marginBottom: isMobile ? '8px' : '15px' }}>
                 <div>
-                    <h2 className="text-lg font-bold text-gray-900">Personal Information</h2>
-                    <p className="text-xs sm:text-sm text-gray-500 mt-1">Manage your personal details</p>
+                    <h2 className={`${isMobile ? 'text-base' : 'text-lg'} font-bold text-gray-900`}>Personal Information</h2>
+                    <p className={`${isMobile ? 'text-[11px]' : 'text-xs sm:text-sm'} text-gray-500 mt-0.5`}>Manage your personal details</p>
                 </div>
+
                 
                 {!isEditing ? (
                     <button
                         onClick={handleEdit}
-                        className="flex items-center gap-1 px-4 py-2 text-xs sm:text-sm font-medium text-emerald-600 bg-emerald-50 rounded-lg hover:bg-emerald-100 transition-colors"
-                        style={{ padding: '2px 10px'}}
+                        className={`flex items-center gap-1 ${isMobile ? 'px-3 py-1.5' : 'px-4 py-2'} text-xs font-medium text-emerald-600 bg-emerald-50 rounded-lg hover:bg-emerald-100 transition-colors`}
+                        style={{ padding: isMobile ? '2px 10px' : '2px 10px'}}
                     >
+
                         <Edit2 className="w-4 h-4" />
-                        <span style={{ marginTop: '3px'}}>Edit Details</span>
+                        <span className='hidden sm:inline-block' style={{ marginTop: '3px'}}>Edit Details</span>
                     </button>
                 ) : (
-                    <div className="flex items-center gap-2">
+                    <div className="flex items-center gap-1">
                          <button
                             onClick={handleCancel}
-                            className="flex items-center gap-2 px-4 py-2 text-xs sm:text-sm font-medium text-gray-600 bg-white border border-gray-200 rounded-lg hover:bg-gray-50 transition-colors"
-                            style={{ padding: '2px 10px'}}
+                            className="flex items-center gap-1 px-4 py-2 text-xs sm:text-sm font-medium text-gray-600 bg-white border border-gray-200 rounded-lg hover:bg-gray-50 transition-colors"
+                            style={{ padding: isMobile ? '2px 10px' : '2px 10px'}}
                         >
                             <X className="w-4 h-4" />
-                            <span style={{ marginTop: '3px'}}>Cancel</span>
+                            <span className='hidden sm:inline-block' style={{ marginTop: '3px'}}>Cancel</span>
                         </button>
                         <button
                             onClick={handleSave}
                             disabled={isSaving}
-                            className="flex items-center gap-2 px-4 py-2 text-xs sm:text-sm font-medium text-white bg-emerald-600 rounded-lg hover:bg-emerald-700 disabled:opacity-50 disabled:cursor-not-allowed transition-colors shadow-sm"
-                            style={{ padding: '2px 10px'}}
+                            className={`flex items-center gap-1 ${isMobile ? 'px-3 py-1.5' : 'px-4 py-2'} text-xs font-medium text-white bg-emerald-600 rounded-lg hover:bg-emerald-700 disabled:opacity-50 disabled:cursor-not-allowed transition-colors shadow-sm`}
+                            style={{ padding: isMobile ? '2px 10px' : '2px 10px'}}
                         >
                             {isSaving ? (
-                                <div className="w-4 h-4 border-2 border-white border-t-transparent rounded-full animate-spin" />
+                                <div className={`${isMobile ? 'w-4 h-4' : 'w-4 h-4'} border-2 border-white border-t-transparent rounded-full animate-spin`} />
                             ) : (
-                                <Save className="w-4 h-4" />
+                                <Save className={`${isMobile ? 'w-4 h-4' : 'w-4 h-4'}`} />
                             )}
-                            <span style={{ marginTop: '3px'}}>Save Changes</span>
+                            <span className='hidden sm:inline-block' style={{ marginTop: isMobile ? '1px' : '3px'}}>Save Changes</span>
                         </button>
                     </div>
                 )}
             </div>
 
+
             {/* Personal Info Grid */}
-            <div className="p-6 grid grid-cols-1 md:grid-cols-2 gap-6">
+            <div className={`${isMobile ? 'p-4' : 'p-6'} grid grid-cols-1 md:grid-cols-2 gap-4 sm:gap-6`}>
+
                 {/* First Name */}
                 <div className="relative">
                     <label className={labelClasses}>First Name</label>

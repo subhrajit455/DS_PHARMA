@@ -6,7 +6,7 @@ export const MascotCard = () => {
       initial={{ opacity: 0, x: -30, y: 20 }}
       animate={{ opacity: 1, x: 0, y: 0 }}
       transition={{ duration: 0.8, delay: 0.7 }}
-      className="hidden md:block absolute bottom-0 left-2  z-30 md:w-[240px] lg:w-[420px] gap-1"
+      className="hidden md:block absolute bottom-0 left-2  z-30 md:w-60 lg:w-[420px] gap-1"
       style={{padding: '20px'}}
     >
     <div className="flex flex-col items-center justify-center md:gap-14 lg:gap-19">
@@ -18,7 +18,7 @@ export const MascotCard = () => {
         <img
           src="/src/assets/images/medicine-character.png"
           alt="DS Pharma Mascots"
-          className="w-full h-auto block object-contain max-h-[200px] max-w-[250px] absolute mb-[100px] md:max-h-[200px] md:max-w-[120px] md:mb-[10px] lg:max-h-[150px] lg:max-w-[250px] lg:mb-[10px]"
+          className="w-full h-auto block object-contain max-h-[200px] max-w-[250px] absolute mb-[100px] md:max-h-[200px] md:max-w-[120px] md:mb-2.5 lg:max-h-[150px] lg:max-w-[250px] lg:mb-2.5"
         />
       </div>
 

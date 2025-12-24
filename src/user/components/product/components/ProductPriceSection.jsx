@@ -74,7 +74,7 @@ const ProductPriceSection = ({ price, originalPrice, discount, stock, specialOff
           Special Offer For You
         </h3>
         <div className="flex items-start gap-2 w-[220px] bg-white rounded-lg shadow-sm" style={{ padding: '5px' }}>
-          <div className="w-[40px] h-[40px] rounded-lg shadow-sm overflow-hidden">
+          <div className="w-10 h-10 rounded-lg shadow-sm overflow-hidden">
             <img src="" alt="" />
           </div>
           <div className="flex flex-col justify-center" style={{ marginTop: '5px' }}>

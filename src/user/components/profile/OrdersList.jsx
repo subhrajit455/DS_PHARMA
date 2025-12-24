@@ -58,23 +58,27 @@ const OrdersList = () => {
                         style={{ marginBottom: '10px' }}
                         key={order.id}
                         whileHover={{ scale: 1.01, boxShadow: '0 10px 25px rgba(0,0,0,0.1)' }}
-                        className="border border-gray-200 rounded-xl p-5 transition-all cursor-pointer bg-gradient-to-r from-white to-gray-50"
+                        className="border border-gray-200 rounded-xl p-5 transition-all cursor-pointer bg-linear-to-r from-white to-gray-50"
                         onClick={() => navigate(`/orders/${order.id}`)}
                     >
-                        <div className="flex flex-col md:flex-row md:justify-between md:items-center gap-4" style={{ padding: '5px' }}>
+                        <div className="flex flex-col md:flex-row md:justify-between md:items-center gap-2" style={{ padding: '5px' }}>
                             <div className="flex-1">
-                                <div className="flex items-center gap-3 mb-2">
+                                <div className="flex items-center gap-1 mb-2">
                                     <Package className="w-5 h-5 text-teal-600" />
-                                    <p className="font-bold text-base md:text-lg" style={{ fontFamily: 'Gyrotrope' }}>
+                                    <p className="font-bold text-sm md:text-lg" style={{ fontFamily: 'Gyrotrope' }}>
                                         Order #{order.id}
                                     </p>
-                                    <span className={`px-3 py-1 rounded-full text-[8px] sm:text-xs font-semibold ${order.statusColor === 'green' || order.status === 'Delivered'
+                                    <span
+                                     className={`px-3 py-1 rounded-full text-[8px] sm:text-xs font-semibold ${order.statusColor === 'green' || order.status === 'Delivered'
                                             ? 'bg-green-100 text-green-700'
                                             : order.status === 'Return Requested'
                                             ? 'bg-orange-100 text-orange-700'
                                             : 'bg-blue-100 text-blue-700'
-                                        }`}>
-                                        {order.status}
+                                        }`
+                                        }>
+                                        <span style={{ padding:'2px 5px'}}>
+                                            {order.status}
+                                        </span>
                                     </span>
                                 </div>
                                 <div className="flex flex-wrap gap-4 text-gray-600 ml-8" style={{ fontSize: window.innerWidth >= 640 ? '14px' : '11px' }}>
@@ -92,12 +96,12 @@ const OrdersList = () => {
                             <div className="ml-8 md:ml-0">
                                 
                                 <button 
-                                    style={{ padding: '2px 10px', fontSize: window.innerWidth >= 640 ? '14px' : '11px' }}
+                                    style={{ padding: '2px 5px' }}
                                     onClick={(e) => {
                                         e.stopPropagation();
                                         navigate(`/orders/${order.id}`);
                                     }}
-                                    className="px-4 py-2 font-medium text-white bg-teal-600 rounded-lg hover:bg-teal-700 transition-colors shadow-md"
+                                    className="px-4 py-2 font-medium text-[10px] sm:text-xs text-white bg-teal-600 rounded-lg hover:bg-teal-700 transition-colors shadow-md"
                                 >
                                     View Details
                                 </button>

@@ -119,14 +119,6 @@ const BannerForm = () => {
             {isEditMode ? 'Update your banner details' : 'Create a new banner for your store'}
           </p>
         </div>
-        <Button
-          variant="ghost"
-          className="pl-0 text-gray-500 hover:text-gray-900 text-[8px] sm:text-sm"
-          onClick={() => navigate('/admin/announcements')}
-        >
-          <ArrowLeft className="mr-2 h-3 w-3 sm:h-4 sm:w-4" />
-          <span style={{ marginTop: '3px' }}>Back to Announcements</span>
-        </Button>
       </div>
 
       <form onSubmit={handleSubmit}>

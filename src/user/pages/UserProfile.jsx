@@ -23,12 +23,16 @@ import OrdersList from '@/user/components/profile/OrdersList';
 import ProfileSidebar from '@/user/components/profile/ProfileSidebar';
 import WishlistSection from '@/user/components/profile/WishlistSection';
 import { Heart } from 'lucide-react';
+import useIsMobile from '@/shared/hooks/useIsMobile';
+
 
 const UserProfile = () => {
     const navigate = useNavigate();
     const { isAuthenticated, currentUser } = useDataStore();
     const [activeSection, setActiveSection] = useState('overview');
     const [isEditingProfile, setIsEditingProfile] = useState(false);
+    const isMobile = useIsMobile(768);
+
 
     // Redirect if not authenticated
     useEffect(() => {
@@ -131,7 +135,8 @@ const UserProfile = () => {
                 }
             `}</style>
             {/* Main Content Area - flex-1 ensures it takes available space */}
-            <main className="profile-container flex-1 w-full px-2 sm:px-4 md:px-6 lg:px-8 py-4 sm:py-6 md:py-8" style={{ maxWidth: '1280px', margin: '0 auto' }}>
+            <main className="profile-container flex-1 w-full px-2 sm:px-4 md:px-6 lg:px-8 py-4 sm:py-6 md:py-8" style={{ maxWidth: '1280px', margin: '0 auto', padding: isMobile ? '16px 8px' : undefined }}>
+
                 <div className="grid grid-cols-1 lg:grid-cols-12 gap-4 sm:gap-6 lg:gap-8">
 
                     <ProfileSidebar 
@@ -145,10 +150,11 @@ const UserProfile = () => {
                     <div className="lg:col-span-9">
                         {/* Min-height container prevents layout shifts - Responsive */}
                         <div style={{ 
-                            minHeight: window.innerWidth >= 768 
-                                ? 'calc(100vh - 320px)'  // Desktop/Tablet
-                                : 'calc(100vh - 220px)'   // Mobile - reduced for smaller screens
+                            minHeight: isMobile 
+                                ? 'calc(100vh - 220px)'   // Mobile - reduced for smaller screens
+                                : 'calc(100vh - 320px)'  // Desktop/Tablet
                         }}>
+
                             <AnimatePresence mode="wait">
                                 <Motion.div
                                     key={activeSection}

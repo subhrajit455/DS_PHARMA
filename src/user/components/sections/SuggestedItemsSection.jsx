@@ -65,7 +65,7 @@ const SuggestedItemsSection = ({
                     return (
                         <div
                             key={item.id}
-                            className="w-[160px] shrink-0 sm:w-[230px]"
+                            className="w-40 shrink-0 sm:w-[230px]"
                         >
                             <PharmacyProductCard
                                 id={item.id}
