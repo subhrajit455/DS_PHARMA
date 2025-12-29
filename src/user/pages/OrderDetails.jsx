@@ -12,6 +12,7 @@ import SuggestedItemsSection from "@/user/components/sections/SuggestedItemsSect
 import ConfirmationModal from "@/shared/components/common/ConfirmationModal";
 import { useOrderDetails } from "@/shared/hooks/queries/useOrders";
 import { AlertCircle, RefreshCw, Printer, Share2 } from 'lucide-react';
+import BackButton from '@/shared/components/BackButton';
 
 import { useProducts } from '@/shared/hooks/queries/useProducts';
 import { useCancelOrder } from '@/shared/hooks/mutations/useCancelOrder';
@@ -326,8 +327,10 @@ const OrderDetails = () => {
           className="w-full px-4 mx-auto"
           style={{ maxWidth: "1280px", margin: "10px auto" }}
         >
+          <div style={{ marginBottom: '1.5rem' }}><BackButton fallbackRoute="/orders" label="Back to Orders" className="mb-4" /></div>
             {/* Header */}
-            <div className="mb-6">
+            <div className="mb-6" sty>
+              
               <h1
                 className="mb-6 text-2xl font-bold text-gray-900"
                 style={{

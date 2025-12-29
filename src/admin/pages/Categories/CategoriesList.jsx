@@ -1,5 +1,5 @@
 import React, { useState } from 'react';
-import { Plus, Edit, Trash2, Search, Tag, Sparkles } from 'lucide-react';
+import { Plus, Edit, Trash2, Search, Sparkles } from 'lucide-react';
 import { toast } from 'react-hot-toast';
 import { Button } from '@/admin/components/ui/Button';
 import { Input } from '@/admin/components/ui/Input';
@@ -100,7 +100,7 @@ const CategoriesList = () => {
         <div className="flex-1 h-full flex flex-col space-y-4 p-2 sm:p-4 lg:p-6 animate-in fade-in slide-in-from-bottom-6 duration-700" style={{ background: 'linear-gradient(135deg, #f0fdf4 0%, #ecfdf5 50%, #f0fdfa 100%)' }}>
              <div className="flex sm:flex-row justify-between items-start sm:items-center gap-2 sm:gap-4 shrink-0" style={{ padding: '5px' }}>
                 <div>
-                   <h2 className="text-2xl sm:text-3xl lg:text-4xl font-bold bg-gradient-to-r from-gray-900 via-emerald-800 to-teal-800 bg-clip-text text-transparent flex items-center gap-2 sm:gap-3">
+                   <h2 className="text-2xl sm:text-3xl lg:text-4xl font-bold bg-linear-to-r from-gray-900 via-emerald-800 to-teal-800 bg-clip-text text-transparent flex items-center gap-2 sm:gap-3">
                     Categories
                     <Sparkles className="h-6 w-6 sm:h-7 sm:w-7 lg:h-8 lg:w-8 text-emerald-500" />
                    </h2>
@@ -143,9 +143,6 @@ const CategoriesList = () => {
                                         <TableRow key={category.id} className="hover:bg-emerald-50/50 transition-all duration-200 border-b border-gray-100">
                                             <TableCell className="font-medium text-gray-900 text-[8px] sm:text-sm" style={{ padding: '8px 5px' }}>
                                                 <div className="flex items-center gap-2">
-                                                    <div className="p-1.5 sm:p-2 bg-emerald-100 rounded-lg text-emerald-600">
-                                                        <Tag className="h-3 w-3 sm:h-4 sm:w-4" />
-                                                    </div>
                                                     {category.name}
                                                 </div>
                                             </TableCell>

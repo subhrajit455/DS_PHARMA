@@ -45,7 +45,7 @@ const StatCard = ({ title, value, trend, trendUp, description, gradient, icon: I
               {trend}
             </span>
           )}
-          <span className="ml-2 text-gray-500 font-medium">{description || "from last month"}</span>
+          <span className="ml-2 text-gray-500 font-medium" style={{ paddingLeft: '4px' }}>{description || "from last month"}</span>
         </div>
       </CardContent>
     </Card>

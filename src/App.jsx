@@ -17,6 +17,7 @@ import ResetPasswordPage from "./user/pages/ResetPasswordPage";
 import SearchPage from "./user/pages/SearchPage";
 import AdminRouter from "./admin/AdminRouter";
 import Layout from "@/user/components/layout/Layout.jsx";
+import ScrollToTop from "@/shared/components/ScrollToTop";
 import { AnnouncementProvider } from '@/shared/contexts/AnnouncementContext';
 
 // Create React Query client
@@ -36,6 +37,7 @@ function App() {
     <QueryClientProvider client={queryClient}>
       <AnnouncementProvider>
         <Router>
+          <ScrollToTop />
           <ToastContainer />
           <Routes>
             {/* Public Auth Routes (No Layout) */}

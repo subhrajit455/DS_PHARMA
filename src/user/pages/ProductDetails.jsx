@@ -15,6 +15,7 @@ import { useProducts } from '@/shared/hooks/queries/useProducts';
 import { useReviews } from '@/shared/hooks/queries/useReviews';
 import { useAddToCart } from '@/shared/hooks/mutations/useAddToCart';
 import useDataStore from '@/store/useDataStore';
+import BackButton from '@/shared/components/BackButton';
 
 const ProductDetails = () => {
   const navigate = useNavigate();
@@ -112,7 +113,7 @@ const ProductDetails = () => {
   };
 
   return (
-    <div style={{ paddingTop: '60px' }}>
+    <div style={{ paddingTop: '30px' }}>
       <style>{` 
          @media (min-width: 768px) { 
            .orders-container { 
@@ -136,15 +137,9 @@ const ProductDetails = () => {
         <main className="grow">
           <div className="product-details-container flex flex-col items-center w-full px-4 md:px-6 lg:px-12">
             <div className="mx-auto max-w-7xl w-full">
-              {/* Back Button */}
-              <button
-                onClick={() => navigate(-1)}
-                className="sm:hidden flex items-center gap-2 mb-4 sm:mb-6 text-gray-700 transition-colors cursor-pointer hover:text-gray-900"
-                style={{ fontFamily: 'Gyrotrope', fontSize: '14px', fontWeight: 500, marginBottom: '1.5rem' }}
-              >
-                <ArrowLeft size={18} className="sm:w-5 sm:h-5" />
-                <span></span>
-              </button>
+              <div className="mb-6" style={{ marginBottom: '1.5rem' }}>
+                <BackButton fallbackRoute="/" label="Back to Products" className="inline-flex" />
+              </div>
 
               {/* Product Section */}
               <div className="grid grid-cols-1 gap-6 sm:gap-8 mb-8 sm:mb-12" style={{ gridTemplateColumns: 'repeat(1, minmax(0, 1fr))', marginBottom: '1.5rem' }}

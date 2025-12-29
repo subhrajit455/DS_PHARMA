@@ -4,6 +4,7 @@ import { motion as Motion } from 'framer-motion';
 import { ArrowLeft, Package } from 'lucide-react';
 import { PharmacyProductCard } from '@/user/components/product';
 import { useProducts } from '@/shared/hooks/queries/useProducts';
+import BackButton from '@/shared/components/BackButton';
 import Loading from '@/shared/components/common/Loading';
 import ErrorState from '@/shared/components/common/ErrorState';
 
@@ -59,7 +60,7 @@ const CategoryProducts = () => {
   if (isError) return <ErrorState message="Failed to load products" className="my-20" />;
 
   return (
-    <div style={{ paddingTop: '3rem' }}>
+    <div style={{ paddingTop: '1rem' }}>
       <style>{`
         @media (min-width: 768px) {
           .category-container {
@@ -83,14 +84,9 @@ const CategoryProducts = () => {
       <div className="category-container w-full pt-4 pb-16 lg:pt-32 lg:pb-16 bg-gray-50 min-h-screen">
         <div className="w-full px-4 mx-auto" style={{ maxWidth: "1240px", margin: "10px auto" }}>
 
-        <button
-              onClick={() => navigate(-1)}
-              className="sm:hidden flex items-center gap-1 text-gray-600 hover:text-emerald-600 transition-colors"
-              style={{ fontFamily: 'Gyrotrope', marginBottom: '1rem' }}
-            >
-              <ArrowLeft className="w-5 h-5" />
-              <span className="hidden sm:inline" style={{ marginTop: '5px' }}>Back</span>
-            </button>
+          <div className="mb-4" style={{ marginBottom: '1.5rem' }}>
+            <BackButton fallbackRoute="/" label="Back to Home" />
+          </div>
           
           {/* Header */}
           <div className="mb-6 flex items-center gap-4">

@@ -146,9 +146,6 @@ const FeaturedProducts = () => {
                                         <TableRow key={product.id} className="hover:bg-emerald-50/50 transition-all duration-200 border-b border-gray-100">
                                             <TableCell className="font-medium text-gray-900 text-[8px] sm:text-sm" style={{ padding: '8px 5px' }}>
                                                 <div className="flex items-center gap-2">
-                                                    <div className="p-1.5 sm:p-2 bg-gray-100 rounded-lg text-gray-600">
-                                                        <Package className="h-3 w-3 sm:h-4 sm:w-4" />
-                                                    </div>
                                                     {product.name}
                                                 </div>
                                             </TableCell>

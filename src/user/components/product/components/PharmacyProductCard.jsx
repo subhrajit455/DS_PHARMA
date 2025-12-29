@@ -19,7 +19,7 @@ const PharmacyProductCard = ({
   image,
   stock,
   inStock = true,
-  onCardClick = () => { },
+  onCardClick = null,
   className = ''
 }) => {
   const navigate = useNavigate();
@@ -82,8 +82,13 @@ const PharmacyProductCard = ({
   };
 
   const handleCardClick = () => {
-    navigate(`/product/${id}`);
-    onCardClick({ id, name, price, quantity, unit });
+    // If onCardClick is provided by parent, use it (it usually handles navigation)
+    // Otherwise, use default navigation to product details
+    if (onCardClick) {
+      onCardClick({ id, name, price, quantity, unit });
+    } else {
+      navigate(`/product/${id}`);
+    }
   };
 
   // Check if transparent variant is requested via className or props (could be extended)

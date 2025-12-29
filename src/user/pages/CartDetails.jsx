@@ -13,6 +13,7 @@ import AddressForm from '@/shared/components/common/AddressForm';
 import { useAddresses, useAddAddress } from '@/shared/hooks/queries/useAddresses';
 import { X, MapPin, Home, Briefcase, Plus } from 'lucide-react';
 import { useToastStore } from '@/store/useToastStore';
+import BackButton from '@/shared/components/BackButton';
 
 const CartDetails = () => {
   const navigate = useNavigate();
@@ -249,7 +250,7 @@ const CartDetails = () => {
   };
 
   return (
-    <div style={{ paddingTop: '4rem' }}>
+    <div style={{ paddingTop: '2rem' }}>
       <style>{` 
          @media (min-width: 768px) { .orders-container { padding-top: 80px !important; } }
          @media (max-width: 639px) { .cart-details-container { padding-left: 5px !important; padding-right: 5px !important; } }
@@ -363,6 +364,9 @@ const CartDetails = () => {
       <div className="cart-details-container w-full" style={{ maxWidth: '1280px', margin: '10px auto' }}>
         <div className="grid grid-cols-1 lg:grid-cols-3 gap-8">
           <div className="lg:col-span-2">
+            <div style={{paddingBottom:'1.25rem'}}>
+              <BackButton fallbackRoute="/" label="Back to Shopping" className="mb-4" />
+            </div>  
             <div className="mb-5">
               <h1 style={{ fontFamily: 'Gyrotrope', fontSize: '20px', fontWeight: 700, color: '#000000', marginBottom: '0', letterSpacing: '-0.01em' }}>
                 Cart Items ({cartItems.length})

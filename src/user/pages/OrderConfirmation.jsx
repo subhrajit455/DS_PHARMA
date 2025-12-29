@@ -13,6 +13,7 @@ import { motion as Motion } from "framer-motion";
 import { useOrderDetails } from "@/shared/hooks/queries/useOrders";
 import Button from "@/shared/components/ui/Button";
 import Navigation from "@/user/components/navigation";
+import BackButton from "@/shared/components/BackButton";
 import Footer from "@/user/components/sections/Footer";
 
 const OrderConfirmation = () => {
@@ -96,9 +97,12 @@ const OrderConfirmation = () => {
         style={{ width: "100%", margin: "0 5px" }}
       >
       <div
-        className="max-w-5xl mx-auto"
+        className="max-w-7xl mx-auto"
         style={{ width: "100%", margin: "0 auto" }}
       >
+        <div className="mb-6" style={{ marginBottom: '1.5rem' }}>
+          <BackButton fallbackRoute="/orders" label="Back to Orders" className="inline-flex" />
+        </div>
         {/* Success Header */}
         <Motion.div
           initial={{ opacity: 0, scale: 0.9 }}
@@ -195,61 +199,6 @@ const OrderConfirmation = () => {
           </div>
         </Motion.div>
 
-        {/* Product List */}
-        <Motion.div
-          initial={{ opacity: 0, y: 20 }}
-          animate={{ opacity: 1, y: 0 }}
-          transition={{ delay: 0.3 }}
-          className="bg-white rounded-2xl shadow-lg p-6 mb-6"
-          style={{ padding: "10px 20px", marginBottom: '10px' }}
-        >
-          <h3
-            className="font-semibold text-gray-900 mb-4 flex items-center gap-1"
-            style={{ fontFamily: "Gyrotrope" }}
-          >
-            <Package className="w-5 h-5 text-emerald-600" />
-           <span style={{marginTop: '5px'}}> Order Items ({order.items?.length || 0})</span>
-          </h3>
-          <div className="space-y-3">
-            {order.items?.map((item) => (
-              <div
-                key={item.id}
-                className="flex items-center gap-4 pb-3 border-b last:border-0"
-                style={{ padding: '3px 10px' }}
-              >
-                <img
-                  src={item.image}
-                  alt={item.productName || item.name}
-                  className="w-16 h-16 object-cover rounded-lg bg-gray-100"
-                  onError={(e) => {
-                    e.target.src =
-                      "https://images.unsplash.com/photo-1587854692152-cbe660dbde88?auto=format&fit=crop&w=100&q=80";
-                  }}
-                />
-                <div className="flex-1">
-                  <p
-                    className="font-semibold text-gray-900 text-sm"
-                    style={{ fontFamily: "Gyrotrope" }}
-                  >
-                    {item.productName || item.name}
-                  </p>
-                  <p
-                    className="text-xs text-gray-600"
-                    style={{ fontFamily: "Gyrotrope" }}
-                  >
-                    ₹{item.price} × {item.quantity}
-                  </p>
-                </div>
-                <p
-                  className="font-semibold text-gray-900"
-                  style={{ fontFamily: "Gyrotrope" }}
-                >
-                  ₹{item.price * item.quantity}
-                </p>
-              </div>
-            ))}
-          </div>
-        </Motion.div>
         <div className="md:flex w-full gap-4 items-center" style={{ marginBottom: '10px' }}>
         {/* Payment Breakdown */}
         <Motion.div
