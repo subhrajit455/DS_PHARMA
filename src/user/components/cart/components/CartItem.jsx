@@ -48,7 +48,7 @@ const CartItem = ({ item, onUpdateQuantity, onRemove }) => {
                 {item.name}
               </h3>
               <div className="flex items-center gap-2 mt-15" style={{
-                paddingTop: '8px'
+                paddingTop: '4px'
               }}>
                 <span className="font-gyrotrope text-[8px] sm:text-xs md:text-[16px] font-bold text-black">
                   ₹{item.price || 0}
@@ -63,6 +63,13 @@ const CartItem = ({ item, onUpdateQuantity, onRemove }) => {
                     {item.discount}% Off
                   </span>
                 )}
+              </div>
+              
+              {/* Item Total Amount */}
+              <div className="mt-2.5" style={{paddingTop: '5px'}}>
+                <p className="font-gyrotrope text-[10px] sm:text-[11px] md:text-[14px] text-gray-500 font-medium">
+                  Item Total: <span className="text-black font-bold">₹{(Number(item.price) || 0) * (Number(item.quantity) || 1)}</span>
+                </p>
               </div>
 
             </div>

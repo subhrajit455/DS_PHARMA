@@ -15,6 +15,7 @@ import SignupPage from "./user/pages/SignupPage";
 import ForgotPasswordPage from "./user/pages/ForgotPasswordPage";
 import ResetPasswordPage from "./user/pages/ResetPasswordPage";
 import SearchPage from "./user/pages/SearchPage";
+import NotFoundPage from "./user/pages/NotFoundPage";
 import AdminRouter from "./admin/AdminRouter";
 import Layout from "@/user/components/layout/Layout.jsx";
 import ScrollToTop from "@/shared/components/ScrollToTop";
@@ -65,6 +66,8 @@ function App() {
 
             </Route>
 
+            {/* 404 - Not Found Route */}
+            <Route path="*" element={<NotFoundPage />} />
           </Routes>
         </Router>
         <ReactQueryDevtools initialIsOpen={false} />

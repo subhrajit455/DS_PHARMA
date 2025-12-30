@@ -21,7 +21,7 @@ const SearchPage = () => {
   
   const [filters, setFilters] = useState({
      categories: searchParams.getAll('category'),
-     priceRangeStr: null, 
+     priceRangeStr: 'all', 
      inStock: searchParams.get('instock') === 'true',
      isFeatured: searchParams.get('featured') === 'true',
   });
@@ -87,8 +87,9 @@ const SearchPage = () => {
     // 2. Clear local filter state
     setFilters({
       categories: [],
-      priceRangeStr: null,
+      priceRangeStr: 'all',
       inStock: false,
+      isFeatured: false,
     });
     // 3. Clear search input (if any)
     const searchInput = document.querySelector('input[type="search"]');

@@ -81,6 +81,8 @@ const SearchResults = ({ products, isLoading, query, onReset }) => {
                 quantity="1"
                 unit="strip"
                 imageUrl={product.image}
+                stock={product.stock}
+                inStock={product.inStock}
                 className="h-full hover:-translate-y-1 transition-transform"
               />
             );

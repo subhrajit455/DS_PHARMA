@@ -60,7 +60,7 @@ const ProductDetails = () => {
   const product = fetchedProduct ? {
     ...fetchedProduct,
     images: fetchedProduct.images && fetchedProduct.images.length > 0 ? fetchedProduct.images : (fetchedProduct.image ? [fetchedProduct.image, fetchedProduct.image, fetchedProduct.image] : []),
-    stock: fetchedProduct.inStock ? (fetchedProduct.stock || 50) : 0,
+    stock: Number(fetchedProduct.stock ?? 50),
     originalPrice: fetchedProduct.mrp || fetchedProduct.originalPrice,
     discount: fetchedProduct.discount || (fetchedProduct.mrp > fetchedProduct.price ? Math.round(((fetchedProduct.mrp - fetchedProduct.price) / fetchedProduct.mrp) * 100) : 0),
     specialOffer: fetchedProduct.specialOffer || {
@@ -199,6 +199,7 @@ const ProductDetails = () => {
                     onAddToCart={handleAddToCart}
                     onViewCart={() => navigate('/cart')}
                     isAdding={isAddingToCart}
+                    isOutOfStock={product.stock === 0}
                   />
                 </div>
               </div>

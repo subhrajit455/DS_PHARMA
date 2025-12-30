@@ -128,6 +128,7 @@ export const SearchFilters = ({ filters = {}, selectedFilters = {}, onFilterChan
         ? Object.values(filters.categories) 
         : ['Antibiotics', 'Fever & Pain', 'Supplements', 'First Aid']);
   const priceRanges = [
+    { label: 'All Prices', value: 'all' },
     { label: 'Under ₹100', value: '0-100' },
     { label: '₹100 - ₹500', value: '100-500' },
     { label: 'Over ₹500', value: '500-10000' }
@@ -143,9 +144,12 @@ export const SearchFilters = ({ filters = {}, selectedFilters = {}, onFilterChan
   };
   
   const handlePriceChange = (range) => {
-    if (selectedFilters.priceRangeStr === range.value) {
+    if (range.value === 'all') {
        const { priceRangeStr: _p, priceRange: _r, customPrice: _c, ...rest } = selectedFilters;
-       onFilterChange(rest);
+       onFilterChange({ ...rest, priceRangeStr: 'all' });
+    } else if (selectedFilters.priceRangeStr === range.value) {
+       const { priceRangeStr: _p, priceRange: _r, customPrice: _c, ...rest } = selectedFilters;
+       onFilterChange({ ...rest, priceRangeStr: 'all' });
     } else {
        const [min, max] = range.value.split('-').map(Number);
        onFilterChange({ 

@@ -43,7 +43,8 @@ const PharmacyProductCard = ({
     : discount || 0;
     
   // Determine if product is available
-  const isAvailable = inStock && (stock === undefined || stock > 0);
+  // Robust check: Only treat as unavailable if explicitly inStock === false OR stock is explicitly 0
+  const isAvailable = inStock !== false && (stock === undefined || Number(stock) > 0);
 
   const handleAddToCart = (e) => {
     e.stopPropagation();
@@ -184,7 +185,7 @@ const PharmacyProductCard = ({
         aria-label={`${name} - ${quantity} ${unit} - ₹${price}`}
       >
         {/* Product Image */}
-        <div className="relative overflow-hidden aspect-4/3 bg-linear-to-br from-sky-100 to-sky-200">
+        <div className="relative rounded-sm overflow-hidden aspect-4/3 bg-linear-to-br from-sky-100 to-sky-200">
           <img
             src={displayImage}
             alt={name}

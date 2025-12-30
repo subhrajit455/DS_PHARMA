@@ -58,7 +58,7 @@ const HighlightedCategorySection = () => {
 
   // View All ignores visibility restriction (shows all featured)
   const handleViewAll = () => {
-    navigate('/products?featured=true');
+    navigate('/search?featured=true');
   };
 
   return (

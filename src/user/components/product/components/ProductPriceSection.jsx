@@ -41,16 +41,25 @@ const ProductPriceSection = ({ price, originalPrice, discount, stock, specialOff
             {discount}% Off
           </span>
         </div>
-        <p
-          style={{
-            fontFamily: 'Gyrotrope',
-            fontSize: '12px',
-            color: '#EF4444',
-            fontWeight: 500
-          }}
-        >
-          Hurry, only {stock} in stock
-        </p>
+        <div className="flex items-center gap-2 mt-2">
+          <div 
+            className={`w-2 h-2 rounded-full ${
+              stock === 0 ? 'bg-red-500 shadow-[0_0_8px_rgba(239,68,68,0.5)]' : 
+              stock <= 5 ? 'bg-amber-500 shadow-[0_0_8px_rgba(245,158,11,0.5)]' : 
+              'bg-emerald-500 shadow-[0_0_8px_rgba(16,185,129,0.5)]'
+            }`}
+          />
+          <span
+            style={{
+              fontFamily: 'Gyrotrope',
+              fontSize: '13px',
+              fontWeight: 600,
+              color: stock === 0 ? '#EF4444' : stock <= 5 ? '#F59E0B' : '#10B981',
+            }}
+          >
+            {stock === 0 ? 'Out of Stock' : stock <= 5 ? `Hurry, only ${stock} left in stock!` : 'In Stock'}
+          </span>
+        </div>
       </div>
       <div style={{ marginBottom: '1rem' }}>
         {/* Special Offer */}

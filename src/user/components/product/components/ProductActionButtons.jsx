@@ -1,25 +1,30 @@
 import React from 'react';
 
-const ProductActionButtons = ({ onAddToCart, onViewCart }) => {
+const ProductActionButtons = ({ onAddToCart, onViewCart, isAdding, isOutOfStock }) => {
   return (
     <div className="flex gap-3 mt-6">
       <button
         onClick={onAddToCart}
-        className="py-3 font-semibold transition-all duration-200 rounded-lg cursor-pointer hover:shadow-lg"
+        disabled={isAdding || isOutOfStock}
+        className={`py-3 font-semibold transition-all duration-200 rounded-lg ${
+          isAdding || isOutOfStock 
+            ? 'cursor-not-allowed opacity-60 grayscale' 
+            : 'cursor-pointer hover:shadow-lg active:scale-95'
+        }`}
         style={{
           fontFamily: 'Gyrotrope',
           fontSize: '16px',
-          backgroundColor: '#F97316',
+          backgroundColor: isOutOfStock ? '#9CA3AF' : '#F97316',
           color: '#FFFFFF',
           border: 'none',
           width: '60%'
         }}
       >
-        Add to Cart
+        {isAdding ? 'Adding...' : isOutOfStock ? 'Currently Unavailable' : 'Add to Cart'}
       </button>
       <button
         onClick={onViewCart}
-        className="py-3 font-semibold transition-all duration-200 border-2 rounded-lg cursor-pointer hover:bg-gray-50"
+        className="py-3 font-semibold transition-all duration-200 border-2 rounded-lg cursor-pointer hover:bg-gray-50 active:scale-95"
         style={{
           fontFamily: 'Gyrotrope',
           fontSize: '16px',
