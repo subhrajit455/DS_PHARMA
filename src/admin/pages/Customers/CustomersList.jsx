@@ -17,6 +17,9 @@ import {
 } from '@/admin/components/ui/Table';
 import { customerService } from '@/services/admin/api/customerService';
 import { Pagination } from '@/admin/components/ui/Pagination';
+import Loading from '@/shared/components/common/Loading';
+
+// ... existing imports
 
 const CustomersList = () => {
   const navigate = useNavigate();
@@ -120,8 +123,16 @@ const CustomersList = () => {
     );
   }
 
+  if (isLoading && customers.length === 0) {
+    return (
+      <div className="flex h-[50vh] items-center justify-center">
+        <Loading size="large" text="Loading customers..." />
+      </div>
+    );
+  }
+
   return (
-    <div className="h-full flex flex-col space-y-4 p-2 sm:p-4" style={{ background: 'linear-gradient(135deg, #f0fdf4 0%, #ecfdf5 50%, #f0fdfa 100%)', padding:'10px 10px 0px 10px'}}>
+    <div className="h-full flex flex-col space-y-4 p-2 sm:p-4 animate-in fade-in slide-in-from-bottom-6 duration-700" style={{ background: 'linear-gradient(135deg, #f0fdf4 0%, #ecfdf5 50%, #f0fdfa 100%)', padding:'10px 1rem 0px 1rem'}}>
       <div className="flex flex-col sm:flex-row justify-between items-start sm:items-center gap-3 sm:gap-4 shrink-0">
         <div>
           <h2 className="text-xl sm:text-2xl md:text-4xl font-bold bg-gradient-to-r from-gray-900 via-emerald-800 to-teal-800 bg-clip-text text-transparent flex items-center gap-2">

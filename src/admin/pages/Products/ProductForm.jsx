@@ -11,8 +11,10 @@ import { Switch } from '@/admin/components/ui/Switch';
 import { Card, CardContent, CardHeader, CardTitle, CardDescription } from '@/admin/components/ui/Card';
 import ConfirmationModal from '@/admin/components/ui/ConfirmationModal';
 import ImageUpload from '@/shared/components/common/ImageUpload';
-
+import Loading from '@/shared/components/common/Loading';
 import useDataStore from '@/store/useDataStore';
+
+// ... existing imports
 
 const ProductForm = () => {
   const navigate = useNavigate();
@@ -44,6 +46,7 @@ const ProductForm = () => {
   useEffect(() => {
     if (isEditMode) {
       const fetchProduct = async () => {
+        setIsLoading(true);
         try {
           const product = await productService.getProduct(id);
           setFormData({
@@ -64,6 +67,8 @@ const ProductForm = () => {
           console.error(error);
           toast.error('Failed to fetch product details');
           navigate('/admin/products');
+        } finally {
+          setIsLoading(false);
         }
       };
       fetchProduct();
@@ -116,8 +121,16 @@ const ProductForm = () => {
     }
   };
 
+  if (isLoading && isEditMode && !formData.name) {
+     return (
+        <div className="flex h-[50vh] items-center justify-center">
+          <Loading size="large" text="Loading product details..." />
+        </div>
+     );
+  }
+
   return (
-    <div className="max-w-7xl mx-auto space-y-4 sm:space-y-6 min-h-screen" style={{ padding: '5px', background: 'linear-gradient(135deg, #f0fdf4 0%, #ecfdf5 50%, #f0fdfa 100%)' }}>
+    <div className="min-w-6xl mx-auto space-y-4 sm:space-y-6 min-h-screen animate-in fade-in slide-in-from-bottom-6 duration-700" style={{ padding: '5px 1rem', background: 'linear-gradient(135deg, #f0fdf4 0%, #ecfdf5 50%, #f0fdfa 100%)' }}>
       <Button variant="ghost" className="pl-0 text-gray-500 hover:text-gray-900 text-[8px] sm:text-sm" onClick={() => navigate('/admin/products')} style={{ paddingBottom: '15px sm:20px' }}>  
          <ArrowLeft className="mr-1 sm:mr-2 h-3 w-3 sm:h-4 sm:w-4" />
          <span style={{ marginTop: '4px' }}>Back to Products</span>

@@ -377,7 +377,7 @@ const OrderDetails = () => {
                         style={{ padding: '0 12px' }}
                       >
                         <Share2 size={14} className="sm:w-4 sm:h-4" />
-                        Share Order Details
+                        <span style={{ paddingTop: '3px' }}>Share Order Details</span>
                       </Button>
                       <Button
                         variant="primary"
@@ -387,7 +387,7 @@ const OrderDetails = () => {
                         style={{ padding: '0 12px' }}
                       >
                         <Printer size={14} className="sm:w-4 sm:h-4" />
-                        Download Receipt
+                        <span style={{ paddingTop: '3px' }}>Download Receipt</span>
                       </Button>
                     </div>
                   </div>

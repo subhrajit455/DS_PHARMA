@@ -52,17 +52,29 @@ const SearchInput = ({ className = '', placeholder = "Search for medicines, heal
 
   const handleSearch = (e) => {
     e.preventDefault();
-    if (query.trim()) {
-      setIsOpen(false);
-      inputRef.current?.blur();
+    const searchQuery = query.trim();
+    if (searchQuery) {
+      setQuery(''); // Clear input
+      setSuggestions([]); // Clear suggestions
+      setIsOpen(false); // Close dropdown
+      inputRef.current?.blur(); // Remove focus
       if (onSearchSubmit) onSearchSubmit();
-      navigate(`/search?query=${encodeURIComponent(query.trim())}`);
+      navigate(`/search?query=${encodeURIComponent(searchQuery)}`);
     }
   };
 
   const clearSearch = () => {
     setQuery('');
     setSuggestions([]);
+  };
+
+  const handleSuggestionClick = (product) => {
+    setQuery(''); // Clear input
+    setSuggestions([]); // Clear suggestions
+    setIsOpen(false); // Close dropdown
+    inputRef.current?.blur(); // Remove focus
+    if (onSearchSubmit) onSearchSubmit();
+    navigate(`/product/${product.id}`); // Navigate directly to product details
   };
 
   return (
@@ -77,7 +89,7 @@ const SearchInput = ({ className = '', placeholder = "Search for medicines, heal
         >
           <div className="pl-6 text-gray-400 group-focus-within:text-emerald-500 transition-colors flex items-center justify-center" style={{ padding: '10px 5px' }}>
              <Search className="w-5 h-5" />
-          </div>
+          </div> 
           
           <input
             ref={inputRef}
@@ -128,12 +140,12 @@ const SearchInput = ({ className = '', placeholder = "Search for medicines, heal
             exit={{ opacity: 0, y: 10, scale: 0.98 }}
             transition={{ duration: 0.2 }}
             className="absolute top-full left-0 right-0 mt-3 bg-white/95 backdrop-blur-md rounded-2xl shadow-xl border border-gray-100 overflow-hidden z-60"
-            style={{ padding: '10px 5px', marginTop: '5px' }}
+            style={{ padding: '10px 5px 5px 5px', marginTop: '5px' }}
           >
             <div className="py-2">
-              <div className="px-5 py-2 text-[15px] font-bold text-gray-400 uppercase tracking-wider flex items-center justify-between" style={{ paddingBottom: '5px' }}>
+              <div className="px-5 py-2 text-[12px] font-bold text-gray-400 uppercase tracking-wider flex items-center justify-between" style={{ paddingBottom: '5px' }}>
                  <span>Suggestions</span>
-                 <span className="text-[12px] text-emerald-600 bg-emerald-50 px-2 py-0.5 rounded-full">New</span>
+                 <span className="text-[10px] text-emerald-600 bg-emerald-50 px-2 py-0.5 rounded-full">New</span>
               </div>
               
               <div className="max-h-[300px] overflow-y-auto custom-scrollbar">
@@ -142,15 +154,12 @@ const SearchInput = ({ className = '', placeholder = "Search for medicines, heal
                     key={item.id}
                     initial={{ opacity: 0, x: -20 }}
                     animate={{ opacity: 1, x: 0 }}
-                    transition={{ delay: index * 0.03 }}
+                    transition={{ delay: index * 0.03 }} 
+                    style={{ paddingBottom:'5px'}}
                   >
                     <button
-                      onClick={() => {
-                        setQuery(item.name);
-                        setIsOpen(false);
-                        navigate(`/search?query=${encodeURIComponent(item.name)}`);
-                      }}
-                      className="w-full text-left px-5 py-3 hover:bg-emerald-50/50 flex items-center gap-4 transition-all group border-l-4 border-transparent hover:border-emerald-500"
+                      onClick={() => handleSuggestionClick(item)}
+                      className="w-full text-left px-5 py-3 hover:bg-emerald-50/50 flex items-center gap-2 transition-all group border-l-4 border-transparent hover:border-emerald-500"
                     >
                       <div className="flex-shrink-0 w-10 h-10 rounded-full bg-gray-50 flex items-center justify-center group-hover:bg-white group-hover:shadow-sm transition-all border border-gray-100">
                          {item.type === 'generic' ? (
@@ -164,12 +173,12 @@ const SearchInput = ({ className = '', placeholder = "Search for medicines, heal
                          <h4 className="text-sm font-semibold text-gray-800 group-hover:text-emerald-700 truncate">
                            {item.name}
                          </h4>
-                         <p className="text-[8px] sm:text-xs text-gray-500 truncate flex items-center gap-1.5">
+                         <p className="text-[8px] sm:text-[10px] text-gray-500 truncate flex items-center gap-1">
                             {item.manufacturer && <span>{item.manufacturer}</span>}
                             {item.type && (
                               <>
                                 <span className="w-1 h-1 rounded-full bg-gray-300"></span>
-                                <span className="capitalize">{item.type}</span>
+                                <span className="capitalize" style={{marginTop:'3px'}}>{item.type}</span>
                               </>
                             )}
                          </p>
@@ -183,15 +192,17 @@ const SearchInput = ({ className = '', placeholder = "Search for medicines, heal
                 ))}
               </div>
               
+            </div>
+            <div className='w-full flex justify-end'>
               <div className="px-5 py-3 bg-gray-50 border-t border-gray-100 text-center">
                  <button 
                    onClick={handleSearch}
                    className="text-[8px] sm:text-xs font-semibold text-emerald-600 hover:text-emerald-700 flex items-center justify-center gap-1 transition-colors"
                  >
-                    View all results for "{query}" <ArrowRight className="w-3 h-3" />
+                    <span style={{ marginTop:'3px'}}>View all results for "{query}" </span> <ArrowRight className="w-3 h-3"/>
                  </button>
               </div>
-            </div>
+              </div>
           </motion.div>
         )}
       </AnimatePresence>

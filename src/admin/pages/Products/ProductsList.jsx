@@ -16,6 +16,9 @@ import {
 } from '@/admin/components/ui/Table';
 import { productService } from '@/services/admin/api/productService';
 import { Pagination } from '@/admin/components/ui/Pagination';
+import Loading from '@/shared/components/common/Loading';
+
+// ... existing imports
 
 const ProductsList = () => {
   const navigate = useNavigate();
@@ -131,9 +134,17 @@ const ProductsList = () => {
       setStockFilter('all');
   }
 
+  if (isLoading && products.length === 0) {
+    return (
+      <div className="flex h-[70vh] items-center justify-center">
+        <Loading size="large" text="Loading products..." />
+      </div>
+    );
+  }
+
   return (
-        <div className="flex flex-col h-full space-y-4 sm:space-y-6 max-w-full overflow-x-hidden" style={{ padding: '10px 10px 0px 10px', background: 'linear-gradient(135deg, #f0fdf4 0%, #ecfdf5 50%, #f0fdfa 100%)' }}>
-            <div className="flex flex-row justify-between items-start sm:items-center gap-3 sm:gap-4" style={{ paddingBottom: '10px 10px 0px 10px' }}>
+        <div className="flex flex-col h-full space-y-4 sm:space-y-6 max-w-full overflow-x-hidden animate-in fade-in slide-in-from-bottom-6 duration-700" style={{ padding: '0px 1rem', background: 'linear-gradient(135deg, #f0fdf4 0%, #ecfdf5 50%, #f0fdfa 100%)' }}>
+            <div className="flex flex-row justify-between items-start sm:items-center gap-3 sm:gap-4" style={{ padding: '10px 0px' }}>
                 <div>
                     <h2 className="text-xl sm:text-2xl md:text-4xl font-bold bg-gradient-to-r from-gray-900 via-emerald-800 to-teal-800 bg-clip-text text-transparent flex items-center gap-2">
                       Products

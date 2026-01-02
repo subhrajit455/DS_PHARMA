@@ -1,4 +1,5 @@
-import React, { useState } from 'react';
+import React, { useState, useEffect } from 'react';
+import Loading from '@/shared/components/common/Loading';
 import { Plus, Edit, Trash2, Search, Sparkles } from 'lucide-react';
 import { toast } from 'react-hot-toast';
 import { Button } from '@/admin/components/ui/Button';
@@ -96,8 +97,24 @@ const CategoriesList = () => {
         setIsEditing(false);
     };
 
+    const [isLoading, setIsLoading] = useState(true);
+
+    useEffect(() => {
+        // Simulate loading for visual consistency
+        const timer = setTimeout(() => setIsLoading(false), 500);
+        return () => clearTimeout(timer);
+    }, []);
+
+    if (isLoading) {
+        return (
+            <div className="flex h-[50vh] items-center justify-center">
+                <Loading size="large" text="Loading categories..." />
+            </div>
+        );
+    }
+
     return (
-        <div className="flex-1 h-full flex flex-col space-y-4 p-2 sm:p-4 lg:p-6 animate-in fade-in slide-in-from-bottom-6 duration-700" style={{ background: 'linear-gradient(135deg, #f0fdf4 0%, #ecfdf5 50%, #f0fdfa 100%)' }}>
+        <div className="flex-1 h-full flex flex-col space-y-4 p-2 sm:p-4 lg:p-6 animate-in fade-in slide-in-from-bottom-6 duration-700" style={{ background: 'linear-gradient(135deg, #f0fdf4 0%, #ecfdf5 50%, #f0fdfa 100%)', padding: '0px 1rem' }}>
              <div className="flex sm:flex-row justify-between items-start sm:items-center gap-2 sm:gap-4 shrink-0" style={{ padding: '5px' }}>
                 <div>
                    <h2 className="text-2xl sm:text-3xl lg:text-4xl font-bold bg-linear-to-r from-gray-900 via-emerald-800 to-teal-800 bg-clip-text text-transparent flex items-center gap-2 sm:gap-3">

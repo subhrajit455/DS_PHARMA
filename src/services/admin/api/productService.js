@@ -1,4 +1,5 @@
 import mockApi from "../../api/mockApi";
+import useDataStore from "@/store/useDataStore";
 
 export const productService = {
   getProducts: async ({ search, category, page = 1, limit = 10000 } = {}) => {
@@ -31,6 +32,12 @@ export const productService = {
       limit,
       totalPages: Math.ceil(products.length / limit),
     };
+  },
+
+  getCategories: async () => {
+    // Mimic the behavior from the user-facing service
+    const categories = useDataStore.getState().categories;
+    return { data: categories };
   },
 
   getProduct: async (id) => {

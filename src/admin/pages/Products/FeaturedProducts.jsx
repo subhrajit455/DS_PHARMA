@@ -13,7 +13,10 @@ import {
   TableRow,
 } from '@/admin/components/ui/Table';
 import { Pagination } from '@/admin/components/ui/Pagination';
-import { productService } from '@/services/admin/api/productService'; // Assuming we can reuse this service or mock it
+import { productService } from '@/services/admin/api/productService'; 
+import Loading from '@/shared/components/common/Loading';
+
+// ... existing imports
 
 const FeaturedProducts = () => {
     const [itemsPerPage, setItemsPerPage] = useState(10);
@@ -36,7 +39,7 @@ const FeaturedProducts = () => {
                 // Fetch ALL products first
                 const response = await productService.getProducts({ search: searchQuery }); 
                 // Filter only highlighted for the main view
-                const all = response.data;
+                const all = response.data || []; // Defensive check
                 const highlighted = all.filter(p => p.isHighlighted);
                 setProducts(highlighted);
                 
@@ -88,11 +91,18 @@ const FeaturedProducts = () => {
     );
 
     // Pagination Logic
-    const totalPages = Math.ceil(products.length / itemsPerPage);
     const paginatedProducts = products.slice((currentPage - 1) * itemsPerPage, currentPage * itemsPerPage);
 
+    if (isLoading && products.length === 0) {
+        return (
+          <div className="flex h-[50vh] items-center justify-center">
+            <Loading size="large" text="Loading highlighted products..." />
+          </div>
+        );
+    }
+
     return (
-        <div className="h-full flex flex-col space-y-4 p-2 sm:p-4" style={{ background: 'linear-gradient(135deg, #f0fdf4 0%, #ecfdf5 50%, #f0fdfa 100%)', padding: '10px 10px 0px 10px'}}>
+        <div className="h-full flex flex-col space-y-4 p-2 sm:p-4 animate-in fade-in slide-in-from-bottom-6 duration-700" style={{ background: 'linear-gradient(135deg, #f0fdf4 0%, #ecfdf5 50%, #f0fdfa 100%)', padding: '10px 1rem 0px 1rem'}}>
              <div className="flex flex-col sm:flex-row justify-between items-start sm:items-center gap-3 sm:gap-4 shrink-0">
                 <div>
                    <h2 className="text-xl sm:text-2xl md:text-4xl font-bold bg-linear-to-r from-gray-900 via-emerald-800 to-teal-800 bg-clip-text text-transparent flex items-center gap-2">

@@ -15,6 +15,9 @@ import {
   TableRow,
 } from '@/admin/components/ui/Table';
 import { customerService } from '@/services/admin/api/customerService';
+import Loading from '@/shared/components/common/Loading';
+
+// ... existing imports
 
 const CustomerDetails = () => {
   const { id } = useParams();
@@ -38,11 +41,17 @@ const CustomerDetails = () => {
     fetchCustomer();
   }, [id, navigate]);
 
-  if (isLoading) return <div className="p-12 text-center text-gray-500">Loading details...</div>;
+  if (isLoading) {
+    return (
+       <div className="flex h-[50vh] items-center justify-center">
+         <Loading size="large" text="Loading customer details..." />
+       </div>
+    );
+  }
   if (!customer) return null;
 
   return (
-    <div className="space-y-6 min-h-screen" style={{ padding: '10px', background: 'linear-gradient(135deg, #f0fdf4 0%, #ecfdf5 50%, #f0fdfa 100%)' }}>
+    <div className="space-y-6 min-h-screen animate-in fade-in slide-in-from-bottom-6 duration-700" style={{ padding: '10px 1rem', background: 'linear-gradient(135deg, #f0fdf4 0%, #ecfdf5 50%, #f0fdfa 100%)' }}>
        <Button variant="ghost" className="pl-0 text-gray-500 hover:text-gray-900 mb-2 sm:mb-3 md:mb-4 text-[10px] sm:text-[8px] sm:text-xs md:text-sm" onClick={() => navigate('/admin/customers')}>
          <ArrowLeft className="mr-1 sm:mr-2 h-3 w-3 sm:h-4 sm:w-4" />
          <span style={{marginTop: '3px'}}>Back to Customers</span>
@@ -60,9 +69,9 @@ const CustomerDetails = () => {
             <div className="flex-1 text-center md:text-left space-y-2">
                 <h1 className="text-lg sm:text-xl md:text-2xl font-bold text-gray-900">{customer.name}</h1>
                 <div className="flex flex-wrap justify-center md:justify-start gap-2 sm:gap-4 text-[8px] sm:text-sm text-gray-500">
-                    <span className="flex items-center gap-1 sm:gap-1.5"><Mail className="h-3 w-3 sm:h-4 sm:w-4" /> {customer.email}</span>
-                    <span className="flex items-center gap-1 sm:gap-1.5"><Phone className="h-3 w-3 sm:h-4 sm:w-4" /> {customer.phone}</span>
-                    <span className="flex items-center gap-1 sm:gap-1.5"><Calendar className="h-3 w-3 sm:h-4 sm:w-4" /> Joined {customer.joined}</span>
+                    <span className="flex items-center gap-1"><Mail className="h-3 w-3 sm:h-4 sm:w-4 " /> <span style={{marginTop: '3px'}}>{customer.email}</span></span>
+                    <span className="flex items-center gap-1"><Phone className="h-3 w-3 sm:h-4 sm:w-4 " /> <span style={{marginTop: '3px'}}>{customer.phone}</span></span>
+                    <span className="flex items-center gap-1"><Calendar className="h-3 w-3 sm:h-4 sm:w-4 " /> <span style={{marginTop: '5  px'}}>Joined {customer.joined}</span></span>
                 </div>
                 <div className="pt-2">
                     <Badge variant={customer.status === 'Active' ? 'success' : 'secondary'} className="text-[8px] sm:text-xs">
@@ -104,7 +113,7 @@ const CustomerDetails = () => {
                         </TableRow>
                     </TableHeader>
                     <TableBody>
-                        {customer.recentOrders.map((order, index) => (
+                        {customer.recentOrders.map((order) => (
                             <TableRow 
                                 key={order.id} 
                                 className="hover:bg-emerald-50/50 transition-all duration-200 border-b border-gray-100"

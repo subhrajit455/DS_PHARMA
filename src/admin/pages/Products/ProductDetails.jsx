@@ -53,7 +53,7 @@ const ProductDetails = () => {
   if (!product) return null;
 
   return (
-    <div className="space-y-6 min-h-screen" style={{ padding: '10px', background: 'linear-gradient(135deg, #f0fdf4 0%, #ecfdf5 50%, #f0fdfa 100%)' }}>
+    <div className="space-y-6 min-h-screen" style={{ padding: '10px 1rem', background: 'linear-gradient(135deg, #f0fdf4 0%, #ecfdf5 50%, #f0fdfa 100%)' }}>
        <Button variant="ghost" className="pl-0 text-gray-500 hover:text-gray-900" onClick={() => navigate('/admin/products')}>
           <ArrowLeft className="mr-2 h-4 w-4" />
          <span style={{ marginTop: '3px' }}>Back to Products</span>

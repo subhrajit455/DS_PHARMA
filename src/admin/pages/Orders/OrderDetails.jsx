@@ -16,6 +16,9 @@ import {
 } from '@/admin/components/ui/Table';
 import { orderService } from '@/services/admin/api/orderService';
 import ConfirmationModal from '@/admin/components/ui/ConfirmationModal';
+import Loading from '@/shared/components/common/Loading';
+
+// ... existing imports
 
 const OrderDetails = () => {
   const { id } = useParams();
@@ -70,11 +73,17 @@ const OrderDetails = () => {
     }
   };
 
-  if (isLoading) return <div className="p-12 text-center text-gray-500">Loading details...</div>;
+  if (isLoading) {
+    return (
+       <div className="flex h-[50vh] items-center justify-center">
+         <Loading size="large" text="Loading order details..." />
+       </div>
+    );
+  }
   if (!order) return null;
 
   return (
-    <div className="space-y-6 min-h-screen" style={{ padding: '10px', background: 'linear-gradient(135deg, #f0fdf4 0%, #ecfdf5 50%, #f0fdfa 100%)' }}>
+    <div className="space-y-6 min-h-screen animate-in fade-in slide-in-from-bottom-6 duration-700" style={{ padding: '10px 1rem', background: 'linear-gradient(135deg, #f0fdf4 0%, #ecfdf5 50%, #f0fdfa 100%)' }}>
       <Button variant="ghost" className="pl-0 text-gray-500 hover:text-gray-900" onClick={() => navigate('/admin/orders')} style={{ marginBottom: '10px' }}>
          <ArrowLeft className="mr-2 h-4 w-4" />
          <span style={{ marginTop: '5px', paddingLeft: '5px' }}>Back to Orders</span>

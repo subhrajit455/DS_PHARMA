@@ -100,7 +100,7 @@ const SearchPage = () => {
     <div className="search-page-wrapper min-h-screen bg-gray-50/50">
       <style>{`
         .search-page-wrapper {
-          padding-top: 60px;
+          padding-top: 30px;
           padding-bottom: 80px;
         }
         @media (min-width: 768px) {

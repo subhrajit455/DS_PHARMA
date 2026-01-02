@@ -16,6 +16,9 @@ import {
 } from '@/admin/components/ui/Table';
 import { orderService } from '@/services/admin/api/orderService';
 import { Pagination } from '@/admin/components/ui/Pagination';
+import Loading from '@/shared/components/common/Loading';
+
+// ... existing imports
 
 const OrdersList = () => {
   const navigate = useNavigate();
@@ -58,8 +61,17 @@ const OrdersList = () => {
     return 'secondary'; // Gray (PLACED, etc)
   };
 
+  if (isLoading && orders.length === 0) {
+    return (
+      <div className="flex h-[50vh] items-center justify-center">
+        <Loading size="large" text="Loading orders..." />
+      </div>
+    );
+  }
+
   return (
-    <div className="h-full flex flex-col space-y-4 p-2 sm:p-4 animate-in fade-in slide-in-from-bottom-6 duration-700" style={{ background: 'linear-gradient(135deg, #f0fdf4 0%, #ecfdf5 50%, #f0fdfa 100%)', padding: '10px 10px 0px 10px' }}>
+    <div className="h-full flex flex-col space-y-4 p-2 sm:p-4 animate-in fade-in slide-in-from-bottom-6 duration-700" style={{ background: 'linear-gradient(135deg, #f0fdf4 0%, #ecfdf5 50%, #f0fdfa 100%)',padding: '0px 1rem' }}>
+    <div style={{ padding: '10px 10px'}}>
       <div className="flex flex-col sm:flex-row justify-between items-start sm:items-center gap-3 sm:gap-4 shrink-0">
         <div>
           <div>
@@ -72,7 +84,7 @@ const OrdersList = () => {
         </div>
       </div>
 
-      <Card className="flex-1 flex flex-col min-h-0 shadow-sm border-gray-200/60 bg-white/50 backdrop-blur-xl">
+      <Card className="flex-1 flex flex-col min-h-[calc(100vh-190px)] shadow-sm border-gray-200/60 bg-white/50 backdrop-blur-xl">
         <CardContent className="flex-1 flex flex-col p-2 sm:p-3 md:p-4 min-h-0">
             <div className="flex flex-col lg:flex-row gap-2 sm:gap-3 md:gap-4 justify-between items-center mb-2 sm:mb-3 md:mb-4 shrink-0" style={{ paddingBottom: '5px' }}>
                 {/* Status Tabs */}
@@ -82,7 +94,7 @@ const OrdersList = () => {
                         style={{padding:'2px 5px'}}
                         key={status}
                         onClick={() => setActiveStatus(status)}
-                        className={`px-2 sm:px-3 py-1.5 text-[8px] sm:text-sm font-medium rounded-md transition-all whitespace-nowrap ${
+                        className={`px-2 sm:px-3 py-1.5 text-[7px] sm:text-xs font-medium rounded-md transition-all whitespace-nowrap ${
                             activeStatus === status 
                             ? 'bg-white text-gray-900 shadow-sm' 
                             : 'text-gray-500 hover:text-gray-900'
@@ -109,14 +121,14 @@ const OrdersList = () => {
                  <Table>
                     <TableHeader>
                         <TableRow style={{ background: 'linear-gradient(to right, #f0fdf4, #f0fdfa)' }}>
-                            <TableHead className="font-semibold text-gray-700 text-[8px] sm:text-sm" style={{ padding: '6px 8px' }}>Order ID</TableHead>
-                            <TableHead className="font-semibold text-gray-700 text-[8px] sm:text-sm hidden md:table-cell" style={{ padding: '6px 8px' }}>Date</TableHead>
-                            <TableHead className="font-semibold text-gray-700 text-[8px] sm:text-sm hidden sm:table-cell" style={{ padding: '6px 8px' }}>Customer</TableHead>
-                            <TableHead className="font-semibold text-gray-700 text-[8px] sm:text-sm hidden lg:table-cell" style={{ padding: '6px 8px' }}>Items</TableHead>
-                            <TableHead className="font-semibold text-gray-700 text-[8px] sm:text-sm" style={{ padding: '6px 8px' }}>Total</TableHead>
-                            <TableHead className="font-semibold text-gray-700 text-[8px] sm:text-sm hidden xl:table-cell" style={{ padding: '6px 8px' }}>Payment</TableHead>
-                            <TableHead className="font-semibold text-gray-700 text-[8px] sm:text-sm" style={{ padding: '6px 8px' }}>Status</TableHead>
-                            <TableHead className="text-right font-semibold text-gray-700 text-[8px] sm:text-sm" style={{ padding: '6px 8px' }}>Actions</TableHead>
+                            <TableHead className="font-semibold text-gray-700 text-[8px] sm:text-sm" style={{ padding: '6px' }}>Order ID</TableHead>
+                            <TableHead className="font-semibold text-gray-700 text-[8px] sm:text-sm hidden md:table-cell" style={{ padding: '6px' }}>Date</TableHead>
+                            <TableHead className="font-semibold text-gray-700 text-[8px] sm:text-sm hidden sm:table-cell" style={{ padding: '6px' }}>Customer</TableHead>
+                            <TableHead className="font-semibold text-gray-700 text-[8px] sm:text-sm hidden lg:table-cell" style={{ padding: '6px ' }}>Items</TableHead>
+                            <TableHead className="font-semibold text-gray-700 text-[8px] sm:text-sm" style={{ padding: '6px' }}>Total</TableHead>
+                            <TableHead className="font-semibold text-gray-700 text-[8px] sm:text-sm hidden xl:table-cell" style={{ padding: '6px' }}>Payment</TableHead>
+                            <TableHead className="font-semibold text-gray-700 text-[8px] sm:text-sm" style={{ padding: '6px' }}>Status</TableHead>
+                            <TableHead className="text-right font-semibold text-gray-700 text-[8px] sm:text-sm" style={{ padding: '6px' }}>Actions</TableHead>
                         </TableRow>
                     </TableHeader>
                     <TableBody>
@@ -139,12 +151,12 @@ const OrdersList = () => {
                                     </TableCell>
                                     <TableCell className="text-gray-500 text-[8px] sm:text-xs hidden lg:table-cell" style={{ padding: '6px 5px' }}>{order.items} items</TableCell>
                                     <TableCell className="font-bold text-[8px] sm:text-xs text-center" style={{ padding: '6px 5px' }}>₹{order.total || order.paymentBreakdown?.total}</TableCell>
-                                    <TableCell className="hidden xl:table-cell" style={{ padding: '6px 5px 6px 20px' }}>
+                                    <TableCell className="hidden xl:table-cell" style={{ padding: '6px 5px 6px 10px' }}>
                                         <Badge variant={order.payment === 'Paid' ? 'success' : 'secondary'} className=" font-normal text-[8px] sm:text-xs">
                                             {order.payment}
                                         </Badge>
                                     </TableCell>
-                                    <TableCell className="" style={{ padding: '6px 5px' }}>
+                                    <TableCell className="" style={{ padding: '6px 0px' }}>
                                         <Badge variant={getStatusVariant(order.status)} className="text-[8px] sm:text-xs">
                                             {order.status}
                                         </Badge>
@@ -165,8 +177,12 @@ const OrdersList = () => {
                     </TableBody>
                  </Table>
             </div>
-            {!isLoading && orders.length > 0 && (
-              <div className="shrink-0 mt-4 pt-4" style={{bottom:'0', marginTop:'10px'}}>
+            
+        </CardContent>
+       
+      </Card>
+       {!isLoading && orders.length > 0 && (
+              <div className="shrink-0 mt-4 pt-4 bottom-0" style={{ marginTop:'0px'}}>
                 <Pagination
                   currentPage={currentPage}
                   totalPages={Math.ceil(orders.length / itemsPerPage)}
@@ -179,8 +195,7 @@ const OrdersList = () => {
                 />
               </div>
             )}
-        </CardContent>
-      </Card>
+    </div>
     </div>
   );
 };
