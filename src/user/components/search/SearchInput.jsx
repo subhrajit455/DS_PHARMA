@@ -89,7 +89,7 @@ const SearchInput = ({ className = '', placeholder = "Search for medicines, heal
         >
           <div className="pl-6 text-gray-400 group-focus-within:text-emerald-500 transition-colors flex items-center justify-center" style={{ padding: '10px 5px' }}>
              <Search className="w-5 h-5" />
-          </div> 
+          </div>      
           
           <input
             ref={inputRef}

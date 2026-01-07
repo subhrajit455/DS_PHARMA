@@ -354,7 +354,7 @@ const CartDetails = () => {
                                  )}
                              </div>
                          </div>
-                     )}
+                     )}    
                  </div>
              </div>
         </div>
@@ -365,7 +365,7 @@ const CartDetails = () => {
         <div className="grid grid-cols-1 lg:grid-cols-3 gap-8">
           <div className="lg:col-span-2">
             <div style={{paddingBottom:'1.25rem'}}>
-              <BackButton fallbackRoute="/" label="Back to Shopping" className="mb-4" />
+              <BackButton on fallbackRoute="/" label="Back to Shopping" className="mb-4" />
             </div>  
             <div className="mb-5">
               <h1 style={{ fontFamily: 'Gyrotrope', fontSize: '20px', fontWeight: 700, color: '#000000', marginBottom: '0', letterSpacing: '-0.01em' }}>
