@@ -29,15 +29,17 @@ const ProductDetails = () => {
   
   const reviews = reviewsData?.data || [];
   
-  // Get product from data wrapper
-  const fetchedProduct = productData?.data;
+  // Get product (service already normalizes and returns the object)
+  const fetchedProduct = productData;
 
   // Fetch suggested items based on category of current product
-  // Only fetch if we have a category
+  // Category identification must be done ONLY using _id
+  const categoryId = fetchedProduct?.categoryId || fetchedProduct?.category?._id || fetchedProduct?.category;
+
   const { data: suggestedData } = useProducts({ 
-      category: fetchedProduct?.category, 
+      categoryId: categoryId, 
       limit: 5,
-      exclude: id 
+      page: 1 // Always first page for related products
   });
   
   const suggestedItems = suggestedData?.data || [];
@@ -56,12 +58,14 @@ const ProductDetails = () => {
     </div>
   );
 
-  // Use real data or fallback object structure if somehow missing (should be handled by error boundary usually)
+  // Use real data or fallback object structure 
   const product = fetchedProduct ? {
     ...fetchedProduct,
-    images: fetchedProduct.images && fetchedProduct.images.length > 0 ? fetchedProduct.images : (fetchedProduct.image ? [fetchedProduct.image, fetchedProduct.image, fetchedProduct.image] : []),
+    images: fetchedProduct.images && fetchedProduct.images.length > 0 
+      ? fetchedProduct.images 
+      : (fetchedProduct.image ? [fetchedProduct.image] : []),
     stock: Number(fetchedProduct.stock ?? 50),
-    originalPrice: fetchedProduct.mrp || fetchedProduct.originalPrice,
+    originalPrice: fetchedProduct.originalPrice || fetchedProduct.mrp || fetchedProduct.price,
     discount: fetchedProduct.discount || (fetchedProduct.mrp > fetchedProduct.price ? Math.round(((fetchedProduct.mrp - fetchedProduct.price) / fetchedProduct.mrp) * 100) : 0),
     specialOffer: fetchedProduct.specialOffer || {
         title: 'Bank Offer: 10% instant discount',

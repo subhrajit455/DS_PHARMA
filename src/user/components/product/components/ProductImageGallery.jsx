@@ -1,6 +1,7 @@
 import React from 'react';
 import { motion as Motion } from 'framer-motion';
 import { ChevronUp, ChevronDown, ChevronLeft, ChevronRight } from 'lucide-react';
+import SafeImage from '@/shared/components/SafeImage';
 
 const ProductImageGallery = ({ images, selectedImage, onImageSelect, onScroll }) => {
   return (
@@ -28,14 +29,10 @@ const ProductImageGallery = ({ images, selectedImage, onImageSelect, onScroll })
               whileHover={{ scale: 1.05 }}
               whileTap={{ scale: 0.95 }}
             >
-              <img
+              <SafeImage
                 src={image}
                 alt={`Product view ${index + 1}`}
                 className="object-cover w-full h-full"
-                onError={(e) => {
-                  e.target.onerror = null;
-                  e.target.src = '/src/assets/images/medicine.jpeg';
-                }}
               />
             </Motion.button>
           ))}
@@ -53,19 +50,12 @@ const ProductImageGallery = ({ images, selectedImage, onImageSelect, onScroll })
 
       {/* Main Image */}
       <div className="relative flex-1 overflow-hidden bg-white border border-gray-200 rounded-lg shadow-sm group">
-        <Motion.img
+        <SafeImage
           key={selectedImage}
-          src={images && images.length > 0 ? images[selectedImage] : '/src/assets/images/medicine.jpeg'}
+          src={images && images.length > 0 ? images[selectedImage] : null}
           alt="Product"
           className="object-cover w-full h-full"
-          initial={{ opacity: 0 }}
-          animate={{ opacity: 1 }}
-          transition={{ duration: 0.3 }}
           style={{ minHeight: '300px', maxHeight: '420px' }}
-          onError={(e) => {
-            e.target.onerror = null;
-            e.target.src = '/src/assets/images/medicine.jpeg';
-          }}
         />
 
         {/* Mobile Navigation Buttons */}

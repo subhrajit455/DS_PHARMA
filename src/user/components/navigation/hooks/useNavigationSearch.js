@@ -1,5 +1,5 @@
 import { useState, useEffect, useRef } from "react";
-import { MOCK_PRODUCTS } from "../constants";
+import searchService from "@/services/api/searchService";
 
 /**
  * Hook to manage navigation search functionality
@@ -15,13 +15,14 @@ export const useNavigationSearch = () => {
   // Debounced search effect
   useEffect(() => {
     if (searchQuery.trim()) {
-      const timer = setTimeout(() => {
-        const filtered = MOCK_PRODUCTS.filter(
-          (product) =>
-            product.name.toLowerCase().includes(searchQuery.toLowerCase()) ||
-            product.category.toLowerCase().includes(searchQuery.toLowerCase())
-        );
-        setSearchResults(filtered);
+      const timer = setTimeout(async () => {
+        try {
+          const response = await searchService.getSuggestions(searchQuery);
+          setSearchResults(response.data || []);
+        } catch (error) {
+          console.error("Search error:", error);
+          setSearchResults([]);
+        }
       }, 300);
 
       return () => clearTimeout(timer);

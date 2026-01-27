@@ -71,16 +71,25 @@ const SearchResults = ({ products, isLoading, query, onReset }) => {
         <div className="search-results-grid grid grid-cols-2 md:grid-cols-3 lg:grid-cols-4 gap-4 sm:gap-6">
           {safeProducts && safeProducts.length > 0 && safeProducts.map((product) => {
             if (!product || !product.id) return null;
+            
+            // Ensure product has proper image fallback
+            const displayImage = product.image || product.imageUrl || product.images?.[0] || 
+              (Array.isArray(product.image) && product.image[0]) || 
+              "https://images.unsplash.com/photo-1584308666744-24d5c474f2ae?auto=format&fit=crop&w=400&q=80";
+            
             return (
               <PharmacyProductCard
                 key={product.id}
                 id={product.id}
-                name={product.name || ''}
+                name={product.name || 'Product'}
                 price={product.price || 0}
-                originalPrice={product.mrp}
+                originalPrice={product.originalPrice || product.mrp}
+                mrp={product.mrp}
+                discount={product.discount}
                 quantity="1"
-                unit="strip"
-                imageUrl={product.image}
+                unit={product.unit || "strip"}
+                imageUrl={displayImage}
+                image={displayImage}
                 stock={product.stock}
                 inStock={product.inStock}
                 className="h-full hover:-translate-y-1 transition-transform"

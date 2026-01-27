@@ -1,11 +1,19 @@
-import React, { useState, useEffect } from 'react';
-import { useNavigate } from 'react-router-dom';
-import { Plus, Search, Edit, Trash2, Filter, Sparkles, Eye, EyeOff, Package } from 'lucide-react';
-import { toast } from 'react-hot-toast';
-import { Button } from '@/admin/components/ui/Button';
-import { Input } from '@/admin/components/ui/Input';
-import { Badge } from '@/admin/components/ui/Badge';
-import { Card, CardContent } from '@/admin/components/ui/Card';
+import React, { useState, useEffect } from "react";
+import { useNavigate } from "react-router-dom";
+import {
+  Plus,
+  Edit,
+  Trash2,
+  Eye,
+  EyeOff,
+  Sparkles,
+  Package,
+} from "lucide-react";
+import { toast } from "react-hot-toast";
+import { ChevronDown } from "lucide-react";
+
+import { Button } from "@/admin/components/ui/Button";
+import { Card, CardContent } from "@/admin/components/ui/Card";
 import {
   Table,
   TableBody,
@@ -13,353 +21,422 @@ import {
   TableHead,
   TableHeader,
   TableRow,
-} from '@/admin/components/ui/Table';
-import { productService } from '@/services/admin/api/productService';
-import { Pagination } from '@/admin/components/ui/Pagination';
-import Loading from '@/shared/components/common/Loading';
-
-// ... existing imports
+} from "@/admin/components/ui/Table";
+import { Pagination } from "@/admin/components/ui/Pagination";
+import { productUrl } from "@/config/adminApi";
+import ViewProductModal from "./ViewProduct";
+import axios from "axios";
+import ConfirmationModal from "@/admin/components/ui/ConfirmationModal";
+// import { error } from "node:console";
 
 const ProductsList = () => {
   const navigate = useNavigate();
+
   const [products, setProducts] = useState([]);
   const [isLoading, setIsLoading] = useState(true);
-  
-  // Filters State
-  const [searchQuery, setSearchQuery] = useState('');
-  const [selectedCategory, setSelectedCategory] = useState('All');
-  const [minPrice, setMinPrice] = useState('');
-  const [maxPrice, setMaxPrice] = useState('');
-  const [stockFilter, setStockFilter] = useState('all'); // all, in_stock, out_of_stock
-  const [showFilters, setShowFilters] = useState(false);
-  const [currentPage, setCurrentPage] = useState(1);
-  const [itemsPerPage, setItemsPerPage] = useState(10);
-  
-  // Dynamic Categories
-  const [categories, setCategories] = useState(["All"]);
+  const [confirmOpen, setConfirmOpen] = useState(false);
+  const [deleteId, setDeleteId] = useState(null);
+  const [deleteLoading, setDeleteLoading] = useState(false);
 
-  const fetchCategories = async () => {
-      try {
-          const { data } = await productService.getCategories();
-          // Map to names, handling if data is objects or strings
-          const categoryNames = data.map(c => c.name || c);
-          // Deduplicate just in case
-          const uniqueCategories = [...new Set(categoryNames)];
-          setCategories(["All", ...uniqueCategories]);
-      } catch (error) {
-          console.error("Failed to fetch categories", error);
-      }
-  }
+  const [pagination, setPagination] = useState({
+    totalItems: 0,
+    totalPages: 1,
+    currentPage: 1,
+    limit: 10,
+  });
+  const [search, setSearch] = useState("");
+  const [viewOpen, setViewOpen] = useState(false);
+  const [selectedProductId, setSelectedProductId] = useState(null);
 
-  useEffect(() => {
-    fetchCategories();
-  }, []);
-
-  const fetchProducts = async () => {
+  const fetchProducts = async (page = 1, limit = 10, searchTerm = "") => {
     setIsLoading(true);
     try {
-      const params = {
-        query: searchQuery,
-        category: selectedCategory !== 'All' ? selectedCategory : undefined,
-        minPrice: minPrice || undefined,
-        maxPrice: maxPrice || undefined,
-        inStock: stockFilter === 'all' ? undefined : (stockFilter === 'in_stock'),
-      };
-      
-      const response = await productService.getProducts(params);
-      setProducts(response.data);
+      const response = await axios.get(productUrl.getAllProducts, {
+        params: { page, limit, search: searchTerm },
+      });
+      // API: { message, pagination, data }
+      setProducts(response.data.data || []);
+      setPagination(
+        response.data.pagination || {
+          totalItems: 0,
+          totalPages: 1,
+          currentPage: 1,
+          limit,
+        },
+      );
     } catch (error) {
       console.error(error);
-      toast.error('Failed to fetch products');
+      toast.error("Failed to fetch products");
     } finally {
       setIsLoading(false);
     }
   };
 
+
   useEffect(() => {
-    const timer = setTimeout(() => {
-      fetchProducts();
-    }, 500); // 500ms debounce
-    return () => clearTimeout(timer);
-    // eslint-disable-next-line react-hooks/exhaustive-deps
-  }, [searchQuery, selectedCategory, minPrice, maxPrice, stockFilter]);
+    fetchProducts(pagination.currentPage, pagination.limit, search);
+  }, [pagination.currentPage, pagination.limit, search]);
 
-  const handleDelete = async (id) => {
-    if (window.confirm('Are you sure you want to delete this product?')) {
-      try {
-        await productService.deleteProduct(id);
-        toast.success('Product deleted successfully');
-        fetchProducts();
-      } catch (error) {
-        console.error(error);
-        toast.error('Failed to delete product');
-      }
-    }
+  const handlePageChange = (page) => {
+    setPagination((prev) => ({ ...prev, currentPage: page }));
   };
 
-  const handleToggleVisibility = async (product) => {
+const handleItemsPerPageChange = (limit) => {
+  setPagination((prev) => ({ ...prev, limit, currentPage: 1 }));
+};
+
+
+  const handleSearchChange = (e) => {
+    setSearch(e.target.value);
+    setPagination((prev) => ({ ...prev, currentPage: 1 }));
+  };
+
+  const handleDelete = async () => {
+    if (!deleteId) return;
+
+    setDeleteLoading(true);
     try {
-        // If undefined, it's visible by default, so toggle to false
-        const currentVisibility = product.isVisible !== undefined ? product.isVisible : true;
-        const newVisibility = !currentVisibility;
-        
-        await productService.updateProduct(product.id, { isVisible: newVisibility });
-        
-        toast.success(`Product ${newVisibility ? 'visible' : 'hidden'} on website`);
-        fetchProducts(); // Refresh list to reflect changes
+      await axios.delete(`${productUrl.deleteProduct}/${deleteId}`);
+      toast.success("Product deleted successfully");
+
+      setConfirmOpen(false);
+      setDeleteId(null);
+
+      fetchProducts(pagination.currentPage, pagination.limit);
     } catch (error) {
-        console.error("Failed to toggle visibility", error);
-        toast.error("Failed to update visibility");
+      console.error(error);
+      toast.error("Failed to delete product");
+    } finally {
+      setDeleteLoading(false);
     }
   };
-
-  const getStatusVariant = (status, stock) => {
-      // Logic to determine status badge color based on stock or status string
-      if (stock === 0) return 'destructive';
-      if (stock < 10) return 'warning';
-      return 'success';
-  };
-
-  const getStatusText = (status, stock) => {
-      if (stock === 0) return 'Out of Stock';
-      if (stock < 10) return 'Low Stock';
-      return 'Active';
-  }
-
-  const clearFilters = () => {
-      setSearchQuery('');
-      setSelectedCategory('All');
-      setMinPrice('');
-      setMaxPrice('');
-      setStockFilter('all');
-  }
-
-  if (isLoading && products.length === 0) {
-    return (
-      <div className="flex h-[70vh] items-center justify-center">
-        <Loading size="large" text="Loading products..." />
-      </div>
-    );
-  }
 
   return (
-        <div className="flex flex-col h-full space-y-4 sm:space-y-6 max-w-full overflow-x-hidden animate-in fade-in slide-in-from-bottom-6 duration-700" style={{ padding: '0px 1rem', background: 'linear-gradient(135deg, #f0fdf4 0%, #ecfdf5 50%, #f0fdfa 100%)' }}>
-            <div className="flex flex-row justify-between items-start sm:items-center gap-3 sm:gap-4" style={{ padding: '10px 0px' }}>
-                <div>
-                    <h2 className="text-xl sm:text-2xl md:text-4xl font-bold bg-gradient-to-r from-gray-900 via-emerald-800 to-teal-800 bg-clip-text text-transparent flex items-center gap-2">
-                      Products
-                      <Sparkles className="h-6 w-6 sm:h-7 sm:w-7 lg:h-8 lg:w-8 text-emerald-500" />
-                    </h2>
-                    <p className="text-gray-500 text-[10px] sm:text-[8px] sm:text-xs md:text-sm mt-0.5">Manage your pharmacy inventory</p>
-                </div>
-                <Button onClick={() => navigate('/admin/products/new')} className="text-[10px] sm:text-[8px] sm:text-xs md:text-sm h-7 sm:h-9 md:h-10" style={{ padding: '0px 10px' }}>
-                    <Plus className="mr-0.5 sm:mr-1 md:mr-2 h-3 w-3 sm:h-3.5 sm:w-3.5 md:h-4 md:w-4"  /> <span style={{ marginTop: '3px' }}>Add Product</span>
-                </Button>
-            </div>
-
-            <Card className="flex-1 flex flex-col overflow-hidden">
-                <CardContent className="flex flex-col h-full p-2 sm:p-3 md:p-4 lg:p-6 space-y-2 sm:space-y-3 md:space-y-4 overflow-hidden" style={{ padding: '5px' }}>
-                    {/* Filters & Search Bar */}
-                    <div className="flex flex-col gap-3">
-                        <div className="flex flex-row gap-2 sm:gap-4" style={{ paddingBottom: '5px' }}>
-                            <div className="relative flex-1">
-                                <Search className="absolute right-2.5 top-2.5 h-3 w-3 sm:h-4 sm:w-4 text-gray-500" />
-                                <Input
-                                    placeholder="Search by name, generic name, or SKU..."
-                                    className="pl-8 sm:pl-9 text-[8px] sm:text-sm h-9 sm:h-10"
-                                    value={searchQuery}
-                                    onChange={(e) => { setSearchQuery(e.target.value); setCurrentPage(1); }}
-                                    style={{ padding: '15px' }}
-                                />
-                            </div>
-                            <Button 
-                                variant={showFilters ? "secondary" : "outline"} 
-                                onClick={() => setShowFilters(!showFilters)}
-                                className="shrink-0 text-[8px] sm:text-sm h-9 sm:h-10" 
-                                style={{ padding: '0px 10px' }}
-                            >
-                                <Filter className="mr-1 sm:mr-2 h-3 w-3 sm:h-4 sm:w-4" />
-                                <span style={{ marginTop: '3px' }}>{showFilters ? 'Hide Filters' : 'Filters'}</span>
-                            </Button>
-                        </div>
-                        
-                        {/* Advanced Filters Area */}
-                        {showFilters && (
-                             <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-3 p-3 bg-gray-50/50 rounded-lg border border-gray-100 animate-in fade-in slide-in-from-top-2">
-                                {/* Category Filter */}
-                                <div className="space-y-1">
-                                    <label className="text-[10px] sm:text-xs font-medium text-gray-600">Category</label>
-                                    <select 
-                                        className="w-full h-8 sm:h-9 rounded-md border border-gray-200 bg-white px-3 py-1 text-[10px] sm:text-sm focus:outline-none focus:ring-2 focus:ring-emerald-500/20"
-                                        value={selectedCategory}
-                                        onChange={(e) => setSelectedCategory(e.target.value)}
-                                    >
-                                        {categories.map(cat => <option key={cat} value={cat}>{cat}</option>)}
-                                    </select>
-                                </div>
-
-                                {/* Price Range Filter */}
-                                <div className="space-y-1">
-                                    <label className="text-[10px] sm:text-xs font-medium text-gray-600">Price Range (₹)</label>
-                                    <div className="flex items-center gap-2">
-                                        <Input 
-                                            type="number" 
-                                            placeholder="Min" 
-                                            className="h-8 sm:h-9 text-[10px] sm:text-sm"
-                                            value={minPrice}
-                                            onChange={(e) => setMinPrice(e.target.value)}
-                                        />
-                                        <span className="text-gray-400">-</span>
-                                        <Input 
-                                            type="number" 
-                                            placeholder="Max" 
-                                            className="h-8 sm:h-9 text-[10px] sm:text-sm"
-                                            value={maxPrice}
-                                            onChange={(e) => setMaxPrice(e.target.value)}
-                                        />
-                                    </div>
-                                </div>
-
-                                {/* Stock Filter */}
-                                <div className="space-y-1">
-                                    <label className="text-[10px] sm:text-xs font-medium text-gray-600">Stock Status</label>
-                                    <select 
-                                        className="w-full h-8 sm:h-9 rounded-md border border-gray-200 bg-white px-3 py-1 text-[10px] sm:text-sm focus:outline-none focus:ring-2 focus:ring-emerald-500/20"
-                                        value={stockFilter}
-                                        onChange={(e) => setStockFilter(e.target.value)}
-                                    >
-                                        <option value="all">All Status</option>
-                                        <option value="in_stock">In Stock</option>
-                                        <option value="out_of_stock">Out of Stock</option>
-                                    </select>
-                                </div>
-                                
-                                {/* Reset Button */}
-                                <div className="flex items-end">
-                                    <Button 
-                                        variant="ghost" 
-                                        onClick={clearFilters}
-                                        className="w-full h-8 sm:h-9 text-red-500 hover:text-red-700 hover:bg-red-50"
-                                        style={{ marginTop: '20px' }}
-                                    >
-                                        <span style={{ marginTop: '3px' }}>Reset Filters</span>
-                                    </Button>
-                                </div>
-                             </div>
-                        )}
-                    </div>
-
-                    {/* Products Table */}
-                    <div className="flex-1 overflow-auto rounded-md border border-gray-200">
-                        <Table>
-                            <TableHeader>
-                                <TableRow style={{ background: 'linear-gradient(to right, #f0fdf4, #f0fdfa)' }}>
-                                    <TableHead className="font-semibold text-gray-700 text-[8px] sm:text-sm" style={{ padding: '6px 8px' }}>Name</TableHead>
-                                    <TableHead className="font-semibold text-gray-700 text-[8px] sm:text-sm hidden md:table-cell" style={{ padding: '6px 8px' }}>SKU</TableHead>
-                                    <TableHead className="font-semibold text-gray-700 text-[8px] sm:text-sm hidden sm:table-cell" style={{ padding: '6px 8px' }}>Category</TableHead>
-                                    <TableHead className="font-semibold text-gray-700 text-[8px] sm:text-sm" style={{ padding: '6px 8px' }}>Price</TableHead>
-                                    <TableHead className="font-semibold text-gray-700 text-[8px] sm:text-sm hidden lg:table-cell" style={{ padding: '6px 8px' }}>Stock</TableHead>
-                                    <TableHead className="font-semibold text-gray-700 text-[8px] sm:text-sm hidden sm:table-cell" style={{ padding: '6px 8px' }}>Status</TableHead>
-                                    <TableHead className="font-semibold text-gray-700 text-[8px] sm:text-sm" style={{ padding: '6px 8px' }}>Visibility</TableHead>
-                                    <TableHead className="text-right font-semibold text-gray-700 text-[8px] sm:text-sm" style={{ padding: '6px 8px' }}>Actions</TableHead>
-                                </TableRow>
-                            </TableHeader>
-                            <TableBody>
-                                {isLoading ? (
-                                    <TableRow>
-                                        <TableCell colSpan={8} className="h-24 text-center">
-                                            <div className="flex items-center justify-center gap-2 text-emerald-600">
-                                                <div className="w-4 h-4 border-2 border-emerald-600 border-t-transparent rounded-full animate-spin"/>
-                                                <span>Loading products...</span>
-                                            </div>
-                                        </TableCell>
-                                    </TableRow>
-                                ) : products.length > 0 ? (
-                                    products.slice((currentPage - 1) * itemsPerPage, currentPage * itemsPerPage).map((product, index) => (
-                                        <TableRow 
-                                            key={product.id}
-                                            className="hover:bg-emerald-50/50 transition-all duration-200 border-b border-gray-100 group"
-                                            style={{ 
-                                                marginBottom: index !== products.length - 1 ? '10px' : '0',
-                                            }}
-                                        >
-                                            <TableCell className="font-medium text-gray-900 text-[8px] sm:text-sm" style={{ padding: '8px' }}>
-                                                <div className="flex flex-col">
-                                                    <span>{product.name}</span>
-                                                    <span className="text-[8px] text-gray-400 sm:hidden">{product.manufacturer}</span>
-                                                </div>
-                                            </TableCell>
-                                            <TableCell className="font-mono text-[8px] sm:text-xs text-gray-500 hidden md:table-cell" style={{ padding: '6px' }}>{product.id}</TableCell>
-                                            <TableCell className="text-gray-600 text-[8px] sm:text-xs hidden sm:table-cell" style={{ padding: '6px' }}>{product.category}</TableCell>
-                                            <TableCell className="text-[8px] sm:text-xs font-semibold text-emerald-600" style={{ padding: '6px' }}>₹{product.price}</TableCell>
-                                            <TableCell className="text-[8px] sm:text-xs hidden lg:table-cell" style={{ padding: '6px' }}>
-                                                <span className={product.stock < 10 ? 'text-red-600 font-bold' : 'text-gray-600'}>
-                                                    {product.stock} units
-                                                </span>
-                                            </TableCell>
-                                            <TableCell className="hidden sm:table-cell text-center" style={{ padding: '6px' }}>
-                                                <Badge variant={getStatusVariant(product.status, product.stock)} className="text-[8px] sm:text-xs">
-                                                    {getStatusText(product.status, product.stock)}
-                                                </Badge>
-                                            </TableCell>
-                                            <TableCell className="text-[8px] sm:text-xs text-center" style={{ padding: '6px' }}>
-                                                <Button 
-                                                    variant="ghost" 
-                                                    size="icon" 
-                                                    className="h-6 w-6 hover:bg-gray-100"
-                                                    title={product.isVisible !== false ? "Hide from website" : "Show on website"}
-                                                    onClick={() => handleToggleVisibility(product)}
-                                                >
-                                                    {product.isVisible !== false 
-                                                        ? <Eye className="h-4 w-4 text-emerald-600" /> 
-                                                        : <EyeOff className="h-4 w-4 text-gray-400" />
-                                                    }
-                                                </Button>
-                                            </TableCell>
-                                            <TableCell className="text-right" style={{ padding: '6px' }}>
-                                                <div className="flex items-center justify-center gap-1 sm:gap-2 opacity-100">
-                                                    <Button variant="ghost" size="icon" className="h-7 w-7 sm:h-8 sm:w-8 hover:bg-blue-50" onClick={() => navigate(`/admin/products/${product.id}/edit`)}>
-                                                        <Edit className="h-3 w-3 sm:h-4 sm:w-4 text-blue-600" />
-                                                    </Button>
-                                                    <Button variant="ghost" size="icon" className="h-7 w-7 sm:h-8 sm:w-8 hover:bg-red-50" onClick={() => handleDelete(product.id)}>
-                                                        <Trash2 className="h-3 w-3 sm:h-4 sm:w-4 text-red-600" />
-                                                    </Button>
-                                                </div>
-                                            </TableCell>
-                                        </TableRow>
-                                    ))
-                                ) : (
-                                    <TableRow>
-                                        <TableCell colSpan={8} className="h-32 text-center text-gray-500">
-                                            <div className="flex flex-col items-center justify-center gap-2">
-                                                <Package className="w-8 h-8 text-gray-300" />
-                                                <p>No products found matching your search.</p>
-                                                <Button size="sm" variant="link" className="text-emerald-600" onClick={clearFilters}>Clear all filters</Button>
-                                            </div>
-                                        </TableCell>
-                                    </TableRow>
-                                )}
-                            </TableBody>
-                        </Table>
-                    </div>
-
-                    {!isLoading && products.length > 0 && (
-                        <div className="shrink-0 mt-auto pt-4" style={{bottom:'0', marginTop:'10px'}}>
-                        <Pagination
-                            currentPage={currentPage}
-                            totalPages={Math.ceil(products.length / itemsPerPage)}
-                            onPageChange={page => setCurrentPage(page)}
-                            itemsPerPage={itemsPerPage}
-                            onItemsPerPageChange={(val) => {
-                                setItemsPerPage(val);
-                                setCurrentPage(1);
-                            }}
-                        />
-                        </div>
-                    )}
-                </CardContent>
-            </Card>
+    <div
+      className="flex flex-col h-full space-y-4 sm:space-y-6 max-w-full overflow-x-hidden"
+      style={{
+        padding: "10px 10px 0px 10px",
+        background:
+          "linear-gradient(135deg, #f0fdf4 0%, #ecfdf5 50%, #f0fdfa 100%)",
+      }}
+    >
+      <div
+        className="flex flex-row justify-between items-start sm:items-center gap-3 sm:gap-4"
+        style={{ paddingBottom: "10px 10px 0px 10px" }}
+      >
+        <div>
+          <h2 className="text-xl sm:text-xl md:text-2xl font-bold bg-gradient-to-r from-gray-900 via-emerald-800 to-teal-800 bg-clip-text text-transparent flex items-center gap-2">
+            Products
+            
+          </h2>
+          {/* <p className="text-gray-500 text-[10px] sm:text-[8px] sm:text-xs md:text-sm mt-0.5">
+            Manage your pharmacy inventory
+          </p> */}
         </div>
+        <Button
+          onClick={() => navigate("/admin/products/new")}
+          className="text-[10px] sm:text-[8px] sm:text-xs md:text-sm h-7 sm:h-9 md:h-10"
+          style={{ padding: "0px 10px" }} 
+        >
+          <Plus className="mr-0.5 sm:mr-1 md:mr-2 h-3 w-3 sm:h-3.5 sm:w-3.5 md:h-4 md:w-4" />{" "}
+          <span style={{ marginTop: "3px" }}>Add Product</span>
+        </Button>
+      </div>
+
+      {/* Search Bar */}
+      <div className="flex items-center mb-2 mt-2">
+        <input
+          type="text"
+          placeholder="Search products..."
+          value={search}
+          onChange={handleSearchChange}
+          className="w-full max-w-xs px-3 py-2 border border-gray-300 rounded-md text-sm focus:outline-none focus:ring-2 focus:ring-emerald-400"
+          style={{ marginBottom: "8px" }}
+        />
+      </div>
+
+      <Card className="flex-1 flex flex-col overflow-hidden">
+        <CardContent
+          className="flex flex-col flex-1 min-h-0 p-2 sm:p-3 md:p-4 lg:p-6 space-y-2 sm:space-y-3 md:space-y-4 overflow-hidden"
+          style={{ padding: "5px" }}
+        >
+          <div className="flex-1 overflow-auto rounded-md border border-gray-200">
+            <Table>
+              <TableHeader>
+                <TableRow
+                  style={{
+                    background: "linear-gradient(to right, #f0fdf4, #f0fdfa)",
+                  }}
+                >
+                  <TableHead
+                    className="font-semibold text-gray-700 text-[8px] sm:text-sm"
+                    style={{ padding: "6px 8px" }}
+                  >
+                    Image
+                  </TableHead>
+                  <TableHead
+                    className="font-semibold text-gray-700 text-[8px] sm:text-sm"
+                    style={{ padding: "6px 8px" }}
+                  >
+                    Name
+                  </TableHead>
+                  <TableHead
+                    className="font-semibold text-gray-700 text-[8px] sm:text-sm"
+                    style={{ padding: "6px 8px" }}
+                  >
+                    Brand
+                  </TableHead>
+                  <TableHead
+                    className="font-semibold text-gray-700 text-[8px] sm:text-sm"
+                    style={{ padding: "6px 8px" }}
+                  >
+                    Category
+                  </TableHead>
+                  <TableHead
+                    className="font-semibold text-gray-700 text-[8px] sm:text-sm"
+                    style={{ padding: "6px 8px" }}
+                  >
+                    SKU
+                  </TableHead>
+                  <TableHead
+                    className="font-semibold text-gray-700 text-[8px] sm:text-sm"
+                    style={{ padding: "6px 8px" }}
+                  >
+                    Unit
+                  </TableHead>
+                  <TableHead
+                    className="font-semibold text-gray-700 text-[8px] sm:text-sm"
+                    style={{ padding: "6px 8px" }}
+                  >
+                    Price
+                  </TableHead>
+                  <TableHead
+                    className="font-semibold text-gray-700 text-[8px] sm:text-sm"
+                    style={{ padding: "6px 8px" }}
+                  >
+                    Discount
+                  </TableHead>
+                  <TableHead
+                    className="font-semibold text-gray-700 text-[8px] sm:text-sm"
+                    style={{ padding: "6px 8px" }}
+                  >
+                    Disc. Price
+                  </TableHead>
+                  <TableHead
+                    className="font-semibold text-gray-700 text-[8px] sm:text-sm"
+                    style={{ padding: "6px 8px" }}
+                  >
+                    Stock
+                  </TableHead>
+                  <TableHead
+                    className="font-semibold text-gray-700 text-[8px] sm:text-sm"
+                    style={{ padding: "6px 8px" }}
+                  >
+                    Status
+                  </TableHead>
+                  <TableHead
+                    className="text-right font-semibold text-gray-700 text-[8px] sm:text-sm"
+                    style={{ padding: "6px 8px" }}
+                  >
+                    Actions
+                  </TableHead>
+                </TableRow>
+              </TableHeader>
+              <TableBody>
+                {isLoading ? (
+                  <TableRow>
+                    <TableCell colSpan={12} className="h-24 text-center">
+                      <div className="flex items-center justify-center gap-2 text-emerald-600">
+                        <div className="w-4 h-4 border-2 border-emerald-600 border-t-transparent rounded-full animate-spin" />
+                        <span>Loading products...</span>
+                      </div>
+                    </TableCell>
+                  </TableRow>
+                ) : products.length > 0 ? (
+                  products.map((product) => (
+                    <TableRow
+                      key={product._id}
+                      className="hover:bg-emerald-50/50 transition-all duration-200 border-b border-gray-100 group"
+                    >
+                      <TableCell style={{ padding: "6px" }}>
+                        {product.image && product.image.length > 0 ? (
+                          <img
+                            src={product.image[0].url}
+                            alt={product.name}
+                            className="w-12 h-12 object-cover rounded"
+                          />
+                        ) : (
+                          <div className="w-12 h-12 bg-gray-100 flex items-center justify-center rounded">
+                            <Package className="w-6 h-6 text-gray-300" />
+                          </div>
+                        )}
+                      </TableCell>
+                      <TableCell
+                        className="font-medium text-gray-900 text-[8px] sm:text-sm"
+                        style={{ padding: "8px" }}
+                      >
+                        {product.name}
+                      </TableCell>
+                      <TableCell
+                        className="text-gray-700 text-[8px] sm:text-xs"
+                        style={{ padding: "6px" }}
+                      >
+                        {product.brand}
+                      </TableCell>
+                      <TableCell
+                        className="text-gray-700 text-[8px] sm:text-xs"
+                        style={{ padding: "6px" }}
+                      >
+                        {product.category}
+                      </TableCell>
+                      <TableCell
+                        className="font-mono text-[8px] sm:text-xs text-gray-500"
+                        style={{ padding: "6px" }}
+                      >
+                        {product.sku}
+                      </TableCell>
+                      <TableCell
+                        className="text-gray-700 text-[8px] sm:text-xs"
+                        style={{ padding: "6px" }}
+                      >
+                        {product.unit}
+                      </TableCell>
+                      <TableCell
+                        className="text-[8px] sm:text-xs font-semibold text-emerald-600"
+                        style={{ padding: "6px" }}
+                      >
+                        ₹{product.price}
+                      </TableCell>
+                      <TableCell
+                        className="text-[8px] sm:text-xs"
+                        style={{ padding: "6px" }}
+                      >
+                        {product.discount}%
+                      </TableCell>
+                      <TableCell
+                        className="text-[8px] sm:text-xs font-semibold text-emerald-700"
+                        style={{ padding: "6px" }}
+                      >
+                        ₹{product.discountedPrice}
+                      </TableCell>
+                      <TableCell
+                        className="text-[8px] sm:text-xs"
+                        style={{ padding: "6px" }}
+                      >
+                        {product.stock}
+                      </TableCell>
+                      <TableCell
+                        className="text-[8px] sm:text-xs"
+                        style={{ padding: "6px" }}
+                      >
+                        {product.status}
+                      </TableCell>
+                      <TableCell
+                        className="text-right"
+                        style={{ padding: "6px" }}
+                      >
+                        <div className="flex items-center justify-center gap-1 sm:gap-2 opacity-100">
+                          <Button
+                            variant="ghost"
+                            size="icon"
+                            className="h-7 w-7 sm:h-8 sm:w-8 hover:bg-emerald-50"
+                            onClick={() => {
+                              setSelectedProductId(product._id);
+                              setViewOpen(true);
+                            }}
+                          >
+                            <Eye className="h-3 w-3 sm:h-4 sm:w-4 text-emerald-600" />
+                          </Button>
+
+                          <Button
+                            variant="ghost"
+                            size="icon"
+                            className="h-7 w-7 sm:h-8 sm:w-8 hover:bg-blue-50"
+                            onClick={() =>
+                              navigate(`/admin/products/${product._id}/edit`, {
+                                state: { product },
+                              })
+                            }
+                          >
+                            <Edit className="h-3 w-3 sm:h-4 sm:w-4 text-blue-600" />
+                          </Button>
+
+                          <Button
+                            variant="ghost"
+                            size="icon"
+                            className="h-7 w-7 sm:h-8 sm:w-8 hover:bg-red-50"
+                            onClick={() => {
+                              setDeleteId(product._id);
+                              setConfirmOpen(true);
+                            }}
+                          >
+                            <Trash2 className="h-3 w-3 sm:h-4 sm:w-4 text-red-600" />
+                          </Button>
+                        </div>
+                      </TableCell>
+                    </TableRow>
+                  ))
+                ) : (
+                  <TableRow>
+                    <TableCell
+                      colSpan={12}
+                      className="h-32 text-center text-gray-500"
+                    >
+                      <div className="flex flex-col items-center justify-center gap-2">
+                        <Package className="w-8 h-8 text-gray-300" />
+                        <p>No products found.</p>
+                      </div>
+                    </TableCell>
+                  </TableRow>
+                )}
+              </TableBody>
+            </Table>
+          </div>
+
+          {!isLoading && pagination.totalPages > 1 && (
+            <div
+              className="shrink-0 mt-auto pt-4"
+              style={{ bottom: "0", marginTop: "10px" }}
+            >
+              <Pagination
+                currentPage={pagination.currentPage}
+                totalPages={pagination.totalPages}
+                onPageChange={handlePageChange}
+                itemsPerPage={pagination.limit}
+                onItemsPerPageChange={handleItemsPerPageChange}
+              />
+            </div>
+          )}
+        </CardContent>
+      </Card>
+      <ViewProductModal
+        open={viewOpen}
+        productId={selectedProductId}
+        onClose={() => {
+          setViewOpen(false);
+          setSelectedProductId(null);
+        }}
+      />
+
+
+
+      <ConfirmationModal
+        isOpen={confirmOpen}
+        onClose={() => {
+          if (!deleteLoading) {
+            setConfirmOpen(false);
+            setDeleteId(null);
+          }
+        }}
+        onConfirm={handleDelete}
+        title="Delete Product"
+        message="Are you sure you want to delete this product? This action cannot be undone."
+        confirmText="Delete"
+        cancelText="Cancel"
+        variant="danger"
+        isLoading={deleteLoading}
+      />
+    </div>
   );
 };
 

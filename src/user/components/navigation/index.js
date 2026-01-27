@@ -14,7 +14,4 @@ export { useNavigationSearch } from "@/user/components/navigation/hooks/useNavig
 export { useActiveNavItem } from "@/user/components/navigation/hooks/useActiveNavItem";
 
 // Constants
-export {
-  NAV_ITEMS,
-  MOCK_PRODUCTS,
-} from "@/user/components/navigation/constants";
+export { NAV_ITEMS } from "@/user/components/navigation/constants";

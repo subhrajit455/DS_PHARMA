@@ -41,7 +41,7 @@ const ConfirmationModal = ({
                         animate={{ opacity: 1, scale: 1 }}
                         exit={{ opacity: 0, scale: 0.95 }}
                         transition={{ duration: 0.2 }}
-                        className="bg-white rounded-lg shadow-xl w-full max-w-md overflow-hidden"
+                        className="bg-white rounded-lg shadow-xl w-full max-w-md max-h-[85vh] overflow-y-auto scrollbar-thin scrollbar-thumb-gray-200"
                     >
                         <div className="p-8" style={{ padding: '10px'}} >
                             <div className="flex items-start justify-between mb-4" style={{ marginBottom: '10px'}}>

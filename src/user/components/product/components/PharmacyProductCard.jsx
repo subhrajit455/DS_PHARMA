@@ -4,6 +4,7 @@ import { Heart } from 'lucide-react';
 import { useAddToCart } from '@/shared/hooks/mutations/useAddToCart';
 import useDataStore from '@/store/useDataStore';
 import CartIcon from '@/assets/icons/Cart.png';
+import SafeImage from '@/shared/components/SafeImage';
 
 
 const PharmacyProductCard = ({
@@ -33,7 +34,7 @@ const PharmacyProductCard = ({
   const isInWishlist = wishlist.some((item) => item.id === id);
 
   // Handle image prop variation (image vs imageUrl)
-  const displayImage = imageUrl || image || "https://images.unsplash.com/photo-1587854692152-cbe660dbde88?auto=format&fit=crop&w=600&q=80";
+  const displayImage = imageUrl || image;
   
   // Use mrp or originalPrice for comparison price
   const comparisonPrice = mrp || originalPrice;
@@ -186,15 +187,11 @@ const PharmacyProductCard = ({
       >
         {/* Product Image */}
         <div className="relative rounded-sm overflow-hidden aspect-4/3 bg-linear-to-br from-sky-100 to-sky-200">
-          <img
+          <SafeImage
             src={displayImage}
             alt={name}
             className="object-cover w-full h-full px-2 py-2"
             loading="lazy"
-            onError={(e) => {
-              e.target.onerror = null; 
-              e.target.src = "https://images.unsplash.com/photo-1587854692152-cbe660dbde88?auto=format&fit=crop&w=600&q=80";
-            }}
           />
           
           {/* Wishlist Button */}
@@ -250,7 +247,7 @@ const PharmacyProductCard = ({
 
             <div className="flex items-center gap-1">
               {comparisonPrice && comparisonPrice > price && (
-              <span className="text-[10px] sm:text-[11px] text-gray-400 line-through">
+              <span className="text-xs text-gray-400 line-through" style={{ fontFamily: 'Gyrotrope' }}>
                 ₹{comparisonPrice}
               </span>
             )}

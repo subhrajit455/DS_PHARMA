@@ -18,6 +18,7 @@ const SearchPage = () => {
   // Parse URL params
   const query = searchParams.get('query') || '';
   const sort = searchParams.get('sort') || 'relevance';
+  const page = parseInt(searchParams.get('page') || '1', 10);
   
   const [filters, setFilters] = useState({
      categories: searchParams.getAll('category'),
@@ -33,21 +34,38 @@ const SearchPage = () => {
 
   useEffect(() => {
     const fetchResults = async () => {
-      setIsLoading(true);
+      // Don't set loading to true for rapid typing - keep existing results visible
+      if (debouncedQuery !== query) {
+        setIsLoading(true);
+      }
+      
       try {
         const response = await searchService.searchProducts({
           query: debouncedQuery,
           filters,
           sort,
-          page: 1,
-          limit: 1000
+          page,
+          limit: 12 // Consistent with category pages
         });
-        setProducts(response?.data?.products || []);
-        setFacets(response?.data?.facets || {});
+        
+        // Atomic state update to prevent flickering
+        setProducts(prevProducts => {
+          const newProducts = response?.data?.products || [];
+          // Only update if the response is for the current query to avoid race conditions
+          return newProducts;
+        });
+        
+        setFacets({
+            ...(response?.data?.facets || {}),
+            pagination: response?.data?.pagination
+        });
       } catch (error) {
         console.error('Search failed:', error);
-        setProducts([]); // Reset to empty array on error
-        setFacets({}); // Reset facets on error
+        // Don't clear products on cancellation, only on actual errors
+        if (!(error.code === 'ERR_CANCELED' || error.name === 'CanceledError')) {
+          setProducts([]); // Reset to empty array on error
+          setFacets({}); // Reset facets on error
+        }
       } finally {
         setIsLoading(false);
       }
@@ -55,7 +73,7 @@ const SearchPage = () => {
 
     fetchResults();
     // eslint-disable-next-line react-hooks/exhaustive-deps
-  }, [debouncedQuery, JSON.stringify(filters), sort]);
+  }, [debouncedQuery, JSON.stringify(filters), sort, page]);
 
   // Sync state with URL params when they change (controls navigation-driven updates)
   useEffect(() => {
@@ -227,6 +245,53 @@ const SearchPage = () => {
            {/* Results Grid */}
            <main className="flex-1 min-w-0 ">
                <SearchResults products={products} isLoading={isLoading} query={query} onReset={handleViewAll} />
+               
+               {/* Pagination Controls */}
+               {!isLoading && products.length > 0 && facets?.pagination?.totalPages > 1 && (
+                  <div className="mt-8 flex items-center justify-center gap-2 pb-8">
+                    <button
+                      onClick={() => {
+                        const newPage = (facets.pagination.page || 1) - 1;
+                        if (newPage >= 1) {
+                          setSearchParams(prev => {
+                            prev.set('page', newPage);
+                            return prev;
+                          });
+                          window.scrollTo({ top: 0, behavior: 'smooth' });
+                        }
+                      }}
+                      disabled={(facets.pagination.page || 1) === 1}
+                      className="px-3 py-2 rounded-lg border border-gray-300 bg-white hover:bg-gray-50 disabled:opacity-50 disabled:cursor-not-allowed transition-colors"
+                      aria-label="Previous page"
+                    >
+                      <ArrowLeft className="w-5 h-5" />
+                    </button>
+
+                    <div className="flex items-center gap-1">
+                      <span className="text-sm font-medium text-gray-700">
+                        Page {facets.pagination.page} of {facets.pagination.totalPages}
+                      </span>
+                    </div>
+
+                    <button
+                      onClick={() => {
+                        const newPage = (facets.pagination.page || 1) + 1;
+                        if (newPage <= facets.pagination.totalPages) {
+                           setSearchParams(prev => {
+                            prev.set('page', newPage);
+                            return prev;
+                          });
+                          window.scrollTo({ top: 0, behavior: 'smooth' });
+                        }
+                      }}
+                      disabled={(facets.pagination.page || 1) >= facets.pagination.totalPages}
+                      className="px-3 py-2 rounded-lg border border-gray-300 bg-white hover:bg-gray-50 disabled:opacity-50 disabled:cursor-not-allowed transition-colors"
+                      aria-label="Next page"
+                    >
+                      <ArrowLeft className="w-5 h-5 rotate-180" />
+                    </button>
+                  </div>
+               )}
            </main>
         </div>
 

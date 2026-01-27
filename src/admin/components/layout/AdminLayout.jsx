@@ -51,11 +51,11 @@ const AdminLayout = () => {
        )}
 
       {/* Main Content Area - Flexible */}
-      <div className="flex-1 flex flex-col min-w-0 h-screen overflow-hidden relative z-10 transition-all duration-300 max-w-full overflow-x-hidden">
+      <div className="flex-1 flex flex-col min-w-0 h-screen overflow-hidden relative z-10 transition-all duration-300 max-w-full">
         <AdminHeader onMobileMenuToggle={() => setSidebarOpen(true)} />
 
-        <main className="flex-1 flex flex-col overflow-hidden relative">
-          <div className="absolute inset-0 flex flex-col w-full h-full">
+        <main className="flex-1 overflow-y-auto scroll-smooth w-full relative scrollbar-thin scrollbar-thumb-gray-200 scrollbar-track-transparent">
+          <div className="min-h-full w-full">
             <Outlet />
           </div>
         </main>

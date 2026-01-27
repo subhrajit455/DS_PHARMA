@@ -53,7 +53,7 @@ const useDataStore = create(
           }
           return {
             addresses: updatedAddresses.map((a) =>
-              a.id === id ? { ...a, ...data } : a
+              a.id === id ? { ...a, ...data } : a,
             ),
           };
         }),
@@ -79,7 +79,7 @@ const useDataStore = create(
       updateCategory: (id, updates) =>
         set((state) => ({
           categories: state.categories.map((c) =>
-            c.id === id ? { ...c, ...updates } : c
+            c.id === id ? { ...c, ...updates } : c,
           ),
         })),
       deleteCategory: (id) =>
@@ -92,7 +92,7 @@ const useDataStore = create(
       updateProduct: (updatedProduct) =>
         set((state) => ({
           products: state.products.map((p) =>
-            p.id === updatedProduct.id ? updatedProduct : p
+            p.id === updatedProduct.id ? updatedProduct : p,
           ),
         })),
       addProduct: (newProduct) =>
@@ -122,7 +122,7 @@ const useDataStore = create(
             if (order.id === orderId) {
               // Prevent duplicate status updates in timeline
               const statusExists = (order.timeline || []).some(
-                (t) => t.status === status
+                (t) => t.status === status,
               );
               let newTimeline = order.timeline || [];
 
@@ -202,7 +202,7 @@ const useDataStore = create(
       updateUser: (updatedUser) =>
         set((state) => ({
           users: state.users.map((u) =>
-            u.id === updatedUser.id ? updatedUser : u
+            u.id === updatedUser.id ? updatedUser : u,
           ),
           currentUser:
             state.currentUser?.id === updatedUser.id
@@ -214,7 +214,7 @@ const useDataStore = create(
       updateUserProfileImage: (userId, imageUrl) =>
         set((state) => ({
           users: state.users.map((u) =>
-            u.id === userId ? { ...u, profileImage: imageUrl } : u
+            u.id === userId ? { ...u, profileImage: imageUrl } : u,
           ),
           currentUser:
             state.currentUser?.id === userId
@@ -225,7 +225,7 @@ const useDataStore = create(
       removeUserProfileImage: (userId) =>
         set((state) => ({
           users: state.users.map((u) =>
-            u.id === userId ? { ...u, profileImage: null } : u
+            u.id === userId ? { ...u, profileImage: null } : u,
           ),
           currentUser:
             state.currentUser?.id === userId
@@ -247,7 +247,7 @@ const useDataStore = create(
       updateCartQuantity: (productId, quantity) =>
         set((state) => ({
           cart: state.cart.map((item) =>
-            item.id === productId ? { ...item, quantity } : item
+            item.id === productId ? { ...item, quantity } : item,
           ),
         })),
       clearCart: () => set({ cart: [] }),
@@ -269,18 +269,18 @@ const useDataStore = create(
           if (!product) return state;
 
           const newWishlist = state.wishlist.filter(
-            (item) => item.id !== productId
+            (item) => item.id !== productId,
           );
 
           const existingCartItem = state.cart.find(
-            (item) => item.id === productId
+            (item) => item.id === productId,
           );
           let newCart;
           if (existingCartItem) {
             newCart = state.cart.map((item) =>
               item.id === productId
                 ? { ...item, quantity: item.quantity + 1 }
-                : item
+                : item,
             );
           } else {
             newCart = [...state.cart, { ...product, quantity: 1 }];
@@ -313,9 +313,10 @@ const useDataStore = create(
         cart: state.cart,
         wishlist: state.wishlist,
         addresses: state.addresses,
+        categories: state.categories, // ✅ CRITICAL FIX: Persist categories
       }),
-    }
-  )
+    },
+  ),
 );
 
 if (typeof window !== "undefined") {

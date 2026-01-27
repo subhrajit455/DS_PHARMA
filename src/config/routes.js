@@ -7,6 +7,7 @@ export const ROUTES = {
   HOME: "/",
   PRODUCTS: "/products",
   PRODUCT_DETAILS: "/product/:id",
+  ALL_PRODUCTS: "/shop", // All products with filters
   ABOUT: "/about",
   CONTACT: "/contact",
 

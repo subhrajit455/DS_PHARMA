@@ -1,31 +1,82 @@
 import React from 'react';
 import { useNavigate } from 'react-router-dom';
 import ProductCategorySection from './ProductCategorySection';
-import { useProducts } from '@/shared/hooks/queries/useProducts';
-import Loading from '@/shared/components/common/Loading';
-import ErrorState from '@/shared/components/common/ErrorState';
+import productService from '@/services/productService';
+import { ProductGridSkeleton } from '@/shared/components/skeletons/ProductSkeleton';
+
+// Category identification must be done ONLY using _id
+const getCategoryId = (cat) => {
+  return cat?._id || cat?.id || cat;
+};
 
 // Inner component to fetch data for a single category
-// Keeping it inside ensuring it's isolated and uses the hook cleanly
-const CategorySectionItem = ({ categoryName }) => {
+const CategorySectionItem = ({ category }) => {
   const navigate = useNavigate();
-  // Fetch products for this specific category
-  const { data, isLoading, isError } = useProducts({ category: categoryName, limit: 10 });
+  const [products, setProducts] = React.useState([]);
+  const [loading, setLoading] = React.useState(true);
   
-  // Filter out hidden products
-  const products = (data?.data || []).filter(p => p.isVisible !== false);
+  // Determine display name and id
+  const categoryName = typeof category === 'string' ? category : category.name;
+  const categoryId = getCategoryId(category);
+
+  React.useEffect(() => {
+    let isMounted = true;
+    
+    const fetchProducts = async () => {
+      if (!categoryId) return;
+      setLoading(true);
+      try {
+        // Fetch with proper cancellation support
+        const response = await productService.getCategoryProducts(
+          categoryId, 
+          { page: 1, limit: 5 }
+        );
+        
+        if (isMounted) {
+          const fetchedProducts = response?.data || response || [];
+          const validProducts = Array.isArray(fetchedProducts) ? fetchedProducts : [];
+          
+          // Ensure products have proper image fallbacks
+          const productsWithImages = validProducts.map(product => {
+            if (!product.image || !product.images || product.images.length === 0) {
+              return productService.normalizeProduct(product);
+            }
+            return product;
+          });
+          
+          setProducts(productsWithImages);
+        }
+      } catch (err) {
+        // Silently handle cancellation errors
+        if (err?.name !== 'CanceledError' && err?.code !== 'ERR_CANCELED') {
+          console.error(`Failed to fetch category products for ${categoryName}:`, err);
+        }
+      } finally {
+        if (isMounted) setLoading(false);
+      }
+    };
+
+    fetchProducts();
+    
+    return () => { 
+      isMounted = false;
+    };
+  }, [categoryId, categoryName]);
 
   const handleProductClick = (product) => {
-    navigate(`/product/${product.id}`);
+    navigate(`/product/${product.id || product._id}`);
   };
 
-  const handleViewAll = (categoryTitle) => {
-    navigate(`/category/${encodeURIComponent(categoryTitle)}`);
+  const handleViewAll = () => {
+    // MANDATORY: Category identification via _id only
+    navigate(`/category/${categoryId}`);
   };
 
-  if (isLoading) return <div className="w-full h-64 flex items-center justify-center"><Loading /></div>;
-  if (isError) return null; // Skip sections that fail to load
-  if (!products || products.length === 0) return null; // Skip empty categories
+  if (loading) return <div className="mb-12"><ProductGridSkeleton count={5} /></div>;
+  
+  // Only skip if there are literally zero products and it's NOT an error 
+  // If it's an error (like a mismatch), we still want the section to potentially show something or just skip quietly but not fatalistically hide others.
+  if (!products || products.length === 0) return null; 
 
   return (
     <div className="mb-12 lg:mb-16 last:mb-0">
@@ -41,7 +92,13 @@ const CategorySectionItem = ({ categoryName }) => {
 };
 
 const PharmacyProductsShowcase = ({ categories = [] }) => {
-  if (!categories || categories.length === 0) return null;
+  // Use React.useMemo to ensure stable category list
+  const categoryList = React.useMemo(() => {
+    if (!categories) return [];
+    return Array.isArray(categories) ? categories : [];
+  }, [categories]);
+
+  if (categoryList.length === 0) return null;
 
   return (
     <>
@@ -64,8 +121,8 @@ const PharmacyProductsShowcase = ({ categories = [] }) => {
           {categories.map((category) => (
              /* Check if category is object or string, handle both */
             <CategorySectionItem 
-              key={typeof category === 'string' ? category : category.name} 
-              categoryName={typeof category === 'string' ? category : category.name} 
+              key={typeof category === 'string' ? category : (category._id || category.id)} 
+              category={category} 
             />
           ))}
         </div>

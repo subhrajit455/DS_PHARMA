@@ -1,131 +1,115 @@
 import apiClient from "@/services/api/apiClient";
 import { API_ENDPOINTS } from "@/services/api/baseURL";
-
-// Helper to filter products locally
-import useDataStore from "@/store/useDataStore";
-
-const getFilteredProducts = (query, filters, sort) => {
-  // Use store as source of truth
-  let results = useDataStore.getState().products || [];
-
-  // 1. Text Search
-  if (query) {
-    const q = query.toLowerCase();
-    results = results.filter(
-      (p) =>
-        p.name?.toLowerCase().includes(q) ||
-        p.genericName?.toLowerCase().includes(q) ||
-        p.manufacturer?.toLowerCase().includes(q) ||
-        p.category?.toLowerCase().includes(q) // Added category search for better UX
-    );
-  }
-
-  // 2. Filters
-  if (filters?.categories?.length > 0) {
-    results = results.filter((p) => filters.categories.includes(p.category));
-  }
-  if (filters?.manufacturers?.length > 0) {
-    results = results.filter((p) =>
-      filters.manufacturers.includes(p.manufacturer)
-    );
-  }
-  if (filters?.priceRange) {
-    const [min, max] = filters.priceRange;
-    results = results.filter((p) => p.price >= min && p.price <= max);
-  }
-  if (filters?.prescriptionRequired !== undefined) {
-    results = results.filter(
-      (p) => p.prescriptionRequired === filters.prescriptionRequired
-    );
-  }
-  if (filters?.inStock) {
-    results = results.filter((p) => p.inStock);
-  }
-
-  if (filters?.isHighlighted) {
-    results = results.filter((p) => p.isHighlighted);
-  }
-
-  if (filters?.isFeatured) {
-    results = results.filter((p) => p.isFeatured);
-  }
-
-  // 3. Sorting
-  if (sort) {
-    switch (sort) {
-      case "price_asc":
-        results.sort((a, b) => a.price - b.price);
-        break;
-      case "price_desc":
-        results.sort((a, b) => b.price - a.price);
-        break;
-      case "name_asc":
-        results.sort((a, b) => a.name.localeCompare(b.name));
-        break;
-      default: // relevance (no-op for now)
-        break;
-    }
-  }
-
-  return results;
-};
-
-// MOCK SERVICE (Enable by default for now)
-const USE_MOCK = true;
+import { normalizeProduct } from "@/services/productService"; // CRITICAL FIX: Use proper normalization
+import productService from "@/services/productService"; // For caching utilities
 
 const searchService = {
-  getSuggestions: async (query) => {
-    if (USE_MOCK) {
-      // Simulate network delay
-      await new Promise((resolve) => setTimeout(resolve, 200));
-      if (!query) return [];
-      const q = query.toLowerCase();
-      const allProducts = useDataStore.getState().products || [];
-      const suggestions = allProducts
-        .filter((p) => p.name?.toLowerCase().includes(q))
-        .map((p) => ({
-          id: p.id,
-          name: p.name,
-          type: "product",
-          slug: p.id, // using ID as slug for mock
-        }))
-        .slice(0, 5);
-      return { data: suggestions };
+  /**
+   * Search products using user-facing backend API
+   * @param {Object} params - { query, filters, sort, page, limit }
+   * @returns {Promise} Search results with products and facets
+   */
+  searchProducts: async ({
+    query = "",
+    filters = {},
+    sort = "relevance",
+    page = 1,
+    limit = 12,
+  } = {}) => {
+    // Check cache first
+    const cachedResult = productService.getCachedSearchResults(query, filters, sort, page, limit);
+    if (cachedResult) {
+      return cachedResult;
     }
-    return apiClient.get(API_ENDPOINTS.SEARCH_SUGGEST, { params: { query } });
-  },
-
-  searchProducts: async ({ query, filters, sort, page = 1, limit = 20 }) => {
-    if (USE_MOCK) {
-      await new Promise((resolve) => setTimeout(resolve, 400));
-      const filtered = getFilteredProducts(query, filters, sort);
-
-      const start = (page - 1) * limit;
-      const paginated = filtered.slice(start, start + limit);
-
-      // Extract facets from full filtered list (before pagination) for dynamic filters
-      const categories = [...new Set(filtered.map((p) => p.category))];
-      const manufacturers = [...new Set(filtered.map((p) => p.manufacturer))];
-      const minPrice = Math.min(...filtered.map((p) => p.price));
-      const maxPrice = Math.max(...filtered.map((p) => p.price));
-
-      return {
-        data: {
-          products: paginated,
-          total: filtered.length,
+    
+    try {
+      const response = await apiClient.get(API_ENDPOINTS.PRODUCT_USER_SEARCH, {
+        params: {
+          search: query,
           page,
-          pages: Math.ceil(filtered.length / limit),
-          facets: {
-            categories,
-            manufacturers,
-            priceRange: [minPrice, maxPrice],
+          limit,
+          sort,
+          ...filters,
+        },
+      });
+
+      // Return structured response with PROPER normalization
+      const rawProducts = response.data?.data || response.data || [];
+      
+      // CRITICAL FIX: Use productService normalization for consistency
+      const normalizedProducts = Array.isArray(rawProducts)
+        ? rawProducts.map(normalizeProduct).filter(Boolean)
+        : [];
+
+      const result = {
+        data: {
+          products: normalizedProducts,
+          facets: response.data?.facets || {},
+          pagination: response.data?.pagination || {
+            page,
+            limit,
+            total: rawProducts.length,
+            totalPages: 1,
           },
         },
       };
+      
+      // Cache the result
+      productService.cacheSearchResults(query, filters, sort, page, limit, result);
+      
+      return result;
+    } catch (error) {
+      // Check if it's a cancellation error - don't log these
+      if (error.code === 'ERR_CANCELED' || error.name === 'CanceledError') {
+        // Silent cancellation - do not treat as error
+        return {
+          data: {
+            products: [],
+            facets: {},
+            pagination: { page: 1, limit, total: 0, totalPages: 0 },
+          },
+        };
+      }
+      
+      console.error("Search products failed:", error);
+      // Return empty results instead of throwing to prevent UI breaks
+      return {
+        data: {
+          products: [],
+          facets: {},
+          pagination: { page: 1, limit, total: 0, totalPages: 0 },
+        },
+      };
     }
-    return apiClient.get(API_ENDPOINTS.SEARCH, {
-      params: { query, ...filters, sort, page, limit },
-    });
+  },
+
+  /**
+   * Get search suggestions (for autocomplete)
+   * @param {string} query - Search query
+   * @returns {Promise} Suggestion results
+   */
+  getSuggestions: async (query) => {
+    try {
+      // Use search endpoint with lower limit for suggestions
+      const response = await apiClient.get(API_ENDPOINTS.PRODUCT_USER_SEARCH, {
+        params: { search: query, limit: 5 },
+      });
+
+      // Use normalization for suggestions too
+      const rawData = response.data?.data || response.data || [];
+      return Array.isArray(rawData)
+        ? rawData.map(normalizeProduct).filter(Boolean)
+        : [];
+    } catch (error) {
+      // Check if it's a cancellation error - don't log these
+      if (error.code === 'ERR_CANCELED' || error.name === 'CanceledError') {
+        // Silent cancellation - return empty
+        return [];
+      }
+      
+      console.error("Get suggestions failed:", error);
+      return [];
+    }
   },
 };
 

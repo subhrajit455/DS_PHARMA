@@ -14,6 +14,7 @@ import BannerForm from './pages/Announcements/BannerForm';
 import MarqueeForm from './pages/Announcements/MarqueeForm';
 import AlertForm from './pages/Announcements/AlertForm';
 import CategoriesList from './pages/Categories/CategoriesList';
+import CategoryForm from './pages/Categories/CategoryForm';
 import FeaturedProducts from './pages/Products/FeaturedProducts';
 
 const AdminRouter = () => {
@@ -32,6 +33,8 @@ const AdminRouter = () => {
         
         {/* Categories */}
         <Route path="categories" element={<CategoriesList />} />
+        <Route path="categories/new" element={<CategoryForm />} />
+        <Route path="categories/edit/:id" element={<CategoryForm />} />
         
         {/* Orders */}
         <Route path="orders" element={<OrdersList />} />

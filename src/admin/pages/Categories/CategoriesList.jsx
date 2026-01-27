@@ -1,7 +1,7 @@
 import React, { useState, useEffect } from 'react';
+import { useNavigate } from 'react-router-dom';
 import Loading from '@/shared/components/common/Loading';
-import { Plus, Edit, Trash2, Search, Sparkles } from 'lucide-react';
-import { toast } from 'react-hot-toast';
+import { Plus, Edit, Trash2, Search, Sparkles, Eye, EyeOff, ImageIcon } from 'lucide-react';
 import { Button } from '@/admin/components/ui/Button';
 import { Input } from '@/admin/components/ui/Input';
 import { Card, CardContent } from '@/admin/components/ui/Card';
@@ -13,78 +13,71 @@ import {
   TableHeader,
   TableRow,
 } from '@/admin/components/ui/Table';
-import ConfirmationModal from '@/admin/components/ui/ConfirmationModal';
 import { Pagination } from '@/admin/components/ui/Pagination';
-
+import ConfirmationModal from '@/admin/components/ui/ConfirmationModal';
 import useDataStore from '@/store/useDataStore';
+import { useCategories, useDeleteCategory, useUpdateCategory } from '@/shared/hooks/queries/useCategories';
 
 const CategoriesList = () => {
-    // Connect to Store
-    const categories = useDataStore((state) => state.categories);
-    const products = useDataStore((state) => state.products);
-    const addCategory = useDataStore((state) => state.addCategory);
-    const updateCategory = useDataStore((state) => state.updateCategory);
-    const deleteCategory = useDataStore((state) => state.deleteCategory);
-
-    const [isModalOpen, setIsModalOpen] = useState(false);
-    const [isDeleteModalOpen, setIsDeleteModalOpen] = useState(false);
-    // Use isVisible instead of status string for better logic control
-    const [currentCategory, setCurrentCategory] = useState({ name: '', slug: '', isVisible: true });
-    const [isEditing, setIsEditing] = useState(false);
+    const navigate = useNavigate();
+    
+    // Search and Pagination State
     const [searchQuery, setSearchQuery] = useState('');
+    const [debouncedSearch, setDebouncedSearch] = useState('');
     const [currentPage, setCurrentPage] = useState(1);
-    const [itemsPerPage, setItemsPerPage] = useState(10);
+    const [itemsPerPage, setItemsPerPage] = useState(10); 
 
-    // Compute products count for each category
-    const categoriesWithCounts = categories.map(cat => {
-        // Match exact name string
-        const count = products.filter(p => p.category === cat.name).length;
-        // Generate slug if missing
-        const slug = cat.slug || cat.name.toLowerCase().replace(/[^a-z0-9]+/g, '-').replace(/(^-|-$)+/g, '');
-        return { ...cat, products: count, slug };
+    // Debounce search input
+    useEffect(() => {
+        const handler = setTimeout(() => {
+            setDebouncedSearch(searchQuery);
+            setCurrentPage(1); // Reset to page 1 on search
+        }, 500);
+        return () => clearTimeout(handler);
+    }, [searchQuery]);
+
+    // API Hooks with backend-driven params
+    const { data, isLoading, isError, refetch } = useCategories({ 
+        search: debouncedSearch, 
+        page: currentPage, 
+        limit: itemsPerPage
     });
 
-    const filteredCategories = categoriesWithCounts.filter(cat => 
-        cat.name.toLowerCase().includes(searchQuery.toLowerCase())
-    );
+    const deleteMutation = useDeleteCategory();
+    const updateMutation = useUpdateCategory();
+    
+    // Extract metadata from backend response
+    const categories = data?.categories || [];
+    const totalPages = data?.totalPages || 1;
+    const totalItems = data?.totalItems || 0;
 
-    const paginatedCategories = filteredCategories.slice(
-        (currentPage - 1) * itemsPerPage,
-        currentPage * itemsPerPage
-    );
+    const [isDeleteModalOpen, setIsDeleteModalOpen] = useState(false);
+    const [currentCategory, setCurrentCategory] = useState(null);
 
-    const handleSave = () => {
-        if (!currentCategory.name) {
-            toast.error('Category name is required');
-            return;
+    const products = useDataStore((state) => state.products);
+
+    const handleToggleVisibility = async (category) => {
+        try {
+            const formData = new FormData();
+            formData.append('visibility', String(!category.visibility));
+            formData.append('name', category.name);
+            
+            await updateMutation.mutateAsync({ 
+                id: category.id, 
+                data: formData
+            });
+        } catch {
+            // Error managed by hook
         }
-
-        if (isEditing) {
-            updateCategory(currentCategory.id, currentCategory);
-            toast.success('Category updated successfully');
-        } else {
-            const newCategory = {
-                ...currentCategory,
-                products: 0, // In a real app, this would be computed or 0 for new
-                slug: currentCategory.name.toLowerCase().replace(/\s+/g, '-')
-            };
-            addCategory(newCategory);
-            toast.success('Category created successfully');
-        }
-        setIsModalOpen(false);
-        resetForm();
     };
 
-    const handleDelete = () => {
-        deleteCategory(currentCategory.id);
-        setIsDeleteModalOpen(false);
-        toast.success('Category deleted successfully');
-    };
-
-    const openEditModal = (category) => {
-        setCurrentCategory(category);
-        setIsEditing(true);
-        setIsModalOpen(true);
+    const handleDelete = async () => {
+        try {
+            await deleteMutation.mutateAsync(currentCategory.id);
+            setIsDeleteModalOpen(false);
+        } catch {
+            // Error managed by hook
+        }
     };
 
     const openDeleteModal = (category) => {
@@ -92,100 +85,147 @@ const CategoriesList = () => {
         setIsDeleteModalOpen(true);
     };
 
-    const resetForm = () => {
-        setCurrentCategory({ name: '', slug: '', isVisible: true });
-        setIsEditing(false);
-    };
-
-    const [isLoading, setIsLoading] = useState(true);
-
-    useEffect(() => {
-        // Simulate loading for visual consistency
-        const timer = setTimeout(() => setIsLoading(false), 500);
-        return () => clearTimeout(timer);
-    }, []);
-
-    if (isLoading) {
+    if (isLoading && categories.length === 0) {
         return (
-            <div className="flex h-[50vh] items-center justify-center">
+            <div className="flex h-[70vh] items-center justify-center">
                 <Loading size="large" text="Loading categories..." />
             </div>
         );
     }
 
     return (
-        <div className="flex-1 h-full flex flex-col space-y-4 p-2 sm:p-4 lg:p-6 animate-in fade-in slide-in-from-bottom-6 duration-700" style={{ background: 'linear-gradient(135deg, #f0fdf4 0%, #ecfdf5 50%, #f0fdfa 100%)', padding: '0px 1rem' }}>
-             <div className="flex sm:flex-row justify-between items-start sm:items-center gap-2 sm:gap-4 shrink-0" style={{ padding: '5px' }}>
+        <div className="flex flex-col h-full space-y-4 sm:space-y-6 max-w-full overflow-x-hidden animate-in fade-in slide-in-from-bottom-6 duration-700" style={{ padding: '0px 1rem', background: 'linear-gradient(135deg, #f0fdf4 0%, #ecfdf5 50%, #f0fdfa 100%)' }}>
+             <div className="flex flex-row justify-between items-start sm:items-center gap-3 sm:gap-4" style={{ padding: '10px 0px' }}>
                 <div>
-                   <h2 className="text-2xl sm:text-3xl lg:text-4xl font-bold bg-linear-to-r from-gray-900 via-emerald-800 to-teal-800 bg-clip-text text-transparent flex items-center gap-2 sm:gap-3">
+                   <h2 className="text-xl sm:text-2xl md:text-4xl font-bold bg-gradient-to-r from-gray-900 via-emerald-800 to-teal-800 bg-clip-text text-transparent flex items-center gap-2">
                     Categories
                     <Sparkles className="h-6 w-6 sm:h-7 sm:w-7 lg:h-8 lg:w-8 text-emerald-500" />
                    </h2>
-                   <p className="text-[8px] sm:text-sm text-gray-600 mt-1 sm:mt-2 font-medium">Manage product categories</p>
+                   <p className="text-gray-500 text-[10px] sm:text-[8px] sm:text-xs md:text-sm mt-0.5 font-medium">Manage product categories</p>
                 </div>
-                <Button onClick={() => { resetForm(); setIsModalOpen(true); }} className="gap-1" style={{ background: 'linear-gradient(135deg, #10b981, #059669)' , padding: '0px 5px', color: 'white' }}>
-                   <Plus className="h-4 w-4" /> <span className="hidden sm:inline" style={{ marginTop: '3px'}}>Add Category</span><span className="sm:hidden" style={{marginTop: '3px'}}>Add</span>
+                <Button onClick={() => navigate('/admin/categories/new')} className="text-[10px] sm:text-[8px] sm:text-xs md:text-sm h-7 sm:h-9 md:h-10 shadow-md transition-transform hover:scale-105 active:scale-95" style={{ padding: '0px 15px' }}>
+                   <Plus className="mr-0.5 sm:mr-1 md:mr-2 h-3 w-3 sm:h-3.5 sm:w-3.5 md:h-4 md:w-4" /> <span style={{ marginTop: '3px' }}>Add Category</span>
                 </Button>
              </div>
 
-             <Card className="flex-1 flex flex-col min-h-0 shadow-sm border-gray-200/60 bg-white/50 backdrop-blur-xl" style={{ padding: '5px 10px' }}>
-                <CardContent className="flex-1 flex flex-col p-2 sm:p-3 md:p-4 min-h-0">
-                    <div className="flex items-center gap-4 mb-2 sm:mb-3 md:mb-4 shrink-0" style={{ paddingBottom: '5px' }}>
-                        <div className="relative w-full lg:w-72">
-                            <Search className="absolute right-2.5 top-2 h-3 w-3 sm:h-4 sm:w-4 text-gray-500" />
-                            <Input 
-                                placeholder="Search categories..." 
-                                className="pl-8 sm:pl-9 text-[8px] sm:text-sm h-9 sm:h-10"
-                                value={searchQuery}
-                                onChange={(e) => setSearchQuery(e.target.value)}
-                            />
+             <Card className="flex-1 flex flex-col overflow-hidden">
+                <CardContent className="flex flex-col flex-1 min-h-0 p-2 sm:p-3 md:p-4 lg:p-6 space-y-2 sm:space-y-3 md:space-y-4 overflow-hidden" style={{ padding: '5px' }}>
+                    {/* Filters & Search Bar */}
+                    <div className="flex flex-col gap-3">
+                        <div className="flex flex-row gap-2 sm:gap-4" style={{ paddingBottom: '5px' }}>
+                            <div className="relative flex-1">
+                                <Search className="absolute right-2.5 top-2.5 h-3 w-3 sm:h-4 sm:w-4 text-gray-500" />
+                                <Input 
+                                    placeholder="Search by name..." 
+                                    className="pl-8 sm:pl-9 text-[8px] sm:text-sm h-9 sm:h-10"
+                                    value={searchQuery}
+                                    onChange={(e) => setSearchQuery(e.target.value)}
+                                    style={{ padding: '15px' }}
+                                />
+                            </div>
                         </div>
                     </div>
 
-                    {/* Table Container - Takes available space */}
-                    <div className="flex-1 overflow-auto rounded-md border border-gray-200">
+                    <div className="flex-1 overflow-auto rounded-md border border-gray-200 shadow-sm bg-white">
                         <Table>
                             <TableHeader>
                                 <TableRow style={{ background: 'linear-gradient(to right, #f0fdf4, #f0fdfa)' }}>
-                    <TableHead className="font-semibold text-gray-700 text-[8px] sm:text-sm" style={{ padding: '8px 5px', background: 'rgba(16, 185, 129, 0.1)' }}>Name</TableHead>
-                    <TableHead className="font-semibold text-gray-700 text-[8px] sm:text-sm hidden sm:table-cell" style={{ padding: '8px 5px', background: 'rgba(16, 185, 129, 0.1)' }}>Slug</TableHead>
-                    <TableHead className="font-semibold text-gray-700 text-[8px] sm:text-sm hidden md:table-cell" style={{ padding: '8px 5px', background: 'rgba(16, 185, 129, 0.1)' }}>Products</TableHead>
-                    <TableHead className="font-semibold text-gray-700 text-[8px] sm:text-sm" style={{ padding: '8px 5px', background: 'rgba(16, 185, 129, 0.1)' }}>Visibility</TableHead>
-                    <TableHead className="text-right font-semibold text-gray-700 text-[8px] sm:text-sm" style={{ padding: '8px 5px', background: 'rgba(16, 185, 129, 0.1)' }}>Actions</TableHead>
+                                    <TableHead className="w-16 font-semibold text-gray-700 text-[8px] sm:text-sm text-center" style={{ padding: '6px 8px' }}>SR NO</TableHead>
+                                    <TableHead className="font-semibold text-gray-700 text-[8px] sm:text-sm" style={{ padding: '6px 8px' }}>Image</TableHead>
+                                    <TableHead className="font-semibold text-gray-700 text-[8px] sm:text-sm" style={{ padding: '6px 8px' }}>Name</TableHead>
+                                    <TableHead className="font-semibold text-gray-700 text-[8px] sm:text-sm hidden sm:table-cell" style={{ padding: '6px 8px' }}>Slug</TableHead>
+                                    <TableHead className="font-semibold text-gray-700 text-[8px] sm:text-sm hidden md:table-cell text-center" style={{ padding: '6px 8px' }}>Products</TableHead>
+                                    <TableHead className="font-semibold text-gray-700 text-[8px] sm:text-sm" style={{ padding: '6px 8px' }}>Visibility</TableHead>
+                                    <TableHead className="text-right font-semibold text-gray-700 text-[8px] sm:text-sm" style={{ padding: '6px 8px' }}>Actions</TableHead>
                                 </TableRow>
                             </TableHeader>
                             <TableBody>
-                                {paginatedCategories.length > 0 ? (
-                                    paginatedCategories.map((category) => (
-                                        <TableRow key={category.id} className="hover:bg-emerald-50/50 transition-all duration-200 border-b border-gray-100">
-                                            <TableCell className="font-medium text-gray-900 text-[8px] sm:text-sm" style={{ padding: '8px 5px' }}>
-                                                <div className="flex items-center gap-2">
+                                {isError ? (
+                                     <TableRow>
+                                        <TableCell colSpan={7} className="h-32 text-center">
+                                            <div className="flex flex-col items-center justify-center gap-2">
+                                                <p className="text-red-500 font-medium">Failed to load categories.</p>
+                                                <Button size="sm" onClick={() => refetch()}>Retry</Button>
+                                            </div>
+                                        </TableCell>
+                                    </TableRow>
+                                ) : categories.length > 0 ? (
+                                    categories.map((category, index) => {
+                                        const srNo = (currentPage - 1) * itemsPerPage + index + 1;
+                                        const productCount = products.filter(p => p.category === category.name).length;
+                                        
+                                        return (
+                                            <TableRow key={category.id} className="hover:bg-emerald-50/50 transition-all duration-200 border-b border-gray-100 group">
+                                                <TableCell className="text-center font-medium text-gray-500 text-[8px] sm:text-sm" style={{ padding: '8px' }}>{srNo}</TableCell>
+                                                <TableCell style={{ padding: '6px' }}>
+                                                    <div className="w-10 h-10 rounded-lg overflow-hidden bg-gray-100 flex items-center justify-center border border-gray-200 shadow-xs">
+                                                        {category.image ? (
+                                                            <img 
+                                                                src={category.image} 
+                                                                alt={category.name}
+                                                                className="w-full h-full object-cover"
+                                                                onError={(e) => {
+                                                                    e.target.onerror = null;
+                                                                    e.target.style.display = 'none';
+                                                                    e.target.parentElement.innerHTML = '<div class="text-gray-400"><svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M4 16l4.586-4.586a2 2 0 012.828 0L16 16m-2-2l1.586-1.586a2 2 0 012.828 0L20 14m-6-6h.01M6 20h12a2 2 0 002-2V6a2 2 0 00-2-2H6a2 2 0 00-2 2v12a2 2 0 002 2z"></path></svg></div>';
+                                                                }}
+                                                            />
+                                                        ) : (
+                                                            <ImageIcon className="w-5 h-5 text-gray-400" />
+                                                        )}
+                                                    </div>
+                                                </TableCell>
+                                                <TableCell className="font-semibold text-gray-800 text-[8px] sm:text-sm" style={{ padding: '8px' }}>
                                                     {category.name}
-                                                </div>
-                                            </TableCell>
-                                            <TableCell className="text-gray-500 text-[8px] sm:text-sm hidden sm:table-cell" style={{ padding: '8px 5px' }}>{category.slug}</TableCell>
-                                            <TableCell className="text-gray-900 text-[8px] sm:text-sm hidden md:table-cell" style={{ padding: '8px 5px' }}>{category.products}</TableCell>
-                                            <TableCell style={{ padding: '8px 5px' }}>
-                                                <span className={`px-2 py-1 text-[8px] sm:text-xs font-medium rounded-full ${category.isVisible ? 'bg-green-100 text-green-700' : 'bg-gray-100 text-gray-700'}`}>
-                                                    {category.isVisible ? 'Visible' : 'Hidden'}
-                                                </span>
-                                            </TableCell>
-                                            <TableCell className="text-right" style={{ padding: '8px 5px' }}>
-                                                <div className="flex items-center justify-end gap-2">
-                                                    <Button variant="ghost" size="icon" className="h-7 w-7 sm:h-8 sm:w-8 text-blue-600 hover:bg-blue-50" onClick={() => openEditModal(category)}>
-                                                        <Edit className="h-3 w-3 sm:h-4 sm:w-4" />
+                                                </TableCell>
+                                                <TableCell className="text-gray-500 text-[8px] sm:text-xs hidden sm:table-cell font-mono" style={{ padding: '6px' }}>{category.slug || '-'}</TableCell>
+                                                <TableCell className="text-gray-900 text-[8px] sm:text-xs hidden md:table-cell text-center" style={{ padding: '6px' }}>
+                                                    <span className="px-2.5 py-0.5 bg-emerald-100 text-emerald-700 rounded-full text-[10px] font-bold ring-1 ring-inset ring-emerald-600/20">{productCount}</span>
+                                                </TableCell>
+                                                <TableCell className="text-[8px] sm:text-xs text-center" style={{ padding: '6px' }}>
+                                                    <Button 
+                                                        variant="ghost" 
+                                                        size="icon" 
+                                                        className="h-6 w-6 hover:bg-gray-100"
+                                                        title={category.visibility ? "Hide to website" : "Show toggle website"}
+                                                        onClick={() => handleToggleVisibility(category)}
+                                                    >
+                                                        {category.visibility 
+                                                            ? <Eye className="w-4 h-4 text-emerald-600" /> 
+                                                            : <EyeOff className="w-4 h-4 text-gray-400" />
+                                                        }
                                                     </Button>
-                                                    <Button variant="ghost" size="icon" className="h-7 w-7 sm:h-8 sm:w-8 text-red-600 hover:bg-red-50" onClick={() => openDeleteModal(category)}>
-                                                        <Trash2 className="h-3 w-3 sm:h-4 sm:w-4" />
-                                                    </Button>
-                                                </div>
-                                            </TableCell>
-                                        </TableRow>
-                                    ))
+                                                </TableCell>
+                                                <TableCell className="text-right" style={{ padding: '6px' }}>
+                                                    <div className="flex items-center justify-center gap-1 sm:gap-2 opacity-100">
+                                                        <Button 
+                                                            variant="ghost" 
+                                                            size="icon" 
+                                                            className="h-7 w-7 sm:h-8 sm:w-8 hover:bg-blue-50" 
+                                                            onClick={() => navigate(`/admin/categories/edit/${category.id}`)}
+                                                        >
+                                                            <Edit className="h-3 w-3 sm:h-4 sm:w-4 text-blue-600" />
+                                                        </Button>
+                                                        <Button 
+                                                            variant="ghost" 
+                                                            size="icon" 
+                                                            className="h-7 w-7 sm:h-8 sm:w-8 hover:bg-red-50" 
+                                                            onClick={() => openDeleteModal(category)}
+                                                        >
+                                                            <Trash2 className="h-3 w-3 sm:h-4 sm:w-4 text-red-600" />
+                                                        </Button>
+                                                    </div>
+                                                </TableCell>
+                                            </TableRow>
+                                        );
+                                    })
                                 ) : (
                                     <TableRow>
-                                        <TableCell colSpan={5} className="h-24 text-center text-gray-500 text-[8px] sm:text-sm">
-                                            No categories found.
+                                        <TableCell colSpan={7} className="h-32 text-center text-gray-500">
+                                            <div className="flex flex-col items-center justify-center gap-2">
+                                                <Search className="w-8 h-8 text-gray-300" />
+                                                <p className="text-sm font-medium">No categories found matching your search.</p>
+                                            </div>
                                         </TableCell>
                                     </TableRow>
                                 )}
@@ -193,13 +233,12 @@ const CategoriesList = () => {
                         </Table>
                     </div>
 
-                    {/* Pagination - Fixed at bottom */}
-                    {filteredCategories.length > 0 && (
-                        <div className="shrink-0 mt-4 pt-4" style={{bottom:'0', marginTop:'10px'}}>
+                    {!isLoading && totalItems > 0 && (
+                        <div className="shrink-0 mt-auto pt-4" style={{bottom:'0', marginTop:'10px'}}>
                             <Pagination
                                 currentPage={currentPage}
-                                totalPages={Math.ceil(filteredCategories.length / itemsPerPage)}
-                                onPageChange={(page) => setCurrentPage(page)}
+                                totalPages={totalPages}
+                                onPageChange={page => setCurrentPage(page)}
                                 itemsPerPage={itemsPerPage}
                                 onItemsPerPageChange={(val) => {
                                     setItemsPerPage(val);
@@ -211,50 +250,19 @@ const CategoriesList = () => {
                 </CardContent>
              </Card>
 
-             {/* Add/Edit Modal (Simplified inline) */}
-             {isModalOpen && (
-                 <div className="fixed inset-0 z-50 flex items-center justify-center p-4 bg-black/50 backdrop-blur-sm" style={{ padding: '10px'}}>
-                     <div className="bg-white rounded-lg shadow-xl w-full max-w-md p-4 sm:p-6" style={{ padding: '5px 10px'}}>
-                         <h3 className="text-lg font-bold mb-4">{isEditing ? 'Edit Category' : 'Add Category'}</h3>
-                         <div className="space-y-4">
-                             <div>
-                                 <label className="text-[8px] sm:text-sm font-medium text-gray-700">Category Name</label>
-                                 <Input 
-                                     value={currentCategory.name}
-                                     onChange={(e) => setCurrentCategory({...currentCategory, name: e.target.value })}
-                                     placeholder="e.g. Heart Care"
-                                     className="mt-1"
-                                 />
-                             </div>
-                             <div>
-                                 <label className="text-[8px] sm:text-sm font-medium text-gray-700">Visibility</label>
-                                 <select 
-                                     style={{ padding: '8px 5px' }}
-                                     value={currentCategory.isVisible}
-                                     onChange={(e) => setCurrentCategory({...currentCategory, isVisible: e.target.value === 'true' })}
-                                     className="w-full mt-1 rounded-md border border-gray-200 p-2 text-[8px] sm:text-sm"
-                                 >
-                                     <option value={true}>Visible</option>
-                                     <option value={false}>Hidden</option>
-                                 </select>
-                             </div>
-                             <div className="flex justify-end gap-3 mt-6">
-                                 <Button variant="ghost" onClick={() => setIsModalOpen(false)}>Cancel</Button>
-                                 <Button variant="primary" onClick={handleSave}>{isEditing ? 'Update' : 'Create'}</Button>
-                             </div>
-                         </div>
-                     </div>
-                 </div>
-             )}
-
              <ConfirmationModal 
                 isOpen={isDeleteModalOpen}
                 onClose={() => setIsDeleteModalOpen(false)}
                 onConfirm={handleDelete}
                 title="Delete Category"
-                message={`Are you sure you want to delete "${currentCategory.name}"? This action cannot be undone.`}
+                message={
+                    currentCategory && products.filter(p => p.category === currentCategory.name).length > 0
+                        ? `"${currentCategory?.name}" has ${products.filter(p => p.category === currentCategory.name).length} product(s). Are you sure you want to delete it? Products will remain but lose their category association.`
+                        : `Are you sure you want to delete "${currentCategory?.name}"? This action cannot be undone.`
+                }
                 confirmText="Delete"
                 variant="danger"
+                isLoading={deleteMutation.isPending}
              />
         </div>
     );

@@ -9,6 +9,7 @@ export const useActiveNavItem = () => {
   const getActiveItem = () => {
     const path = location.pathname;
     if (path === "/") return "Home";
+    if (path === "/shop") return "Shop";
     if (path.startsWith("/orders")) return "Orders";
     // For hash-based navigation
     if (location.hash === "#about") return "About Us";

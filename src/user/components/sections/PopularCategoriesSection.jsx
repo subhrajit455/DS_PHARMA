@@ -1,19 +1,18 @@
-import React, { useState } from 'react'; // Added Rect import though not strictly needed in new JSX transform, good for compat
+import React, { useState } from 'react';
 import { motion as Motion } from 'framer-motion';
 import { useNavigate } from 'react-router-dom';
-import { useCategories } from '@/shared/hooks/queries/useProducts'; // Updated hook path
 import Loading from '@/shared/components/common/Loading';
-import ErrorState from '@/shared/components/common/ErrorState';
+import SafeImage from '@/shared/components/SafeImage';
+import { CategorySkeleton } from '@/shared/components/skeletons/ProductSkeleton';
 
-const PopularCategoriesSection = ({
-  categories: propCategories = [], // Accept categories from backend
-}) => {
+import { useVisibleCategories } from '@/shared/hooks/queries/useCategories';
+
+const PopularCategoriesSection = () => {
   const [hoveredCategory, setHoveredCategory] = useState(null);
   const navigate = useNavigate();
-  const { data: categoryData, isLoading, isError } = useCategories();
-
-  const fetchedCategories = categoryData?.data || [];
-  const displayCategories = propCategories.length > 0 ? propCategories : fetchedCategories;
+  
+  // ✅ ENHANCED: Use Backend API hook for real-time visibility sync
+  const { data: displayCategories = [], isLoading, isError } = useVisibleCategories();
 
   const containerVariants = {
     hidden: { opacity: 0 },
@@ -38,8 +37,7 @@ const PopularCategoriesSection = ({
     }
   };
 
-  if (isLoading && propCategories.length === 0) return <Loading className="py-12" />;
-  if (isError && propCategories.length === 0) return null; // Or minor error state
+  if (isError) return null; // Don't show this section if it fails to load
 
   return (
     <section
@@ -49,17 +47,15 @@ const PopularCategoriesSection = ({
         background: 'linear-gradient(135deg, #A5E8DC 0%, #B8F0E8 100%)',
         minHeight: '180px',
         marginBottom: '3rem'
-
       }}
       aria-labelledby="popular-categories-heading"
     >
-      <div className="w-full max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 ml-8 sm:ml-12 lg:ml-16"
+      <div className="w-full max-w-7xl mx-auto px-4 sm:px-6 lg:px-8"
         style={{
-          marginLeft: '',
           marginTop: '22px'
         }}>
-        {/* Section Header - Compact Spacing */}
-        <div className="w-full flex flex-col sm:flex-row items-center justify-between mb-4 lg:mb-6 gap-1 sm:gap-2 ml-4 sm:ml-6 lg:ml-8">
+        {/* Section Header */}
+        <div className="w-full flex flex-col sm:flex-row items-center justify-between mb-4 lg:mb-6 gap-1 sm:gap-2">
           <h2
             id="popular-categories-heading"
             className="text-center sm:text-left flex-1"
@@ -73,7 +69,6 @@ const PopularCategoriesSection = ({
               marginBottom: '8px',
               display: 'flex',
               alignItems: 'center'
-
             }}
           >
             <span
@@ -92,37 +87,37 @@ const PopularCategoriesSection = ({
           </h2>
         </div>
 
-        {/* Categories Grid - Responsive & Dynamic */}
+        {/* Categories Grid */}
         <Motion.div
           variants={containerVariants}
           initial="hidden"
           whileInView="visible"
           viewport={{ once: true }}
-          className="flex overflow-x-auto  pb-4 hide-scrollbar w-full grid-col gap-2 sm:gap-4 sm:max-w-2xl sm:xl:max-w-3xl sm:ml-12 lg:ml-16 sm:overflow-visible sm:pb-0"
+          className="flex overflow-x-auto pb-4 hide-scrollbar w-full gap-4 sm:overflow-visible sm:pb-0 justify-left"
           style={{
             scrollbarWidth: 'none',
-            msOverflowStyle: 'none'// Gap for mobile flex layout
+            msOverflowStyle: 'none'
           }}
         >
-          {displayCategories.map((category, index) => (
+          {isLoading ? (
+            <div className="flex gap-8">
+              {[1, 2, 3, 4, 5, 6].map((i) => (
+                <CategorySkeleton key={i} />
+              ))}
+            </div>
+          ) : displayCategories.map((category, index) => (
             <Motion.div
               key={category.id || `category-${category.name}-${index}`}
               variants={itemVariants}
               className="flex flex-col items-center group cursor-pointer shrink-0 sm:shrink max-w-25 sm:min-w-[100px] relative"
-              style={{
-                // Mobile width handled by class or default behavior
-              }}
               onMouseEnter={() => setHoveredCategory(category.id)}
               onMouseLeave={() => setHoveredCategory(null)}
               role="button"
               tabIndex={0}
               aria-label={`View ${category.name} products`}
-              onClick={() => navigate(`/category/${encodeURIComponent(category.name)}`)}
-              onKeyDown={(e) => {
-                if (e.key === 'Enter' || e.key === ' ') {
-                  e.preventDefault();
-                  navigate(`/category/${encodeURIComponent(category.name)}`);
-                }
+              onClick={() => {
+                const id = category._id || category.id;
+                navigate(`/category/${id}`);
               }}
             >
               {/* Tooltip */}
@@ -130,18 +125,12 @@ const PopularCategoriesSection = ({
                  <Motion.div
                   initial={{ opacity: 0, y: 10 }}
                   animate={{ opacity: 1, y: 0 }}
-                  exit={{ opacity: 0, y: 10 }}
-                  transition={{ duration: 0.15 }}
-                  className="absolute top-full mb-2 left-1/2 -translate-x-1/2 px-3 py-1.5 bg-transparent bg-white-100 backdrop-blur-sm text-black text-[10px] sm:text-sm rounded-md shadow-xl z-50 whitespace-nowrap hidden sm:block pointer-events-none border border-white/10"
+                  className="absolute top-full mb-2 left-1/2 -translate-x-1/2 px-3 py-1.5 bg-white text-black text-[10px] sm:text-sm rounded-md shadow-xl z-50 whitespace-nowrap hidden sm:block border border-gray-100"
                   style={{ fontFamily: 'Gyrotrope', padding: '2px 5px', marginTop: '2px'}}
                 >
                   {category.name}
-                  {/* Arrow */}
-                  <div className="absolute bottom-full left-1/2 -translate-x-1/2 border-4 border-transparent border-b-gray-900/90" />
                 </Motion.div>
               )}
-              {/* Mobile Width Controller */}
-              <div className="sm:hidden" style={{ width: '22vw', minWidth: '80px', height: '0' }}></div>
 
               {/* Category Image */}
               <Motion.div
@@ -160,15 +149,11 @@ const PopularCategoriesSection = ({
                     flexShrink: 0
                   }}
                 >
-                  <img
+                  <SafeImage
                     src={category.image}
-                    alt={category.alt}
+                    alt={category.name}
                     className="w-full h-full object-cover object-center transition-transform duration-300 group-hover:scale-110"
                     loading="lazy"
-                    onError={(e) => {
-                      e.target.onerror = null;
-                      e.target.src = "https://images.unsplash.com/photo-1587854692152-cbe660dbde88?auto=format&fit=crop&w=600&q=80";
-                    }}
                   />
                 </div>
               </Motion.div>
@@ -182,13 +167,10 @@ const PopularCategoriesSection = ({
                   marginTop: '8px',
                   lineHeight: '1.2',
                   color: '#000000',
-                  letterSpacing: '0',
-                  wordBreak: 'break-word',
-                  overflow: 'hidden',
-                  textOverflow: 'ellipsis',
-                  display: '-webkit-box',
                   WebkitLineClamp: 2,
-                  WebkitBoxOrient: 'vertical'
+                  WebkitBoxOrient: 'vertical',
+                  display: '-webkit-box',
+                  overflow: 'hidden'
                 }}
               >
                 {category.name}

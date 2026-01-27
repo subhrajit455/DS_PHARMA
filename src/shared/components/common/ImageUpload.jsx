@@ -41,13 +41,21 @@ const ImageUpload = ({ images = [], onChange, maxFiles = 5, className = '' }) =>
       return;
     }
 
-    const newImages = validFiles.map(file => URL.createObjectURL(file));
-    onChange([...images, ...newImages]);
+    // Pass the actual File objects to the parent
+    onChange([...images, ...validFiles]);
   };
 
   const removeImage = (index) => {
     const newImages = images.filter((_, i) => i !== index);
     onChange(newImages);
+  };
+
+  // Helper function to get image source (matches either string URL or File object)
+  const getImageSource = (img) => {
+    if (typeof img === 'string') return img;
+    if (img instanceof File) return URL.createObjectURL(img);
+    if (img && img.url) return img.url; // Support object format {url, public_id}
+    return '';
   };
 
   return (
@@ -88,12 +96,19 @@ const ImageUpload = ({ images = [], onChange, maxFiles = 5, className = '' }) =>
       {/* Preview Grid */}
       {images.length > 0 && (
         <div className="grid grid-cols-2 sm:grid-cols-3 md:grid-cols-4 lg:grid-cols-5 gap-4" style={{ padding: '10px' }}>
-          {images.map((url, index) => (
+          {images.map((img, index) => (
             <div key={index} className="group relative aspect-square rounded-lg overflow-hidden border border-gray-200 bg-gray-50">
               <img
-                src={url}
-                alt={`Product ${index + 1}`}
+                src={getImageSource(img)}
+                alt={`Preview ${index + 1}`}
                 className="w-full h-full object-cover"
+                onLoad={(e) => {
+                    // Clean up blob URL after load if it's a blob
+                    if (typeof e.target.src === 'string' && e.target.src.startsWith('blob:')) {
+                        // We shouldn't revoke instantly if we re-render, 
+                        // but this is a reminder of the lifecycle
+                    }
+                }}
               />
               <button
                 type="button"
