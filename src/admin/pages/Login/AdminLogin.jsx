@@ -1,7 +1,7 @@
 import React, { useState } from 'react';
 import { useNavigate } from 'react-router-dom';
 import useAdminStore from '@/store/useAdminStore';
-import { toast } from 'react-hot-toast';
+import toastUtil from '@/shared/utils/toast';
 import { USERS } from '@/shared/data/userData';
 import { Button } from '@/admin/components/ui/Button';
 import { Input } from '@/admin/components/ui/Input';
@@ -29,13 +29,13 @@ const AdminLogin = () => {
       if (user && user.role === 'admin') {
         const dummyToken = 'admin-jwt-token-' + Date.now();
         login(user, dummyToken);
-        toast.success(`Welcome back, ${user.name}!`);
+        toastUtil.success(`Welcome back, ${user.name}!`);
         navigate('/admin/dashboard');
       } else {
         throw new Error('Invalid credentials');
       }
     } catch (error) {
-      toast.error(error.message || 'Login failed');
+      toastUtil.error(error.message || 'Login failed');
     } finally {
       setIsLoading(false);
     }
@@ -102,10 +102,9 @@ const AdminLogin = () => {
           <CardFooter className="flex flex-col space-y-4 pt-2">
             <Button 
               type="submit" 
-              variant="premium"
-              size="lg"
               className="w-full h-12 text-base font-semibold shadow-2xl"
               isLoading={isLoading}
+              style={{ background: 'linear-gradient(to right, #10b981, #0d9488)', color: 'white' }}
             >
               {isLoading ? 'Signing In...' : 'Sign In'}
             </Button>

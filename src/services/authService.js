@@ -1,94 +1,95 @@
-import apiClient from "@/services/api/apiClient";
-import { ENDPOINTS } from "@/services/api/endpoints";
-import mockApi from "@/services/api/mockApi";
+import apiClient from "./api/apiClient";
+import { API_ENDPOINTS } from "./api/baseURL";
 
-// Use mock service for local development
-const USE_MOCK = import.meta.env.VITE_USE_MOCK === "true" || true;
-
+/**
+ * Auth Service
+ * Handles all authentication related API calls directly with the backend
+ */
 export const authService = {
   /**
+   * Register a new user
+   * @param {Object} userData { name, email, phone, password }
+   */
+  register: async (userData) => {
+    try {
+      const response = await apiClient.post(API_ENDPOINTS.REGISTER, userData);
+      return response.data;
+    } catch (error) {
+      throw error.response?.data || error;
+    }
+  },
+
+  /**
    * Login user
+   * @param {Object} credentials { email, password }
    */
   login: async (credentials) => {
-    if (USE_MOCK) {
-      return mockApi.login(credentials);
+    try {
+      const response = await apiClient.post(API_ENDPOINTS.LOGIN, credentials);
+      return response.data;
+    } catch (error) {
+      throw error.response?.data || error;
     }
-    return apiClient.post(ENDPOINTS.LOGIN, credentials);
   },
 
-  /**
-   * Register new user
-   */
-  signup: async (userData) => {
-    if (USE_MOCK) {
-      // mockApi doesn't have signup yet, but hooks handle it directly
-      // This is a fallback - hooks should use useSignup which talks to store directly
-      console.warn(
-        "authService.signup called - hooks should use useSignup directly"
-      );
-      return { data: { success: true, message: "Use useSignup hook instead" } };
-    }
-    return apiClient.post(ENDPOINTS.SIGNUP, userData);
-  },
+  // Identity is extracted from JWT token payload, /user method removed.
 
   /**
-   * Logout user
+   * Update user profile
+   * @param {Object} userData { name, phone, password }
    */
-  logout: async () => {
-    if (USE_MOCK) {
-      // Logout is handled by useDataStore directly
-      return { data: { success: true } };
+  updateProfile: async (userData) => {
+    try {
+      const response = await apiClient.put(API_ENDPOINTS.UPDATE_USER, userData);
+      return response.data;
+    } catch (error) {
+      throw error.response?.data || error;
     }
-    return apiClient.post(ENDPOINTS.LOGOUT);
   },
 
   /**
    * Forgot password
+   * @param {string} email
    */
   forgotPassword: async (email) => {
-    return apiClient.post(ENDPOINTS.FORGOT_PASSWORD, { email });
+    try {
+      const response = await apiClient.post(API_ENDPOINTS.FORGOT_PASSWORD, {
+        email,
+      });
+      return response.data;
+    } catch (error) {
+      throw error.response?.data || error;
+    }
   },
 
   /**
    * Reset password
+   * @param {string} id - Reset token/ID
+   * @param {Object} data { password }
    */
-  resetPassword: async (token, newPassword) => {
-    return apiClient.post(ENDPOINTS.RESET_PASSWORD, { token, newPassword });
-  },
-
-  /**
-   * Refresh token
-   */
-  refreshToken: async (refreshToken) => {
-    return apiClient.post(ENDPOINTS.REFRESH_TOKEN, { refreshToken });
-  },
-
-  /**
-   * Get user profile
-   */
-  getProfile: async () => {
-    if (USE_MOCK) {
-      // Get current user from localStorage (useDataStore persistence)
-      const storeData = localStorage.getItem("ds-pharma-store");
-      if (storeData) {
-        const parsed = JSON.parse(storeData);
-        if (parsed.state?.currentUser) {
-          return { data: parsed.state.currentUser };
-        }
-      }
-      return { data: null };
+  resetPassword: async (id, data) => {
+    try {
+      const response = await apiClient.post(
+        API_ENDPOINTS.RESET_PASSWORD(id),
+        data,
+      );
+      return response.data;
+    } catch (error) {
+      throw error.response?.data || error;
     }
-    return apiClient.get(ENDPOINTS.USER_PROFILE);
   },
 
   /**
-   * Update user profile
+   * Get all customers (Admin only)
    */
-  updateProfile: async (profileData) => {
-    if (USE_MOCK) {
-      // In mock mode, profile updates should go through useDataStore
-      return { data: { ...profileData, success: true } };
+  getAdminCustomers: async () => {
+    try {
+      const response = await apiClient.get(API_ENDPOINTS.GET_ADMIN_CUSTOMERS);
+      return response.data;
+    } catch (error) {
+      throw error.response?.data || error;
     }
-    return apiClient.put(ENDPOINTS.UPDATE_PROFILE, profileData);
   },
 };
+
+export default authService;

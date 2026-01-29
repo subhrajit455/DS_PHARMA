@@ -1,6 +1,6 @@
 import React, { useState } from 'react';
 import { Link } from 'react-router-dom';
-import { AuthCard, InputField, SocialLogin } from '@/user/components/auth';
+import { AuthCard, InputField } from '@/user/components/auth';
 import Button from '@/shared/components/ui/Button';
 import { useLogin } from '@/shared/hooks/mutations/useLogin';
 
@@ -121,7 +121,6 @@ const LoginPage = () => {
                 </Button>
             </form>
 
-            <SocialLogin />
 
             <div className="mt-6 text-center text-sm" style={{ padding: '10px' }}>
                 <span className="text-gray-600">Don't have an account? </span>

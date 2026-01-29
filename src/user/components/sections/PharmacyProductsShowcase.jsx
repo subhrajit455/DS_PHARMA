@@ -14,6 +14,7 @@ const CategorySectionItem = ({ category }) => {
   const navigate = useNavigate();
   const [products, setProducts] = React.useState([]);
   const [loading, setLoading] = React.useState(true);
+  const [hasError, setHasError] = React.useState(false);
   
   // Determine display name and id
   const categoryName = typeof category === 'string' ? category : category.name;
@@ -23,8 +24,17 @@ const CategorySectionItem = ({ category }) => {
     let isMounted = true;
     
     const fetchProducts = async () => {
-      if (!categoryId) return;
+      if (!categoryId) {
+        if (isMounted) {
+          setLoading(false);
+          setHasError(true);
+        }
+        return;
+      }
+      
       setLoading(true);
+      setHasError(false);
+      
       try {
         // Fetch with proper cancellation support
         const response = await productService.getCategoryProducts(
@@ -45,11 +55,21 @@ const CategorySectionItem = ({ category }) => {
           });
           
           setProducts(productsWithImages);
+          setHasError(false);
         }
       } catch (err) {
-        // Silently handle cancellation errors
-        if (err?.name !== 'CanceledError' && err?.code !== 'ERR_CANCELED') {
-          console.error(`Failed to fetch category products for ${categoryName}:`, err);
+        // Silently handle all errors - don't show to user
+        if (isMounted) {
+          setProducts([]);
+          setHasError(true);
+          
+          // Only log in development mode
+          if (import.meta.env.DEV) {
+            // Skip logging for cancellation errors
+            if (err?.name !== 'CanceledError' && err?.code !== 'ERR_CANCELED') {
+              console.warn(`[CategorySection] Failed to fetch products for "${categoryName}":`, err.message);
+            }
+          }
         }
       } finally {
         if (isMounted) setLoading(false);
@@ -72,11 +92,11 @@ const CategorySectionItem = ({ category }) => {
     navigate(`/category/${categoryId}`);
   };
 
+  // Show skeleton during loading
   if (loading) return <div className="mb-12"><ProductGridSkeleton count={5} /></div>;
   
-  // Only skip if there are literally zero products and it's NOT an error 
-  // If it's an error (like a mismatch), we still want the section to potentially show something or just skip quietly but not fatalistically hide others.
-  if (!products || products.length === 0) return null; 
+  // Silently hide categories with errors or no products - no alerts to user
+  if (hasError || !products || products.length === 0) return null;
 
   return (
     <div className="mb-12 lg:mb-16 last:mb-0">

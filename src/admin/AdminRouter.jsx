@@ -9,12 +9,10 @@ import OrdersList from './pages/Orders/OrdersList';
 import OrderDetails from './pages/Orders/OrderDetails';
 import CustomersList from './pages/Customers/CustomersList';
 import CustomerDetails from './pages/Customers/CustomerDetails';
-import AnnouncementsList from './pages/Announcements/AnnouncementsList';
-import BannerForm from './pages/Announcements/BannerForm';
-import MarqueeForm from './pages/Announcements/MarqueeForm';
-import AlertForm from './pages/Announcements/AlertForm';
 import CategoriesList from './pages/Categories/CategoriesList';
 import CategoryForm from './pages/Categories/CategoryForm';
+import AnnouncementsList from './pages/Announcements/AnnouncementsList';
+import MarqueeForm from './pages/Announcements/MarqueeForm';
 import FeaturedProducts from './pages/Products/FeaturedProducts';
 
 const AdminRouter = () => {
@@ -46,12 +44,8 @@ const AdminRouter = () => {
         
         {/* Announcements */}
         <Route path="announcements" element={<AnnouncementsList />} />
-        <Route path="announcements/banners/new" element={<BannerForm />} />
-        <Route path="announcements/banners/:id/edit" element={<BannerForm />} />
         <Route path="announcements/marquee/new" element={<MarqueeForm />} />
         <Route path="announcements/marquee/:id/edit" element={<MarqueeForm />} />
-        <Route path="announcements/alerts/new" element={<AlertForm />} />
-        <Route path="announcements/alerts/:id/edit" element={<AlertForm />} />
       </Route>
 
       <Route path="*" element={<Navigate to="/admin/dashboard" replace />} />

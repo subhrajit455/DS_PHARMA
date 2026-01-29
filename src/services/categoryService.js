@@ -92,9 +92,16 @@ export const categoryService = {
    */
   createCategory: async (categoryData) => {
     try {
+      const config = {
+        headers: {
+          "Content-Type": "multipart/form-data",
+        },
+      };
+
       const response = await apiClient.post(
         API_ENDPOINTS.CATEGORY_CREATE,
         categoryData,
+        config,
       );
       return response.data;
     } catch (error) {
@@ -108,9 +115,16 @@ export const categoryService = {
    */
   updateCategory: async (id, categoryData) => {
     try {
+      const config = {
+        headers: {
+          "Content-Type": "multipart/form-data",
+        },
+      };
+
       const response = await apiClient.put(
         API_ENDPOINTS.CATEGORY_UPDATE(id),
         categoryData,
+        config,
       );
       return response.data;
     } catch (error) {

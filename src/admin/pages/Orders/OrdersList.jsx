@@ -1,7 +1,7 @@
 import React, { useState, useEffect } from 'react';
 import { useNavigate } from 'react-router-dom';
 import { Search, Filter, Eye, ArrowRight, Sparkles } from 'lucide-react';
-import { toast } from 'react-hot-toast';
+import toastUtil from '@/shared/utils/toast';
 import { Button } from '@/admin/components/ui/Button';
 import { Input } from '@/admin/components/ui/Input';
 import { Badge } from '@/admin/components/ui/Badge';
@@ -17,8 +17,6 @@ import {
 import { orderService } from '@/services/admin/api/orderService';
 import { Pagination } from '@/admin/components/ui/Pagination';
 import Loading from '@/shared/components/common/Loading';
-
-// ... existing imports
 
 const OrdersList = () => {
   const navigate = useNavigate();
@@ -38,7 +36,7 @@ const OrdersList = () => {
       setOrders(data);
     } catch (error) {
       console.error(error);
-      toast.error('Failed to fetch orders');
+      toastUtil.error('Failed to fetch orders');
     } finally {
       setIsLoading(false);
     }

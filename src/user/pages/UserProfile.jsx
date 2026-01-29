@@ -11,8 +11,7 @@ import { motion as Motion, AnimatePresence } from 'framer-motion';
 // Hooks & Store
 import { useProfile, useUpdateProfile } from '@/shared/hooks/queries/useProfile';
 import { useAddresses, useAddAddress, useUpdateAddress, useDeleteAddress } from '@/shared/hooks/queries/useAddresses';
-import useDataStore from '@/store/useDataStore';
-import { USERS } from '@/data/userData';
+import { useAuthStore } from '@/store/useAuthStore';
 
 // Components
 import PersonalInfoForm from '@/user/components/profile/PersonalInfoForm';
@@ -28,7 +27,7 @@ import useIsMobile from '@/shared/hooks/useIsMobile';
 
 const UserProfile = () => {
     const navigate = useNavigate();
-    const { isAuthenticated, currentUser } = useDataStore();
+    const { isAuthenticated, user: currentUser } = useAuthStore();
     const [activeSection, setActiveSection] = useState('overview');
     const [isEditingProfile, setIsEditingProfile] = useState(false);
     const isMobile = useIsMobile(768);
@@ -56,17 +55,15 @@ const UserProfile = () => {
     const { mutate: deleteAddress, isPending: isDeletingAddress } = useDeleteAddress();
 
     // Dynamic profile data with fallback
-    const [profileData, setProfileData] = useState(currentUser || USERS[0]);
+    const [profileData, setProfileData] = useState(null);
     const [tempProfileData, setTempProfileData] = useState({});
 
     // Sync profile data
     useEffect(() => {
-        if (currentUser) {
-            setProfileData(currentUser);
-            setTempProfileData(currentUser);
-        } else if (profileDataResponse?.data) {
-            setProfileData(profileDataResponse.data);
-            setTempProfileData(profileDataResponse.data);
+        const data = profileDataResponse || currentUser;
+        if (data) {
+            setProfileData(data);
+            setTempProfileData(data);
         }
     }, [currentUser, profileDataResponse]);
 

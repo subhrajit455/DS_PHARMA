@@ -1,6 +1,6 @@
 import { useQuery, useMutation, useQueryClient } from "@tanstack/react-query";
 import { categoryService } from "@/services/categoryService";
-import { toast } from "react-hot-toast";
+import toastUtil from "@/shared/utils/toast";
 
 /**
  * Hook to fetch all product categories with pagination and search
@@ -49,14 +49,13 @@ export const useCreateCategory = () => {
     mutationFn: (categoryData) => categoryService.createCategory(categoryData),
     onSuccess: (data) => {
       queryClient.invalidateQueries({ queryKey: ["categories"] });
-      // Use dynamic message from backend if available
       const message = data?.message || "Category created successfully";
-      toast.success(message);
+      toastUtil.success(message);
     },
     onError: (error) => {
       const message =
         error.response?.data?.message || "Failed to create category";
-      toast.error(message);
+      toastUtil.error(message);
     },
   });
 };
@@ -71,14 +70,13 @@ export const useUpdateCategory = () => {
     mutationFn: ({ id, data }) => categoryService.updateCategory(id, data),
     onSuccess: (data) => {
       queryClient.invalidateQueries({ queryKey: ["categories"] });
-      // Use dynamic message from backend if available
       const message = data?.message || "Category updated successfully";
-      toast.success(message);
+      toastUtil.success(message);
     },
     onError: (error) => {
       const message =
         error.response?.data?.message || "Failed to update category";
-      toast.error(message);
+      toastUtil.error(message);
     },
   });
 };
@@ -93,14 +91,13 @@ export const useDeleteCategory = () => {
     mutationFn: (id) => categoryService.deleteCategory(id),
     onSuccess: (data) => {
       queryClient.invalidateQueries({ queryKey: ["categories"] });
-      // Use dynamic message from backend if available (assuming delete returns one)
       const message = data?.message || "Category deleted successfully";
-      toast.success(message);
+      toastUtil.success(message);
     },
     onError: (error) => {
       const message =
         error.response?.data?.message || "Failed to delete category";
-      toast.error(message);
+      toastUtil.error(message);
     },
   });
 };

@@ -1,6 +1,6 @@
 import React, { useState } from 'react';
 import { Link } from 'react-router-dom';
-import { AuthCard, InputField, SocialLogin, TermsModal } from '@/user/components/auth';
+import { AuthCard, InputField, TermsModal } from '@/user/components/auth';
 import Button from '@/shared/components/ui/Button';
 import { useSignup } from '@/shared/hooks/mutations/useSignup';
 
@@ -58,7 +58,7 @@ const SignupPage = () => {
         e.preventDefault();
         if (validateForm()) {
             signup({
-                fullName: formData.fullName,
+                name: formData.fullName,
                 email: formData.email,
                 phone: formData.phone,
                 password: formData.password
@@ -167,7 +167,6 @@ const SignupPage = () => {
                     </Button>
                 </form>
 
-                <SocialLogin />
 
                 <div className="mt-6 text-center text-sm" style={{ padding: '10px' }}>
                     <span className="text-gray-600">Already have an account? </span>

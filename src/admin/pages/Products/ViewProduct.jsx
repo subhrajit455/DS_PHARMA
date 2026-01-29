@@ -4,14 +4,38 @@ import { X, Package } from "lucide-react";
 import { productUrl } from "@/config/adminApi";
 import { Button } from "@/admin/components/ui/Button";
 import { Card, CardContent } from "@/admin/components/ui/Card";
-import { toast } from "react-hot-toast";
+import toastUtil from "@/shared/utils/toast";
 
 const ViewProductModal = ({ open, onClose, productId }) => {
   const [product, setProduct] = useState(null);
   const [loading, setLoading] = useState(false);
+  const [categories, setCategories] = useState([]);
+
+  const fetchCategories = async () => {
+    try {
+      const res = await axios.get(
+        `${import.meta.env.VITE_URL}/category`
+      );
+      setCategories(res.data.data || []);
+    } catch (err) {
+      console.error("Failed to fetch categories:", err);
+    }
+  };
+
+  const categoryMap = React.useMemo(() => {
+    const map = {};
+    categories.forEach((cat) => {
+      map[cat._id || cat.id] = cat.name;
+    });
+    return map;
+  }, [categories]);
 
   useEffect(() => {
     if (!open || !productId) return;
+
+    if (categories.length === 0) {
+      fetchCategories();
+    }
 
     const fetchProduct = async () => {
       setLoading(true);
@@ -20,15 +44,21 @@ const ViewProductModal = ({ open, onClose, productId }) => {
           `${productUrl.getAllProducts}/${productId}`
         );
         setProduct(res.data.data || res.data);
-      } catch (err) {
-        toast.error("Failed to fetch product details");
+      } catch {
+        toastUtil.error("Failed to fetch product details");
       } finally {
         setLoading(false);
       }
     };
 
     fetchProduct();
-  }, [open, productId]);
+  }, [open, productId, categories.length]);
+
+  const getCategoryName = (category) => {
+     if (!category) return "-";
+     if (typeof category === 'object' && category.name) return category.name;
+     return categoryMap[category] || category;
+  };
 
   if (!open) return null;
 
@@ -97,14 +127,14 @@ const ViewProductModal = ({ open, onClose, productId }) => {
                     <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-6">
                       <Detail label="Name" value={product.name} />
                       <Detail label="Brand" value={product.brand} />
-                      <Detail label="Category" value={product.category} />
+                      <Detail label="Category" value={getCategoryName(product.category)} />
                       <Detail label="SKU" value={product.sku} />
                       <Detail label="Unit" value={product.unit} />
-                      <Detail label="Price" value={`₹${product.price}`} />
+                      <Detail label="Price" value={`₹${Number(product.price).toFixed(2)}`} />
                       <Detail label="Discount" value={`${product.discount}%`} />
                       <Detail
                         label="Discounted Price"
-                        value={`₹${product.discountedPrice}`}
+                        value={`₹${Number(product.discountedPrice).toFixed(2)}`}
                       />
                       <Detail label="Stock" value={product.stock} />
                       <Detail label="Status" value={product.status} />

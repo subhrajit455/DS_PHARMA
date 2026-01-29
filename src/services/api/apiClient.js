@@ -1,11 +1,10 @@
 import axios from "axios";
-import toast from "react-hot-toast";
+import toastUtil from "@/shared/utils/toast";
 
 const REQUEST_TIMEOUT = 15000;
-const MAX_RETRIES = 2;
 
 const apiClient = axios.create({
-  baseURL: import.meta.env.VITE_API_BASE_URL || "http://192.168.0.123:5000/api",
+  baseURL: import.meta.env.VITE_API_BASE_URL || "http://192.168.0.123:5000",
   timeout: REQUEST_TIMEOUT,
   headers: {
     "Content-Type": "application/json",
@@ -39,6 +38,9 @@ const isRetriableError = (error) => {
   return status >= 500 || status === 429;
 };
 
+// ============================================================
+// REQUEST INTERCEPTOR
+// ============================================================
 apiClient.interceptors.request.use(
   (config) => {
     const token = localStorage.getItem("authToken");
@@ -47,20 +49,9 @@ apiClient.interceptors.request.use(
     }
 
     config.metadata = { startTime: Date.now() };
-
-    if (import.meta.env.DEV) {
-      console.log(`[API] ${config.method?.toUpperCase()} ${config.url}`, {
-        params: config.params,
-        data: config.data,
-      });
-    }
-
     return config;
   },
-  (error) => {
-    console.error("[API] Request setup failed:", error);
-    return Promise.reject(error);
-  },
+  (error) => Promise.reject(error),
 );
 
 // ============================================================
@@ -72,101 +63,103 @@ apiClient.interceptors.response.use(
     if (import.meta.env.DEV && response.config.metadata) {
       const duration = Date.now() - response.config.metadata.startTime;
       console.log(
-        `[API] ✓ ${response.config.method?.toUpperCase()} ${response.config.url} (${duration}ms)`,
+        `[API Response] ✓ ${response.config.method?.toUpperCase()} ${response.config.url} (${duration}ms)`,
       );
     }
 
     return response;
   },
   (error) => {
-    // CRITICAL: Handle CanceledError properly (DO NOT show toast)
+    // 1. Handle CanceledError (Silently)
     if (isCancelError(error)) {
       if (import.meta.env.DEV) {
-        console.log(`[API] Request canceled: ${error.config?.url}`);
+        console.log(`[API Request Canceled] ${error.config?.url}`);
       }
-      return Promise.reject(error); // Silent rejection
+      return Promise.reject(error);
     }
 
-    // Handle network errors (server unreachable)
+    // 2. Handle Network Errors
     if (isNetworkError(error)) {
-      console.error("[API] Network error:", error.config?.url);
-
-      // Show toast only once per network failure
+      console.error("[API Network Error]", error.config?.url);
       if (!error.config?._networkErrorShown) {
-        toast.error(
+        toastUtil.error(
           "Unable to connect to server. Please check your connection.",
         );
         if (error.config) error.config._networkErrorShown = true;
       }
-
-      return Promise.reject({
-        ...error,
-        isNetworkError: true,
-        retriable: true,
-      });
+      return Promise.reject({ ...error, isNetworkError: true });
     }
 
-    // Handle timeout errors
+    // 3. Handle Timeout Errors
     if (error.code === "ECONNABORTED" && error.message.includes("timeout")) {
-      console.error("[API] Request timeout:", error.config?.url);
-      toast.error("Request timed out. Please try again.");
-
-      return Promise.reject({
-        ...error,
-        isTimeout: true,
-        retriable: true,
-      });
+      console.error("[API Timeout Error]", error.config?.url);
+      toastUtil.error("Request timed out. Please try again.");
+      return Promise.reject({ ...error, isTimeout: true });
     }
 
-    // Handle HTTP errors with response
+    // 4. Handle HTTP Response Errors
     if (error.response) {
       const { status, data } = error.response;
       const url = error.config?.url;
 
       if (import.meta.env.DEV) {
-        console.error(`[API] ✗ ${status} ${url}`, {
+        console.error(`[API Error] ✗ ${status} ${url}`, {
           error: data,
           config: error.config,
         });
       }
 
+      // Priority-based error message extraction
+      let errorMessage = "";
+
+      // If data is a string (HTML error page from Express)
+      if (typeof data === "string" && data.includes("<!DOCTYPE html>")) {
+        errorMessage = "Something went wrong on the server. Please try again.";
+      } else {
+        errorMessage =
+          data?.message || data?.error?.message || data?.error || "";
+      }
+
       switch (status) {
+        case 400:
+          toastUtil.error(
+            errorMessage || "Invalid request. Please check your inputs.",
+          );
+          break;
+
         case 401:
-          localStorage.removeItem("authToken");
-          toast.error("Session expired. Please login again.");
-          break;
-
-        case 403:
-          toast.error("Access denied. You don't have permission.");
-          break;
-
-        case 404:
-          if (import.meta.env.DEV) {
-            console.warn(`[API] Resource not found: ${url}`);
+          if (localStorage.getItem("authToken")) {
+            localStorage.removeItem("authToken");
+            toastUtil.error("Session expired. Please login again.");
+            window.location.href = "/login";
+          } else {
+            toastUtil.error(errorMessage || "Please login to continue.");
           }
           break;
 
-        case 429:
-          toast.error("Too many requests. Please slow down.");
+        case 403:
+          toastUtil.error(
+            errorMessage || "Access denied. You don't have permission.",
+          );
+          break;
+
+        case 404:
+          toastUtil.error(
+            errorMessage || "The requested resource was not found.",
+          );
           break;
 
         case 500:
-        case 502:
-        case 503:
-        case 504:
-          // Server errors - show generic message
-          toast.error("Server error. Please try again later.");
+          if (import.meta.env.DEV)
+            console.error("[API 500] Server Error:", data);
+          toastUtil.error("Server error. Please try again later.");
           break;
 
-        default: {
-          // Other errors - use backend message if available
-          const message = data?.message || data?.error || "An error occurred";
-          toast.error(message);
+        default:
+          toastUtil.error(errorMessage || "An unexpected error occurred.");
           break;
-        }
       }
 
-      // Add retriable flag
       error.retriable = isRetriableError(error);
     }
 
@@ -179,7 +172,6 @@ apiClient.interceptors.response.use(
 // ============================================================
 export const createCancelableRequest = (requestFn) => {
   const controller = new AbortController();
-
   const promise = requestFn(controller.signal);
 
   return {

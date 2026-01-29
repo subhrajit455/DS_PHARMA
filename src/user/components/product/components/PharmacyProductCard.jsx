@@ -236,7 +236,7 @@ const PharmacyProductCard = ({
         <div className="relative pt-2 translate-y-1/8" >
           {/* Product Name */}
           <h3 className="flex items-center justify-start text-[10px] sm:text-[14px] font-semibold leading-tight text-left text-gray-900 min-h-8">
-            {name.length > 15 ? `${name.substring(0, 13)}...` : name}
+            {name && name.length > 15 ? `${name.substring(0, 13)}...` : (name || 'Unnamed Product')}
           </h3>
 
           {/* Price and Discount Row */}

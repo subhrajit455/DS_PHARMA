@@ -2,7 +2,7 @@ import React, { useRef, useState } from 'react';
 import { User, Camera, ChevronRight, LogOut, Loader2, Trash2, Check, X } from 'lucide-react';
 import { useLogout } from '@/shared/hooks/useLogout';
 import { useUploadProfileImage, useRemoveProfileImage } from '@/shared/hooks/mutations/useProfileImage';
-import useDataStore from '@/store/useDataStore';
+import { useAuthStore } from '@/store/useAuthStore';
 import { validateImage, createImagePreview } from '@/utils/imageValidation';
 import useIsMobile from '@/shared/hooks/useIsMobile';
 
@@ -14,7 +14,7 @@ const ProfileSidebar = ({
     sections 
 }) => {
     const logout = useLogout();
-    const { currentUser } = useDataStore();
+    const { user: currentUser } = useAuthStore();
     const fileInputRef = useRef(null);
     const [preview, setPreview] = useState(null);
     const [selectedFile, setSelectedFile] = useState(null);
@@ -76,7 +76,7 @@ const ProfileSidebar = ({
     };
 
     const isProcessing = isUploading || isRemoving;
-    const avatarUrl = profileData.avatar || profileData.profileImage;
+    const avatarUrl = profileData?.avatar || profileData?.profileImage || profileData?.image;
 
     return (
         <aside className="lg:col-span-3 lg:sticky lg:top-24 self-start space-y-6 md:min-h-[calc(100vh-200px)]" style={{ marginTop: isMobile ? '0px' : '30px' }}>
@@ -148,9 +148,9 @@ const ProfileSidebar = ({
 
                 <div className="space-y-1" style={{marginTop: isMobile ? '8px' : '10px'}}>
                     <h2 className={`${isMobile ? 'text-base' : 'text-lg'} font-bold text-gray-900 leading-tight`}>
-                        {profileData.firstName || profileData.name?.split(' ')[0] || ''} {profileData.lastName || profileData.name?.split(' ').slice(1).join(' ') || ''}
+                        {profileData?.name || 'User'}
                     </h2>
-                    <p className={`text-gray-500 ${isMobile ? 'text-[11px]' : 'text-xs sm:text-sm'}`}>{profileData.email}</p>
+                    <p className={`text-gray-500 ${isMobile ? 'text-[11px]' : 'text-xs sm:text-sm'}`}>{profileData?.email}</p>
                 </div>
 
 

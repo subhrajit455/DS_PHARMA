@@ -1,17 +1,20 @@
 import { useQuery, useMutation, useQueryClient } from "@tanstack/react-query";
 import { authService } from "@/services/authService";
-import { useToastStore } from "@/store/useToastStore";
-import useDataStore from "@/store/useDataStore";
+import { useAuthStore } from "@/store/useAuthStore";
+import toastUtil from "@/shared/utils/toast";
 
 /**
  * Hook to fetch user profile
  */
 export const useProfile = () => {
-  const isAuthenticated = useDataStore((state) => state.isAuthenticated);
+  const isAuthenticated = useAuthStore((state) => state.isAuthenticated);
 
   return useQuery({
     queryKey: ["profile"],
-    queryFn: () => authService.getProfile(),
+    queryFn: async () => {
+      const response = await authService.getCurrentUser();
+      return response;
+    },
     enabled: isAuthenticated,
     staleTime: 5 * 60 * 1000, // 5 minutes
   });
@@ -22,20 +25,21 @@ export const useProfile = () => {
  */
 export const useUpdateProfile = () => {
   const queryClient = useQueryClient();
-  const { success, error } = useToastStore();
-  const updateUser = useDataStore((state) => state.login); // Reuse login to update current user
+  const { setUser } = useAuthStore();
 
   return useMutation({
     mutationFn: (profileData) => authService.updateProfile(profileData),
-    onSuccess: (data) => {
-      success("Profile updated successfully");
-      // Update data store with new user data
-      updateUser(data.data);
-      // Invalidate profile query to refetch fresh data
+    onSuccess: (response) => {
+      const userData = response.data || response;
+      toastUtil.success("Profile updated successfully");
+      // Update store
+      setUser(userData);
+      // Invalidate profile query
       queryClient.invalidateQueries({ queryKey: ["profile"] });
     },
     onError: (err) => {
-      error(err.response?.data?.message || "Failed to update profile");
+      const message = err.message || "Failed to update profile";
+      toastUtil.error(message);
     },
   });
 };

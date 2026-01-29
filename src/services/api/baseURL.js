@@ -1,6 +1,6 @@
 // API Base Configuration
 export const API_BASE_URL =
-  import.meta.env.VITE_API_BASE_URL || "http://192.168.0.123:5000/api";
+  import.meta.env.VITE_API_BASE_URL || "http://192.168.0.123:5000";
 
 export const API_ENDPOINTS = {
   // Products (Generic - Admin)
@@ -10,7 +10,8 @@ export const API_ENDPOINTS = {
 
   // Products (User-Facing - New Backend APIs)
   PRODUCT_USER_SEARCH: "productusersearch",
-  PRODUCT_USER_CATEGORY: (id) => `productusercategory/${id}`,
+  PRODUCT_USER_CATEGORY: (categoryName) =>
+    `productusercategory/${encodeURIComponent(categoryName)}`,
   PRODUCT_BY_ID_USER: (id) => `productbyid/${id}`,
   FILTER_PRODUCTS: "getfilterproduct",
 
@@ -23,9 +24,9 @@ export const API_ENDPOINTS = {
   CATEGORY_PRODUCTS: (id) => `category/${id}/products`,
 
   // Featured Products
-  FEATURED_ADD: "featuredadd",
-  FEATURED_GET: "featuredget",
-  FEATURED_DELETE: (id) => `featureddelete/${id}`,
+  FEATURED_ADD: "featured",
+  FEATURED_GET: "featured",
+  FEATURED_DELETE: (id) => `featured/${id}`,
 
   // Cart
   CART: "cart",
@@ -39,10 +40,13 @@ export const API_ENDPOINTS = {
   CREATE_ORDER: "orders/create",
 
   // Auth
-  LOGIN: "auth/login",
-  REGISTER: "auth/register",
-  LOGOUT: "auth/logout",
-  PROFILE: "auth/profile",
+  LOGIN: "login",
+  REGISTER: "register",
+  LOGOUT: "logout",
+  UPDATE_USER: "updateuser",
+  FORGOT_PASSWORD: "forgotpassword",
+  RESET_PASSWORD: (id) => `resetpassword/${id}`,
+  GET_ADMIN_CUSTOMERS: "getadmincustomer",
 
   // Payments
   PAYMENTS: "payments",
@@ -58,10 +62,17 @@ export const API_ENDPOINTS = {
   REVIEWS: "reviews",
   PRODUCT_REVIEWS: (id) => `products/${id}/reviews`,
 
-  // Addresses (TODO: Implement on backend when ready)
+  // Addresses
   ADDRESSES: "addresses",
   ADDRESS_DETAILS: (id) => `addresses/${id}`,
   ADD_ADDRESS: "addresses",
   UPDATE_ADDRESS: (id) => `addresses/${id}`,
   DELETE_ADDRESS: (id) => `addresses/${id}`,
+
+  // Title / Heading (Marquee System)
+  GET_HEADINGS: "getheading",
+  GET_HEADING_BY_ID: (id) => `getheadingbyid/${id}`,
+  UPDATE_HEADING: (id) => `updateheading/${id}`,
+  DELETE_HEADING: (id) => `deleteheading/${id}`,
+  ADD_HEADING: "addheading",
 };

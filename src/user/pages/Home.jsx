@@ -5,11 +5,10 @@ import LazyComponent from '@/shared/components/LazyComponent';
 import productService from '@/services/productService';
 
 // Lazy load non-critical sections
+const HighlightedCategorySection = lazy(() => import('@/user/components/sections/HighlightedCategorySection'));
 const BannerSection = lazy(() => import('@/user/components/sections/BannerSection'));
-const FeaturedProductsSection = lazy(() => import('@/user/components/sections/FeaturedProductsSection'));
 const PharmacyProductsShowcase = lazy(() => import('@/user/components/sections/PharmacyProductsShowcase'));
 const WhyChooseUsSection = lazy(() => import('@/user/components/sections/WhyChooseUsSection'));
-const AlertBanner = lazy(() => import('@/user/components/sections/alerts/AlertBanner'));
 
 const Home = () => {
   const [categories, setCategories] = useState([]);
@@ -43,7 +42,6 @@ const Home = () => {
 
   return (
     <Suspense fallback={<div className="min-h-screen bg-white" />}>
-      <AlertBanner position="top" />
 
       {/* Hero Section */}
       <section className="py-2 my-2 sm:py-12 sm:my-8">
@@ -62,18 +60,22 @@ const Home = () => {
         </LazyComponent>
       )}
 
-      {/* Banner Section */}
+      {/* Static Banner Section */}
       <LazyComponent>
-        <section className="py-2 my-2 sm:py-12 sm:my-8">
-          <BannerSection />
+        <BannerSection />
+      </LazyComponent>
+
+
+
+      {/* Featured Products Section (Reverted to HighlightedCategorySection) */}
+      <LazyComponent>
+        <section className="py-2 my-2 sm:py-12 sm:my-8 bg-gray-50/20">
+          <HighlightedCategorySection />
         </section>
       </LazyComponent>
 
-      {/* Featured Products Section (Live Backend API) */}
       <LazyComponent>
-        <section className="py-2 my-2 sm:py-12 sm:my-8 bg-gray-50/20">
-          <FeaturedProductsSection />
-        </section>
+        <BannerSection />
       </LazyComponent>
 
       {/* Second Block of Pharmacy Products (Bottom Half of Categories) */}
@@ -83,12 +85,6 @@ const Home = () => {
         </LazyComponent>
       )}
 
-      {/* Second Banner Section */}
-      <LazyComponent>
-        <section className="py-2 my-2 sm:py-12 sm:my-8">
-          <BannerSection />
-        </section>
-      </LazyComponent>
 
       {/* Why Choose Us Section */}
       <LazyComponent>
@@ -97,7 +93,7 @@ const Home = () => {
         </section>
       </LazyComponent>
 
-      <AlertBanner position="bottom" />
+
     </Suspense>
   );
 };

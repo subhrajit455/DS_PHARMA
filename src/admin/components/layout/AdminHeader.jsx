@@ -12,11 +12,13 @@ import {
   DropdownMenuSeparator,
   DropdownMenuTrigger,
 } from '../ui/DropdownMenu';
-import useAdminStore from '../../context/useAdminStore';
+import { useAuthStore } from '@/store/useAuthStore';
+import { useLogout } from '@/shared/hooks/useLogout';
 
 const AdminHeader = ({ onMobileMenuToggle }) => {
   const navigate = useNavigate();
-  const logout = useAdminStore((state) => state.logout);
+  const { user } = useAuthStore();
+  const logout = useLogout();
 
   return (
     <header className="sticky top-0 z-30 flex h-12 sm:h-14 md:h-16 items-center gap-x-1 sm:gap-x-2 md:gap-x-4 border-b-2 border-emerald-200/70 bg-white/90 backdrop-blur-xl px-1 sm:px-2 md:px-4 shadow-md shadow-emerald-500/10 lg:px-8 transition-all" style={{ background: 'linear-gradient(to right, #ffffff 0%, #f0fdf4 50%, #ecfdf5 100%)', padding: '0px 10px' }}>
@@ -46,23 +48,8 @@ const AdminHeader = ({ onMobileMenuToggle }) => {
 
       <div className="flex flex-1 gap-x-2 sm:gap-x-4 self-stretch items-center lg:gap-x-6 relative z-10 justify-end">
 
-        {/* Search - Hidden on mobile, visible on sm and up */}
-        <form className="relative hidden sm:flex w-full max-w-md" action="#" method="GET" style={{ padding: '5px' }} >
-          <label htmlFor="search-field" className="sr-only">
-            Search
-          </label>
-          <div className="relative w-full" style={{ paddingLeft: '10px' }}>
-            <Search className="pointer-events-none absolute right-2 top-1/2 h-2.5 w-2.5 sm:h-3 sm:w-3 md:h-4 md:w-4 -translate-y-1/2 text-emerald-600" aria-hidden="true"/>
-             <Input 
-                id="search-field"
-                className="pl-6 sm:pl-8 md:pl-10 text-[10px] sm:text-[8px] sm:text-xs md:text-sm border-emerald-200 focus:border-emerald-500 focus:ring-2 focus:ring-emerald-500/20 h-7 sm:h-8 md:h-10" 
-                style={{ background: 'linear-gradient(to right, #f0fdf4, #ecfdf5)', borderRadius: '10px', padding: '5px 10px' }}
-                placeholder="Search..."
-                name="search"
-                type="search"
-             />
-          </div>
-        </form>
+        {/* Center spacing or other element in place of search */}
+        <div className="flex-1 hidden sm:flex" />
         
         <div className="flex items-center gap-x-1 sm:gap-x-2 lg:gap-x-4">
           {/* Notification Bell - Hidden on xs, visible on sm and up */}
@@ -82,11 +69,12 @@ const AdminHeader = ({ onMobileMenuToggle }) => {
                     <Avatar 
                         className="h-8 w-10 sm:h-8 sm:w-10 md:h-8 md:w-10 text-white ring-2 ring-emerald-200 shadow-lg shadow-emerald-500/30"
                         style={{ background: 'linear-gradient(to bottom right, #10b981, #0d9488)' }}
-                        fallback="AD"
+                        src={user?.profileImage || user?.image}
+                        fallback={user?.name?.slice(0, 2).toUpperCase() || "AD"}
                     />
                     <span className="hidden md:flex md:items-center">
                         <span className="text-[10px] sm:text-[8px] sm:text-xs md:text-sm font-semibold bg-gradient-to-r from-emerald-700 to-teal-700 bg-clip-text text-transparent" aria-hidden="true">
-                          Admin User
+                          {user?.name || 'Admin User'}
                         </span>
                     </span>
                 </div>

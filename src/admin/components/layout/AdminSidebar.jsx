@@ -37,7 +37,8 @@ const AdminSidebar = ({ isCollapsed, toggleCollapse, isMobile, onCloseMobile }) 
     const isActive = 
       location.pathname === item.href || 
       (location.pathname.startsWith(item.href) && 
-       (item.href !== '/admin/products' || !location.pathname.startsWith('/admin/products/featured')));
+       (item.href !== '/admin/products' || !location.pathname.startsWith('/admin/products/featured')) &&
+       (item.href !== '/admin/dashboard' || location.pathname === '/admin/dashboard'));
     return (
       <NavLink
         to={item.href}

@@ -1,10 +1,12 @@
 import { useNavigate } from 'react-router-dom';
 import useDataStore from '@/store/useDataStore';
+import { useAuthStore } from '@/store/useAuthStore';
 import { useActiveNavItem } from '@/user/components/navigation/hooks/useActiveNavItem';
 import { DesktopNavigation } from '@/user/components/navigation/DesktopNavigation';
 import { MobileTopBar } from '@/user/components/navigation/MobileTopBar';
 import { MobileBottomNav } from '@/user/components/navigation/MobileBottomNav';
 import { NAV_ITEMS } from '@/user/components/navigation/constants';
+import { LayoutGrid } from 'lucide-react';
 
 /**
  * Main Navigation component - orchestrates all navigation sub-components
@@ -12,18 +14,31 @@ import { NAV_ITEMS } from '@/user/components/navigation/constants';
 const Navigation = () => {
   const navigate = useNavigate();
   
-  // Connect to Global Data Store
-  const { currentUser, isAuthenticated, cart } = useDataStore();
+  // Use useAuthStore for primary authentication state
+  const { user, isAuthenticated } = useAuthStore();
+  // Use useDataStore only for shop data like cart
+  const { cart } = useDataStore();
   
   // Calculate total items
-  const totalCartItems = cart.reduce((sum, item) => sum + (item.quantity || 1), 0);
+  const totalCartItems = cart?.reduce((sum, item) => sum + (item.quantity || 1), 0) || 0;
   
   const activeItem = useActiveNavItem();
   
-  // Filter navigation items based on authentication status
-  const filteredNavItems = NAV_ITEMS.filter(item => 
+  // Filter navigation items based on authentication status and roles
+  const filteredNavItems = [...NAV_ITEMS.filter(item => 
     (isAuthenticated && item.auth) || (!isAuthenticated && item.guest)
-  );
+  )];
+
+  // Inject Admin link if user is an admin
+  if (isAuthenticated && user?.role === 'admin') {
+    // Add it after Orders or at the end
+    filteredNavItems.push({ 
+      name: "Admin Panel", 
+      href: "/admin/dashboard", 
+      icon: LayoutGrid, 
+      auth: true 
+    });
+  }
 
   const handleNavClick = (itemName, href) => {
     if (href.startsWith('/')) {
@@ -126,7 +141,7 @@ const Navigation = () => {
           onNavClick={handleNavClick}
           totalCartItems={totalCartItems}
           isAuthenticated={isAuthenticated}
-          user={currentUser}
+          user={user}
           navItems={filteredNavItems}
         />
 

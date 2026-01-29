@@ -1,7 +1,7 @@
 import React, { useState, useEffect } from 'react';
 import { useNavigate, useParams } from 'react-router-dom';
 import { Save, ArrowLeft, Tag, Eye, EyeOff } from 'lucide-react';
-import { toast } from 'react-hot-toast';
+import toastUtil from '@/shared/utils/toast';
 import { Button } from '@/admin/components/ui/Button';
 import { Input } from '@/admin/components/ui/Input';
 import { Label } from '@/admin/components/ui/Label';
@@ -66,25 +66,39 @@ const CategoryForm = () => {
   };
 
   const handleImageChange = (newImages) => {
+    const file = newImages[0];
+    
+    // Client-side validation for file type
+    if (file && file instanceof File) {
+      const allowedTypes = ['image/jpeg', 'image/png', 'image/webp'];
+      if (!allowedTypes.includes(file.type)) {
+        return toastUtil.error("Only JPG, PNG, or WebP images are supported");
+      }
+    }
+
     setImageList(newImages);
     setFormData(prev => ({ ...prev, image: newImages[0] || null }));
   };
 
   const handleSubmit = (e) => {
     e.preventDefault();
-    if (!formData.name.trim()) return toast.error('Category name is required');
-    if (!formData.image) return toast.error('Category image is required');
+    if (!formData.name.trim()) return toastUtil.error('Category name is required');
+    if (!formData.image) return toastUtil.error('Please upload a category image before submitting');
     setIsModalOpen(true);
   };
 
   const handleConfirm = async () => {
     const data = new FormData();
     data.append('name', formData.name.trim());
+    data.append('slug', formData.slug.trim());
     data.append('visibility', String(formData.visibility));
     
     if (formData.image instanceof File) {
       data.append('image', formData.image);
-    } 
+    } else if (formData.image) {
+      // If image exists but is not a new file (edit mode)
+      data.append('image', formData.image);
+    }
 
     try {
       if (isEditMode) {
@@ -94,6 +108,7 @@ const CategoryForm = () => {
       }
       navigate('/admin/categories');
     } catch (err) {
+      // Error is handled by apiClient interceptor
       console.error('Submission Error:', err);
     } finally {
       setIsModalOpen(false);

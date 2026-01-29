@@ -2,7 +2,7 @@ import React from 'react';
 import { Menu, LogOut, Bell } from 'lucide-react';
 import { useNavigate } from 'react-router-dom';
 import useAdminStore from '../../context/useAdminStore';
-import { toast } from 'react-hot-toast';
+import toastUtil from '@/shared/utils/toast';
 
 const Topbar = () => {
   const toggleSidebar = useAdminStore((state) => state.toggleSidebar);
@@ -11,7 +11,7 @@ const Topbar = () => {
 
   const handleLogout = () => {
     logout();
-    toast.success('Logged out successfully');
+    toastUtil.success('Logged out successfully');
     navigate('/admin/login');
   };
 

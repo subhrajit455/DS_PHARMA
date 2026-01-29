@@ -9,7 +9,7 @@ import {
   Sparkles,
   Package,
 } from "lucide-react";
-import { toast } from "react-hot-toast";
+import toastUtil from "@/shared/utils/toast";
 import { ChevronDown } from "lucide-react";
 
 import { Button } from "@/admin/components/ui/Button";
@@ -23,7 +23,7 @@ import {
   TableRow,
 } from "@/admin/components/ui/Table";
 import { Pagination } from "@/admin/components/ui/Pagination";
-import { productUrl } from "@/config/adminApi";
+import { productUrl, categoryUrl } from "@/config/adminApi";
 import ViewProductModal from "./ViewProduct";
 import axios from "axios";
 import ConfirmationModal from "@/admin/components/ui/ConfirmationModal";
@@ -47,10 +47,32 @@ const ProductsList = () => {
   const [search, setSearch] = useState("");
   const [viewOpen, setViewOpen] = useState(false);
   const [selectedProductId, setSelectedProductId] = useState(null);
+  const [categories, setCategories] = useState([]);
 
-  const fetchProducts = async (page = 1, limit = 10, searchTerm = "") => {
+  const fetchCategories = async () => {
+    try {
+      const res = await axios.get(categoryUrl.getAllCategories);
+      setCategories(res.data.data || []);
+    } catch (err) {
+      console.error("Failed to load categories:", err);
+    }
+  };
+
+  const categoryMap = React.useMemo(() => {
+    const map = {};
+    categories.forEach((cat) => {
+      map[cat._id || cat.id] = cat.name;
+    });
+    return map;
+  }, [categories]);
+
+  const fetchProducts = React.useCallback(async (page = 1, limit = 10, searchTerm = "") => {
     setIsLoading(true);
     try {
+      // Fetch categories once if not already fetched
+      if (categories.length === 0) {
+        fetchCategories();
+      }
       const response = await axios.get(productUrl.getAllProducts, {
         params: { page, limit, search: searchTerm },
       });
@@ -66,16 +88,16 @@ const ProductsList = () => {
       );
     } catch (error) {
       console.error(error);
-      toast.error("Failed to fetch products");
+      toastUtil.error("Failed to fetch products");
     } finally {
       setIsLoading(false);
     }
-  };
+  }, [categories.length]);
 
 
   useEffect(() => {
     fetchProducts(pagination.currentPage, pagination.limit, search);
-  }, [pagination.currentPage, pagination.limit, search]);
+  }, [pagination.currentPage, pagination.limit, search, fetchProducts]);
 
   const handlePageChange = (page) => {
     setPagination((prev) => ({ ...prev, currentPage: page }));
@@ -97,7 +119,7 @@ const handleItemsPerPageChange = (limit) => {
     setDeleteLoading(true);
     try {
       await axios.delete(`${productUrl.deleteProduct}/${deleteId}`);
-      toast.success("Product deleted successfully");
+      toastUtil.success("Product deleted successfully");
 
       setConfirmOpen(false);
       setDeleteId(null);
@@ -105,7 +127,7 @@ const handleItemsPerPageChange = (limit) => {
       fetchProducts(pagination.currentPage, pagination.limit);
     } catch (error) {
       console.error(error);
-      toast.error("Failed to delete product");
+      toastUtil.error("Failed to delete product");
     } finally {
       setDeleteLoading(false);
     }
@@ -287,7 +309,10 @@ const handleItemsPerPageChange = (limit) => {
                         className="text-gray-700 text-[8px] sm:text-xs"
                         style={{ padding: "6px" }}
                       >
-                        {product.category}
+                        {typeof product.category === 'object' && product.category?.name 
+                          ? product.category.name 
+                          : categoryMap[product.category] || product.category || 'N/A'
+                        }
                       </TableCell>
                       <TableCell
                         className="font-mono text-[8px] sm:text-xs text-gray-500"
@@ -305,7 +330,7 @@ const handleItemsPerPageChange = (limit) => {
                         className="text-[8px] sm:text-xs font-semibold text-emerald-600"
                         style={{ padding: "6px" }}
                       >
-                        ₹{product.price}
+                        ₹{Number(product.price).toFixed(2)}
                       </TableCell>
                       <TableCell
                         className="text-[8px] sm:text-xs"
@@ -317,7 +342,7 @@ const handleItemsPerPageChange = (limit) => {
                         className="text-[8px] sm:text-xs font-semibold text-emerald-700"
                         style={{ padding: "6px" }}
                       >
-                        ₹{product.discountedPrice}
+                        ₹{Number(product.discountedPrice).toFixed(2)}
                       </TableCell>
                       <TableCell
                         className="text-[8px] sm:text-xs"

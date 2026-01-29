@@ -463,110 +463,149 @@ const getAllCategories = async (options = {}) => {
 // ============================================================
 // API: Get Products by Category
 // ============================================================
+// Session-based mapping of category identifiers that successfully returned data
+// This avoids double-fetching for known working mappings in the same session
+const workingCategoryIdentifiers = new Map();
+
 const getProductsByCategory = async (
   categoryId,
   page = 1,
   limit = 12,
   options = {},
 ) => {
-  // Validate inputs
-  if (!categoryId) {
-    console.warn("[ProductService] No categoryId provided");
-    return {
-      data: [],
-      pagination: {
-        currentPage: 1,
-        totalPages: 0,
-        totalItems: 0,
-        hasMore: false,
-      },
-    };
-  }
+  if (!categoryId) return { data: [], pagination: {} };
 
   const pageNum = Math.max(1, Number(page) || 1);
   const limitNum = Math.max(1, Math.min(100, Number(limit) || 12));
 
-  // Resolve category ID to name (backend expects name)
-  let categoryIdentifier = categoryId;
-
-  try {
-    const categories = await getAllCategories();
-    const category = categories.find(
-      (c) =>
-        c.id === categoryId || c._id === categoryId || c.name === categoryId,
-    );
-
-    if (category) {
-      categoryIdentifier = category.name;
-    } else {
-      console.warn(`[ProductService] Category not found: ${categoryId}`);
-      // Return empty result instead of failing
-      return {
-        data: [],
-        pagination: {
-          currentPage: pageNum,
-          totalPages: 0,
-          totalItems: 0,
-          hasMore: false,
-        },
-      };
-    }
-  } catch (error) {
-    console.error("[ProductService] Category resolution failed:", error);
-    // Continue with original ID
-  }
+  // If we already know which identifier works for this categoryId, use it immediately
+  const knownIdentifier = workingCategoryIdentifiers.get(categoryId);
 
   const requestKey = getRequestKey(`category_${categoryId}`, {
     page: pageNum,
     limit: limitNum,
+    id_override: !!knownIdentifier, // Differentiate cache keys
   });
 
   try {
-    const result = await resilientFetch(
+    return await resilientFetch(
       requestKey,
       async (signal) => {
-        const response = await apiClient.get(
-          API_ENDPOINTS.PRODUCT_USER_CATEGORY(categoryIdentifier),
-          {
-            params: { page: pageNum, limit: limitNum },
-            signal,
-          },
-        );
+        let primaryIdentifier = knownIdentifier || categoryId;
+        let secondaryIdentifier = null;
 
-        const data = response.data?.data || response.data || [];
-        const pagination = response.data?.pagination || {};
+        const isObjectId = /^[a-f\d]{24}$/i.test(categoryId);
+
+        // Define fallback strategy if we don't have a known identifier yet
+        if (!knownIdentifier && isObjectId) {
+          try {
+            const categories = await getAllCategories();
+            const category = categories.find(
+              (c) => c.id === categoryId || c._id === categoryId,
+            );
+            if (category && category.name) {
+              // We'll try ID first (primary), then fallback to Name (secondary)
+              // This is because Admin-saved products use IDs.
+              primaryIdentifier = categoryId;
+              secondaryIdentifier = category.name;
+            }
+          } catch (err) {
+            console.warn("[ProductService] Category resolution failed:", err);
+          }
+        }
+
+        // 1. Try Primary Fetch
+        const fetchBy = async (id) => {
+          try {
+            const response = await apiClient.get(
+              API_ENDPOINTS.PRODUCT_USER_CATEGORY(id),
+              {
+                params: { page: pageNum, limit: limitNum },
+                signal,
+              },
+            );
+            const data = response.data?.data || response.data || [];
+            const pagination = response.data?.pagination || {};
+            return { data, pagination };
+          } catch (err) {
+            // Handle 404 specifically for fallback logic
+            if (err.response?.status === 404) {
+              return { data: [], pagination: {} };
+            }
+            throw err; // Re-throw other errors (500, Network, etc.)
+          }
+        };
+
+        let result = await fetchBy(primaryIdentifier);
+
+        // 2. Fallback if Primary returned nothing but a secondary exists
+        // API might return {"message": "No products found..."} instead of []
+        const isPrimaryEmpty =
+          !result.data ||
+          !Array.isArray(result.data) ||
+          result.data.length === 0;
+
+        if (isPrimaryEmpty && secondaryIdentifier) {
+          if (import.meta.env.DEV) {
+            console.log(
+              `[ProductService] No products found for ID ${primaryIdentifier}, trying fallback name: ${secondaryIdentifier}`,
+            );
+          }
+          const fallbackResult = await fetchBy(secondaryIdentifier);
+          const isFallbackValid =
+            fallbackResult.data &&
+            Array.isArray(fallbackResult.data) &&
+            fallbackResult.data.length > 0;
+
+          if (isFallbackValid) {
+            result = fallbackResult;
+            workingCategoryIdentifiers.set(categoryId, secondaryIdentifier);
+          }
+        } else if (!isPrimaryEmpty && !knownIdentifier) {
+          // Success with primary! Cache it.
+          workingCategoryIdentifiers.set(categoryId, primaryIdentifier);
+        }
+
+        const { data, pagination } = result;
+
+        // Calculate totalPages if not provided by backend
+        const totalItems =
+          pagination.totalItems || (Array.isArray(data) ? data.length : 0);
+        const totalPages =
+          pagination.totalPages ||
+          (limitNum > 0 ? Math.ceil(totalItems / limitNum) : 1);
 
         return {
           data: Array.isArray(data)
             ? data.map(normalizeProduct).filter(Boolean)
             : [],
           pagination: {
-            currentPage: pagination.currentPage || pageNum,
-            totalPages: pagination.totalPages || (data.length > 0 ? 1 : 0),
-            totalItems: pagination.totalItems || data.length,
+            currentPage: pagination.current_page || pagination.page || pageNum,
+            totalPages:
+              totalPages ||
+              (Array.isArray(data) && data.length > 0 ? pageNum : 0),
+            totalItems: totalItems,
             hasMore:
-              (pagination.currentPage || pageNum) <
-              (pagination.totalPages || 1),
+              pagination.hasMore ??
+              (Array.isArray(data) &&
+                data.length >= limitNum &&
+                pageNum < totalPages),
           },
         };
       },
       options,
     );
-
-    return (
-      result || {
-        data: [],
-        pagination: {
-          currentPage: pageNum,
-          totalPages: 0,
-          totalItems: 0,
-          hasMore: false,
-        },
-      }
-    );
   } catch (error) {
-    // Handle 404 gracefully (category might be empty)
     if (error.response?.status === 404) {
+      if (import.meta.env.DEV) {
+        console.warn(
+          `[ProductService] 404 on category fetch for ID ${categoryId}. Clearing cache.`,
+        );
+      }
+      // Force refresh of categories on next attempt
+      categoriesCache = null;
+      categoriesCacheTime = 0;
+
       return {
         data: [],
         pagination: {
@@ -579,11 +618,9 @@ const getProductsByCategory = async (
     }
 
     console.error(
-      `[ProductService] Failed to fetch products for category ${categoryId}:`,
+      "[ProductService] Failed to fetch products for category:",
       error,
     );
-
-    // Return empty result on error
     return {
       data: [],
       pagination: {
@@ -602,28 +639,25 @@ const getProductsByCategory = async (
 // ============================================================
 const getFeaturedProducts = async (options = {}) => {
   const requestKey = "featured_products";
-
   try {
-    const result = await resilientFetch(
+    return await resilientFetch(
       requestKey,
       async (signal) => {
         const response = await apiClient.get(API_ENDPOINTS.FEATURED_GET, {
           signal,
         });
         const data = response.data?.data || response.data || [];
-
         return Array.isArray(data)
-          ? data
-              .map((item) => normalizeProduct(item.product || item))
-              .filter(Boolean)
+          ? data.map((item) =>
+              normalizeProduct(item.productId || item.product || item),
+            )
           : [];
       },
       options,
     );
-
-    return result || [];
   } catch (error) {
-    console.error("[ProductService] Failed to fetch featured products:", error);
+    if (error.name === "AbortError") return null;
+    console.error("[ProductService] Failed to load featured products:", error);
     return [];
   }
 };
@@ -901,7 +935,7 @@ const getAllProducts = async ({ page = 1, limit = 12, filters = {} } = {}) => {
           },
         };
       },
-      {}
+      {},
     );
 
     return (
@@ -953,12 +987,15 @@ const getAllProductsAtOnce = async (filters = {}) => {
           ? data.map(normalizeProduct).filter(Boolean)
           : [];
       },
-      {}
+      {},
     );
 
     return result || [];
   } catch (error) {
-    console.error("[ProductService] Failed to fetch all products at once:", error);
+    console.error(
+      "[ProductService] Failed to fetch all products at once:",
+      error,
+    );
     return [];
   }
 };
@@ -974,6 +1011,7 @@ export const productService = {
   getProductById,
   searchUserProducts,
   getAllProducts,
+  getProducts: getAllProducts, // Alias for hook compatibility
   getAllProductsAtOnce,
 
   // Legacy aliases for backward compatibility

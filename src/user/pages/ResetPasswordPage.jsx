@@ -7,7 +7,7 @@ import { CheckCircle, AlertCircle, ArrowLeft } from 'lucide-react';
 import { motion as Motion } from 'framer-motion';
 
 const ResetPasswordPage = () => {
-    const { token } = useParams();
+    const { id } = useParams();
     const navigate = useNavigate();
     
     const [formData, setFormData] = useState({
@@ -43,7 +43,7 @@ const ResetPasswordPage = () => {
         if (validateForm()) {
             setIsLoading(true);
             try {
-                await authService.resetPassword(token, formData.password);
+                await authService.resetPassword(id, { password: formData.password });
                 setIsSuccess(true);
                 // Redirect after a short delay
                 setTimeout(() => {

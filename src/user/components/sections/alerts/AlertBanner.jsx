@@ -1,6 +1,6 @@
 import React, { useEffect, useState } from 'react';
 import { X } from 'lucide-react';
-import { useAnnouncements } from '@/shared/contexts/AnnouncementContext';
+import { useAnnouncements } from '@/shared/contexts/AnnouncementContextInternal';
 
 const AlertBanner = ({ position = 'top'}) => {
   const { alerts } = useAnnouncements();

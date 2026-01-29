@@ -2,7 +2,8 @@ import React from 'react';
 import { useNavigate } from 'react-router-dom';
 import { motion as Motion } from 'framer-motion';
 import { PharmacyProductCard } from '@/user/components/product';
-import { useProducts } from '@/shared/hooks/queries/useProducts';
+import { useFeaturedProducts } from '@/shared/hooks/queries/useFeaturedProducts';
+import { productService } from '@/services/productService';
 
 import Loading from '@/shared/components/common/Loading';
 import ErrorState from '@/shared/components/common/ErrorState';
@@ -10,20 +11,30 @@ import ErrorState from '@/shared/components/common/ErrorState';
 const HighlightedCategorySection = () => {
   const navigate = useNavigate();
   
-  // Fetch featured products (Admin controlled)
-  const { data, isLoading, isError } = useProducts({ isFeatured: true, limit: 20 });
+  // Fetch featured products (Explicitly admin-selected via /featured endpoint)
+  const { data: featuredData, isLoading, isError } = useFeaturedProducts();
   
-  // Filter for visibility on Home Page only (View All shows all)
-  const allFeatured = data?.data || [];
-  const visibleProducts = allFeatured.filter(p => p.isVisible !== false);
+  // Data structure comes as a simple array or { data: [] } depending on service logic
+  const allFeaturedRaw = Array.isArray(featuredData) ? featuredData : featuredData?.data || [];
+  
+  // Extract and normalize the actual products
+  const allProducts = allFeaturedRaw
+    .map(item => {
+      // API returns product details inside 'productId' or 'product' key
+      const productData = item.productId || item.product || item;
+      return productData ? productService.normalizeProduct(productData) : null;
+    })
+    .filter(Boolean)
+    .map(p => ({
+       ...p,
+       quantity: '1',
+       unit: 'box',
+       imageUrl: p.image,
+       discount: p.discount || 10
+    }));
 
-  const products = visibleProducts.map(p => ({
-     ...p,
-     quantity: '1',
-     unit: 'box',
-     imageUrl: p.image, // Map image to imageUrl if card expects it
-     discount: p.discount || 10 // Default discount if missing
-  }));
+  // Limit to first 5 products for home page display
+  const products = allProducts.slice(0, 5);
 
   if (isLoading) return <Loading className="py-20" />;
   if (isError) return <ErrorState message="Failed to load featured items" />;
@@ -56,9 +67,9 @@ const HighlightedCategorySection = () => {
     navigate(`/product/${product.id}`);
   };
 
-  // View All ignores visibility restriction (shows all featured)
+  // View All correctly points to the dedicated featured products page
   const handleViewAll = () => {
-    navigate('/search?featured=true');
+    navigate('/featured');
   };
 
   return (

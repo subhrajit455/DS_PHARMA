@@ -1,6 +1,6 @@
 import React, { useState, useRef } from 'react';
 import { Upload, X, Image as ImageIcon } from 'lucide-react';
-import { toast } from 'react-hot-toast';
+import toastUtil from '@/shared/utils/toast';
 
 const ImageUpload = ({ images = [], onChange, maxFiles = 5, className = '' }) => {
   const fileInputRef = useRef(null);
@@ -33,11 +33,11 @@ const ImageUpload = ({ images = [], onChange, maxFiles = 5, className = '' }) =>
     const validFiles = files.filter(file => file.type.startsWith('image/'));
     
     if (validFiles.length !== files.length) {
-      toast.error('Some files were ignored. Only images are allowed.');
+      toastUtil.error('Some files were ignored. Only images are allowed.');
     }
 
     if (images.length + validFiles.length > maxFiles) {
-      toast.error(`You can only upload up to ${maxFiles} images.`);
+      toastUtil.error(`You can only upload up to ${maxFiles} images.`);
       return;
     }
 
@@ -102,13 +102,6 @@ const ImageUpload = ({ images = [], onChange, maxFiles = 5, className = '' }) =>
                 src={getImageSource(img)}
                 alt={`Preview ${index + 1}`}
                 className="w-full h-full object-cover"
-                onLoad={(e) => {
-                    // Clean up blob URL after load if it's a blob
-                    if (typeof e.target.src === 'string' && e.target.src.startsWith('blob:')) {
-                        // We shouldn't revoke instantly if we re-render, 
-                        // but this is a reminder of the lifecycle
-                    }
-                }}
               />
               <button
                 type="button"

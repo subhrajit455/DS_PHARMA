@@ -1,7 +1,7 @@
 import React, { useEffect, useState } from 'react';
 import { useParams, useNavigate } from 'react-router-dom';
 import { ArrowLeft, User, MapPin, CreditCard, Truck } from 'lucide-react';
-import { toast } from 'react-hot-toast';
+import toastUtil from '@/shared/utils/toast';
 import { useQueryClient } from '@tanstack/react-query';
 import { Button } from '@/admin/components/ui/Button';
 import { Card, CardContent, CardHeader, CardTitle } from '@/admin/components/ui/Card';
@@ -17,8 +17,6 @@ import {
 import { orderService } from '@/services/admin/api/orderService';
 import ConfirmationModal from '@/admin/components/ui/ConfirmationModal';
 import Loading from '@/shared/components/common/Loading';
-
-// ... existing imports
 
 const OrderDetails = () => {
   const { id } = useParams();
@@ -40,7 +38,7 @@ const OrderDetails = () => {
         setOrder(data);
       } catch (error) {
         console.error(error);
-        toast.error('Order not found');
+        toastUtil.error('Order not found');
         navigate('/admin/orders');
       } finally {
         setIsLoading(false);
@@ -48,8 +46,6 @@ const OrderDetails = () => {
     };
     fetchOrder();
   }, [id, navigate]);
-
-
 
   const confirmStatusUpdate = async () => {
     if (!pendingStatus) return;
@@ -62,11 +58,11 @@ const OrderDetails = () => {
       // Invalidate orders list
       await queryClient.invalidateQueries({ queryKey: ['orders'] });
       
-      toast.success(`Order updated to ${pendingStatus}`);
-      setPendingStatus(null); // Clear pending status on success
+      toastUtil.success(`Order updated to ${pendingStatus}`);
+      setPendingStatus(null); 
     } catch (error) {
       console.error(error);
-      toast.error('Failed to update status');
+      toastUtil.error('Failed to update status');
     } finally {
       setIsUpdating(false);
       setIsModalOpen(false);
@@ -112,7 +108,6 @@ const OrderDetails = () => {
       </div>
 
       <div className="grid grid-cols-1 lg:grid-cols-3 gap-6">
-        {/* Left Column: Items */}
         <div className="lg:col-span-2 space-y-6">
            <Card>
               <CardHeader>
@@ -133,9 +128,6 @@ const OrderDetails = () => {
                            <TableRow 
                              key={idx}
                              className="hover:bg-emerald-50/50 transition-all duration-200 border-b border-gray-100"
-                             style={{ 
-                               marginBottom: idx !== order.products.length - 1 ? '5px' : '0',
-                             }}
                            >
                              <TableCell className="pl-6 font-medium text-gray-900" style={{ padding: '10px', paddingLeft: '16px' }}>{item.name}</TableCell>
                              <TableCell style={{ padding: '10px' }}>₹{item.price}</TableCell>
@@ -143,17 +135,13 @@ const OrderDetails = () => {
                              <TableCell className="text-right pr-6 font-medium text-gray-900" style={{ padding: '10px', paddingRight: '16px' }}>₹{item.price * item.qty}</TableCell>
                            </TableRow>
                          ))}
-                         <TableRow className="bg-gray-50/50 hover:bg-gray-50/50">
-                           <TableCell colSpan={3} className="pl-6 text-right font-medium text-gray-500" style={{ padding: '10px', paddingLeft: '16px' }}>Subtotal</TableCell>
-                           <TableCell className="text-right pr-6 font-medium text-gray-900" style={{ padding: '10px', paddingRight: '16px' }}>₹{order.total}</TableCell>
+                         <TableRow className="bg-gray-50/50">
+                           <TableCell colSpan={3} className="pl-6 text-right font-medium text-gray-500">Subtotal</TableCell>
+                           <TableCell className="text-right pr-6 font-medium text-gray-900">₹{order.total}</TableCell>
                          </TableRow>
-                         <TableRow className="bg-gray-50/50 hover:bg-gray-50/50">
-                            <TableCell colSpan={3} className="pl-6 text-right font-medium text-gray-500" style={{ padding: '10px', paddingLeft: '16px' }}>Shipping</TableCell>
-                            <TableCell className="text-right pr-6 font-medium text-gray-900" style={{ padding: '10px', paddingRight: '16px' }}>Free</TableCell>
-                         </TableRow>
-                         <TableRow className="bg-gray-100/50 hover:bg-gray-100/50">
-                            <TableCell colSpan={3} className="pl-6 text-right font-bold text-lg text-gray-900" style={{ padding: '10px', paddingLeft: '16px' }}>Grand Total</TableCell>
-                            <TableCell className="text-right pr-6 font-bold text-lg text-emerald-600" style={{ padding: '10px', paddingRight: '16px' }}>₹{order.total}</TableCell>
+                         <TableRow className="bg-gray-100/50">
+                             <TableCell colSpan={3} className="pl-6 text-right font-bold text-lg text-gray-900">Grand Total</TableCell>
+                             <TableCell className="text-right pr-6 font-bold text-lg text-emerald-600">₹{order.total}</TableCell>
                          </TableRow>
                     </TableBody>
                   </Table>
@@ -161,94 +149,52 @@ const OrderDetails = () => {
            </Card>
         </div>
 
-        {/* Right Column: Customer & Address */}
         <div className="space-y-6">
-           <Card style={{ marginBottom: '10px', padding: '10px' }}>
+           <Card className="p-4">
               <CardHeader>
                   <CardTitle>Customer Details</CardTitle>
               </CardHeader>
               <CardContent>
                  <div className="flex items-start gap-4">
-                    <Avatar 
-                        className="bg-blue-100 text-blue-600"
-                        fallback={<User className="h-4 w-4" />} 
-                    />
+                    <Avatar className="bg-blue-100 text-blue-600" fallback={<User className="h-4 w-4" />} />
                     <div>
                         <h4 className="font-semibold text-gray-900">{order.customer || 'Guest User'}</h4>
-                        <p className="text-sm text-gray-500 mt-0.5">{order.email}</p>
-                        <p className="text-sm text-gray-500 mt-0.5">{order.phone || '+91 9999999999'}</p>
-                        {order.altPhone && <p className="text-sm text-gray-500 mt-0.5">Alt: {order.altPhone}</p>}
+                        <p className="text-sm text-gray-500">{order.email}</p>
+                        <p className="text-sm text-gray-500">{order.phone || '+91 9999999999'}</p>
                     </div>
                  </div>
               </CardContent>
            </Card>
 
-           <Card style={{ marginBottom: '10px', padding: '10px' }}>
+           <Card className="p-4">
                <CardHeader>
                    <CardTitle>Delivery Address</CardTitle>
                </CardHeader>
                <CardContent>
                    <div className="flex items-start gap-4">
                      <MapPin className="mt-1 h-5 w-5 text-gray-400 shrink-0" />
-                     <p className="text-sm text-gray-600 leading-relaxed">
-                        {order.shippingAddress}
-                     </p>
-                   </div>
-                   
-                   <div className="mt-6 pt-4 border-t border-gray-100">
-                       <h4 className="text-sm font-semibold text-gray-700 mb-3 flex items-center gap-2">
-                          <Truck className="h-4 w-4" /> Shipping Method
-                       </h4>
-                       <p className="text-sm text-gray-600">{order.courierName ? `${order.courierName} Express` : 'Standard Delivery (3-5 Days)'}</p>
-                   </div>
-               </CardContent>
-           </Card>
-
-           <Card style={{ marginBottom: '10px', padding: '10px' }}>
-               <CardHeader>
-                   <CardTitle>Payment Information</CardTitle>
-               </CardHeader>
-               <CardContent>
-                   <div className="flex items-start gap-4">
-                      <CreditCard className="mt-1 h-5 w-5 text-gray-400" />
-                      <div>
-                         <p className="text-sm font-medium text-gray-900">Paid Online</p>
-                         <p className="text-[8px] sm:text-xs text-gray-500 mt-1">Status: {order.payment || 'Completed'}</p>
-                      </div>
+                     <p className="text-sm text-gray-600 leading-relaxed">{order.shippingAddress}</p>
                    </div>
                </CardContent>
            </Card>
         </div>
       </div>
       
-      {/* Sticky Bottom Bar for Update Action */}
       {pendingStatus && pendingStatus !== order.status && (
-          <div className="fixed bottom-0 right-0 left-0 lg:left-53 bg-white border-t border-gray-200 p-4 shadow-[0_-4px_6px_-1px_rgba(0,0,0,0.1)] z-40 animate-in slide-in-from-bottom-5">
-              <div className="flex justify-between items-center max-w-7xl mx-auto px-4" style={{ padding: ' 0px 10px' }}>
-                  <span className="text-sm text-gray-600 hidden sm:block">
-                      Status change: <span className="font-semibold text-gray-900">{order.status}</span> → <span className="font-semibold text-emerald-600">{pendingStatus}</span>
-                  </span>
-                  <div className="flex items-center gap-4 ml-auto sm:ml-0">
-                      <Button variant="ghost" onClick={() => setPendingStatus(null)}>Cancel</Button>
-                      <Button 
-                        onClick={() => setIsModalOpen(true)}
-                        className="bg-emerald-600 hover:bg-emerald-700 text-white shadow-md hover:shadow-lg transition-all"
-                        style={{ padding: '0px 16px' }}
-                      >
-                        Update Status
-                      </Button>
-                  </div>
+          <div className="fixed bottom-0 right-0 left-0 lg:left-53 bg-white border-t border-gray-200 p-4 shadow-lg z-40">
+              <div className="flex justify-end items-center max-w-7xl mx-auto px-4 gap-4">
+                  <Button variant="ghost" onClick={() => setPendingStatus(null)}>Cancel</Button>
+                  <Button onClick={() => setIsModalOpen(true)} className="bg-emerald-600 hover:bg-emerald-700 text-white">Update Status</Button>
               </div>
           </div>
       )}
 
-      
       <ConfirmationModal 
         isOpen={isModalOpen}
         onClose={() => setIsModalOpen(false)}
         onConfirm={confirmStatusUpdate}
         title="Update Order Status"
-        message={`Are you sure you want to change the order status to "${pendingStatus}"? This will notify the customer.`}
+        message={`Are you sure you want to change the order status to "${pendingStatus}"?`}
         confirmText="Update Status"
         isLoading={isUpdating}
       />

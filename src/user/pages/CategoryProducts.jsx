@@ -21,21 +21,25 @@ const CategoryProducts = () => {
   const [hasMore, setHasMore] = useState(true);
   const [totalItems, setTotalItems] = useState(0);
 
-  // Refs
+  // Refs for infinite scroll tracking
   const observerRef = useRef(null);
   const fetchingRef = useRef(false);
   const currentCategoryRef = useRef(null);
+  
+  // PAGE_LIMIT constant
+  const PAGE_LIMIT = 12;
 
   // 1. Fetch Category Details & Initial Products
   useEffect(() => {
     let isMounted = true;
     
-    // Cancel previous requests when category changes
+    // Track category changes to reset and cleanup
     if (currentCategoryRef.current !== categoryId) {
-      productService.cleanupActiveRequests(`category_${categoryId}`);
+      if (currentCategoryRef.current) {
+        productService.cleanupActiveRequests(`category_${currentCategoryRef.current}`);
+      }
+      currentCategoryRef.current = categoryId;
     }
-    
-    currentCategoryRef.current = categoryId;
     
     const initFetch = async () => {
       if (!categoryId) return;
@@ -48,35 +52,36 @@ const CategoryProducts = () => {
       fetchingRef.current = false;
       
       try {
-        // Parallel fetch for speed
+        // Parallel fetch for speed: categories (for name) and first page items
         const [categories, productRes] = await Promise.all([
           productService.getAllCategories(),
-          productService.getProductsByCategory(categoryId, 1, 12)
+          productService.getProductsByCategory(categoryId, 1, PAGE_LIMIT)
         ]);
 
         if (!isMounted) return;
 
-        // Set Category Name
-        const currentCat = categories.find(c => c.id === categoryId);
-        if (currentCat) setCategoryName(currentCat.name);
+        // Set Category Name (from cache or new fetch)
+        const currentCat = categories.find(c => c.id === categoryId || c._id === categoryId);
+        if (currentCat) {
+          setCategoryName(currentCat.name);
+        } else {
+          // Fallback if not in list - identifier might be name already
+          const isObjectId = /^[a-f\d]{24}$/i.test(categoryId);
+          if (!isObjectId) setCategoryName(categoryId);
+        }
 
-        // Set Products
+        // Set Initial Products
         if (productRes) {
-          // Ensure all products have proper image fallbacks
-          const productsWithImages = productRes.data?.map(product => {
-            if (!product.image || !product.images || product.images.length === 0) {
-              return productService.normalizeProduct(product);
-            }
-            return product;
-          }) || [];
-          
-          setProducts(productsWithImages);
-          setTotalItems(productRes.pagination?.totalItems || 0);
+          const fetchedProducts = productRes.data || [];
+          setProducts(fetchedProducts);
+          setTotalItems(productRes.pagination?.totalItems || fetchedProducts.length);
           setHasMore(productRes.pagination?.hasMore || false);
         }
       } catch (err) {
-        console.error("Initial fetch failed:", err);
-        if (isMounted) setError(true);
+        if (isMounted) {
+          console.error("CategoryProducts initial fetch failed:", err);
+          setError(true);
+        }
       } finally {
         if (isMounted) setLoading(false);
       }
@@ -86,62 +91,54 @@ const CategoryProducts = () => {
     
     return () => { 
       isMounted = false;
-      // Cancel requests when component unmounts or category changes
-      if (currentCategoryRef.current === categoryId) {
-        productService.cleanupActiveRequests(`category_${categoryId}`);
-      }
     };
   }, [categoryId]);
 
-  // 2. Fetch Next Page
+  // 2. Fetch Next Page Function
   const fetchNextPage = useCallback(async () => {
-    // Prevent duplicate calls
-    if (fetchingRef.current || !hasMore || loadingMore) {
+    // Prevent duplicate or invalid calls
+    if (fetchingRef.current || !hasMore || loading || loadingMore) {
       return;
     }
     
     fetchingRef.current = true;
     setLoadingMore(true);
     
+    const nextPage = page + 1;
+    
     try {
-      const nextPage = page + 1;
-      const result = await productService.getProductsByCategory(categoryId, nextPage, 12);
+      const result = await productService.getProductsByCategory(categoryId, nextPage, PAGE_LIMIT);
       
-      if (result && result.data && Array.isArray(result.data)) {
-        // Ensure new products have proper image fallbacks
-        const newProducts = result.data.map(product => {
-          if (!product.image || !product.images || product.images.length === 0) {
-            return productService.normalizeProduct(product);
-          }
-          return product;
+      if (result && Array.isArray(result.data) && result.data.length > 0) {
+        setProducts(prev => {
+          // Simple duplicate check by ID
+          const existingIds = new Set(prev.map(p => p.id || p._id));
+          const newUniqueProducts = result.data.filter(p => !existingIds.has(p.id || p._id));
+          return [...prev, ...newUniqueProducts];
         });
         
-        setProducts(prev => [...prev, ...newProducts]);
         setPage(nextPage);
         setHasMore(result.pagination?.hasMore || false);
       } else {
+        // End of data
         setHasMore(false);
       }
     } catch (err) {
-      console.error("Failed to fetch next page:", err);
-      // Don't set hasMore to false on error - allow retry
+      console.error("Failed to fetch next page for category:", err);
+      // We don't mark error = true here to avoid breaking the UI; just stop loading more
+      setHasMore(false);
     } finally {
       setLoadingMore(false);
       fetchingRef.current = false;
     }
-  }, [categoryId, hasMore, page, loadingMore]);
+  }, [categoryId, hasMore, page, loading, loadingMore]);
 
   // 3. Infinite Scroll Intersection Observer
   const lastElementRef = useCallback(node => {
-    // Don't observe if loading or no more items
-    if (loading || !hasMore) return;
+    if (loading) return; 
     
-    // Disconnect previous observer
-    if (observerRef.current) {
-      observerRef.current.disconnect();
-    }
+    if (observerRef.current) observerRef.current.disconnect();
 
-    // Create new observer
     observerRef.current = new IntersectionObserver(
       entries => {
         if (entries[0].isIntersecting && hasMore && !fetchingRef.current) {
@@ -149,23 +146,19 @@ const CategoryProducts = () => {
         }
       },
       {
-        root: null, // viewport
-        rootMargin: '100px', // Trigger 100px before reaching element
+        root: null,
+        rootMargin: '200px', // Fetch slightly before user reaches bottom
         threshold: 0.1,
       }
     );
 
-    if (node) {
-      observerRef.current.observe(node);
-    }
+    if (node) observerRef.current.observe(node);
   }, [loading, hasMore, fetchNextPage]);
   
-  // Clean up observer on unmount
+  // Cleanup observer
   useEffect(() => {
     return () => {
-      if (observerRef.current) {
-        observerRef.current.disconnect();
-      }
+      if (observerRef.current) observerRef.current.disconnect();
     };
   }, []);
 
@@ -236,7 +229,7 @@ const CategoryProducts = () => {
                         marginTop: '0.5rem'
                       }}
                     >
-                      {totalItems} products available
+                      {totalItems} total products available
                     </p>
                   </div>
                 </div>
@@ -257,9 +250,9 @@ const CategoryProducts = () => {
                       marginBottom: '0.5rem'
                     }}
                   >
-                    Something went wrong
+                    Failed to load {categoryName} category
                   </h2>
-                  <p className="text-gray-500 max-w-sm mb-8">We couldn't load the products. The server might be temporarily unavailable.</p>
+                  <p className="text-gray-500 max-w-sm mb-8">We couldn't retrieve the products. Please try refreshing or check your connection.</p>
                   <button 
                     onClick={() => window.location.reload()}
                     className="px-8 py-3 bg-emerald-600 text-white rounded-xl font-bold hover:bg-emerald-700 transition-all active:scale-95 shadow-lg shadow-emerald-100"
@@ -280,9 +273,9 @@ const CategoryProducts = () => {
                       marginBottom: '0.5rem'
                     }}
                   >
-                    No products found
+                    No products found in {categoryName}
                   </h2>
-                  <p className="text-gray-500 max-w-sm">We don't have any items in this category yet. Check back soon!</p>
+                  <p className="text-gray-500 max-w-sm">There are no items currently available in this {categoryName} category.</p>
                 </div>
               ) : (
                 <>
@@ -294,7 +287,7 @@ const CategoryProducts = () => {
                   >
                     {products.map((product, index) => (
                       <Motion.div 
-                        key={`${product.id}-${index}`}
+                        key={`${product.id || product._id}-${index}`}
                         variants={itemVariants}
                         ref={index === products.length - 1 ? lastElementRef : null}
                       >
@@ -309,25 +302,13 @@ const CategoryProducts = () => {
                   {/* Loading More Indicator */}
                   {loadingMore && (
                     <div className="mt-12 flex justify-center py-4">
-                      <div className="flex items-center gap-3 px-6 py-3 bg-white rounded-full shadow-md border border-gray-100">
-                        <Loader2 className="w-5 h-5 text-emerald-600 animate-spin" />
-                        <span
-                          style={{
-                            fontFamily: 'Gyrotrope',
-                            fontSize: '14px',
-                            fontWeight: 700,
-                            color: '#374151'
-                          }}
-                        >
-                          Loading more products...
-                        </span>
-                      </div>
+                       <Loader2 className="w-8 h-8 text-emerald-600 animate-spin" />
                     </div>
                   )}
 
                   {/* End of list message */}
                   {!hasMore && products.length > 0 && (
-                    <div className="mt-16 text-center">
+                    <div className="mt-16 text-center" style={{ paddingTop: '1.5rem', paddingBottom: '1.5rem' }}>
                       <div className="inline-flex items-center gap-3 px-6 py-2 bg-gray-100 rounded-full">
                          <div className="w-1.5 h-1.5 rounded-full bg-gray-400" />
                          <span
@@ -337,10 +318,11 @@ const CategoryProducts = () => {
                              fontWeight: 700,
                              color: '#6B7280',
                              textTransform: 'uppercase',
-                             letterSpacing: '0.1em'
+                             letterSpacing: '0.1em',
+                             marginTop: '3px'
                            }}
                          >
-                           You've reached the end
+                           End of {categoryName} category collection
                          </span>
                          <div className="w-1.5 h-1.5 rounded-full bg-gray-400" />
                       </div>

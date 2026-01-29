@@ -2,6 +2,7 @@ import React, { useState } from 'react';
 import { Link } from 'react-router-dom';
 import { AuthCard, InputField } from '@/user/components/auth';
 import Button from '@/shared/components/ui/Button';
+import authService from '@/services/authService';
 import { ArrowLeft, CheckCircle } from 'lucide-react';
 import { motion as Motion } from 'framer-motion';
 
@@ -26,12 +27,11 @@ const ForgotPasswordPage = () => {
         setError('');
 
         try {
-            // Simulate API call
-            await new Promise(resolve => setTimeout(resolve, 1500));
+            await authService.forgotPassword(email);
             setIsSubmitted(true);
         } catch (err) {
             console.error(err);
-            setError('Failed to send reset link. Please try again.');
+            setError(err.message || 'Failed to send reset link. Please try again.');
         } finally {
             setIsLoading(false);
         }

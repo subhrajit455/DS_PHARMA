@@ -1,71 +1,68 @@
 import { useMutation } from "@tanstack/react-query";
 import { useNavigate } from "react-router-dom";
-import useDataStore from "@/store/useDataStore";
-import { useToastStore } from "@/store/useToastStore";
+import { authService } from "@/services/authService";
+import { useAuthStore } from "@/store/useAuthStore";
+import { decodeToken } from "@/shared/utils/decodeToken";
+import toastUtil from "@/shared/utils/toast";
 
 /**
  * Hook to handle user signup
- * Creates a new user in the global store and logs them in
+ * Creates a new user in the backend and logs them in
  */
 export const useSignup = () => {
   const navigate = useNavigate();
-  const { login: storeLogin, users } = useDataStore();
-  const addUser = useDataStore((state) => state.addUser);
-  const { success, error } = useToastStore();
+  const { login: storeLogin } = useAuthStore();
 
   return useMutation({
-    mutationFn: async ({ fullName, name, email, password, phone }) => {
-      // Simulate network delay
-      await new Promise((resolve) => setTimeout(resolve, 800));
-
-      // Check if user already exists
-      const existingUser = users.find((u) => u.email === email);
-      if (existingUser) {
-        throw new Error("User with this email already exists");
-      }
-
-      // Create new user
-      const newUser = {
-        id: Date.now(),
-        name: fullName || name,
-        email,
-        password,
-        phone: phone || "",
-        role: "user",
-        address: null,
-        orders: [],
-        cart: [],
-        wishlist: [],
-      };
-
-      return newUser;
+    mutationFn: async (userData) => {
+      // payload: { name, email, phone, password }
+      const response = await authService.register(userData);
+      return response;
     },
 
-    onSuccess: (newUser) => {
-      // Add user to global store
-      if (addUser) {
-        addUser(newUser);
+    onSuccess: (response) => {
+      let user = response.data?.user || response.user;
+      const token = response.data?.token || response.token;
+
+      if (!token) {
+        toastUtil.error(
+          "Account created but automatic login failed. Please login manually.",
+        );
+        navigate("/login");
+        return;
+      }
+
+      // If user data is missing from response, decode it from token
+      if (!user) {
+        const decoded = decodeToken(token);
+        if (decoded) {
+          user = {
+            id: decoded.id || decoded.sub || decoded._id,
+            role: decoded.role || "user",
+            email: decoded.email,
+          };
+        }
       }
 
       // Log in the new user
-      storeLogin(newUser);
+      storeLogin(user, token);
 
-      success("Account created successfully!");
+      toastUtil.success("Account created successfully!");
 
-      // Check for redirect parameter in URL
+      // Role-based redirection
       const params = new URLSearchParams(window.location.search);
       const redirectPath = params.get("redirect");
 
-      if (redirectPath) {
-        navigate(redirectPath);
+      if (user?.role === "admin") {
+        navigate("/admin/dashboard");
       } else {
-        navigate("/");
+        navigate(redirectPath || "/");
       }
     },
 
     onError: (err) => {
       const message = err.message || "Signup failed. Please try again.";
-      error(message);
+      toastUtil.error(message);
     },
   });
 };
