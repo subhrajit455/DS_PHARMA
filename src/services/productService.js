@@ -238,11 +238,22 @@ export const normalizeProduct = (p) => {
 
   const categoryId = typeof category === "object" ? category._id : category;
 
-  // Normalize pricing
-  const price = Number(p.price) || 0;
-  const mrp = Number(p.mrp || p.originalPrice) || price;
+  // Normalize pricing with robust fallback logic based on Marg API + Common fallbacks
+  // Priority 1: Marg API (rawPRate > rawRate)
+  // Priority 2: Generic (sellingPrice, discountedPrice, price)
+  const rawMRP = Number(p.MRP || p.mrp || p.originalPrice || 0);
+  const rawRate = Number(
+    p.Rate || p.rate || p.sellingPrice || p.discountedPrice || p.price || 0,
+  );
+  const rawPRate = Number(p.PRate || p.prate || 0);
+
+  const price = rawPRate > 0 ? rawPRate : rawRate;
+  const mrp =
+    rawMRP > 0 ? rawMRP : p.originalPrice ? Number(p.originalPrice) : price;
+
+  // Calculate discount percentage dynamically if MRP > price
   const discount =
-    p.discount || (mrp > price ? Math.round(((mrp - price) / mrp) * 100) : 0);
+    mrp > price && mrp > 0 ? Math.round(((mrp - price) / mrp) * 100) : 0;
 
   // Normalize stock
   const stock = Number(p.stock ?? 0);
@@ -256,10 +267,10 @@ export const normalizeProduct = (p) => {
     images: finalImages,
     category,
     categoryId,
-    price,
-    mrp,
+    price: price,
+    mrp: mrp,
     originalPrice: mrp,
-    discount,
+    discount: discount,
     stock,
     inStock,
     isVisible: p.isVisible !== false,

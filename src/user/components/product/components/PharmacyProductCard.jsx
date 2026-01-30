@@ -234,21 +234,38 @@ const PharmacyProductCard = ({
             {name && name.length > 15 ? `${name.substring(0, 13)}...` : (name || 'Unnamed Product')}
           </h3>
 
-          {/* Price and Discount Row */}
-          <div className="flex items-center gap-1 sm:gap-2 mb-2 pr-10 sm:pr-12">
-            <span className="text-[12px] sm:text-[14px] font-bold text-gray-900" title={`₹${price}`}>
-              ₹{price}
-            </span>
+          {/* Price and Discount Group */}
+          <div className="flex flex-col gap-1 mb-3">
+            {/* Effective Price and Discount Badge */}
+            <div className="flex items-center flex-wrap gap-x-2 gap-y-1">
+               <span className="text-[12px] sm:text-[16px] font-bold text-gray-900 tracking-tight" title={`Selling Price: ₹${price}`}>
+                  ₹{Number(price).toLocaleString('en-IN')}
+               </span>
+               
+               {discountPercentage > 0 && (
+                 <div className="flex items-center gap-1.5">
+                   <span className="text-[8px] sm:text-[10px] text-gray-40font-bold text-white bg-emerald-600 px-2 py-0.5 rounded-md shadow-sm">
+                      {discountPercentage}% OFF
+                   </span>
+                 </div>
+               )}
+            </div>
 
-            <div className="flex items-center gap-1">
-              {comparisonPrice && comparisonPrice > price && (
-              <span className="text-xs text-gray-400 line-through" style={{ fontFamily: 'Gyrotrope' }}>
-                ₹{comparisonPrice}
+            {/* MRP & Packing/Unit Details */}
+            <div className="flex items-center gap-1 flex-row min-h-4">
+              {comparisonPrice > price && (
+                <span className="text-[8px] sm:text-[10px] text-gray-400 line-through decoration-gray-400/60 font-medium">
+                  MRP ₹{Number(comparisonPrice).toLocaleString('en-IN')}
+                </span>
+              )}
+              {discountPercentage > 0 && (
+                <span className="text-[8px] sm:text-[10px] text-emerald-600 font-bold">
+                  Save ₹{Math.round(comparisonPrice - price)}
+                </span>
+              )}
+              <span className="text-[8px] sm:text-[10px] text-gray-400 font-medium whitespace-nowrap">
+                 {unit || 'strip'}
               </span>
-            )}
-            <span className="text-[8px] sm:text-[10px] text-gray-500 font-medium">
-              /{unit}
-            </span>
             </div>
           </div>
 

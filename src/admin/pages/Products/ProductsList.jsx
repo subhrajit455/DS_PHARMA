@@ -3,9 +3,8 @@ import { useNavigate } from "react-router-dom";
 import {
   Plus,
   Eye,
-  RefreshCw,
-  Ban,
   Package,
+  Image as ImageIcon,
 } from "lucide-react";
 import toastUtil from "@/shared/utils/toast";
 import { Button } from "@/admin/components/ui/Button";
@@ -20,11 +19,13 @@ import {
 } from "@/admin/components/ui/Table";
 import { Pagination } from "@/admin/components/ui/Pagination";
 import ViewProductModal from "./ViewProduct";
+import ProductImageModal from "./ProductImageModal";
 import { useMargProducts } from "@/shared/hooks/queries/useMargProducts";
 import ProductTableSkeleton from "@/admin/components/ui/ProductTableSkeleton";
-import Badge from "@/admin/components/ui/Badge";
+import { cn } from "@/admin/utils/cn";
+import { Badge } from "@/admin/components/ui/Badge";
 
-const ProductRow = React.memo(({ product, onView }) => (
+const ProductRow = React.memo(({ product, onView, onImages }) => (
   <TableRow
     className="group border-b border-gray-100/80 hover:bg-emerald-50/30 transition-all duration-150"
   >
@@ -70,7 +71,27 @@ const ProductRow = React.memo(({ product, onView }) => (
       </Badge>
     </TableCell>
     <TableCell className="py-4 px-6 hidden xl:table-cell text-center">
-      <span className="text-xs font-medium text-gray-600">{product.expiry}</span>
+      <div className="flex justify-center">
+        <span className={cn(
+          "inline-flex items-center px-2.5 py-0.5 rounded-full text-[10px] font-black tracking-tight border",
+          "bg-slate-50 text-slate-600 border-slate-200 shadow-sm uppercase"
+        )}>
+          {(() => {
+            const exp = product.expiry;
+            if (!exp || exp === "N/A") return "N/A";
+            
+            // Handle common pharma format MM/YY or MM/YYYY
+            const parts = exp.split(/[-/]/);
+            if (parts.length >= 2) {
+              const months = ["JAN", "FEB", "MAR", "APR", "MAY", "JUN", "JUL", "AUG", "SEP", "OCT", "NOV", "DEC"];
+              const m = parseInt(parts[0], 10);
+              const y = parts[1].length === 2 ? `20${parts[1]}` : parts[1];
+              if (m >= 1 && m <= 12) return `${months[m - 1]} ${y}`;
+            }
+            return exp;
+          })()}
+        </span>
+      </div>
     </TableCell>
     <TableCell className="py-4 px-6 text-right">
       <div className="flex items-center justify-end gap-1">
@@ -85,18 +106,11 @@ const ProductRow = React.memo(({ product, onView }) => (
         <Button
           variant="ghost"
           size="icon"
-          className="h-9 w-9 text-gray-500 hover:text-blue-600 hover:bg-blue-50 rounded-lg transition-colors"
-          title="Sync with Marg"
+          className="h-9 w-9 text-gray-500 hover:text-orange-600 hover:bg-orange-50 rounded-lg transition-colors"
+          onClick={() => onImages(product)}
+          title="Edit Images"
         >
-          <RefreshCw className="h-4 w-4" />
-        </Button>
-        <Button
-          variant="ghost"
-          size="icon"
-          className="h-9 w-9 text-gray-500 hover:text-red-600 hover:bg-red-50 rounded-lg transition-colors"
-          title="Disable Product"
-        >
-          <Ban className="h-4 w-4" />
+          <ImageIcon className="h-4 w-4" />
         </Button>
       </div>
     </TableCell>
@@ -114,7 +128,9 @@ const ProductsList = () => {
   });
   
   const [selectedProductId, setSelectedProductId] = useState(null);
+  const [selectedProduct, setSelectedProduct] = useState(null);
   const [viewOpen, setViewOpen] = useState(false);
+  const [imageModalOpen, setImageModalOpen] = useState(false);
 
   // Fetch Marg Products using React Query
   const { 
@@ -154,6 +170,11 @@ const ProductsList = () => {
   const handleViewProduct = (id) => {
     setSelectedProductId(id);
     setViewOpen(true);
+  };
+
+  const handleOpenImages = (product) => {
+    setSelectedProduct(product);
+    setImageModalOpen(true);
   };
 
   if (isError) {
@@ -233,7 +254,12 @@ const ProductsList = () => {
                       <ProductTableSkeleton rows={pagination.limit} columns={6} />
                     ) : products.length > 0 ? (
                       products.map((product) => (
-                        <ProductRow key={product.id} product={product} onView={handleViewProduct} />
+                        <ProductRow 
+                          key={product.id} 
+                          product={product} 
+                          onView={handleViewProduct} 
+                          onImages={handleOpenImages}
+                        />
                       ))
                     ) : (
                       <TableRow>
@@ -272,6 +298,12 @@ const ProductsList = () => {
           </Card>
         </div>
       </main>
+
+      <ProductImageModal
+        open={imageModalOpen}
+        onOpenChange={setImageModalOpen}
+        product={selectedProduct}
+      />
 
       <ViewProductModal
         open={viewOpen}

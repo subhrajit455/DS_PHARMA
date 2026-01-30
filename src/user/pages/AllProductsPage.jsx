@@ -6,6 +6,7 @@ import { productService } from '@/services/productService';
 import useDebounce from '@/shared/hooks/useDebounce';
 import SearchResults from '@/user/components/search/SearchResults';
 import { SearchFilters, SortDropdown } from '@/user/components/search/SearchFilters';
+import { Pagination } from '@/admin/components/ui/Pagination';
 
 const AllProductsPage = () => {
   const [searchParams, setSearchParams] = useSearchParams();
@@ -15,9 +16,16 @@ const AllProductsPage = () => {
   const [isLoading, setIsLoading] = useState(true);
   const [isMobileFiltersOpen, setIsMobileFiltersOpen] = useState(false);
 
-  // Parse URL params
+  // Pagination State
+  const [pagination, setPagination] = useState({
+    currentPage: parseInt(searchParams.get('page') || '1', 10),
+    totalPages: 1,
+    totalItems: 0,
+    limit: parseInt(searchParams.get('limit') || '12', 10)
+  });
+  
+  // Parse URL params for filters
   const sort = searchParams.get('sort') || 'relevance';
-  const page = parseInt(searchParams.get('page') || '1', 10);
   
   const [filters, setFilters] = useState({
      categories: searchParams.getAll('category'),
@@ -35,18 +43,35 @@ const AllProductsPage = () => {
     const fetchResults = async () => {
       setIsLoading(true);
       try {
-        // Fetch all products at once (modern approach)
-        const products = await productService.getAllProductsAtOnce({
-          ...debouncedFilters,
-          sort // Pass sort as a filter parameter
+        const response = await productService.getAllProducts({
+          page: pagination.currentPage,
+          limit: pagination.limit,
+          filters: {
+            ...debouncedFilters,
+            sort
+          }
         });
         
-        setProducts(products);
-        setFacets({}); // No pagination since we're getting all products at once
+        let fetchedProducts = response.data || [];
+        
+        // Logic: Display out of stock products last
+        fetchedProducts = [...fetchedProducts].sort((a, b) => {
+          if (a.inStock === b.inStock) return 0;
+          return a.inStock ? -1 : 1;
+        });
+
+        setProducts(fetchedProducts);
+        setPagination(prev => ({
+          ...prev,
+          totalPages: response.pagination?.totalPages || 1,
+          totalItems: response.pagination?.totalItems || 0,
+          currentPage: response.pagination?.currentPage || pagination.currentPage
+        }));
+        
+        setFacets({}); // Facets can be populated if API supports it
       } catch (error) {
-        console.error('Fetch all products failed:', error);
-        setProducts([]); // Reset to empty array on error
-        setFacets({}); // Reset facets on error
+        console.error('Fetch paginated products failed:', error);
+        setProducts([]);
       } finally {
         setIsLoading(false);
       }
@@ -54,10 +79,21 @@ const AllProductsPage = () => {
 
     fetchResults();
     // eslint-disable-next-line react-hooks/exhaustive-deps
-  }, [JSON.stringify(debouncedFilters), sort]); // Removed page from dependency since we're not paginating
+  }, [pagination.currentPage, pagination.limit, JSON.stringify(debouncedFilters), sort]);
 
-  // Sync state with URL params when they change (controls navigation-driven updates)
+  // Sync state with URL params when they change
   useEffect(() => {
+    const pageInUrl = parseInt(searchParams.get('page') || '1', 10);
+    const limitInUrl = parseInt(searchParams.get('limit') || '12', 10);
+    
+    if (pageInUrl !== pagination.currentPage || limitInUrl !== pagination.limit) {
+      setPagination(prev => ({ 
+        ...prev, 
+        currentPage: pageInUrl,
+        limit: limitInUrl 
+      }));
+    }
+
     setFilters(prev => ({
       ...prev,
       categories: searchParams.getAll('category'),
@@ -65,17 +101,53 @@ const AllProductsPage = () => {
       isFeatured: searchParams.get('featured') === 'true',
       priceRangeStr: searchParams.get('priceRange') || 'all',
     }));
-  }, [searchParams]);
+  }, [searchParams, pagination.currentPage, pagination.limit]);
+
+  const handlePageChange = (newPage) => {
+    setSearchParams(prev => {
+      prev.set('page', newPage.toString());
+      return prev;
+    });
+    // Scroll to top of results
+    window.scrollTo({ top: 0, behavior: 'smooth' });
+  };
+
+  const handleItemsPerPageChange = (newLimit) => {
+    setSearchParams(prev => {
+      prev.set('limit', newLimit.toString());
+      prev.set('page', '1'); // Reset to page 1
+      return prev;
+    });
+  };
 
   const handleSortChange = (newSort) => {
      setSearchParams(prev => {
          prev.set('sort', newSort);
+         prev.set('page', '1'); // Reset to page 1 on sort change
          return prev;
      });
   };
 
   const handleFilterChange = (newFilters) => {
     setFilters(newFilters);
+    setSearchParams(prev => {
+       // Sync categories
+       prev.delete('category');
+       newFilters.categories.forEach(cat => prev.append('category', cat));
+       
+       // Sync other filters
+       if (newFilters.priceRangeStr !== 'all') prev.set('priceRange', newFilters.priceRangeStr);
+       else prev.delete('priceRange');
+       
+       if (newFilters.inStock) prev.set('instock', 'true');
+       else prev.delete('instock');
+       
+       if (newFilters.isFeatured) prev.set('featured', 'true');
+       else prev.delete('featured');
+
+       prev.set('page', '1'); // Reset to page 1 on filter change
+       return prev;
+    });
   };
 
   const handleViewAll = () => {
@@ -132,7 +204,7 @@ const AllProductsPage = () => {
                 All Products
               </h1>
               <p className="text-gray-500 text-sm mt-1.5 font-medium">
-                {isLoading ? 'Loading...' : `${products.length} products`}
+                {isLoading ? 'Loading...' : `${pagination.totalItems.toLocaleString()} items found`}
               </p>
             </div>
           </div>
@@ -202,7 +274,7 @@ const AllProductsPage = () => {
                         <div className="p-5 border-t border-gray-100 bg-gray-50">
                            <button 
                               onClick={() => {
-                                 setFilters(tempFilters); // Apply temp filters to real state
+                                 handleFilterChange(tempFilters);
                                  setIsMobileFiltersOpen(false);
                               }}
                               className="w-full py-3 bg-emerald-600 text-white rounded-xl font-semibold hover:bg-emerald-700 transition-colors shadow-lg shadow-emerald-600/20"
@@ -217,8 +289,23 @@ const AllProductsPage = () => {
            </AnimatePresence>
 
            {/* Results Grid */}
-           <main className="flex-1 min-w-0 ">
+           <main className="flex-1 min-w-0 flex flex-col gap-10">
                <SearchResults products={products} isLoading={isLoading} query="" onReset={handleViewAll} />
+               
+               {pagination.totalPages > 1 && !isLoading && (
+                 <div className="mt-4 pb-10">
+                    <Pagination 
+                      currentPage={pagination.currentPage}
+                      totalPages={pagination.totalPages}
+                      totalItems={pagination.totalItems}
+                      onPageChange={handlePageChange}
+                      itemsPerPage={pagination.limit}
+                      onItemsPerPageChange={handleItemsPerPageChange}
+                      loading={isLoading}
+                      variant="default"
+                    />
+                 </div>
+               )}
            </main>
         </div>
 

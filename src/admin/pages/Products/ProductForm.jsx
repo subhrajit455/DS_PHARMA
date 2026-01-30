@@ -7,7 +7,7 @@ import {
   Tag,
   Box,
   IndianRupee,
-  X,
+  Loader2,
 } from "lucide-react";
 import toastUtil from "@/shared/utils/toast";
 import { useQueryClient } from "@tanstack/react-query";
@@ -48,7 +48,6 @@ const ProductForm = () => {
   const [isLoading, setIsLoading] = useState(false);
   const [isModalOpen, setIsModalOpen] = useState(false);
   const [categories, setCategories] = useState([]);
-  const [categoryLoading, setCategoryLoading] = useState(false);
 
   const [formData, setFormData] = useState({
     name: "",
@@ -62,21 +61,15 @@ const ProductForm = () => {
     stock: 0,
     description: "",
     status: "active",
-    images: [],
-    imagePreviews: [], 
-    existingImages: [], 
   });
 
   const fetchCategories = async () => {
     try {
-      setCategoryLoading(true);
       const res = await axios.get(categoryUrl.getAllCategories); 
       setCategories(res.data.data || []);
     } catch (err) {
       console.error(err);
       toastUtil.error("Failed to load categories");
-    } finally {
-      setCategoryLoading(false);
     }
   };
 
@@ -99,13 +92,6 @@ const ProductForm = () => {
           stock: navState.stock || 0,
           description: navState.description || "",
           status: navState.status || "active",
-          images: [],
-          imagePreviews: Array.isArray(navState.image)
-            ? navState.image.map((img) => img.url)
-            : [],
-          existingImages: Array.isArray(navState.image)
-            ? navState.image.map((img) => img.url)
-            : [],
         });
       } else {
         const fetchProduct = async () => {
@@ -123,17 +109,9 @@ const ProductForm = () => {
               stock: product.stock,
               description: product.description || "",
               status: product.status || "active",
-              images: [],
-              imagePreviews: Array.isArray(product.images)
-                ? product.images.map((img) => img.url)
-                : [],
-              existingImages: Array.isArray(product.images)
-                ? product.images.map((img) => img.url)
-                : [],
             });
           } catch (error) {
             console.error(error);
-            // toastUtil.error("Failed to fetch product details"); // Handled by apiClient if appropriate
             navigate("/admin/products");
           }
         };
@@ -156,53 +134,10 @@ const ProductForm = () => {
     });
   };
 
-  const handleImageChange = (e) => {
-    const files = Array.from(e.target.files);
-    const allowedTypes = ['image/jpeg', 'image/png', 'image/webp'];
-    const maxImages = 5;
-
-    const validFiles = files.filter((file) => {
-      if (!allowedTypes.includes(file.type)) {
-        toastUtil.error(`${file.name} is not a supported image type (JPG, PNG, WebP only)`);
-        return false;
-      }
-      const isLt2M = file.size / 1024 / 1024 < 2;
-      if (!isLt2M) {
-        toastUtil.error(`${file.name} must be smaller than 2MB`);
-        return false;
-      }
-      return true;
-    });
-
-    if (validFiles.length + formData.images.length > maxImages) {
-      toastUtil.error(`You can upload a maximum of ${maxImages} images`);
-      return;
-    }
-
-    const newPreviews = validFiles.map((file) => URL.createObjectURL(file));
-
-    setFormData((prev) => ({
-      ...prev,
-      images: [...prev.images, ...validFiles],
-      imagePreviews: [...prev.imagePreviews, ...newPreviews],
-    }));
-  };
-
-  const handleRemoveImage = (index) => {
-    setFormData((prev) => {
-      const newImages = prev.images.filter((_, i) => i !== index);
-      const newPreviews = prev.imagePreviews.filter((_, i) => i !== index);
-      return { ...prev, images: newImages, imagePreviews: newPreviews };
-    });
-  };
-
   const handleSubmit = (e) => {
     e.preventDefault();
     if (!formData.name.trim()) return toastUtil.error("Product name is required");
     if (!formData.category) return toastUtil.error("Please select a category");
-    if (formData.images.length === 0 && formData.existingImages.length === 0) {
-      return toastUtil.error("Please upload at least one product image");
-    }
     setIsModalOpen(true);
   };
 
@@ -210,50 +145,18 @@ const ProductForm = () => {
     setIsLoading(true);
 
     try {
-      const fd = new FormData();
-      fd.append('name', formData.name.trim());
-      fd.append('sku', formData.sku.trim());
-      fd.append('category', formData.category);
-      fd.append('unit', formData.unit.trim());
-      fd.append('brand', formData.brand.trim());
-      fd.append('description', formData.description.trim());
-      fd.append('status', formData.status);
-      fd.append('price', Number(formData.price));
-      fd.append('discount', Number(formData.discount));
-      fd.append('discountedPrice', Number(formData.discountedPrice));
-      fd.append('stock', Number(formData.stock));
-
-      if (Array.isArray(formData.images)) {
-        formData.images.forEach((file) => {
-          if (file instanceof File) {
-            fd.append("images", file);
-          }
-        });
-      }
-
-      if (Array.isArray(formData.existingImages)) {
-        formData.existingImages.forEach((url) => {
-          if (typeof url === "string") {
-            fd.append("existingImages", url);
-          }
-        });
-      }
-
-      const config = { headers: { "Content-Type": "multipart/form-data" } };
-
       if (isEditMode) {
-        await axios.put(`${productUrl.updateProduct}/${id}`, fd, config);
+        await axios.put(`${productUrl.updateProduct}/${id}`, formData);
         toastUtil.success("Product updated successfully");
       } else {
-        await axios.post(productUrl.createProduct, fd, config);
+        await axios.post(productUrl.createProduct, formData);
         toastUtil.success("Product created successfully");
       }
 
       await queryClient.invalidateQueries({ queryKey: ["products"] });
       navigate("/admin/products");
     } catch (err) {
-      console.error("Submission Error:", err);
-      // Detailed error handling is in apiClient, but we can provide context here
+      console.error(err);
       toastUtil.error(err.response?.data?.message || "Failed to save product");
     } finally {
       setIsLoading(false);
@@ -262,144 +165,79 @@ const ProductForm = () => {
   };
 
   return (
-    <div
-      className="max-w-7xl mx-auto space-y-4 sm:space-y-6 min-h-screen animate-in fade-in slide-in-from-bottom-6 duration-700 w-full"
-      style={{
-        padding: "0px 1rem",
-        background: "linear-gradient(135deg, #f0fdf4 0%, #ecfdf5 50%, #f0fdfa 100%)",
-      }}
-    >
-      <Button
-        variant="ghost"
-        className="pl-0 text-gray-500 hover:text-gray-900 text-[8px] sm:text-sm"
-        onClick={() => navigate("/admin/products")}
-      >
-        <ArrowLeft className="mr-1 sm:mr-2 h-3 w-3 sm:h-4 sm:w-4" />
-        <span style={{ marginTop: '3px' }}>Back to Products</span>
-      </Button>
+    <div className="max-w-7xl mx-auto space-y-6 min-h-screen p-6 animate-in fade-in duration-500 bg-[#f8fafc]/50">
+      <header className="flex items-center justify-between">
+         <div className="flex items-center gap-4">
+            <Button
+               variant="ghost"
+               size="icon"
+               className="rounded-full bg-white shadow-sm border"
+               onClick={() => navigate("/admin/products")}
+            >
+               <ArrowLeft className="h-5 w-5" />
+            </Button>
+            <h1 className="text-2xl font-black text-slate-900 tracking-tight">
+               {isEditMode ? "Edit Product Details" : "Add New Product"}
+            </h1>
+         </div>
+      </header>
 
-      <div className="flex justify-between items-center" style={{ marginTop: '0px' }}>
-        <h1 className="text-xl sm:text-2xl md:text-3xl font-bold tracking-tight text-gray-900">
-          {isEditMode ? "Edit Product" : "Add New Product"}
-        </h1>
-      </div>
-
-      <form onSubmit={handleSubmit} className="pb-10">
-        <div className="grid grid-cols-1 lg:grid-cols-3 gap-4 lg:gap-6">
-          <div className="lg:col-span-2 space-y-4 lg:space-y-6">
-            <Card className="shadow-sm border-gray-100">
-              <CardHeader className="pb-3 border-b border-gray-50 bg-gray-50/30">
-                <CardTitle className="text-base sm:text-lg font-bold text-gray-800">Product Details</CardTitle>
-                <CardDescription className="text-[10px] sm:text-xs">Enter the basic information for the product.</CardDescription>
+      <form onSubmit={handleSubmit}>
+        <div className="grid grid-cols-1 lg:grid-cols-3 gap-8">
+          <div className="lg:col-span-2 space-y-6">
+            <Card className="border-slate-100 shadow-sm">
+              <CardHeader className="border-b bg-slate-50/30">
+                <CardTitle className="text-lg font-bold">Product Information</CardTitle>
+                <CardDescription>Primary details and categorization.</CardDescription>
               </CardHeader>
-              <CardContent className="space-y-4 pt-4 lg:pt-6" style={{ paddingBottom: '1rem' }}>
-                <div className="grid gap-2" style={{ marginTop: '10px' }}>
-                  <Label htmlFor="name" className="text-xs sm:text-sm font-semibold text-gray-700">Product Name<span className="text-red-500">*</span></Label>
-                  <Input
-                    id="name"
-                    name="name"
-                    required
-                    placeholder="e.g. Paracetamol 500mg"
-                    value={formData.name}
-                    onChange={handleChange}
-                    icon={Package}
-                    className="h-9 sm:h-10 text-xs sm:text-sm"
-                    style={{ paddingLeft: '30px' }}
-                  />
+              <CardContent className="space-y-6 pt-6">
+                <div className="grid gap-2">
+                  <Label htmlFor="name">Product Name</Label>
+                  <Input id="name" name="name" required value={formData.name} onChange={handleChange} icon={Package} placeholder="e.g. Paracetamol 500mg" />
                 </div>
+                
+                <div className="grid grid-cols-2 gap-4">
+                   <div className="grid gap-2">
+                      <Label htmlFor="unit">Unit</Label>
+                      <Input id="unit" name="unit" required value={formData.unit} onChange={handleChange} placeholder="e.g. 10 Tablets" />
+                   </div>
+                   <div className="grid gap-2">
+                      <Label htmlFor="brand">Brand</Label>
+                      <Input id="brand" name="brand" required value={formData.brand} onChange={handleChange} placeholder="e.g. Cipla" />
+                   </div>
+                </div>
+
                 <div className="grid grid-cols-2 gap-4">
                   <div className="grid gap-2">
-                    <Label htmlFor="unit" className="text-xs sm:text-sm font-semibold text-gray-700">Unit<span className="text-red-500">*</span></Label>
-                    <Input
-                      id="unit"
-                      name="unit"
-                      required
-                      placeholder="e.g. 500mg, 1L"
-                      value={formData.unit}
-                      onChange={handleChange}
-                      className="h-9 sm:h-10 text-xs sm:text-sm"
-                    />
+                    <Label htmlFor="sku">SKU Code</Label>
+                    <Input id="sku" name="sku" required value={formData.sku} onChange={handleChange} icon={Tag} placeholder="SKU-001" />
                   </div>
                   <div className="grid gap-2">
-                    <Label htmlFor="brand" className="text-xs sm:text-sm font-semibold text-gray-700">Brand<span className="text-red-500">*</span></Label>
-                    <Input
-                      id="brand"
-                      name="brand"
+                    <Label htmlFor="category">Category</Label>
+                    <select
+                      id="category"
+                      name="category"
                       required
-                      placeholder="e.g. Cipla"
-                      value={formData.brand}
+                      className="flex h-10 w-full rounded-md border border-slate-200 bg-white px-3 py-2 text-sm focus:ring-2 focus:ring-emerald-500 outline-none"
+                      value={formData.category}
                       onChange={handleChange}
-                      className="h-9 sm:h-10 text-xs sm:text-sm"
-                    />
+                    >
+                      <option value="">Select Category</option>
+                      {categories.map((cat) => (
+                        <option key={cat._id || cat.id} value={cat._id || cat.id}>{cat.name}</option>
+                      ))}
+                    </select>
                   </div>
                 </div>
-                <div className="grid grid-cols-2 gap-4">
-                  <div className="grid gap-2">
-                    <Label htmlFor="sku" className="text-xs sm:text-sm font-semibold text-gray-700">SKU<span className="text-red-500">*</span></Label>
-                    <Input
-                      id="sku"
-                      name="sku"
-                      required
-                      className="h-9 sm:h-10 text-xs sm:text-sm font-mono"
-                      placeholder="e.g. MED-001"
-                      value={formData.sku}
-                      onChange={handleChange}
-                      icon={Tag}
-                      style={{ paddingLeft: '30px' }}
-                    />
-                  </div>
-                  <div className="grid gap-2">
-                    <Label htmlFor="category" className="text-xs sm:text-sm font-semibold text-gray-700">Category<span className="text-red-500">*</span></Label>
-                    <div className="relative">
-                      <select
-                        id="category"
-                        name="category"
-                        required
-                        disabled={categoryLoading}
-                        className="flex h-9 sm:h-10 w-full rounded-md border border-gray-200 bg-white px-3 py-2 text-xs sm:text-sm shadow-sm transition-colors focus-visible:outline-none focus-visible:ring-1 focus-visible:ring-emerald-600 disabled:cursor-not-allowed disabled:opacity-50"
-                        value={formData.category}
-                        onChange={handleChange}
-                      >
-                        <option value="">{categoryLoading ? "Loading..." : "Select Category"}</option>
-                        {categories.map((cat) => (
-                          <option key={cat._id || cat.id} value={cat._id || cat.id}>
-                            {cat.name || cat}
-                          </option>
-                        ))}
-                      </select>
-                      {categoryLoading && (
-                        <div className="absolute right-3 top-1/2 -translate-y-1/2">
-                          <div className="w-4 h-4 border-2 border-emerald-600 border-t-transparent rounded-full animate-spin" />
-                        </div>
-                      )}
-                    </div>
-                  </div>
-                </div>
+
                 <div className="grid gap-2">
-                  <Label htmlFor="status" className="text-xs sm:text-sm font-semibold text-gray-700">Status<span className="text-red-500">*</span></Label>
-                  <select
-                    id="status"
-                    name="status"
-                    required
-                    className="flex h-9 sm:h-10 w-full rounded-md border border-gray-200 bg-white px-3 py-2 text-xs sm:text-sm shadow-sm transition-colors focus-visible:outline-none focus-visible:ring-1 focus-visible:ring-emerald-600"
-                    value={formData.status}
-                    onChange={handleChange}
-                  >
-                    <option value="active">Active</option>
-                    <option value="inactive">Inactive</option>
-                    <option value="draft">Draft</option>
-                    <option value="out_of_stock">Out of Stock</option>
-                  </select>
-                </div>
-                <div className="grid gap-2">
-                  <Label htmlFor="description" className="text-xs sm:text-sm font-semibold text-gray-700">Description<span className="text-red-500">*</span></Label>
+                  <Label htmlFor="description">Product Description</Label>
                   <textarea
                     id="description"
                     name="description"
                     rows="4"
-                    required
-                    className="flex min-h-[100px] w-full rounded-md border border-gray-200 bg-white px-3 py-2 text-xs sm:text-sm shadow-sm focus-visible:outline-none focus-visible:ring-1 focus-visible:ring-emerald-600 disabled:cursor-not-allowed disabled:opacity-50"
-                    placeholder="Product detailed description..."
+                    className="flex min-h-[120px] w-full rounded-md border border-slate-200 bg-white px-3 py-2 text-sm focus:ring-2 focus:ring-emerald-500 outline-none"
+                    placeholder="Describe the product effects, dosage, etc."
                     value={formData.description}
                     onChange={handleChange}
                   />
@@ -408,122 +246,54 @@ const ProductForm = () => {
             </Card>
           </div>
 
-          <div className="space-y-4 lg:space-y-6">
-            <Card className="shadow-sm border-gray-100">
-              <CardHeader className="pb-3 border-b border-gray-50 bg-gray-50/30">
-                <CardTitle className="text-base sm:text-lg font-bold text-gray-800">Pricing & Inventory</CardTitle>
-              </CardHeader>
-              <CardContent className="space-y-4 pt-4 lg:pt-6" style={{ paddingBottom: '1rem' }}>
-                <div className="grid gap-2">
-                  <Label htmlFor="price" className="text-xs sm:text-sm font-semibold text-gray-700">Price (₹)<span className="text-red-500">*</span></Label>
-                  <Input
-                    id="price"
-                    type="number"
-                    name="price"
-                    required
-                    min="0"
-                    step="0.01"
-                    value={formData.price}
-                    onChange={handleChange}
-                    icon={IndianRupee}
-                    className="h-9 sm:h-10 text-xs sm:text-sm"
-                    style={{ paddingLeft: '30px' }}
-                  />
-                </div>
-                <div className="grid gap-2">
-                  <Label htmlFor="discount" className="text-xs sm:text-sm font-semibold text-gray-700">Discount (%)</Label>
-                  <Input
-                    id="discount"
-                    type="number"
-                    name="discount"
-                    min="0"
-                    max="100"
-                    step="0.1"
-                    value={formData.discount}
-                    onChange={handleChange}
-                    className="h-9 sm:h-10 text-xs sm:text-sm"
-                  />
-                </div>
-                <div className="grid gap-2">
-                  <Label htmlFor="discountedPrice" className="text-xs sm:text-sm font-semibold text-gray-700">Discounted Price (₹)</Label>
-                  <Input
-                    id="discountedPrice"
-                    type="number"
-                    value={formData.discountedPrice}
-                    disabled
-                    className="h-9 sm:h-10 text-xs sm:text-sm bg-gray-50 text-gray-500"
-                  />
-                </div>
-                <div className="grid gap-2">
-                  <Label htmlFor="stock" className="text-xs sm:text-sm font-semibold text-gray-700">Stock<span className="text-red-500">*</span></Label>
-                  <Input
-                    id="stock"
-                    type="number"
-                    name="stock"
-                    required
-                    min="0"
-                    value={formData.stock}
-                    onChange={handleChange}
-                    icon={Box}
-                    className="h-9 sm:h-10 text-xs sm:text-sm"
-                    style={{ paddingLeft: '30px' }}
-                  />
-                </div>
-              </CardContent>
+          <div className="space-y-6">
+            <Card className="border-slate-100 shadow-sm">
+               <CardHeader className="border-b bg-slate-50/30">
+                  <CardTitle className="text-lg font-bold">Pricing & Stock</CardTitle>
+               </CardHeader>
+               <CardContent className="space-y-4 pt-6">
+                  <div className="grid gap-2">
+                    <Label htmlFor="price">Original Price (₹)</Label>
+                    <Input id="price" type="number" name="price" required value={formData.price} onChange={handleChange} icon={IndianRupee} />
+                  </div>
+                  <div className="grid gap-2">
+                    <Label htmlFor="discount">Discount (%)</Label>
+                    <Input id="discount" type="number" name="discount" value={formData.discount} onChange={handleChange} />
+                  </div>
+                  <div className="grid gap-2">
+                    <Label>Discounted Price</Label>
+                    <Input value={formData.discountedPrice} disabled className="bg-slate-50 text-slate-500 font-bold" />
+                  </div>
+                  <div className="grid gap-2 pt-2">
+                    <Label htmlFor="stock">Available Stock</Label>
+                    <Input id="stock" type="number" name="stock" required value={formData.stock} onChange={handleChange} icon={Box} />
+                  </div>
+                  <div className="grid gap-2 pt-2">
+                    <Label htmlFor="status">Listing Status</Label>
+                    <select
+                      id="status"
+                      name="status"
+                      className="flex h-10 w-full rounded-md border border-slate-200 bg-white px-3 py-2 text-sm"
+                      value={formData.status}
+                      onChange={handleChange}
+                    >
+                      <option value="active">Active</option>
+                      <option value="inactive">Inactive</option>
+                      <option value="out_of_stock">Out of Stock</option>
+                    </select>
+                  </div>
+               </CardContent>
             </Card>
 
-            <Card className="shadow-sm border-gray-100">
-              <CardHeader className="pb-3 border-b border-gray-50 bg-gray-50/30">
-                <CardTitle className="text-base sm:text-lg font-bold text-gray-800">Images</CardTitle>
-                <CardDescription className="text-[10px] sm:text-xs">Upload at least one product image.</CardDescription>
-              </CardHeader>
-              <CardContent className="space-y-4 pt-4 lg:pt-6" style={{ paddingBottom: '1rem' }}>
-                <label className="flex flex-col items-center justify-center gap-2 rounded-xl border-2 border-dashed border-gray-300 bg-gray-50 p-6 text-center cursor-pointer transition hover:border-emerald-600 hover:bg-emerald-50/50">
-                  <input
-                    type="file"
-                    accept="image/jpeg,image/png,image/webp"
-                    multiple
-                    onChange={handleImageChange}
-                    className="hidden"
-                  />
-                  <div className="p-3 bg-white rounded-full shadow-sm">
-                    <Save className="w-5 h-5 text-emerald-600 rotate-180" />
-                  </div>
-                  <p className="text-sm font-medium text-gray-700">Click to upload or drag & drop</p>
-                  <p className="text-xs text-gray-500">JPG, PNG, WebP (Max 5 images)</p>
-                </label>
-
-                {formData.imagePreviews.length > 0 && (
-                  <div className="grid grid-cols-2 gap-4">
-                    {formData.imagePreviews.map((url, idx) => (
-                      <div key={idx} className="relative group aspect-square rounded-lg overflow-hidden border">
-                        <img src={url} alt="" className="h-full w-full object-cover" />
-                        <button
-                          type="button"
-                          onClick={() => handleRemoveImage(idx)}
-                          className="absolute top-1 right-1 p-1 bg-white rounded-full shadow opacity-0 group-hover:opacity-100 transition-opacity hover:text-red-600"
-                        >
-                          <X className="w-4 h-4" />
-                        </button>
-                        {idx === 0 && (
-                          <div className="absolute bottom-0 left-0 right-0 bg-emerald-600 text-white text-[10px] py-0.5 text-center">
-                            Main Image
-                          </div>
-                        )}
-                      </div>
-                    ))}
-                  </div>
-                )}
-              </CardContent>
-            </Card>
+            <Button
+              type="submit"
+              disabled={isLoading}
+              className="w-full bg-emerald-600 hover:bg-emerald-700 text-white font-black h-12 shadow-xl shadow-emerald-200 transition-all active:scale-[0.98]"
+            >
+              {isLoading ? <Loader2 className="animate-spin mr-2" /> : <Save className="mr-2 h-5 w-5" />}
+              {isEditMode ? "Save Changes" : "Create Product"}
+            </Button>
           </div>
-        </div>
-
-        <div className="flex justify-end items-center pt-6 sm:pt-8 w-full">
-          <Button type="submit" disabled={isLoading} className="h-10 sm:h-11 px-8 min-w-[140px] shadow-lg shadow-emerald-700/10 hover:shadow-emerald-700/20 active:scale-95 transition-all bg-emerald-600 hover:bg-emerald-700">
-            <Save className="mr-2 h-4 w-4" />
-            <span className="font-semibold text-sm" style={{ marginTop: '4px', padding:'0 4px'}}>{isLoading ? "Saving..." : "Save Product"}</span>
-          </Button>
         </div>
       </form>
 
@@ -532,7 +302,7 @@ const ProductForm = () => {
         onClose={() => setIsModalOpen(false)}
         onConfirm={handleConfirm}
         title={isEditMode ? "Update Product" : "Create Product"}
-        message={`Are you sure you want to ${isEditMode ? "update" : "create"} this product?`}
+        message={`Save the following changes to this product?`}
         confirmText={isEditMode ? "Update" : "Create"}
         isLoading={isLoading}
       />

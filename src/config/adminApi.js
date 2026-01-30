@@ -9,6 +9,7 @@ export const productUrl = {
   getAllProducts: `${config.productBaseUrl}`,
   createProduct: `${config.productBaseUrl}`,
   updateProduct: `${config.productBaseUrl}`,
+  updateImages: (id) => `${config.productBaseUrl}/${id}/images`,
   deleteProduct: `${config.productBaseUrl}`,
   withoutPagination: `${config.withoutPaginationProductBaseUrl}`,
 };

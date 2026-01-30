@@ -1,5 +1,5 @@
 import React from 'react';
-import { useNavigate } from 'react-router-dom';
+import { Link } from 'react-router-dom';
 import { Search, Bell, User, Menu, LogOut, Settings, ExternalLink } from 'lucide-react';
 import { Button } from '../ui/Button';
 import { Input } from '../ui/Input';
@@ -16,7 +16,6 @@ import { useAuthStore } from '@/store/useAuthStore';
 import { useLogout } from '@/shared/hooks/useLogout';
 
 const AdminHeader = ({ onMobileMenuToggle }) => {
-  const navigate = useNavigate();
   const { user } = useAuthStore();
   const logout = useLogout();
 
@@ -35,16 +34,17 @@ const AdminHeader = ({ onMobileMenuToggle }) => {
         <span className="sr-only">Open sidebar</span>
       </Button>
       {/* Go to Website Button */}
-          <Button
-            variant="ghost"
-            size="sm"
-            onClick={() => navigate('/')}
-            className=" sm:flex items-center gap-2 text-emerald-700 hover:text-emerald-800 hover:bg-emerald-50/50"
-            style={{ padding: '0 8px', height: '32px' }}
-          >
-            <span className=" sm:block text-[10px] sm:text-lg font-medium" style={{marginTop:'3px'}}>DS Pharma</span>
-            <ExternalLink className=" hidden md:block h-2.5 w-2.5 sm:h-4 sm:w-4 md:h-5" />
-          </Button>
+      {/* Go to Website Link */}
+      <Link
+        to="/"
+        className="flex items-center gap-2 group px-2 sm:px-3 py-1.5 rounded-xl text-emerald-700 hover:text-emerald-800 hover:bg-emerald-50/80 transition-all duration-300 border border-emerald-100/50 hover:border-emerald-200 shadow-sm hover:shadow-md h-8 sm:h-9 md:h-10 relative z-10"
+        title="Visit Main Website"
+      >
+        <span className="text-[10px] sm:text-xs md:text-sm font-bold tracking-tight bg-gradient-to-r from-emerald-700 to-teal-700 bg-clip-text text-transparent group-hover:scale-105 transition-transform" style={{marginTop:'2px'}}>
+          DS Pharma
+        </span>
+        <ExternalLink className="h-3 w-3 sm:h-4 sm:w-4 md:h-4.5 group-hover:translate-x-0.5 group-hover:-translate-y-0.5 transition-transform" />
+      </Link>
 
       <div className="flex flex-1 gap-x-2 sm:gap-x-4 self-stretch items-center lg:gap-x-6 relative z-10 justify-end">
 

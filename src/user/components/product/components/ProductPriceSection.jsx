@@ -4,60 +4,58 @@ const ProductPriceSection = ({ price, originalPrice, discount, stock, specialOff
   return (
     <div className="bg-white rounded-lg p-6 ">
       {/* Price Section */}
-      <div className="mb-6" style={{ marginBottom: '1rem', padding: '10px' }}>
-        <div className="flex items-center gap-3 mb-2">
+      <div className="mb-6" style={{ padding: '0 10px' }}>
+        <div className="flex items-center flex-wrap gap-3 mb-3">
           <span
-            style={{
-              fontFamily: 'Gyrotrope',
-              fontSize: '20px',
-              fontWeight: 600,
-              color: '#000000',
-            }}
+            className="text-3xl font-bold text-gray-900"
+            style={{ fontFamily: 'Gyrotrope' }}
           >
-            ₹{price}
+            ₹{Number(price).toLocaleString('en-IN')}
           </span>
-          <span
-            style={{
-              fontFamily: 'Gyrotrope',
-              fontSize: '14px',
-              fontWeight: 400,
-              color: '#9CA3AF',
-              textDecoration: 'line-through'
-            }}
-          >
-            ₹{originalPrice}
-          </span>
-          <span
-            style={{
-              fontFamily: 'Gyrotrope',
-              fontSize: '12px',
-              fontWeight: 600,
-              color: '#10B981',
-              backgroundColor: '#D1FAE5',
-              padding: '2px 6px',
-              borderRadius: '6px'
-            }}
-          >
-            {discount}% Off
-          </span>
+          
+          {originalPrice > price && (
+            <span
+              className="text-lg text-gray-400 line-through"
+              style={{ fontFamily: 'Gyrotrope', textDecorationThickness: '1px' }}
+            >
+              ₹{Number(originalPrice).toLocaleString('en-IN')}
+            </span>
+          )}
+
+          {discount > 0 && (
+            <span
+              className="px-3 py-1 text-sm font-bold text-white bg-emerald-600 rounded-md shadow-sm"
+              style={{ fontFamily: 'Gyrotrope' }}
+            >
+              {discount}% OFF
+            </span>
+          )}
         </div>
-        <div className="flex items-center gap-2 mt-2">
+
+        {discount > 0 && originalPrice > price && (
+          <div className="mb-4">
+            <span className="text-emerald-700 font-bold text-sm" style={{ fontFamily: 'Gyrotrope' }}>
+              Special Price: Save ₹{Math.round(originalPrice - price)}
+            </span>
+          </div>
+        )}
+
+        <div className="flex items-center gap-2 pt-2">
           <div 
-            className={`w-2 h-2 rounded-full ${
+            className={`w-2.5 h-2.5 rounded-full ${
               stock === 0 ? 'bg-red-500 shadow-[0_0_8px_rgba(239,68,68,0.5)]' : 
               stock <= 5 ? 'bg-amber-500 shadow-[0_0_8px_rgba(245,158,11,0.5)]' : 
               'bg-emerald-500 shadow-[0_0_8px_rgba(16,185,129,0.5)]'
-            }`}
+            } animate-pulse`}
           />
           <span
+            className="text-sm font-bold tracking-tight"
             style={{
               fontFamily: 'Gyrotrope',
-              fontSize: '13px',
-              fontWeight: 600,
-              color: stock === 0 ? '#EF4444' : stock <= 5 ? '#F59E0B' : '#10B981',
+              color: stock === 0 ? '#EF4444' : stock <= 5 ? '#F59E0B' : '#059669',
             }}
           >
-            {stock === 0 ? 'Out of Stock' : stock <= 5 ? `Hurry, only ${stock} left in stock!` : 'In Stock'}
+            {stock === 0 ? 'Currently Out of Stock' : stock <= 5 ? `Only ${stock} items left!` : 'Currently in Stock'}
           </span>
         </div>
       </div>

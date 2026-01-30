@@ -1,5 +1,5 @@
 import React, { Suspense, lazy } from 'react';
-import { BrowserRouter as Router, Routes, Route, Navigate, useLocation, useNavigate } from 'react-router-dom';
+import { BrowserRouter as Router, Routes, Route, Navigate } from 'react-router-dom';
 import { QueryClient, QueryClientProvider } from '@tanstack/react-query';
 import { ReactQueryDevtools } from '@tanstack/react-query-devtools';
 import { ToastContainer } from 'react-toastify';
@@ -33,21 +33,7 @@ import { useAuthStore } from './store/useAuthStore';
 import { decodeToken } from './shared/utils/decodeToken';
 import ProtectedRoute from './shared/components/ProtectedRoute';
 
-// Helper to auto-redirect admins to their section if they land on the home page
-const AdminAutoRedirect = () => {
-  const navigate = useNavigate();
-  const location = useLocation();
-  const { user, isAuthenticated } = useAuthStore();
 
-  React.useEffect(() => {
-    // If authenticated admin is at the root, send to dashboard
-    if (isAuthenticated && user?.role === 'admin' && location.pathname === '/') {
-      navigate('/admin/dashboard', { replace: true });
-    }
-  }, [isAuthenticated, user, location.pathname, navigate]);
-
-  return null;
-};
 
 // Create React Query client
 const queryClient = new QueryClient({
@@ -107,7 +93,7 @@ function App() {
           <Router>
             <ScrollToTop />
             <ToastContainer />
-            <AdminAutoRedirect />
+
             <Suspense fallback={<PageLoader />}>
               <Routes>
                 {/* Public Auth Routes (No Layout) */}
