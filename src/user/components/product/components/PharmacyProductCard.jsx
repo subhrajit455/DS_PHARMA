@@ -1,7 +1,7 @@
 import React from 'react';
 import { useNavigate } from 'react-router-dom';
 import { Heart } from 'lucide-react';
-import { useAddToCart } from '@/shared/hooks/mutations/useAddToCart';
+import { useAddToCart } from '@/shared/hooks/queries/useCartQuery';
 import useDataStore from '@/store/useDataStore';
 import CartIcon from '@/assets/icons/Cart.png';
 import SafeImage from '@/shared/components/SafeImage';
@@ -52,17 +52,12 @@ const PharmacyProductCard = ({
     if (!isAvailable) return;
     
     addToCart({
-      product: { 
-        id, 
-        name, 
-        price, 
-        originalPrice: comparisonPrice || price,
-        discount: discountPercentage || 0,
-        quantity, 
-        unit, 
-        image: displayImage 
-      },
-      quantity: 1
+      productId: id,
+      name,
+      price: Number(price) || 0,
+      quantity: 1,
+      image: displayImage,
+      unit
     });
   };
   

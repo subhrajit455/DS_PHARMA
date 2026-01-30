@@ -25,9 +25,6 @@ export const useSignup = () => {
       const token = response.data?.token || response.token;
 
       if (!token) {
-        toastUtil.error(
-          "Account created but automatic login failed. Please login manually.",
-        );
         navigate("/login");
         return;
       }

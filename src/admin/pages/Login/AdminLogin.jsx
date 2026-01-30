@@ -1,6 +1,6 @@
 import React, { useState } from 'react';
 import { useNavigate } from 'react-router-dom';
-import useAdminStore from '@/store/useAdminStore';
+import useAdminStore from '@/admin/context/useAdminStore';
 import toastUtil from '@/shared/utils/toast';
 import { USERS } from '@/shared/data/userData';
 import { Button } from '@/admin/components/ui/Button';

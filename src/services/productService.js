@@ -515,13 +515,15 @@ const getProductsByCategory = async (
         }
 
         // 1. Try Primary Fetch
-        const fetchBy = async (id) => {
+        const fetchBy = async (id, silent = false) => {
           try {
             const response = await apiClient.get(
               API_ENDPOINTS.PRODUCT_USER_CATEGORY(id),
               {
                 params: { page: pageNum, limit: limitNum },
                 signal,
+                silent, // Suppress console logs
+                noToast: silent, // Suppress error toasts
               },
             );
             const data = response.data?.data || response.data || [];
@@ -536,7 +538,8 @@ const getProductsByCategory = async (
           }
         };
 
-        let result = await fetchBy(primaryIdentifier);
+        // Attempt primary lookup silently - we don't want to show errors if it fails and we have a fallback
+        let result = await fetchBy(primaryIdentifier, !!secondaryIdentifier);
 
         // 2. Fallback if Primary returned nothing but a secondary exists
         // API might return {"message": "No products found..."} instead of []

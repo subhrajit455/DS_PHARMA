@@ -1,432 +1,245 @@
-import React, { useState, useMemo } from 'react';
-import { useLocation, useNavigate } from 'react-router-dom';
-import { PharmacyProductCard } from '@/user/components/product';
-import { CartItem } from '@/user/components/cart';
-import { OrderSummary } from '@/user/components/order';
-import SuggestedItemsSection from '@/user/components/sections/SuggestedItemsSection';
-import useDataStore from '@/store/useDataStore';
-import { useUpdateCart } from '@/shared/hooks/mutations/useUpdateCart';
-import { useRemoveFromCart } from '@/shared/hooks/mutations/useRemoveFromCart';
-import { usePlaceOrder } from '@/shared/hooks/mutations/usePlaceOrder';
-import { useProducts } from '@/shared/hooks/queries/useProducts';
-import AddressForm from '@/shared/components/common/AddressForm';
-import { useAddresses, useAddAddress } from '@/shared/hooks/queries/useAddresses';
-import { X, MapPin, Home, Briefcase, Plus } from 'lucide-react';
-import { useToastStore } from '@/store/useToastStore';
-import BackButton from '@/shared/components/BackButton';
+import React, { useMemo } from 'react';
+import { useNavigate } from 'react-router-dom';
+import { Trash2, Plus, Minus, ShoppingBag, ArrowRight, ShieldCheck, Truck } from 'lucide-react';
+import { Button } from '@/admin/components/ui/Button';
+import Loading from '@/shared/components/common/Loading';
+import { useCart, useUpdateCartItem, useRemoveCartItem } from '@/shared/hooks/queries/useCartQuery';
 
 const CartDetails = () => {
-  const navigate = useNavigate();
-  const location = useLocation();
-  // Use global data store
-  const cartItems = useDataStore((state) => state.cart);
-  const currentUser = useDataStore((state) => state.currentUser);
-  
-  // API Hooks
-  const { mutate: updateCartItem } = useUpdateCart();
-  const { mutate: removeCartItem } = useRemoveFromCart();
-  const { mutate: placeOrder, isPending: isPlacingOrder } = usePlaceOrder();
-  const { mutate: addAddress, isPending: isAddingAddress } = useAddAddress();
-  
-  // Fetch suggested items
-  const { data: suggestionsData } = useProducts({ limit: 5 });
-  const suggestedItems = suggestionsData?.data || [];
+    const navigate = useNavigate();
+    const { data: cartData, isLoading, isError } = useCart();
+    const updateMutation = useUpdateCartItem();
+    const removeMutation = useRemoveCartItem();
 
-  const [couponCode, setCouponCode] = useState('');
-  const [appliedCoupon, setAppliedCoupon] = useState(null);
-  const [showAddressModal, setShowAddressModal] = useState(false);
-  const [modalMode, setModalMode] = useState('select'); // 'select' or 'add'
-  const [validationError, setValidationError] = useState(null);
-  const { success: toastSuccess, error: toastError } = useToastStore();
+    // Robust Data Mapping: Handle various response structures
+    const cartItems = useMemo(() => {
+        if (!cartData) return [];
+        if (Array.isArray(cartData)) return cartData;
+        return cartData.data || cartData.cartItems || cartData.items || [];
+    }, [cartData]);
 
-  // Use addresses hook
-  const { data: addressesData } = useAddresses();
-  const userAddresses = useMemo(() => addressesData?.data || [], [addressesData]);
+    // Calculate totals
+    const { totalQuantity, totalAmount, subtotal, discount } = useMemo(() => {
+        if (!cartItems.length) return { totalQuantity: 0, totalAmount: 0, subtotal: 0, discount: 0 };
 
-  const [deliveryAddress, setDeliveryAddress] = useState(null);
+        const sub = cartItems.reduce((acc, item) => acc + (item.productId?.price || 0) * item.quantity, 0);
+        const total = cartItems.reduce((acc, item) => acc + (item.productId?.discountedPrice || item.productId?.price || 0) * item.quantity, 0);
+        
+        return {
+            totalQuantity: cartItems.reduce((acc, item) => acc + item.quantity, 0),
+            totalAmount: total,
+            subtotal: sub,
+            discount: sub - total
+        };
+    }, [cartItems]);
 
-  // Initialize delivery address from saved addresses or user profile
-  React.useEffect(() => {
-      // Only auto-select if no address is currently selected
-      if (!deliveryAddress) {
-          if (userAddresses.length > 0) {
-              // Default to first address or default one
-              const defaultAddr = userAddresses.find(a => a.isDefault) || userAddresses[0];
-              setDeliveryAddress(defaultAddr);
-          } else if (currentUser) {
-              setDeliveryAddress({
-                  id: 'temp-1',
-                  name: currentUser.name || '',
-                  phone: currentUser.phone || '',
-                  address: currentUser.address ? `${currentUser.address.street}, ${currentUser.address.city}, ${currentUser.address.state} - ${currentUser.address.pincode}` : '',
-                  type: 'Home'
-              });
-          }
-      }
-  }, [currentUser, addressesData, deliveryAddress, userAddresses]); 
-
-  const updateQuantity = (id, newQuantity) => {
-      updateCartItem({ productId: id, quantity: Math.max(1, newQuantity) });
-  };
-
-  const removeItem = (id) => {
-    removeCartItem(id);
-  };
-  
-  // Reactive Coupon Reset - Clear discount if input is emptied
-  React.useEffect(() => {
-    if (!couponCode && appliedCoupon) {
-      setAppliedCoupon(null);
-    }
-  }, [couponCode, appliedCoupon]);
-
-  const handleApplyCoupon = () => {
-      if (!couponCode.trim()) {
-          toastError('Please enter a coupon code');
-          setAppliedCoupon(null);
-          return;
-      }
-      
-      const code = couponCode.trim().toUpperCase();
-      const cartValue = cartItems.reduce((sum, item) => sum + (item.price * item.quantity), 0);
-
-      // Validation logic (Recalculation happens in calculateTotals)
-      if (code === 'SAVE10') {
-          if (cartValue < 500) {
-              toastError('Min order value for SAVE10 is ₹500');
-              setAppliedCoupon(null);
-              return;
-          }
-          setAppliedCoupon({ code, type: '10% Off' });
-      } else if (code === 'FLAT50') {
-          if (cartValue < 300) {
-              toastError('Min order value for FLAT50 is ₹300');
-              setAppliedCoupon(null);
-              return;
-          }
-          setAppliedCoupon({ code, type: 'Flat ₹50 Off' });
-      } else if (code === 'FREESHIP') {
-          setAppliedCoupon({ code, type: 'Free Shipping' });
-      } else {
-          toastError('Invalid coupon code');
-          setAppliedCoupon(null);
-          return;
-      }
-      toastSuccess(`Coupon ${code} applied!`);
-  };
-
-  // Re-validate coupon when cart changes
-  React.useEffect(() => {
-      if (appliedCoupon) {
-          // 1. Silent reset if cart is cleared
-          if (cartItems.length === 0) {
-              setAppliedCoupon(null);
-              return;
-          }
-
-          const cartValue = cartItems.reduce((sum, item) => sum + (item.price * item.quantity), 0);
-          
-          // 2. Threshold checks with professional feedback
-          if (appliedCoupon.code === 'SAVE10' && cartValue < 500) {
-              setAppliedCoupon(null);
-              toastError('Coupon SAVE10 removed (min order value ₹500 not met)');
-          } else if (appliedCoupon.code === 'FLAT50' && cartValue < 300) {
-              setAppliedCoupon(null);
-              toastError('Coupon FLAT50 removed (min order value ₹300 not met)');
-          }
-      }
-  }, [cartItems, appliedCoupon, toastError]);
-
-  const removeCoupon = () => {
-      setAppliedCoupon(null);
-      setCouponCode('');
-  };
-
-  const totals = useMemo(() => {
-    const totalCartValue = cartItems.reduce((sum, item) => sum + (item.price * item.quantity), 0);
-    const productDiscount = cartItems.reduce((sum, item) => {
-      const originalPrice = item.originalPrice || (item.price * 1.2);
-      return sum + ((originalPrice - item.price) * item.quantity);
-    }, 0);
-    
-    const gst = Math.round(totalCartValue * 0.18);
-    
-    // Delivery Charge Logic
-    // 1. Empty Cart -> 0
-    // 2. Cart Value >= 500 -> 0 (Free Shipping starts at 500)
-    // 3. Else -> 40 (Standard Fee)
-    let deliveryCharges = (cartItems.length > 0 && totalCartValue < 500) ? 40 : 0;
-    let couponDiscount = 0;
-
-    if (appliedCoupon) {
-        if (appliedCoupon.code === 'FREESHIP') {
-            deliveryCharges = 0;
-        } else if (appliedCoupon.code === 'SAVE10') {
-            couponDiscount = Math.round(totalCartValue * 0.10);
-        } else if (appliedCoupon.code === 'FLAT50') {
-            couponDiscount = 50;
+    const handleQuantityChange = (itemId, type, currentQty) => {
+        if (type === 'increase') {
+            updateMutation.mutate({ id: itemId, quantity: currentQty + 1 });
+        } else {
+            if (currentQty > 1) {
+                updateMutation.mutate({ id: itemId, quantity: currentQty - 1 });
+            }
         }
-    }
-
-    const totalWithoutCoupon = totalCartValue + gst + deliveryCharges;
-    const finalCouponDiscount = Math.min(couponDiscount, totalWithoutCoupon);
-    const total = totalWithoutCoupon - finalCouponDiscount;
-
-    return { 
-        totalCartValue, 
-        discount: Math.round(productDiscount), 
-        coupon: finalCouponDiscount, 
-        gst, 
-        deliveryCharges, 
-        total: Math.max(0, Math.round(total)) 
     };
-  }, [cartItems, appliedCoupon]);
 
-  const handlePlaceOrder = (paymentMethod) => {
-    // Clear previous validation errors
-    setValidationError(null);
-    
-    // 1. Validate user authentication
-    if (!currentUser) {
-      toastError('Please login to place your order');
-      navigate(`/login?redirect=${encodeURIComponent(location.pathname)}`);
-      return;
+    const handleRemoveItem = (itemId) => {
+        if (window.confirm("Are you sure you want to remove this item?")) {
+            removeMutation.mutate(itemId);
+        }
+    };
+
+    if (isLoading) {
+        return (
+            <div className="min-h-screen flex items-center justify-center pt-20">
+                <Loading size="large" text="Loading cart..." />
+            </div>
+        );
     }
-    
-    // 2. Validate cart is not empty
+
+    // DEBUG: Temporary visual aid
+    if (cartData) {
+        console.log("[Cart UI] Raw Data:", cartData);
+    }
+
+    if (isError) {
+       return (
+            <div className="min-h-screen flex flex-col items-center justify-center pt-20 gap-4">
+                <p className="text-red-500 font-medium">Failed to load cart. Please try again.</p>
+                <Button onClick={() => window.location.reload()}>Retry</Button>
+            </div>
+       );
+    }
+
     if (cartItems.length === 0) {
-      setValidationError('Your cart is empty. Add items to continue shopping.');
-      return;
+        return (
+            <div className="min-h-screen pt-24 pb-12 px-4 sm:px-6 lg:px-8 bg-gray-50/50">
+                <div className="max-w-7xl mx-auto text-center">
+                    <div className="w-24 h-24 bg-emerald-100 rounded-full flex items-center justify-center mx-auto mb-6">
+                        <ShoppingBag className="h-10 w-10 text-emerald-600" />
+                    </div>
+                    <h2 className="text-2xl font-bold text-gray-900 mb-2">Your Cart is Empty</h2>
+                    <p className="text-gray-500 mb-8">Looks like you haven't added anything to your cart yet.</p>
+                    <Button 
+                        onClick={() => navigate('/products')}
+                        className="bg-emerald-600 hover:bg-emerald-700 text-white px-8 py-3 rounded-xl shadow-lg shadow-emerald-600/20"
+                    >
+                        Start Shopping
+                    </Button>
+                </div>
+            </div>
+        );
     }
-    
-    // 3. Validate delivery address exists
-    if (!deliveryAddress) {
-      setValidationError('Please select a delivery address to continue.');
-      setShowAddressModal(true);
-      return;
-    }
-    
-    // 4. Validate address completeness
-    if (!deliveryAddress.name || !deliveryAddress.phone || !deliveryAddress.address) {
-      setValidationError('Selected address is incomplete. Please choose or add a complete address.');
-      setShowAddressModal(true);
-      return;
-    }
-    
-    // 5. Validate cart items data integrity
-    const invalidItems = cartItems.filter(item => !item.id || !item.price || !item.name);
-    if (invalidItems.length > 0) {
-      setValidationError('Some items in your cart have invalid data. Please refresh the page and try again.');
-      return;
-    }
-    
-    // 6. Validate totals
-    if (!totals || totals.total < 0) {
-      setValidationError('Order total calculation failed. Please refresh and try again.');
-      return;
-    }
-    
-    // All validations passed - prepare and place order
-    const orderData = {
-        items: cartItems.map(item => ({
-          id: item.id,
-          name: item.name || item.productName,
-          productName: item.name || item.productName,
-          price: item.price,
-          quantity: item.quantity,
-          image: item.image || item.imageUrl,
-        })),
-        totals,
-        appliedCoupon,
-        deliveryAddress,
-        paymentMethod,
-        customerName: deliveryAddress.name,
-        phone: deliveryAddress.phone,
-        address: deliveryAddress.address,
-    };
-    
-    // Place order - usePlaceOrder hook handles navigation on success
-    placeOrder(orderData);
-  };
 
-  return (
-    <div style={{ paddingTop: '2rem' }}>
-      <style>{` 
-         @media (min-width: 768px) { .orders-container { padding-top: 80px !important; } }
-         @media (max-width: 639px) { .cart-details-container { padding-left: 5px !important; padding-right: 5px !important; } }
-       `}</style>
-       
-    {/* Address Management Modal */}
-    {showAddressModal && (
-        <div className="fixed inset-0 z-50 flex items-center justify-center p-4 bg-black/60 backdrop-blur-sm animate-in fade-in duration-200" style={{ padding: '5px' }}>
-             <div className="bg-white rounded-3xl w-full max-w-2xl max-h-[90vh] overflow-hidden shadow-2xl animate-in zoom-in-95 duration-200" style={{padding: '10px'}}>
-                 {/* Modal Header */}
-                 <div className="flex justify-between items-center p-6 border-b border-gray-100 bg-gray-50/50" style={{paddingBottom: '10px'}}>
-                     <h3 className="text-xl font-bold text-gray-900">
-                        {modalMode === 'add' ? 'Add New Address' : 'Select Delivery Address'}
-                     </h3>
-                     <button 
-                        onClick={() => setShowAddressModal(false)}
-                        className="p-2 hover:bg-gray-200 rounded-full transition-colors"
-                     >
-                        <X size={20} className="text-gray-500" />
-                     </button>
-                 </div>
-
-                 {/* Modal Content */}
-                 <div className="p-6 overflow-y-auto max-h-[calc(90vh-140px)] custom-scrollbar" style={{padding: '5px'}}>
-                     {modalMode === 'add' ? (
-                         <AddressForm 
-                            style={{padding: '5px'}}
-                            onSave={(data) => {
-                                addAddress(data, {
-                                    onSuccess: (newAddr) => {
-                                        setDeliveryAddress(newAddr.data || newAddr);
-                                        setShowAddressModal(false);
-                                    }
-                                });
-                            }}
-                            onCancel={() => setModalMode('select')}
-                            isSaving={isAddingAddress}
-                         />
-                     ) : (
-                         <div className="space-y-4">
-                             <div className="flex justify-between items-center mb-4">
-                                <p className="text-sm text-gray-500">Choose from your saved addresses</p>
-                                <button 
-                                    onClick={() => setModalMode('add')}
-                                    className="flex items-center gap-1 text-emerald-600 font-bold text-sm hover:text-emerald-700 transition-colors"
-                                >
-                                    <Plus size={16} />
-                                    <span style={{marginTop: '5px'}}>Add New Address</span>
-                                </button>
-                             </div>
-                             
-                             <div className="grid grid-cols-1 gap-3" style={{padding: '5px'}}>
-                                 {userAddresses.length > 0 ? (
-                                     userAddresses.map((addr) => (
-                                         <div 
-                                             style={{padding: '5px'}}
-                                             key={addr.id}
-                                             onClick={() => {
-                                                 setDeliveryAddress(addr);
-                                                 setShowAddressModal(false);
-                                             }}
-                                             className={`p-4 rounded-2xl border-2 cursor-pointer transition-all hover:shadow-md ${
-                                                 deliveryAddress?.id === addr.id 
-                                                 ? 'border-emerald-500 bg-emerald-50/50' 
-                                                 : 'border-gray-100 bg-white hover:border-emerald-200'
-                                             }`}
-                                         >
-                                             <div className="flex justify-between items-start">
-                                                 <div className="flex items-center gap-2">
-                                                     <div className={`p-2 rounded-lg ${
-                                                         addr.type === 'Work' ? 'bg-purple-100 text-purple-600' : 
-                                                         addr.type === 'Home' ? 'bg-blue-100 text-blue-600' : 'bg-orange-100 text-orange-600'
-                                                     }`}>
-                                                        {addr.type === 'Work' ? <Briefcase size={14} /> : 
-                                                         addr.type === 'Home' ? <Home size={14} /> : <MapPin size={14} />}
-                                                     </div>
-                                                     <span className="font-bold text-gray-900">{addr.type}</span>
-                                                 </div>
-                                                 {deliveryAddress?.id === addr.id && (
-                                                     <span className="bg-emerald-500 text-white text-[10px] px-2 py-0.5 rounded-full font-bold" style={{padding: '2px 5px'}}>Selected</span>
-                                                 )}
-                                             </div>
-                                             <div className="mt-3 space-y-1">
-                                                <p className="text-sm font-bold text-gray-800">{addr.name}</p>
-                                                <p className="text-xs text-gray-600 leading-relaxed tabular-nums">{addr.phone}</p>
-                                                <p className="text-xs text-gray-500 line-clamp-2">{addr.address}, {addr.city}, {addr.state} - {addr.pincode}</p>
-                                             </div>
-                                         </div>
-                                     ))
-                                 ) : (
-                                     <div className="text-center flex flex-col items-center justify-center py-12">
-                                         <MapPin size={40} className="mx-auto text-gray-300 mb-3" />
-                                         <p className="text-gray-500">No saved addresses found</p>
-                                         <button 
-                                            onClick={() => setModalMode('add')}
-                                            className="mt-4 text-emerald-600 font-bold hover:underline"
-                                         >
-                                             Add your first address
-                                         </button>
-                                     </div>
-                                 )}
-                             </div>
-                         </div>
-                     )}    
-                 </div>
-             </div>
-        </div>
-    )}
-
-    <div className="orders-container w-full pt-4 pb-16 lg:pt-32 lg:pb-16">
-      <div className="cart-details-container w-full" style={{ maxWidth: '1280px', margin: '10px auto' }}>
-        <div className="grid grid-cols-1 lg:grid-cols-3 gap-8">
-          <div className="lg:col-span-2">
-            <div style={{paddingBottom:'1.25rem'}}>
-              <BackButton on fallbackRoute="/" label="Back to Shopping" className="mb-4" />
-            </div>  
-            <div className="mb-5">
-              <h1 style={{ fontFamily: 'Gyrotrope', fontSize: '20px', fontWeight: 700, color: '#000000', marginBottom: '0', letterSpacing: '-0.01em' }}>
-                Cart Items ({cartItems.length})
-              </h1>
+    return (
+        <div className="min-h-screen pt-24 pb-12 px-4 sm:px-6 lg:px-8 bg-gray-50/50">
+            {/* DEBUG AID: Remove after fixing */}
+            <div className="bg-black text-green-400 p-4 mb-4 rounded overflow-auto max-h-60 text-xs font-mono">
+                <strong>DEBUG: Cart Data Structure</strong>
+                <pre>{JSON.stringify(cartData, null, 2)}</pre>
             </div>
 
-            {/* Validation Error Display */}
-            {validationError && (
-              <div className="mb-4 p-4 bg-red-50 border-l-4 border-red-500 rounded-lg animate-in fade-in slide-in-from-top-2 duration-200" style={{ margin: '10px 0px' }}>
-                <div className="flex items-center flex-row justify-between"> 
-                  <p className="text-red-800 text-sm font-medium" style={{ fontFamily: 'Gyrotrope', marginTop:'5px' }}>
-                    {validationError}
-                  </p>
-                  <svg className="w-5 h-5 text-red-500 mr-2 shrink-0" fill="currentColor" viewBox="0 0 20 20" style={{margin:'0px 10px'}}>
-                    <path fillRule="evenodd" d="M10 18a8 8 0 100-16 8 8 0 000 16zM8.707 7.293a1 1 0 00-1.414 1.414L8.586 10l-1.293 1.293a1 1 0 101.414 1.414L10 11.414l1.293 1.293a1 1 0 001.414-1.414L11.414 10l1.293-1.293a1 1 0 00-1.414-1.414L10 8.586 8.707 7.293z" clipRule="evenodd" />
-                  </svg>
-                </div>
-              </div>
-            )}
+            <div className="max-w-7xl mx-auto">
+                <h1 className="text-3xl font-bold text-gray-900 mb-8 flex items-center gap-3">
+                    Shopping Cart
+                    <span className="text-sm font-medium bg-emerald-100 text-emerald-700 px-3 py-1 rounded-full">
+                        {totalQuantity} Items
+                    </span>
+                </h1>
 
-            <div className="space-y-3" style={{ maxHeight: '750px', overflowY: 'auto', paddingRight: '5px', scrollbarWidth: 'none', msOverflowStyle: 'none' }}>
-              <style>{`.space-y-3::-webkit-scrollbar { display: none; }`}</style>
-              {cartItems.length > 0 ? (
-                cartItems.map((item) => (
-                  <CartItem key={item.id} item={item} onUpdateQuantity={updateQuantity} onRemove={removeItem} />
-                ))
-              ) : (
-                <div className="p-8 text-center bg-white rounded-lg shadow-sm">
-                  <p className="text-gray-500" style={{ fontFamily: 'Gyrotrope', padding: '10px', marginTop: '10px' }}>Your cart is empty</p>
+                <div className="grid grid-cols-1 lg:grid-cols-12 gap-8">
+                    {/* Cart Items List */}
+                    <div className="lg:col-span-8 space-y-4">
+                        {cartItems.map((item) => (
+                            <div 
+                                key={item._id} 
+                                className="bg-white rounded-2xl p-4 sm:p-6 shadow-sm border border-gray-100 hover:shadow-md transition-shadow group"
+                            >
+                                <div className="flex gap-4 sm:gap-6">
+                                    {/* Product Image */}
+                                    <div className="w-24 h-24 sm:w-32 sm:h-32 rounded-xl overflow-hidden bg-gray-100 border border-gray-200 shrink-0">
+                                        <img 
+                                            src={item.productId?.image?.[0]?.url || item.productId?.image || '/placeholder-image.png'} 
+                                            alt={item.productId?.name}
+                                            className="w-full h-full object-cover group-hover:scale-105 transition-transform duration-500"
+                                        />
+                                    </div>
+
+                                    {/* Product Details */}
+                                    <div className="flex-1 flex flex-col justify-between">
+                                        <div>
+                                            <div className="flex justify-between items-start gap-4">
+                                                <div>
+                                                    <h3 className="font-bold text-gray-900 text-lg line-clamp-2 hover:text-emerald-600 transition-colors cursor-pointer" onClick={() => navigate(`/product/${item.productId?._id}`)}>
+                                                        {item.productId?.name}
+                                                    </h3>
+                                                    <p className="text-sm text-gray-500 mt-1">{item.productId?.brand}</p>
+                                                </div>
+                                                <button 
+                                                    onClick={() => handleRemoveItem(item._id)}
+                                                    className="text-gray-400 hover:text-red-500 transition-colors p-1"
+                                                    disabled={removeMutation.isPending}
+                                                >
+                                                    <Trash2 className="h-5 w-5" />
+                                                </button>
+                                            </div>
+                                            
+                                            <div className="flex items-center gap-2 mt-2">
+                                                <span className="font-bold text-lg text-emerald-700">
+                                                    ₹{item.productId?.discountedPrice || item.productId?.price}
+                                                </span>
+                                                {item.productId?.discountedPrice && (
+                                                    <span className="text-sm text-gray-400 line-through">
+                                                        ₹{item.productId?.price}
+                                                    </span>
+                                                )}
+                                            </div>
+                                        </div>
+
+                                        {/* Quantity & Total */}
+                                        <div className="flex items-center justify-between mt-4">
+                                            <div className="flex items-center gap-3 bg-gray-50 rounded-lg p-1 border border-gray-200">
+                                                <button 
+                                                    onClick={() => handleQuantityChange(item._id, 'decrease', item.quantity)}
+                                                    className="p-1.5 rounded-md hover:bg-white hover:shadow-sm text-gray-600 disabled:opacity-50 transition-all"
+                                                    disabled={item.quantity <= 1 || updateMutation.isPending}
+                                                >
+                                                    <Minus className="h-4 w-4" />
+                                                </button>
+                                                <span className="font-semibold w-8 text-center text-gray-900">{item.quantity}</span>
+                                                <button 
+                                                    onClick={() => handleQuantityChange(item._id, 'increase', item.quantity)}
+                                                    className="p-1.5 rounded-md hover:bg-white hover:shadow-sm text-gray-600 disabled:opacity-50 transition-all"
+                                                    disabled={updateMutation.isPending}
+                                                >
+                                                    <Plus className="h-4 w-4" />
+                                                </button>
+                                            </div>
+                                            <div className="text-right">
+                                                <p className="text-xs text-gray-500 mb-0.5">Subtotal</p>
+                                                <p className="font-bold text-gray-900">
+                                                    ₹{((item.productId?.discountedPrice || item.productId?.price) * item.quantity).toFixed(2)}
+                                                </p>
+                                            </div>
+                                        </div>
+                                    </div>
+                                </div>
+                            </div>
+                        ))}
+                    </div>
+
+                    {/* Order Summary */}
+                    <div className="lg:col-span-4 space-y-6">
+                        <div className="bg-white rounded-2xl p-6 shadow-sm border border-gray-100 sticky top-24">
+                            <h2 className="text-xl font-bold text-gray-900 mb-6">Order Summary</h2>
+                            
+                            <div className="space-y-4 mb-6">
+                                <div className="flex justify-between text-gray-600">
+                                    <span>Subtotal</span>
+                                    <span>₹{subtotal.toFixed(2)}</span>
+                                </div>
+                                <div className="flex justify-between text-emerald-600">
+                                    <span>Discount</span>
+                                    <span>-₹{discount.toFixed(2)}</span>
+                                </div>
+                                <div className="flex justify-between text-gray-600">
+                                    <span>Delivery Charges</span>
+                                    <span className="text-emerald-600 font-medium">Free</span>
+                                </div>
+                                <div className="h-px bg-gray-100 my-4" />
+                                <div className="flex justify-between items-end">
+                                    <span className="text-lg font-bold text-gray-900">Total Amount</span>
+                                    <div className="text-right">
+                                        <span className="text-2xl font-bold text-emerald-700">₹{totalAmount.toFixed(2)}</span>
+                                        <p className="text-xs text-gray-500 mt-1">Include all taxes</p>
+                                    </div>
+                                </div>
+                            </div>
+
+                            <Button 
+                                className="w-full bg-emerald-600 hover:bg-emerald-700 text-white h-12 text-lg font-semibold rounded-xl shadow-lg shadow-emerald-600/20 group"
+                                onClick={() => navigate('/checkout')}
+                            >
+                                Proceed to Checkout
+                                <ArrowRight className="ml-2 h-5 w-5 group-hover:translate-x-1 transition-transform" />
+                            </Button>
+
+                            <div className="mt-6 grid grid-cols-2 gap-4">
+                                <div className="flex items-center gap-2 text-xs text-gray-500">
+                                    <ShieldCheck className="h-4 w-4 text-emerald-600" />
+                                    Secure Payment
+                                </div>
+                                <div className="flex items-center gap-2 text-xs text-gray-500">
+                                    <Truck className="h-4 w-4 text-emerald-600" />
+                                    Free Delivery
+                                </div>
+                            </div>
+                        </div>
+                    </div>
                 </div>
-              )}
             </div>
-          </div>
-
-          <div className="lg:col-span-1">
-            <OrderSummary
-              deliveryAddress={deliveryAddress}
-              couponCode={couponCode}
-              onCouponChange={(e) => setCouponCode(e.target.value)}
-              onApplyCoupon={handleApplyCoupon}
-              onRemoveCoupon={removeCoupon}
-              appliedCoupon={appliedCoupon}
-              totals={totals}
-              onOrderNow={handlePlaceOrder}
-              onAddNewAddress={() => { setModalMode('add'); setShowAddressModal(true); }}
-              onChangeAddress={() => { setModalMode('select'); setShowAddressModal(true); }}
-              isPlacingOrder={isPlacingOrder}
-              cartItems={cartItems}
-            />
-          </div>
         </div>
-      
-        <SuggestedItemsSection title="Suggested Items" items={suggestedItems} className="w-full" 
-            titleStyle={{ fontSize: '22px', marginBottom: '1rem', textDecorationThickness: '2px', textDecorationColor: '#111827', lineHeight: '1.2' }}
-            containerStyle={{ paddingTop: '1rem' }}
-        />
-      </div>
-    </div>
-    </div>
-  );
+    );
 };
 
 export default CartDetails;

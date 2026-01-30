@@ -1,17 +1,13 @@
-import React, { useState, useEffect } from "react";
+import React, { useState } from "react";
 import { useNavigate } from "react-router-dom";
 import {
   Plus,
-  Edit,
-  Trash2,
   Eye,
-  EyeOff,
-  Sparkles,
+  RefreshCw,
+  Ban,
   Package,
 } from "lucide-react";
 import toastUtil from "@/shared/utils/toast";
-import { ChevronDown } from "lucide-react";
-
 import { Button } from "@/admin/components/ui/Button";
 import { Card, CardContent } from "@/admin/components/ui/Card";
 import {
@@ -23,417 +19,260 @@ import {
   TableRow,
 } from "@/admin/components/ui/Table";
 import { Pagination } from "@/admin/components/ui/Pagination";
-import { productUrl, categoryUrl } from "@/config/adminApi";
 import ViewProductModal from "./ViewProduct";
-import axios from "axios";
-import ConfirmationModal from "@/admin/components/ui/ConfirmationModal";
-// import { error } from "node:console";
+import { useMargProducts } from "@/shared/hooks/queries/useMargProducts";
+import ProductTableSkeleton from "@/admin/components/ui/ProductTableSkeleton";
+import Badge from "@/admin/components/ui/Badge";
+
+const ProductRow = React.memo(({ product, onView }) => (
+  <TableRow
+    className="group border-b border-gray-100/80 hover:bg-emerald-50/30 transition-all duration-150"
+  >
+    <TableCell className="py-4 px-6">
+      <div className="flex items-center gap-4">
+        <div className="relative shrink-0">
+          {product.images?.[0] ? (
+            <img
+              src={product.images[0]}
+              alt={product.name}
+              className="w-14 h-14 object-cover rounded-xl shadow-sm border border-gray-200"
+            />
+          ) : (
+            <div className="w-14 h-14 bg-gray-100 flex items-center justify-center rounded-xl border border-dashed border-gray-300">
+              <Package className="w-6 h-6 text-gray-300" />
+            </div>
+          )}
+        </div>
+        <div className="flex flex-col min-w-0">
+          <span className="text-sm font-bold text-gray-900 truncate group-hover:text-emerald-700 transition-colors">
+            {product.name}
+          </span>
+          <span className="text-[11px] text-gray-500 font-mono mt-0.5">
+            {product.code}
+          </span>
+        </div>
+      </div>
+    </TableCell>
+    <TableCell className="py-4 px-6 hidden lg:table-cell">
+       <div className="max-w-[150px]">
+         <p className="text-xs font-medium text-gray-600 truncate">{product.company}</p>
+       </div>
+    </TableCell>
+    <TableCell className="py-4 px-6 text-center">
+      <div className="flex flex-col items-center">
+        <span className="text-sm font-bold text-gray-900">₹{product.mrp.toFixed(2)}</span>
+        <span className="text-[10px] text-gray-400 line-through">₹{(product.mrp * 1.1).toFixed(2)}</span>
+      </div>
+    </TableCell>
+    <TableCell className="py-4 px-6 text-center">
+      <Badge variant={product.stock > 0 ? "success" : "destructive"} className="px-3">
+        {product.stock > 0 ? `In Stock: ${product.stock}` : "Out of Stock"}
+      </Badge>
+    </TableCell>
+    <TableCell className="py-4 px-6 hidden xl:table-cell text-center">
+      <span className="text-xs font-medium text-gray-600">{product.expiry}</span>
+    </TableCell>
+    <TableCell className="py-4 px-6 text-right">
+      <div className="flex items-center justify-end gap-1">
+        <Button
+          variant="ghost"
+          size="icon"
+          className="h-9 w-9 text-gray-500 hover:text-emerald-600 hover:bg-emerald-50 rounded-lg transition-colors"
+          onClick={() => onView(product.id)}
+        >
+          <Eye className="h-4 w-4" />
+        </Button>
+        <Button
+          variant="ghost"
+          size="icon"
+          className="h-9 w-9 text-gray-500 hover:text-blue-600 hover:bg-blue-50 rounded-lg transition-colors"
+          title="Sync with Marg"
+        >
+          <RefreshCw className="h-4 w-4" />
+        </Button>
+        <Button
+          variant="ghost"
+          size="icon"
+          className="h-9 w-9 text-gray-500 hover:text-red-600 hover:bg-red-50 rounded-lg transition-colors"
+          title="Disable Product"
+        >
+          <Ban className="h-4 w-4" />
+        </Button>
+      </div>
+    </TableCell>
+  </TableRow>
+));
+
+ProductRow.displayName = "ProductRow";
 
 const ProductsList = () => {
   const navigate = useNavigate();
-
-  const [products, setProducts] = useState([]);
-  const [isLoading, setIsLoading] = useState(true);
-  const [confirmOpen, setConfirmOpen] = useState(false);
-  const [deleteId, setDeleteId] = useState(null);
-  const [deleteLoading, setDeleteLoading] = useState(false);
-
-  const [pagination, setPagination] = useState({
-    totalItems: 0,
-    totalPages: 1,
-    currentPage: 1,
-    limit: 10,
-  });
   const [search, setSearch] = useState("");
-  const [viewOpen, setViewOpen] = useState(false);
+  const [pagination, setPagination] = useState({
+    currentPage: 1,
+    limit: 50,
+  });
+  
   const [selectedProductId, setSelectedProductId] = useState(null);
-  const [categories, setCategories] = useState([]);
+  const [viewOpen, setViewOpen] = useState(false);
 
-  const fetchCategories = async () => {
-    try {
-      const res = await axios.get(categoryUrl.getAllCategories);
-      setCategories(res.data.data || []);
-    } catch (err) {
-      console.error("Failed to load categories:", err);
-    }
-  };
+  // Fetch Marg Products using React Query
+  const { 
+    data, 
+    isLoading, 
+    isFetching,
+    isError, 
+    error 
+  } = useMargProducts({
+    page: pagination.currentPage,
+    limit: pagination.limit,
+    search: search
+  });
 
-  const categoryMap = React.useMemo(() => {
-    const map = {};
-    categories.forEach((cat) => {
-      map[cat._id || cat.id] = cat.name;
-    });
-    return map;
-  }, [categories]);
+  const products = data?.products || [];
+  const totalItems = data?.total || 0;
+  const totalPages = data?.totalPages || 1;
 
-  const fetchProducts = React.useCallback(async (page = 1, limit = 10, searchTerm = "") => {
-    setIsLoading(true);
-    try {
-      // Fetch categories once if not already fetched
-      if (categories.length === 0) {
-        fetchCategories();
-      }
-      const response = await axios.get(productUrl.getAllProducts, {
-        params: { page, limit, search: searchTerm },
-      });
-      // API: { message, pagination, data }
-      setProducts(response.data.data || []);
-      setPagination(
-        response.data.pagination || {
-          totalItems: 0,
-          totalPages: 1,
-          currentPage: 1,
-          limit,
-        },
-      );
-    } catch (error) {
-      console.error(error);
-      toastUtil.error("Failed to fetch products");
-    } finally {
-      setIsLoading(false);
-    }
-  }, [categories.length]);
-
-
-  useEffect(() => {
-    fetchProducts(pagination.currentPage, pagination.limit, search);
-  }, [pagination.currentPage, pagination.limit, search, fetchProducts]);
-
+  // Handle page change with smooth scroll to top of table
   const handlePageChange = (page) => {
     setPagination((prev) => ({ ...prev, currentPage: page }));
+    const scrollTarget = document.querySelector("#admin-product-table");
+    if (scrollTarget) {
+      scrollTarget.scrollTo({ top: 0, behavior: 'smooth' });
+    }
   };
 
-const handleItemsPerPageChange = (limit) => {
-  setPagination((prev) => ({ ...prev, limit, currentPage: 1 }));
-};
-
+  const handleItemsPerPageChange = (limit) => {
+    setPagination((prev) => ({ ...prev, limit, currentPage: 1 }));
+  };
 
   const handleSearchChange = (e) => {
     setSearch(e.target.value);
     setPagination((prev) => ({ ...prev, currentPage: 1 }));
   };
 
-  const handleDelete = async () => {
-    if (!deleteId) return;
-
-    setDeleteLoading(true);
-    try {
-      await axios.delete(`${productUrl.deleteProduct}/${deleteId}`);
-      toastUtil.success("Product deleted successfully");
-
-      setConfirmOpen(false);
-      setDeleteId(null);
-
-      fetchProducts(pagination.currentPage, pagination.limit);
-    } catch (error) {
-      console.error(error);
-      toastUtil.error("Failed to delete product");
-    } finally {
-      setDeleteLoading(false);
-    }
+  const handleViewProduct = (id) => {
+    setSelectedProductId(id);
+    setViewOpen(true);
   };
 
+  if (isError) {
+    toastUtil.error(error?.message || "Failed to fetch Marg products");
+  }
+
   return (
-    <div
-      className="flex flex-col h-full space-y-4 sm:space-y-6 max-w-full overflow-x-hidden"
-      style={{
-        padding: "10px 10px 0px 10px",
-        background:
-          "linear-gradient(135deg, #f0fdf4 0%, #ecfdf5 50%, #f0fdfa 100%)",
-      }}
-    >
-      <div
-        className="flex flex-row justify-between items-start sm:items-center gap-3 sm:gap-4"
-        style={{ paddingBottom: "10px 10px 0px 10px" }}
-      >
-        <div>
-          <h2 className="text-xl sm:text-xl md:text-2xl font-bold bg-gradient-to-r from-gray-900 via-emerald-800 to-teal-800 bg-clip-text text-transparent flex items-center gap-2">
-            Products
-            
-          </h2>
-          {/* <p className="text-gray-500 text-[10px] sm:text-[8px] sm:text-xs md:text-sm mt-0.5">
-            Manage your pharmacy inventory
-          </p> */}
-        </div>
-        <Button
-          onClick={() => navigate("/admin/products/new")}
-          className="text-[10px] sm:text-[8px] sm:text-xs md:text-sm h-7 sm:h-9 md:h-10"
-          style={{ padding: "0px 10px" }} 
-        >
-          <Plus className="mr-0.5 sm:mr-1 md:mr-2 h-3 w-3 sm:h-3.5 sm:w-3.5 md:h-4 md:w-4" />{" "}
-          <span style={{ marginTop: "3px" }}>Add Product</span>
-        </Button>
-      </div>
-
-      {/* Search Bar */}
-      <div className="flex items-center mb-2 mt-2">
-        <input
-          type="text"
-          placeholder="Search products..."
-          value={search}
-          onChange={handleSearchChange}
-          className="w-full max-w-xs px-3 py-2 border border-gray-300 rounded-md text-sm focus:outline-none focus:ring-2 focus:ring-emerald-400"
-          style={{ marginBottom: "8px" }}
-        />
-      </div>
-
-      <Card className="flex-1 flex flex-col overflow-hidden">
-        <CardContent
-          className="flex flex-col flex-1 min-h-0 p-2 sm:p-3 md:p-4 lg:p-6 space-y-2 sm:space-y-3 md:space-y-4 overflow-hidden"
-          style={{ padding: "5px" }}
-        >
-          <div className="flex-1 overflow-auto rounded-md border border-gray-200">
-            <Table>
-              <TableHeader>
-                <TableRow
-                  style={{
-                    background: "linear-gradient(to right, #f0fdf4, #f0fdfa)",
-                  }}
-                >
-                  <TableHead
-                    className="font-semibold text-gray-700 text-[8px] sm:text-sm"
-                    style={{ padding: "6px 8px" }}
-                  >
-                    Image
-                  </TableHead>
-                  <TableHead
-                    className="font-semibold text-gray-700 text-[8px] sm:text-sm"
-                    style={{ padding: "6px 8px" }}
-                  >
-                    Name
-                  </TableHead>
-                  <TableHead
-                    className="font-semibold text-gray-700 text-[8px] sm:text-sm"
-                    style={{ padding: "6px 8px" }}
-                  >
-                    Brand
-                  </TableHead>
-                  <TableHead
-                    className="font-semibold text-gray-700 text-[8px] sm:text-sm"
-                    style={{ padding: "6px 8px" }}
-                  >
-                    Category
-                  </TableHead>
-                  <TableHead
-                    className="font-semibold text-gray-700 text-[8px] sm:text-sm"
-                    style={{ padding: "6px 8px" }}
-                  >
-                    SKU
-                  </TableHead>
-                  <TableHead
-                    className="font-semibold text-gray-700 text-[8px] sm:text-sm"
-                    style={{ padding: "6px 8px" }}
-                  >
-                    Unit
-                  </TableHead>
-                  <TableHead
-                    className="font-semibold text-gray-700 text-[8px] sm:text-sm"
-                    style={{ padding: "6px 8px" }}
-                  >
-                    Price
-                  </TableHead>
-                  <TableHead
-                    className="font-semibold text-gray-700 text-[8px] sm:text-sm"
-                    style={{ padding: "6px 8px" }}
-                  >
-                    Discount
-                  </TableHead>
-                  <TableHead
-                    className="font-semibold text-gray-700 text-[8px] sm:text-sm"
-                    style={{ padding: "6px 8px" }}
-                  >
-                    Disc. Price
-                  </TableHead>
-                  <TableHead
-                    className="font-semibold text-gray-700 text-[8px] sm:text-sm"
-                    style={{ padding: "6px 8px" }}
-                  >
-                    Stock
-                  </TableHead>
-                  <TableHead
-                    className="font-semibold text-gray-700 text-[8px] sm:text-sm"
-                    style={{ padding: "6px 8px" }}
-                  >
-                    Status
-                  </TableHead>
-                  <TableHead
-                    className="text-right font-semibold text-gray-700 text-[8px] sm:text-sm"
-                    style={{ padding: "6px 8px" }}
-                  >
-                    Actions
-                  </TableHead>
-                </TableRow>
-              </TableHeader>
-              <TableBody>
-                {isLoading ? (
-                  <TableRow>
-                    <TableCell colSpan={12} className="h-24 text-center">
-                      <div className="flex items-center justify-center gap-2 text-emerald-600">
-                        <div className="w-4 h-4 border-2 border-emerald-600 border-t-transparent rounded-full animate-spin" />
-                        <span>Loading products...</span>
-                      </div>
-                    </TableCell>
-                  </TableRow>
-                ) : products.length > 0 ? (
-                  products.map((product) => (
-                    <TableRow
-                      key={product._id}
-                      className="hover:bg-emerald-50/50 transition-all duration-200 border-b border-gray-100 group"
-                    >
-                      <TableCell style={{ padding: "6px" }}>
-                        {product.image && product.image.length > 0 ? (
-                          <img
-                            src={product.image[0].url}
-                            alt={product.name}
-                            className="w-12 h-12 object-cover rounded"
-                          />
-                        ) : (
-                          <div className="w-12 h-12 bg-gray-100 flex items-center justify-center rounded">
-                            <Package className="w-6 h-6 text-gray-300" />
-                          </div>
-                        )}
-                      </TableCell>
-                      <TableCell
-                        className="font-medium text-gray-900 text-[8px] sm:text-sm"
-                        style={{ padding: "8px" }}
-                      >
-                        {product.name}
-                      </TableCell>
-                      <TableCell
-                        className="text-gray-700 text-[8px] sm:text-xs"
-                        style={{ padding: "6px" }}
-                      >
-                        {product.brand}
-                      </TableCell>
-                      <TableCell
-                        className="text-gray-700 text-[8px] sm:text-xs"
-                        style={{ padding: "6px" }}
-                      >
-                        {typeof product.category === 'object' && product.category?.name 
-                          ? product.category.name 
-                          : categoryMap[product.category] || product.category || 'N/A'
-                        }
-                      </TableCell>
-                      <TableCell
-                        className="font-mono text-[8px] sm:text-xs text-gray-500"
-                        style={{ padding: "6px" }}
-                      >
-                        {product.sku}
-                      </TableCell>
-                      <TableCell
-                        className="text-gray-700 text-[8px] sm:text-xs"
-                        style={{ padding: "6px" }}
-                      >
-                        {product.unit}
-                      </TableCell>
-                      <TableCell
-                        className="text-[8px] sm:text-xs font-semibold text-emerald-600"
-                        style={{ padding: "6px" }}
-                      >
-                        ₹{Number(product.price).toFixed(2)}
-                      </TableCell>
-                      <TableCell
-                        className="text-[8px] sm:text-xs"
-                        style={{ padding: "6px" }}
-                      >
-                        {product.discount}%
-                      </TableCell>
-                      <TableCell
-                        className="text-[8px] sm:text-xs font-semibold text-emerald-700"
-                        style={{ padding: "6px" }}
-                      >
-                        ₹{Number(product.discountedPrice).toFixed(2)}
-                      </TableCell>
-                      <TableCell
-                        className="text-[8px] sm:text-xs"
-                        style={{ padding: "6px" }}
-                      >
-                        {product.stock}
-                      </TableCell>
-                      <TableCell
-                        className="text-[8px] sm:text-xs"
-                        style={{ padding: "6px" }}
-                      >
-                        {product.status}
-                      </TableCell>
-                      <TableCell
-                        className="text-right"
-                        style={{ padding: "6px" }}
-                      >
-                        <div className="flex items-center justify-center gap-1 sm:gap-2 opacity-100">
-                          <Button
-                            variant="ghost"
-                            size="icon"
-                            className="h-7 w-7 sm:h-8 sm:w-8 hover:bg-emerald-50"
-                            onClick={() => {
-                              setSelectedProductId(product._id);
-                              setViewOpen(true);
-                            }}
-                          >
-                            <Eye className="h-3 w-3 sm:h-4 sm:w-4 text-emerald-600" />
-                          </Button>
-
-                          <Button
-                            variant="ghost"
-                            size="icon"
-                            className="h-7 w-7 sm:h-8 sm:w-8 hover:bg-blue-50"
-                            onClick={() =>
-                              navigate(`/admin/products/${product._id}/edit`, {
-                                state: { product },
-                              })
-                            }
-                          >
-                            <Edit className="h-3 w-3 sm:h-4 sm:w-4 text-blue-600" />
-                          </Button>
-
-                          <Button
-                            variant="ghost"
-                            size="icon"
-                            className="h-7 w-7 sm:h-8 sm:w-8 hover:bg-red-50"
-                            onClick={() => {
-                              setDeleteId(product._id);
-                              setConfirmOpen(true);
-                            }}
-                          >
-                            <Trash2 className="h-3 w-3 sm:h-4 sm:w-4 text-red-600" />
-                          </Button>
-                        </div>
-                      </TableCell>
-                    </TableRow>
-                  ))
-                ) : (
-                  <TableRow>
-                    <TableCell
-                      colSpan={12}
-                      className="h-32 text-center text-gray-500"
-                    >
-                      <div className="flex flex-col items-center justify-center gap-2">
-                        <Package className="w-8 h-8 text-gray-300" />
-                        <p>No products found.</p>
-                      </div>
-                    </TableCell>
-                  </TableRow>
-                )}
-              </TableBody>
-            </Table>
+    <div className="flex flex-col h-screen max-h-screen bg-[#F9FAFB] overflow-hidden">
+      {/* Premium Header Section - Fixed */}
+      <header className="shrink-0 px-6 py-4 bg-white border-b border-gray-200/80 shadow-sm z-30">
+        <div className="max-w-[1600px] mx-auto flex flex-col sm:flex-row justify-between items-start sm:items-center gap-4">
+          <div>
+            <h1 className="text-xl sm:text-2xl font-extrabold text-gray-900 tracking-tight">
+              Marg ERP Products
+            </h1>
           </div>
-
-          {!isLoading && pagination.totalPages > 1 && (
-            <div
-              className="shrink-0 mt-auto pt-4"
-              style={{ bottom: "0", marginTop: "10px" }}
+          <div className="flex items-center gap-3 w-full sm:w-auto">
+            <Button
+              variant="outline"
+              className="flex-1 sm:flex-none h-10 px-4 font-semibold text-gray-700 hover:bg-gray-50 border-gray-300 transition-all active:scale-95"
+              onClick={() => navigate("/admin/dashboard")}
             >
-              <Pagination
-                currentPage={pagination.currentPage}
-                totalPages={pagination.totalPages}
-                onPageChange={handlePageChange}
-                itemsPerPage={pagination.limit}
-                onItemsPerPageChange={handleItemsPerPageChange}
-              />
-            </div>
-          )}
-        </CardContent>
-      </Card>
+              Dashboard
+            </Button>
+            <Button
+              onClick={() => navigate("/admin/products/new")}
+              className="flex-1 sm:flex-none bg-emerald-600 hover:bg-emerald-700 text-white shadow-lg shadow-emerald-600/20 transition-all active:scale-95 h-10 px-5 font-bold"
+            >
+              <Plus className="mr-2 h-4 w-4" />
+              <span>Add Product</span>
+            </Button>
+          </div>
+        </div>
+      </header>
+
+      {/* Modern Filter & Search Toolbar - Fixed */}
+      <div className="shrink-0 px-6 py-4 bg-gray-50/50 border-b border-gray-200/60 z-20">
+        <div className="max-w-[1600px] mx-auto flex flex-col md:flex-row items-center gap-4">
+          <div className="relative w-full max-w-xl group">
+            <input
+              type="text"
+              placeholder="Search products by brand, code, or salt name..."
+              value={search}
+              onChange={handleSearchChange}
+              className="block w-full pl-10 pr-4 py-2.5 bg-white border border-gray-300/80 rounded-xl text-sm placeholder:text-gray-400 focus:outline-none focus:ring-4 focus:ring-emerald-500/10 focus:border-emerald-500 transition-all shadow-sm group-hover:border-gray-400"
+            />
+          </div>
+          <div className="flex items-center gap-2 ml-auto shrink-0 overflow-x-auto w-full md:w-auto pb-2 md:pb-0 no-scrollbar">
+             <Badge variant="secondary" className="cursor-default bg-white border-gray-200 text-gray-600">
+               {totalItems.toLocaleString()} Products Found
+             </Badge>
+          </div>
+        </div>
+      </div>
+
+      {/* Main Content Area - Constrained to prevent whole-page scroll */}
+      <main className="flex-1 overflow-hidden p-4 sm:p-6 lg:p-8 bg-gray-50/30">
+        <div className="max-w-[1600px] mx-auto h-full flex flex-col">
+          <Card className="flex-1 flex flex-col min-h-0 border border-gray-200/80 shadow-xl shadow-gray-200/40 bg-white rounded-2xl overflow-hidden">
+            <CardContent className="flex flex-col flex-1 p-0 overflow-hidden">
+              
+              {/* FIXED SCROLLABLE TABLE AREA */}
+              <div id="admin-product-table" className="flex-1 overflow-auto no-scrollbar relative">
+                <Table className="relative border-collapse min-w-full">
+                  <TableHeader className="sticky top-0 z-20">
+                    <TableRow className="bg-gray-50 border-b border-gray-200 hover:bg-gray-50">
+                      <TableHead className="py-4 px-6 text-[11px] font-bold text-gray-500 uppercase tracking-wider sticky top-0 bg-gray-50 z-20">Product Information</TableHead>
+                      <TableHead className="py-4 px-6 text-[11px] font-bold text-gray-500 uppercase tracking-wider hidden lg:table-cell sticky top-0 bg-gray-50 z-20">Manufacturer</TableHead>
+                      <TableHead className="py-4 px-6 text-[11px] font-bold text-gray-500 uppercase tracking-wider text-center sticky top-0 bg-gray-50 z-20">Unit Price (MRP)</TableHead>
+                      <TableHead className="py-4 px-6 text-[11px] font-bold text-gray-500 uppercase tracking-wider text-center sticky top-0 bg-gray-50 z-20">Inventory Status</TableHead>
+                      <TableHead className="py-4 px-6 text-[11px] font-bold text-gray-500 uppercase tracking-wider hidden xl:table-cell sticky top-0 bg-gray-50 z-20">Expiry Date</TableHead>
+                      <TableHead className="py-4 px-6 text-right text-[11px] font-bold text-gray-500 uppercase tracking-wider sticky top-0 bg-gray-50 z-20">Actions</TableHead>
+                    </TableRow>
+                  </TableHeader>
+                  <TableBody>
+                    {isLoading ? (
+                      <ProductTableSkeleton rows={pagination.limit} columns={6} />
+                    ) : products.length > 0 ? (
+                      products.map((product) => (
+                        <ProductRow key={product.id} product={product} onView={handleViewProduct} />
+                      ))
+                    ) : (
+                      <TableRow>
+                        <TableCell colSpan={6} className="h-96 text-center">
+                          <div className="flex flex-col items-center justify-center p-12">
+                            <div className="w-20 h-20 bg-gray-50 rounded-full flex items-center justify-center mb-4">
+                              <Package className="w-10 h-10 text-gray-200" />
+                            </div>
+                            <h3 className="text-lg font-bold text-gray-900">No products found</h3>
+                            <p className="text-sm text-gray-500 mt-1 max-w-xs mx-auto">
+                              Try adjusting your search or filters to find what you're looking for.
+                            </p>
+                          </div>
+                        </TableCell>
+                      </TableRow>
+                    )}
+                  </TableBody>
+                </Table>
+              </div>
+
+              {/* FIXED PAGINATION FOOTER */}
+              <div className="shrink-0 px-6 py-4 bg-white border-t border-gray-200/80 z-30 shadow-[0_-4px_6px_-1px_rgba(0,0,0,0.05)]">
+                <Pagination
+                  currentPage={pagination.currentPage}
+                  totalPages={totalPages}
+                  totalItems={totalItems}
+                  onPageChange={handlePageChange}
+                  itemsPerPage={pagination.limit}
+                  onItemsPerPageChange={handleItemsPerPageChange}
+                  loading={isLoading || isFetching}
+                  variant="enterprise"
+                  className="shadow-none border-none p-0 bg-transparent"
+                />
+              </div>
+            </CardContent>
+          </Card>
+        </div>
+      </main>
+
       <ViewProductModal
         open={viewOpen}
         productId={selectedProductId}
@@ -441,25 +280,6 @@ const handleItemsPerPageChange = (limit) => {
           setViewOpen(false);
           setSelectedProductId(null);
         }}
-      />
-
-
-
-      <ConfirmationModal
-        isOpen={confirmOpen}
-        onClose={() => {
-          if (!deleteLoading) {
-            setConfirmOpen(false);
-            setDeleteId(null);
-          }
-        }}
-        onConfirm={handleDelete}
-        title="Delete Product"
-        message="Are you sure you want to delete this product? This action cannot be undone."
-        confirmText="Delete"
-        cancelText="Cancel"
-        variant="danger"
-        isLoading={deleteLoading}
       />
     </div>
   );

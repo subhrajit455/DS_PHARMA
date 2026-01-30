@@ -17,6 +17,8 @@ import { Pagination } from '@/admin/components/ui/Pagination';
 import ConfirmationModal from '@/admin/components/ui/ConfirmationModal';
 import useDataStore from '@/store/useDataStore';
 import { useCategories, useDeleteCategory, useUpdateCategory } from '@/shared/hooks/queries/useCategories';
+import { useQuery } from '@tanstack/react-query';
+import { productService } from '@/services/productService';
 
 const CategoriesList = () => {
     const navigate = useNavigate();
@@ -43,6 +45,13 @@ const CategoriesList = () => {
         limit: itemsPerPage
     });
 
+    // Fetch all products for accurate counting (legacy name vs new ID match)
+    const { data: allProducts = [] } = useQuery({
+        queryKey: ['all-products-count'],
+        queryFn: () => productService.getAllProductsAtOnce(),
+        staleTime: 60 * 1000 // 1 minute stale time
+    });
+
     const deleteMutation = useDeleteCategory();
     const updateMutation = useUpdateCategory();
     
@@ -54,7 +63,9 @@ const CategoriesList = () => {
     const [isDeleteModalOpen, setIsDeleteModalOpen] = useState(false);
     const [currentCategory, setCurrentCategory] = useState(null);
 
-    const products = useDataStore((state) => state.products);
+    // Use fetched products if available, fallback to store (though store might be empty)
+    const storeProducts = useDataStore((state) => state.products);
+    const productsForCount = allProducts.length > 0 ? allProducts : storeProducts;
 
     const handleToggleVisibility = async (category) => {
         try {
@@ -152,7 +163,12 @@ const CategoriesList = () => {
                                 ) : categories.length > 0 ? (
                                     categories.map((category, index) => {
                                         const srNo = (currentPage - 1) * itemsPerPage + index + 1;
-                                        const productCount = products.filter(p => p.category === category.name).length;
+                                        // Robust counting: check ID (standard) or Name (legacy)
+                                        const productCount = productsForCount.filter(
+                                            p => p.category === category.name || 
+                                                 p.category === category.id || 
+                                                 (p.category && p.category._id === category.id)
+                                        ).length;
                                         
                                         return (
                                             <TableRow key={category.id} className="hover:bg-emerald-50/50 transition-all duration-200 border-b border-gray-100 group">
@@ -256,9 +272,19 @@ const CategoriesList = () => {
                 onConfirm={handleDelete}
                 title="Delete Category"
                 message={
-                    currentCategory && products.filter(p => p.category === currentCategory.name).length > 0
-                        ? `"${currentCategory?.name}" has ${products.filter(p => p.category === currentCategory.name).length} product(s). Are you sure you want to delete it? Products will remain but lose their category association.`
-                        : `Are you sure you want to delete "${currentCategory?.name}"? This action cannot be undone.`
+                    currentCategory 
+                        ? (() => {
+                            const count = productsForCount.filter(
+                                p => p.category === currentCategory.name || 
+                                     p.category === currentCategory.id || 
+                                     (p.category && p.category._id === currentCategory.id)
+                            ).length;
+                            
+                            return count > 0 
+                                ? `"${currentCategory.name}" has ${count} product(s). Are you sure you want to delete it? Products will remain but lose their category association.`
+                                : `Are you sure you want to delete "${currentCategory.name}"? This action cannot be undone.`;
+                        })()
+                        : "Are you sure you want to delete this category?"
                 }
                 confirmText="Delete"
                 variant="danger"

@@ -263,38 +263,38 @@ const ProductForm = () => {
 
   return (
     <div
-      className="max-w-7xl mx-auto space-y-4 sm:space-y-6 min-h-screen"
+      className="max-w-7xl mx-auto space-y-4 sm:space-y-6 min-h-screen animate-in fade-in slide-in-from-bottom-6 duration-700 w-full"
       style={{
-        padding: "10px",
+        padding: "0px 1rem",
         background: "linear-gradient(135deg, #f0fdf4 0%, #ecfdf5 50%, #f0fdfa 100%)",
       }}
     >
       <Button
         variant="ghost"
-        className="pl-0 text-gray-500 hover:text-gray-900 text-sm"
+        className="pl-0 text-gray-500 hover:text-gray-900 text-[8px] sm:text-sm"
         onClick={() => navigate("/admin/products")}
       >
-        <ArrowLeft className="mr-2 h-4 w-4" />
-        <span>Back to Products</span>
+        <ArrowLeft className="mr-1 sm:mr-2 h-3 w-3 sm:h-4 sm:w-4" />
+        <span style={{ marginTop: '3px' }}>Back to Products</span>
       </Button>
 
-      <div className="flex justify-between items-center">
-        <h1 className="text-2xl sm:text-3xl font-bold tracking-tight text-gray-900">
+      <div className="flex justify-between items-center" style={{ marginTop: '0px' }}>
+        <h1 className="text-xl sm:text-2xl md:text-3xl font-bold tracking-tight text-gray-900">
           {isEditMode ? "Edit Product" : "Add New Product"}
         </h1>
       </div>
 
-      <form onSubmit={handleSubmit}>
-        <div className="grid grid-cols-1 lg:grid-cols-3 gap-6">
-          <div className="lg:col-span-2 space-y-6">
-            <Card>
-              <CardHeader>
-                <CardTitle>Product Details</CardTitle>
-                <CardDescription>Enter the basic information for the product.</CardDescription>
+      <form onSubmit={handleSubmit} className="pb-10">
+        <div className="grid grid-cols-1 lg:grid-cols-3 gap-4 lg:gap-6">
+          <div className="lg:col-span-2 space-y-4 lg:space-y-6">
+            <Card className="shadow-sm border-gray-100">
+              <CardHeader className="pb-3 border-b border-gray-50 bg-gray-50/30">
+                <CardTitle className="text-base sm:text-lg font-bold text-gray-800">Product Details</CardTitle>
+                <CardDescription className="text-[10px] sm:text-xs">Enter the basic information for the product.</CardDescription>
               </CardHeader>
-              <CardContent className="space-y-4">
-                <div className="grid gap-2 text-sm">
-                  <Label htmlFor="name">Product Name<span className="text-red-500">*</span></Label>
+              <CardContent className="space-y-4 pt-4 lg:pt-6" style={{ paddingBottom: '1rem' }}>
+                <div className="grid gap-2" style={{ marginTop: '10px' }}>
+                  <Label htmlFor="name" className="text-xs sm:text-sm font-semibold text-gray-700">Product Name<span className="text-red-500">*</span></Label>
                   <Input
                     id="name"
                     name="name"
@@ -303,11 +303,13 @@ const ProductForm = () => {
                     value={formData.name}
                     onChange={handleChange}
                     icon={Package}
+                    className="h-9 sm:h-10 text-xs sm:text-sm"
+                    style={{ paddingLeft: '30px' }}
                   />
                 </div>
                 <div className="grid grid-cols-2 gap-4">
                   <div className="grid gap-2">
-                    <Label htmlFor="unit">Unit<span className="text-red-500">*</span></Label>
+                    <Label htmlFor="unit" className="text-xs sm:text-sm font-semibold text-gray-700">Unit<span className="text-red-500">*</span></Label>
                     <Input
                       id="unit"
                       name="unit"
@@ -315,10 +317,11 @@ const ProductForm = () => {
                       placeholder="e.g. 500mg, 1L"
                       value={formData.unit}
                       onChange={handleChange}
+                      className="h-9 sm:h-10 text-xs sm:text-sm"
                     />
                   </div>
                   <div className="grid gap-2">
-                    <Label htmlFor="brand">Brand<span className="text-red-500">*</span></Label>
+                    <Label htmlFor="brand" className="text-xs sm:text-sm font-semibold text-gray-700">Brand<span className="text-red-500">*</span></Label>
                     <Input
                       id="brand"
                       name="brand"
@@ -326,32 +329,34 @@ const ProductForm = () => {
                       placeholder="e.g. Cipla"
                       value={formData.brand}
                       onChange={handleChange}
+                      className="h-9 sm:h-10 text-xs sm:text-sm"
                     />
                   </div>
                 </div>
                 <div className="grid grid-cols-2 gap-4">
                   <div className="grid gap-2">
-                    <Label htmlFor="sku">SKU<span className="text-red-500">*</span></Label>
+                    <Label htmlFor="sku" className="text-xs sm:text-sm font-semibold text-gray-700">SKU<span className="text-red-500">*</span></Label>
                     <Input
                       id="sku"
                       name="sku"
                       required
-                      className="font-mono"
+                      className="h-9 sm:h-10 text-xs sm:text-sm font-mono"
                       placeholder="e.g. MED-001"
                       value={formData.sku}
                       onChange={handleChange}
                       icon={Tag}
+                      style={{ paddingLeft: '30px' }}
                     />
                   </div>
                   <div className="grid gap-2">
-                    <Label htmlFor="category">Category<span className="text-red-500">*</span></Label>
+                    <Label htmlFor="category" className="text-xs sm:text-sm font-semibold text-gray-700">Category<span className="text-red-500">*</span></Label>
                     <div className="relative">
                       <select
                         id="category"
                         name="category"
                         required
                         disabled={categoryLoading}
-                        className="flex h-10 w-full rounded-md border border-gray-200 bg-white px-3 py-2 text-sm shadow-sm transition-colors focus-visible:outline-none focus-visible:ring-1 focus-visible:ring-emerald-600 disabled:cursor-not-allowed disabled:opacity-50"
+                        className="flex h-9 sm:h-10 w-full rounded-md border border-gray-200 bg-white px-3 py-2 text-xs sm:text-sm shadow-sm transition-colors focus-visible:outline-none focus-visible:ring-1 focus-visible:ring-emerald-600 disabled:cursor-not-allowed disabled:opacity-50"
                         value={formData.category}
                         onChange={handleChange}
                       >
@@ -371,12 +376,12 @@ const ProductForm = () => {
                   </div>
                 </div>
                 <div className="grid gap-2">
-                  <Label htmlFor="status">Status<span className="text-red-500">*</span></Label>
+                  <Label htmlFor="status" className="text-xs sm:text-sm font-semibold text-gray-700">Status<span className="text-red-500">*</span></Label>
                   <select
                     id="status"
                     name="status"
                     required
-                    className="flex h-10 w-full rounded-md border border-gray-200 bg-white px-3 py-2 text-sm shadow-sm transition-colors focus-visible:outline-none focus-visible:ring-1 focus-visible:ring-emerald-600"
+                    className="flex h-9 sm:h-10 w-full rounded-md border border-gray-200 bg-white px-3 py-2 text-xs sm:text-sm shadow-sm transition-colors focus-visible:outline-none focus-visible:ring-1 focus-visible:ring-emerald-600"
                     value={formData.status}
                     onChange={handleChange}
                   >
@@ -387,13 +392,13 @@ const ProductForm = () => {
                   </select>
                 </div>
                 <div className="grid gap-2">
-                  <Label htmlFor="description">Description<span className="text-red-500">*</span></Label>
+                  <Label htmlFor="description" className="text-xs sm:text-sm font-semibold text-gray-700">Description<span className="text-red-500">*</span></Label>
                   <textarea
                     id="description"
                     name="description"
                     rows="4"
                     required
-                    className="flex min-h-[100px] w-full rounded-md border border-gray-200 bg-white px-3 py-2 text-sm shadow-sm focus-visible:outline-none focus-visible:ring-1 focus-visible:ring-emerald-600 disabled:cursor-not-allowed disabled:opacity-50"
+                    className="flex min-h-[100px] w-full rounded-md border border-gray-200 bg-white px-3 py-2 text-xs sm:text-sm shadow-sm focus-visible:outline-none focus-visible:ring-1 focus-visible:ring-emerald-600 disabled:cursor-not-allowed disabled:opacity-50"
                     placeholder="Product detailed description..."
                     value={formData.description}
                     onChange={handleChange}
@@ -403,14 +408,14 @@ const ProductForm = () => {
             </Card>
           </div>
 
-          <div className="space-y-6">
-            <Card>
-              <CardHeader>
-                <CardTitle>Pricing & Inventory</CardTitle>
+          <div className="space-y-4 lg:space-y-6">
+            <Card className="shadow-sm border-gray-100">
+              <CardHeader className="pb-3 border-b border-gray-50 bg-gray-50/30">
+                <CardTitle className="text-base sm:text-lg font-bold text-gray-800">Pricing & Inventory</CardTitle>
               </CardHeader>
-              <CardContent className="space-y-4">
+              <CardContent className="space-y-4 pt-4 lg:pt-6" style={{ paddingBottom: '1rem' }}>
                 <div className="grid gap-2">
-                  <Label htmlFor="price">Price (₹)<span className="text-red-500">*</span></Label>
+                  <Label htmlFor="price" className="text-xs sm:text-sm font-semibold text-gray-700">Price (₹)<span className="text-red-500">*</span></Label>
                   <Input
                     id="price"
                     type="number"
@@ -421,10 +426,12 @@ const ProductForm = () => {
                     value={formData.price}
                     onChange={handleChange}
                     icon={IndianRupee}
+                    className="h-9 sm:h-10 text-xs sm:text-sm"
+                    style={{ paddingLeft: '30px' }}
                   />
                 </div>
                 <div className="grid gap-2">
-                  <Label htmlFor="discount">Discount (%)</Label>
+                  <Label htmlFor="discount" className="text-xs sm:text-sm font-semibold text-gray-700">Discount (%)</Label>
                   <Input
                     id="discount"
                     type="number"
@@ -434,20 +441,21 @@ const ProductForm = () => {
                     step="0.1"
                     value={formData.discount}
                     onChange={handleChange}
+                    className="h-9 sm:h-10 text-xs sm:text-sm"
                   />
                 </div>
                 <div className="grid gap-2">
-                  <Label htmlFor="discountedPrice">Discounted Price (₹)</Label>
+                  <Label htmlFor="discountedPrice" className="text-xs sm:text-sm font-semibold text-gray-700">Discounted Price (₹)</Label>
                   <Input
                     id="discountedPrice"
                     type="number"
                     value={formData.discountedPrice}
                     disabled
-                    className="bg-gray-50"
+                    className="h-9 sm:h-10 text-xs sm:text-sm bg-gray-50 text-gray-500"
                   />
                 </div>
                 <div className="grid gap-2">
-                  <Label htmlFor="stock">Stock<span className="text-red-500">*</span></Label>
+                  <Label htmlFor="stock" className="text-xs sm:text-sm font-semibold text-gray-700">Stock<span className="text-red-500">*</span></Label>
                   <Input
                     id="stock"
                     type="number"
@@ -457,17 +465,19 @@ const ProductForm = () => {
                     value={formData.stock}
                     onChange={handleChange}
                     icon={Box}
+                    className="h-9 sm:h-10 text-xs sm:text-sm"
+                    style={{ paddingLeft: '30px' }}
                   />
                 </div>
               </CardContent>
             </Card>
 
-            <Card>
-              <CardHeader>
-                <CardTitle>Images</CardTitle>
-                <CardDescription>Upload at least one product image.</CardDescription>
+            <Card className="shadow-sm border-gray-100">
+              <CardHeader className="pb-3 border-b border-gray-50 bg-gray-50/30">
+                <CardTitle className="text-base sm:text-lg font-bold text-gray-800">Images</CardTitle>
+                <CardDescription className="text-[10px] sm:text-xs">Upload at least one product image.</CardDescription>
               </CardHeader>
-              <CardContent className="space-y-4">
+              <CardContent className="space-y-4 pt-4 lg:pt-6" style={{ paddingBottom: '1rem' }}>
                 <label className="flex flex-col items-center justify-center gap-2 rounded-xl border-2 border-dashed border-gray-300 bg-gray-50 p-6 text-center cursor-pointer transition hover:border-emerald-600 hover:bg-emerald-50/50">
                   <input
                     type="file"
@@ -509,10 +519,10 @@ const ProductForm = () => {
           </div>
         </div>
 
-        <div className="flex justify-end mt-6">
-          <Button type="submit" disabled={isLoading} className="w-full sm:w-auto">
+        <div className="flex justify-end items-center pt-6 sm:pt-8 w-full">
+          <Button type="submit" disabled={isLoading} className="h-10 sm:h-11 px-8 min-w-[140px] shadow-lg shadow-emerald-700/10 hover:shadow-emerald-700/20 active:scale-95 transition-all bg-emerald-600 hover:bg-emerald-700">
             <Save className="mr-2 h-4 w-4" />
-            {isLoading ? "Saving..." : "Save Product"}
+            <span className="font-semibold text-sm" style={{ marginTop: '4px', padding:'0 4px'}}>{isLoading ? "Saving..." : "Save Product"}</span>
           </Button>
         </div>
       </form>

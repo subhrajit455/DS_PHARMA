@@ -3,6 +3,7 @@ import { Outlet, useNavigate } from 'react-router-dom';
 import AdminSidebar from '@/admin/components/layout/AdminSidebar';
 import AdminHeader from '@/admin/components/layout/AdminHeader';
 import useDataStore from '@/store/useDataStore';
+import { cn } from '@/admin/utils/cn';
 
 const AdminLayout = () => {
   const [sidebarOpen, setSidebarOpen] = useState(false);
@@ -27,12 +28,13 @@ const AdminLayout = () => {
       <div className="absolute bottom-0 left-0 w-96 h-96 bg-teal-200/20 rounded-full blur-3xl pointer-events-none" />
       
       {/* Mobile Sidebar Overlay */}
-      {sidebarOpen && (
-          <div 
-              className="fixed inset-0 z-40 bg-slate-900/60 lg:hidden backdrop-blur-sm"
-              onClick={() => setSidebarOpen(false)}
-          />
-      )}
+      <div 
+          className={cn(
+            "fixed inset-0 z-[90] bg-slate-950/60 backdrop-blur-sm lg:hidden transition-all duration-300",
+            sidebarOpen ? "opacity-100 pointer-events-auto" : "opacity-0 pointer-events-none"
+          )}
+          onClick={() => setSidebarOpen(false)}
+      />
 
       {/* Desktop Sidebar - In Flow */}
       <div className="hidden lg:block shrink-0 relative z-50">

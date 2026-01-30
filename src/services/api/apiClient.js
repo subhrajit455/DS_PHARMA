@@ -101,13 +101,18 @@ apiClient.interceptors.response.use(
     if (error.response) {
       const { status, data } = error.response;
       const url = error.config?.url;
+      const config = error.config || {};
 
-      if (import.meta.env.DEV) {
+      // Suppress console logging if silent requested
+      if (import.meta.env.DEV && !config.silent) {
         console.error(`[API Error] ✗ ${status} ${url}`, {
           error: data,
-          config: error.config,
+          config: config,
         });
       }
+
+      // Suppress toasts if noToast requested
+      const shouldToast = !config.noToast;
 
       // Priority-based error message extraction
       let errorMessage = "";
@@ -122,41 +127,51 @@ apiClient.interceptors.response.use(
 
       switch (status) {
         case 400:
-          toastUtil.error(
-            errorMessage || "Invalid request. Please check your inputs.",
-          );
+          if (shouldToast) {
+            toastUtil.error(
+              errorMessage || "Invalid request. Please check your inputs.",
+            );
+          }
           break;
 
         case 401:
           if (localStorage.getItem("authToken")) {
             localStorage.removeItem("authToken");
-            toastUtil.error("Session expired. Please login again.");
+            if (shouldToast)
+              toastUtil.error("Session expired. Please login again.");
             window.location.href = "/login";
           } else {
-            toastUtil.error(errorMessage || "Please login to continue.");
+            if (shouldToast)
+              toastUtil.error(errorMessage || "Please login to continue.");
           }
           break;
 
         case 403:
-          toastUtil.error(
-            errorMessage || "Access denied. You don't have permission.",
-          );
+          if (shouldToast) {
+            toastUtil.error(
+              errorMessage || "Access denied. You don't have permission.",
+            );
+          }
           break;
 
         case 404:
-          toastUtil.error(
-            errorMessage || "The requested resource was not found.",
-          );
+          if (shouldToast) {
+            toastUtil.error(
+              errorMessage || "The requested resource was not found.",
+            );
+          }
           break;
 
         case 500:
-          if (import.meta.env.DEV)
+          if (import.meta.env.DEV && !config.silent)
             console.error("[API 500] Server Error:", data);
-          toastUtil.error("Server error. Please try again later.");
+          if (shouldToast)
+            toastUtil.error("Server error. Please try again later.");
           break;
 
         default:
-          toastUtil.error(errorMessage || "An unexpected error occurred.");
+          if (shouldToast)
+            toastUtil.error(errorMessage || "An unexpected error occurred.");
           break;
       }
 

@@ -13,7 +13,7 @@ import SuggestedItemsSection from '@/user/components/sections/SuggestedItemsSect
 import { useProductDetails } from '@/shared/hooks/queries/useProductDetails';
 import { useProducts } from '@/shared/hooks/queries/useProducts';
 import { useReviews } from '@/shared/hooks/queries/useReviews';
-import { useAddToCart } from '@/shared/hooks/mutations/useAddToCart';
+import { useAddToCart } from '@/shared/hooks/queries/useCartQuery';
 import useDataStore from '@/store/useDataStore';
 import BackButton from '@/shared/components/BackButton';
 
@@ -89,15 +89,11 @@ const ProductDetails = () => {
 
   const handleAddToCart = () => {
     addToCart({
-      product: {
-        id: product.id,
-        name: product.name,
-        price: product.price,
-        originalPrice: product.originalPrice || product.price,
-        discount: product.discount || 0,
-        image: product.images[0],
-      },
-      quantity: 1
+      productId: product.id || product._id,
+      quantity: 1,
+      price: Number(product.discountedPrice || product.price) || 0,
+      name: product.name,
+      image: product.images?.[0] || product.image
     });
   };
   
