@@ -13,7 +13,14 @@ const masterSyncLimiter = rateLimit({
 
 app.use(
   cors({
-    origin: "*",
+    origin: [
+      "http://localhost:5173",
+      "http://192.168.0.113:5173",
+      "http:192.168.0.168:5173",
+      "https://www.dspharma.online",
+      "https://dspharma.online",
+      "https://dspharma.pages.dev",
+    ],
     credentials: true,
   }),
 );
@@ -22,6 +29,10 @@ app.use(express.urlencoded({ extended: true, limit: "16kb" }));
 app.use(express.static("public"));
 app.use(cookieParser());
 app.use(morgan(":method :url :status - :response-time ms"));
+
+app.get("/status", (req, res) => {
+  res.send("Server is running");
+});
 
 // Routes import
 import authRouter from "./modules/auth/auth.route.js";

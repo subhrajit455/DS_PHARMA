@@ -39,13 +39,11 @@ const partySchema = new mongoose.Schema(
     // Current Ledger balance
     balance: {
       type: Number,
-      default: 0.0,
     },
 
     // PDC Amount of Ledger
     pdc: {
       type: Number,
-      default: 0.0,
     },
 
     // Ledger Type (Group - Debtor, creditor, sales man etc)
@@ -62,10 +60,10 @@ const partySchema = new mongoose.Schema(
     },
 
     // 1=deleted, 0=non deleted
-    is_deleted: {
-      type: Number,
-      enum: [0, 1],
-      default: 0,
+
+    Is_Deleted: {
+      type: String,
+      enum: ["0", "1"],
     },
 
     // Phone number-1
@@ -132,23 +130,29 @@ const partySchema = new mongoose.Schema(
     },
 
     // Marg Code
-    margCode: {
+    MargCode: {
       type: String,
       maxlength: 20,
       default: "",
     },
 
     // GSTN
-    gstn: {
+    GSTIN: {
       type: String,
       maxlength: 15,
       default: "",
     },
 
     // DlNo
-    dlNo: {
+    DlNo: {
       type: String,
       maxlength: 45,
+      default: "",
+    },
+
+    LedgerCode: {
+      type: String,
+      maxlength: 6,
       default: "",
     },
   },

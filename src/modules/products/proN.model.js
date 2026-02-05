@@ -3,111 +3,111 @@ import mongoose from "mongoose";
 const proNSchema = new mongoose.Schema(
   {
     // Row ID (Identity) - Auto-incremented unique identifier
-    Rid: {
-      type: Number,
+    rid: {
+      type: String,
       required: true,
     },
 
     // Item Category Code
-    CatCode: {
+    catcode: {
       type: String,
       maxlength: 6,
       default: "",
     },
 
     // Item Code
-    Code: {
+    code: {
       type: String,
       maxlength: 22,
       required: true,
     },
 
     // Item Name
-    Name: {
+    name: {
       type: String,
       maxlength: 45,
       required: true,
     },
 
     // Current Stock
-    Stock: {
-      type: Number,
+    stock: {
+      type: String,
       default: 0,
     },
 
     // General Remark (combination of MRP, Rate, Schemes, etc. - Not mandatory)
-    Remark: {
+    remark: {
       type: String,
       maxlength: 200,
       default: "",
     },
 
     // Name of Product Company (Marketed By)
-    Company: {
+    company: {
       type: String,
       maxlength: 40,
       default: "",
     },
 
     // Shop Code
-    ShopCode: {
+    shopcode: {
       type: String,
       default: "",
     },
 
     // Maximum Retail Price
     MRP: {
-      type: Number,
+      type: String,
       default: 0.0,
     },
 
     // Billing Price
     Rate: {
-      type: Number,
+      type: String,
       default: 0.0,
     },
 
     // Deal on (10 if deal is 10+1)
     Deal: {
-      type: Number,
+      type: String,
       default: 0,
     },
 
     // Free Qty (1 if deal is 10+1)
     Free: {
-      type: Number,
+      type: String,
       default: 0,
     },
 
     // Purchase Price
     Prate: {
-      type: Number,
+      type: String,
       default: 0.0,
     },
 
     // If product is deleted or not (0=not deleted, 1=deleted)
     Is_Deleted: {
-      type: Number,
-      enum: [0, 1],
-      default: 0,
+      type: String,
+      enum: ["0", "1"],
+      default: "0",
     },
 
     // Current Running batch of the item
-    CurBatch: {
+    curbatch: {
       type: String,
       maxlength: 12,
       default: "",
     },
 
     // Expiry Date of current batch
-    Exp: {
+    exp: {
       type: String,
       maxlength: 20,
       default: "",
     },
 
     // Product Company Code
-    GCode: {
+    gcode: {
       type: String,
       maxlength: 6,
       default: "",
@@ -138,6 +138,21 @@ const proNSchema = new mongoose.Schema(
     ENCODE: {
       type: String,
       maxlength: 25,
+      default: "",
+    },
+    remarks: {
+      type: String,
+      maxlength: 200,
+      default: "",
+    },
+    Gcode6: {
+      type: String,
+      maxlength: 6,
+      default: "",
+    },
+    ProductCode: {
+      type: String,
+      maxlength: 200,
       default: "",
     },
   },

@@ -12,14 +12,26 @@ import {
 } from "./product.service.js";
 
 export const fetchProducts = asyncHandler(async (req, res) => {
-  const { page = 1, limit = 25, query = "", stock = 2 } = req.query;
+  const {
+    page = 1,
+    limit = 25,
+    query = "",
+    sortBy = "name",
+    order = 1,
+    stock = 2,
+    is_deleted = "0",
+  } = req.query;
 
-  const { products, totalProducts, totalPages } = await fetchProductsService(
-    page,
-    limit,
-    query.trim().toLowerCase(),
-    stock,
-  );
+  const { products, totalProducts, totalInventoryValue, totalPages, totalInStock, totalOutStock } =
+    await fetchProductsService(
+      Number(page),
+      Number(limit),
+      query.trim().toLowerCase(),
+      sortBy,
+      Number(order),
+      Number(stock),
+      is_deleted,
+    );
 
   res.status(200).json(
     new ApiResponse(
@@ -27,6 +39,9 @@ export const fetchProducts = asyncHandler(async (req, res) => {
       {
         products,
         totalProducts,
+        totalInventoryValue,
+        totalInStock,
+        totalOutStock,
         page: Number(page),
         limit: Number(limit),
         totalPages: Number(totalPages),
@@ -101,7 +116,7 @@ export const updateProductDetails = asyncHandler(async (req, res) => {
     rid,
     images,
     categoryId,
-    isFeatured,
+    Boolean(isFeatured),
   );
 
   res

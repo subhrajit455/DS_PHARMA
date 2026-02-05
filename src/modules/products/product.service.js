@@ -1,38 +1,49 @@
 import ProductInfo from "./productInfo.model.js";
 import ProN from "./proN.model.js";
 
-export const fetchProductsService = async (page, limit, query = "", stock) => {
+export const fetchProductsService = async (
+  page,
+  limit,
+  query = "",
+  sortBy = "Name",
+  order = 1,
+  stock,
+  is_deleted = "0",
+) => {
   try {
     const pipeline = [
       {
-        $addFields: {
-          stockValue: {
-            $convert: {
-              input: "$stock",
-              to: "double",
-              onError: 0,
-              onNull: 0,
-            },
-          },
-        },
-      },
-      {
         $match: {
-          $and: [
-            {
-              $or: [
-                { name: { $regex: query, $options: "i" } },
-                { company: { $regex: query, $options: "i" } },
-              ],
-            },
-            ...(stock == 0
-              ? [{ stockValue: { $lte: 0 } }]
-              : stock == 1
-                ? [{ stockValue: { $gt: 0 } }]
-                : []),
+          Is_Deleted: "0",
+          $or: [
+            { name: { $regex: query, $options: "i" } },
+            { company: { $regex: query, $options: "i" } },
+            { code: { $regex: query, $options: "i" } },
+            { curbatch: { $regex: query, $options: "i" } },
           ],
         },
       },
+      ...(stock === 1
+        ? [
+            {
+              $match: {
+                $expr: {
+                  $gt: [{ $toDouble: "$stock" }, 0],
+                },
+              },
+            },
+          ]
+        : stock === 0
+          ? [
+              {
+                $match: {
+                  $expr: {
+                    $lte: [{ $toDouble: "$stock" }, 0],
+                  },
+                },
+              },
+            ]
+          : []),
     ];
 
     const products = await ProN.aggregate([
@@ -98,6 +109,11 @@ export const fetchProductsService = async (page, limit, query = "", stock) => {
         },
       },
       {
+        $sort: {
+          [sortBy]: order,
+        },
+      },
+      {
         $skip: (page - 1) * limit,
       },
       {
@@ -105,17 +121,69 @@ export const fetchProductsService = async (page, limit, query = "", stock) => {
       },
     ]);
 
-    const countResult = await ProN.aggregate([
+    const totalProductsAgg = await ProN.aggregate([
+      ...pipeline,
+      { $count: "total" },
+    ]);
+
+    // Total In Stock (independent of stock filter, but respects query)
+    const totalInStockAgg = await ProN.aggregate([
       ...pipeline,
       {
-        $count: "total",
+        $match: {
+          $expr: {
+            $gt: [{ $toDouble: "$stock" }, 0],
+          },
+        },
+      },
+      { $count: "totalInStock" },
+    ]);
+
+    const totalOutStockAgg = await ProN.aggregate([
+      ...pipeline,
+      {
+        $match: {
+          $expr: {
+            $lte: [{ $toDouble: "$stock" }, 0],
+          },
+        },
+      },
+      { $count: "totalOutStock" },
+    ]);
+
+    // Total Inventory Value (independent of stock filter, but respects query)
+    const inventoryAgg = await ProN.aggregate([
+      ...pipeline,
+      {
+        $group: {
+          _id: null,
+          totalInventoryValue: {
+            $sum: {
+              $multiply: [{ $toDouble: "$stock" }, { $toDouble: "$Prate" }],
+            },
+          },
+        },
       },
     ]);
 
-    const totalProducts = countResult[0]?.total || 0;
+    const totalProducts = totalProductsAgg[0]?.total || 0;
+
+    const totalInStock = totalInStockAgg[0]?.totalInStock || 0;
+
+    const totalOutStock = totalOutStockAgg[0]?.totalOutStock || 0;
+
+    const totalInventoryValue = inventoryAgg[0]?.totalInventoryValue || 0;
+
     const totalPages = Math.ceil(totalProducts / limit);
 
-    return { products, totalProducts, totalPages };
+    return {
+      products,
+      totalProducts,
+      totalInStock,
+      totalOutStock,
+      totalInventoryValue,
+      totalPages,
+    };
   } catch (error) {
     throw error;
   }
@@ -331,8 +399,6 @@ export const fetchFeaturedProductsService = async (query = "") => {
       {
         $match: {
           isFeatured: true,
-          $or: [{ name: { $regex: query, $options: "i" } }],
-          $or: [{ company: { $regex: query, $options: "i" } }],
         },
       },
       {
