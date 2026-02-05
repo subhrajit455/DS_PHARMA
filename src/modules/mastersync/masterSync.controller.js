@@ -24,12 +24,16 @@ export const syncMastersData = asyncHandler(async (req, res) => {
 
 export const syncMasterOrderDispatchData = asyncHandler(async (req, res) => {
   try {
-    const { datetime, index = 0, type = "S" } = req.query;
+    const {
+      datetime = formatDateTime(new Date()),
+      index = 0,
+      type = "S",
+    } = req.query;
 
     const { salesManId } = req.params;
 
     const data = await syncMasterOrderDispatchDataService(
-      formatDateTime(new Date(datetime)),
+      datetime,
       index,
       String(salesManId),
       type,
@@ -52,8 +56,9 @@ export const syncMasterOrderDispatchData = asyncHandler(async (req, res) => {
 export const syncMasterOrderData = asyncHandler(async (req, res) => {
   try {
     const { salesManId } = req.params;
+    const payload = req.body;
 
-    const data = await syncMasterOrderDataService(String(salesManId));
+    const data = await syncMasterOrderDataService(String(salesManId), "S", payload);
 
     res
       .status(200)

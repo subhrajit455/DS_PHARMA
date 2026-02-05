@@ -5,7 +5,7 @@ export const fetchProductsService = async (
   page,
   limit,
   query = "",
-  sortBy = "Name",
+  sortBy = "name",
   order = 1,
   stock,
   is_deleted = "0",
@@ -46,134 +46,141 @@ export const fetchProductsService = async (
           : []),
     ];
 
-    const products = await ProN.aggregate([
+    // Use $facet to run all aggregations in a single pipeline
+    const result = await ProN.aggregate([
       ...pipeline,
       {
-        $lookup: {
-          from: "productinfos",
-          localField: "rid",
-          foreignField: "rid",
-          as: "productInfoData",
-        },
-      },
-      {
-        $addFields: {
-          images: {
-            $ifNull: [{ $arrayElemAt: ["$productInfoData.images", 0] }, []],
-          },
-          categoryId: {
-            $ifNull: [{ $arrayElemAt: ["$productInfoData.categoryId", 0] }, ""],
-          },
-          isFeatured: {
-            $ifNull: [
-              { $arrayElemAt: ["$productInfoData.isFeatured", 0] },
-              false,
-            ],
-          },
-        },
-      },
-      {
-        $addFields: {
-          categoryIdObject: {
-            $cond: {
-              if: { $ne: ["$categoryId", ""] },
-              then: { $toObjectId: "$categoryId" },
-              else: null,
+        $facet: {
+          // Facet 1: Paginated products with all lookups
+          products: [
+            {
+              $lookup: {
+                from: "productinfos",
+                localField: "rid",
+                foreignField: "rid",
+                as: "productInfoData",
+              },
             },
-          },
-        },
-      },
-      {
-        $lookup: {
-          from: "categories",
-          localField: "categoryIdObject",
-          foreignField: "_id",
-          as: "categoryDetails",
-        },
-      },
-      {
-        $addFields: {
-          categoryDetails: {
-            $ifNull: [{ $arrayElemAt: ["$categoryDetails", 0] }, {}],
-          },
-        },
-      },
-      {
-        $project: {
-          productInfoData: 0,
-          categoryId: 0,
-          categoryData: 0,
-          categoryIdObject: 0,
-          "categoryDetails.images": 0,
-          stockValue: 0,
-        },
-      },
-      {
-        $sort: {
-          [sortBy]: order,
-        },
-      },
-      {
-        $skip: (page - 1) * limit,
-      },
-      {
-        $limit: parseInt(limit),
-      },
-    ]);
-
-    const totalProductsAgg = await ProN.aggregate([
-      ...pipeline,
-      { $count: "total" },
-    ]);
-
-    // Total In Stock (independent of stock filter, but respects query)
-    const totalInStockAgg = await ProN.aggregate([
-      ...pipeline,
-      {
-        $match: {
-          $expr: {
-            $gt: [{ $toDouble: "$stock" }, 0],
-          },
-        },
-      },
-      { $count: "totalInStock" },
-    ]);
-
-    const totalOutStockAgg = await ProN.aggregate([
-      ...pipeline,
-      {
-        $match: {
-          $expr: {
-            $lte: [{ $toDouble: "$stock" }, 0],
-          },
-        },
-      },
-      { $count: "totalOutStock" },
-    ]);
-
-    // Total Inventory Value (independent of stock filter, but respects query)
-    const inventoryAgg = await ProN.aggregate([
-      ...pipeline,
-      {
-        $group: {
-          _id: null,
-          totalInventoryValue: {
-            $sum: {
-              $multiply: [{ $toDouble: "$stock" }, { $toDouble: "$Prate" }],
+            {
+              $addFields: {
+                images: {
+                  $ifNull: [
+                    { $arrayElemAt: ["$productInfoData.images", 0] },
+                    [],
+                  ],
+                },
+                categoryId: {
+                  $ifNull: [
+                    { $arrayElemAt: ["$productInfoData.categoryId", 0] },
+                    "",
+                  ],
+                },
+                isFeatured: {
+                  $ifNull: [
+                    { $arrayElemAt: ["$productInfoData.isFeatured", 0] },
+                    false,
+                  ],
+                },
+              },
             },
-          },
+            {
+              $addFields: {
+                categoryIdObject: {
+                  $cond: {
+                    if: { $ne: ["$categoryId", ""] },
+                    then: { $toObjectId: "$categoryId" },
+                    else: null,
+                  },
+                },
+              },
+            },
+            {
+              $lookup: {
+                from: "categories",
+                localField: "categoryIdObject",
+                foreignField: "_id",
+                as: "categoryDetails",
+              },
+            },
+            {
+              $addFields: {
+                categoryDetails: {
+                  $ifNull: [{ $arrayElemAt: ["$categoryDetails", 0] }, {}],
+                },
+              },
+            },
+            {
+              $project: {
+                productInfoData: 0,
+                categoryId: 0,
+                categoryData: 0,
+                categoryIdObject: 0,
+                "categoryDetails.images": 0,
+                stockValue: 0,
+              },
+            },
+            {
+              $sort: {
+                [sortBy]: order,
+              },
+            },
+            {
+              $skip: (page - 1) * limit,
+            },
+            {
+              $limit: parseInt(limit),
+            },
+          ],
+          // Facet 2: Total count
+          totalCount: [{ $count: "total" }],
+          // Facet 3: In-stock count (independent of stock filter)
+          inStockCount: [
+            {
+              $match: {
+                $expr: {
+                  $gt: [{ $toDouble: "$stock" }, 0],
+                },
+              },
+            },
+            { $count: "total" },
+          ],
+          // Facet 4: Out-of-stock count (independent of stock filter)
+          outStockCount: [
+            {
+              $match: {
+                $expr: {
+                  $lte: [{ $toDouble: "$stock" }, 0],
+                },
+              },
+            },
+            { $count: "total" },
+          ],
+          // Facet 5: Inventory value
+          inventoryValue: [
+            {
+              $group: {
+                _id: null,
+                total: {
+                  $sum: {
+                    $multiply: [
+                      { $toDouble: "$stock" },
+                      { $toDouble: "$Prate" },
+                    ],
+                  },
+                },
+              },
+            },
+          ],
         },
       },
     ]);
 
-    const totalProducts = totalProductsAgg[0]?.total || 0;
-
-    const totalInStock = totalInStockAgg[0]?.totalInStock || 0;
-
-    const totalOutStock = totalOutStockAgg[0]?.totalOutStock || 0;
-
-    const totalInventoryValue = inventoryAgg[0]?.totalInventoryValue || 0;
-
+    // Extract results from facets
+    const products = result[0]?.products || [];
+    const totalProducts = result[0]?.totalCount[0]?.total || 0;
+    const totalInStock = result[0]?.inStockCount[0]?.total || 0;
+    const totalOutStock = result[0]?.outStockCount[0]?.total || 0;
+    const totalInventoryValue = result[0]?.inventoryValue[0]?.total || 0;
     const totalPages = Math.ceil(totalProducts / limit);
 
     return {

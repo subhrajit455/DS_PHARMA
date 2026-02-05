@@ -5,8 +5,9 @@ import {
 } from "../../marg/fetchMasterData.js";
 import Party from "../party/party.model.js";
 import ProN from "../products/proN.model.js";
+import ProductInfo from "../products/productInfo.model.js";
 import Stype from "../stype/stype.model.js";
-import MargUser from "../users/margUser.model.js";
+import MargUser from "../staff/margUser.model.js";
 
 export const syncMastersDataService = async (dateTime, index = 0) => {
   try {
@@ -46,6 +47,42 @@ export const syncMastersDataService = async (dateTime, index = 0) => {
           inserted: insertResult.length,
           total: pro_N.length,
         });
+
+        // Step 3: Create ProductInfo entries with default images for products without them
+        const defaultImageUrl =
+          process.env.DEFAULT_PRODUCT_IMAGE_URL ||
+          "https://jetsonpharma.com/wp-content/uploads/2023/05/medicine-placeholder-300x300.png";
+
+        console.log(`Setting up default images for products...`);
+
+        // Get all RIDs from synced products
+        const productRids = pro_N.map((product) => product.rid);
+
+        // Find existing ProductInfo entries
+        const existingProductInfos = await ProductInfo.find({
+          rid: { $in: productRids },
+        }).select("rid");
+
+        const existingRids = new Set(existingProductInfos.map((p) => p.rid));
+
+        // Find products without ProductInfo
+        const newProductInfos = productRids
+          .filter((rid) => !existingRids.has(rid))
+          .map((rid) => ({
+            rid,
+            images: [{ url: defaultImageUrl }],
+            // isFeatured: false,
+          }));
+
+        // Bulk insert new ProductInfo entries
+        if (newProductInfos.length > 0) {
+          await ProductInfo.insertMany(newProductInfos, { ordered: false });
+          console.log(
+            `Created ${newProductInfos.length} ProductInfo entries with default images`,
+          );
+        } else {
+          console.log("All products already have ProductInfo entries");
+        }
       } catch (dbError) {
         console.error("Database sync error:", dbError);
         throw new Error(
@@ -179,11 +216,12 @@ export const syncMasterOrderDispatchDataService = async (
 export const syncMasterOrderDataService = async (
   salesManId = "",
   type = "S",
+  data
 ) => {
   try {
     console.log("Master Sync Service");
     // Call Marg service to fetch all master data
-    const margData = await fetchMasterOrderData(salesManId, type);
+    const margData = await fetchMasterOrderData(salesManId, type, data);
 
     return margData.Details;
   } catch (error) {

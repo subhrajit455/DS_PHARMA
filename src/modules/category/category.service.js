@@ -31,7 +31,6 @@ export const fetchAllCategoriesService = async (
   try {
     if (all) {
       const categories = await Category.find({}).sort({ createdAt: -1 });
-      console.log(categories);
 
       return categories;
     }

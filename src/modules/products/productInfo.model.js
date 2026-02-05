@@ -22,6 +22,9 @@ const productInfoSchema = new mongoose.Schema(
   },
 );
 
+// Index for performance optimization
+productInfoSchema.index({ rid: 1 }, { unique: true }); // Unique index for rid lookups
+
 const ProductInfo = mongoose.model("ProductInfo", productInfoSchema);
 
 export default ProductInfo;

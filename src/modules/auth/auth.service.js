@@ -1,4 +1,6 @@
+import { generateToken } from "../../helpers/token.js";
 import ApiError from "../../utils/apiError.js";
+import Staff from "../staff/staff.model.js";
 import UserModel from "./auth.model.js";
 import bcrypt from "bcryptjs";
 
@@ -30,16 +32,12 @@ export const registerService = async (payload) => {
 };
 
 export const loginService = async (payload) => {
-  const { employeeId, password } = payload;
+  const { userId, password } = payload;
 
-  if (!employeeId || !password) {
-    throw new ApiError(400, "All fields are required");
-  }
-
-  const user = await UserModel.findOne({ employeeId });
+  const user = await Staff.findOne({ userId });
 
   if (!user) {
-    throw new ApiError(400, "User not found");
+    throw new ApiError(400, "Staff not assigned yet");
   }
 
   const isPasswordMatched = await bcrypt.compare(password, user.password);
@@ -48,21 +46,22 @@ export const loginService = async (payload) => {
     throw new ApiError(400, "Incorrect password");
   }
 
+  const userDetails = await Staff.findOne({ userId }).select("-password");
+
   const token = generateToken({
-    id: user._id,
-    employeeId: user.employeeId,
-    email: user.email,
-    role: user.role,
+    id: userDetails._id,
+    userId: userDetails.userId,
+    role: userDetails.role,
   });
 
   return {
-    user,
+    user: userDetails,
     token,
   };
 };
 
 export const getUserProfile = async (userId) => {
-  const user = await UserModel.findById(userId);
+  const user = await UserModel.findById(userId).select("-password");
 
   if (!user) {
     throw new ApiError(404, "User not found");

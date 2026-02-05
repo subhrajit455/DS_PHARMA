@@ -41,6 +41,10 @@ import masterSyncRouter from "./modules/mastersync/masterSync.route.js";
 import productRoute from "./modules/products/product.route.js";
 import partyRouter from "./modules/party/party.route.js";
 import orderRouter from "./modules/order/order.route.js";
+import staffRouter from "./modules/staff/staff.route.js";
+
+// Middleware import
+import { errorHandler } from "./middlewares/errorHandler.middleware.js";
 
 // Routes declaration
 app.use("/api/v1/auth", authRouter);
@@ -48,6 +52,10 @@ app.use("/api/v1/products", productRoute);
 app.use("/api/v1/categories", categoryRouter);
 app.use("/api/v1/parties", partyRouter);
 app.use("/api/v1/order", orderRouter);
-app.use("/api/v1/master-sync", masterSyncLimiter, masterSyncRouter);
+app.use("/api/v1/staff", staffRouter);
+app.use("/api/v1/master-sync", masterSyncRouter);
+
+// Global error handler - MUST be after all routes
+app.use(errorHandler);
 
 export default app;

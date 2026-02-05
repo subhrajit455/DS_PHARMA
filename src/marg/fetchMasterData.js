@@ -14,7 +14,7 @@ export const fetchMasterData = async (datetime = "", index = 0) => {
 };
 
 export const fetchMasterOrderDispatchData = async (
-  datetime = "",
+  datetime,
   index = 0,
   salesManId = "",
   type = "S",
@@ -32,11 +32,15 @@ export const fetchMasterOrderDispatchData = async (
   return makeRequest("LiveOrderDispatchStatus2017", payload);
 };
 
-export const fetchMasterOrderData = async (salesManId = "", type = "S", data) => {
+export const fetchMasterOrderData = async (
+  salesManId = "",
+  type = "S",
+  data,
+) => {
   const payload = {
-    Margid: margClient.MargID,
+    MargID: Number(margClient.MargID),
     CompanyCode: margClient.CompanyCode,
-    Sid: salesManId,
+    Sid: Number(salesManId),
     Type: type,
     ...data,
   };

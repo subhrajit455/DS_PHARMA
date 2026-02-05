@@ -162,6 +162,15 @@ const proNSchema = new mongoose.Schema(
   },
 );
 
+// Indexes for performance optimization
+proNSchema.index({ Is_Deleted: 1 }); // Filter by deleted status
+proNSchema.index({ rid: 1 }); // Lookup by rid
+proNSchema.index({ name: 1 }); // Search by name
+proNSchema.index({ company: 1 }); // Search by company
+proNSchema.index({ code: 1 }); // Search by code
+proNSchema.index({ stock: 1 }); // Filter by stock
+proNSchema.index({ Is_Deleted: 1, name: 1 }); // Compound index for common queries
+
 const ProN = mongoose.model("ProN", proNSchema);
 
 export default ProN;

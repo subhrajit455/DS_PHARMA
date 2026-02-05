@@ -37,8 +37,6 @@ export const fetchAllCategories = asyncHandler(async (req, res) => {
         hasMore: response.hasMore,
       };
 
-  console.log("data", data);
-
   return res
     .status(200)
     .json(new ApiResponse(200, data, "Categories fetched successfully"));
