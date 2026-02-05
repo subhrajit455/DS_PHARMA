@@ -5,7 +5,7 @@ import axios from "axios";
  * Base URL: https://apibucket.vais.co.in/api/v1
  */
 
-const MEDIACLOUD_API_URL = "https://apibucket.vais.co.in/api/v1";
+const MEDIACLOUD_API_URL = "https://apibucket.vais.co.in/api/v1/user";
 const API_KEY =
   "fup_232a28a4_de6f29b910ac06959d690901f3221b97301657e6b2459173eae6562244022e42";
 
@@ -76,12 +76,12 @@ export const mediaCloudService = {
           }
         },
       });
-
+// console.log("response from uploadFile : ",response)
       // Assuming response.data contains the mapping info
       return {
-        fileId: response.data.fileId,
-        url: response.data.fileUrl,
-        name: response.data.fileName || file.name,
+        fileId: response.data?.data?.fileId,
+        url: response.data?.data?.fileUrl,
+        name: response.data?.data?.fileName || file.name,
       };
     } catch (error) {
       console.error("[MediaCloudService] Upload Error:", error);
@@ -106,7 +106,7 @@ export const mediaCloudService = {
           "Failed to delete image from MediaCloud",
       );
     }
-  },
+  }, 
 
   /**
    * Batch upload multiple files in parallel

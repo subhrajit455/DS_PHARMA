@@ -14,6 +14,7 @@ export const useAuthStore = create(
       setLoading: (loading) => set({ isLoading: loading }),
 
       login: (userData, authToken) => {
+        // console.log("userData in useAuthStore", userData)
         localStorage.setItem("authToken", authToken);
         set({
           user: userData,

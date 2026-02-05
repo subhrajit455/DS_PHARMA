@@ -1,32 +1,128 @@
-import React from 'react';
+import React, { useState, useEffect } from 'react';
 import { motion as Motion } from 'framer-motion';
-import { Edit2, Save, X, User, Mail, Phone, Calendar, Users } from 'lucide-react';
+import { Edit2, Save, X, User, Mail, Phone, Loader2 } from 'lucide-react';
 import useIsMobile from '@/shared/hooks/useIsMobile';
+import { userProfileService } from '@/services/userProfileService';
+import { toast } from 'react-toastify';
 
 
-const PersonalInfoForm = ({
-    profileData,
-    tempData,
-    isEditing,
-    handleEdit,
-    handleSave,
-    handleCancel,
-    handleInputChange,
-    isSaving
-}) => {
+const PersonalInfoForm = () => {
     const isMobile = useIsMobile(768);
+    const [profileData, setProfileData] = useState({
+        name: '',
+        email: '',
+        phone: ''
+    });
+    const [tempData, setTempData] = useState({
+        name: '',
+        email: '',
+        phone: ''
+    });
+    const [isEditing, setIsEditing] = useState(false);
+    const [isSaving, setIsSaving] = useState(false);
+    const [isLoading, setIsLoading] = useState(true);
+    const [errors, setErrors] = useState({});
 
-    // Helper to get first/last name from single name field if needed
-    const getFirstName = (data) => data.firstName || data.name?.split(' ')[0] || '';
-    const getLastName = (data) => data.lastName || data.name?.split(' ').slice(1).join(' ') || '';
+    // Fetch user profile data on component mount
+    useEffect(() => {
+        fetchUserProfile();
+    }, []);
 
-    // Initialize values logic
-    const currentFirstName = isEditing ? (tempData.firstName !== undefined ? tempData.firstName : getFirstName(tempData)) : getFirstName(profileData);
-    const currentLastName = isEditing ? (tempData.lastName !== undefined ? tempData.lastName : getLastName(tempData)) : getLastName(profileData);
+    const fetchUserProfile = async () => {
+        try {
+            setIsLoading(true);
+            const response = await userProfileService.getUserProfile();
+            const userData = response.data || response;
+            const profileInfo = {
+                name: userData.name || '',
+                email: userData.email || '',
+                phone: userData.phone || ''
+            };
+            setProfileData(profileInfo);
+            setTempData(profileInfo);
+        } catch (error) {
+            toast.error(error.response?.data?.message || 'Failed to load user profile');
+        } finally {
+            setIsLoading(false);
+        }
+    };
+
+    const handleEdit = () => {
+        setIsEditing(true);
+        setTempData({ ...profileData });
+        setErrors({});
+    };
+
+    const handleCancel = () => {
+        setIsEditing(false);
+        setTempData({ ...profileData });
+        setErrors({});
+    };
+
+    const handleInputChange = (field, value) => {
+        setTempData(prev => ({ ...prev, [field]: value }));
+        if (errors[field]) {
+            setErrors(prev => ({ ...prev, [field]: null }));
+        }
+    };
+
+    const validate = () => {
+        const newErrors = {};
+        
+        if (!tempData.name.trim()) {
+            newErrors.name = 'Name is required';
+        }
+        
+        if (!tempData.email) {
+            newErrors.email = 'Email is required';
+        } else if (!/^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(tempData.email)) {
+            newErrors.email = 'Invalid email format';
+        }
+        
+        if (!tempData.phone) {
+            newErrors.phone = 'Phone is required';
+        } else if (tempData.phone.length !== 10) {
+            newErrors.phone = 'Phone must be 10 digits';
+        }
+        
+        setErrors(newErrors);
+        return Object.keys(newErrors).length === 0;
+    };
+
+    const handleSave = async () => {
+        if (!validate()) return;
+
+        try {
+            setIsSaving(true);
+            const response = await userProfileService.updateUserProfile(tempData);
+            setProfileData({ ...tempData });
+            setIsEditing(false);
+            toast.success('Profile updated successfully!');
+        } catch (error) {
+            console.error('Error updating profile:', error);
+            toast.error(error.response?.data?.message || 'Failed to update profile');
+        } finally {
+            setIsSaving(false);
+        }
+    };
 
     const inputClasses = `w-full ${isMobile ? 'text-[10px]' : 'text-xs'} pl-11 pr-4 py-3 bg-gray-50 border border-gray-200 rounded-xl focus:outline-none focus:ring-2 focus:ring-emerald-500/20 focus:border-emerald-500 focus:bg-white transition-all disabled:opacity-60 disabled:cursor-not-allowed hover:border-emerald-300`;
     const labelClasses = `block mb-1 ${isMobile ? 'text-[10px]' : 'text-xs sm:text-sm'} font-medium text-gray-700`;
 
+    if (isLoading) {
+        return (
+            <Motion.div
+                initial={{ opacity: 0, y: 10 }}
+                animate={{ opacity: 1, y: 0 }}
+                className="bg-gradient-to-br from-white to-emerald-50/20 rounded-2xl border border-gray-100 shadow-sm overflow-hidden"
+                style={{ marginTop: isMobile ? '0' : '30px', padding: isMobile ? '5px' : '10px', marginBottom: isMobile ? '5px' : '10px'}}
+            >
+                <div className="flex justify-center items-center p-12">
+                    <Loader2 className="w-8 h-8 text-emerald-600 animate-spin" />
+                </div>
+            </Motion.div>
+        );
+    }
 
     return (
         <Motion.div
@@ -70,7 +166,7 @@ const PersonalInfoForm = ({
                             style={{ padding: isMobile ? '2px 10px' : '2px 10px'}}
                         >
                             {isSaving ? (
-                                <div className={`${isMobile ? 'w-4 h-4' : 'w-4 h-4'} border-2 border-white border-t-transparent rounded-full animate-spin`} />
+                                <Loader2 className={`${isMobile ? 'w-4 h-4' : 'w-4 h-4'} animate-spin`} />
                             ) : (
                                 <Save className={`${isMobile ? 'w-4 h-4' : 'w-4 h-4'}`} />
                             )}
@@ -84,9 +180,9 @@ const PersonalInfoForm = ({
             {/* Personal Info Grid */}
             <div className={`${isMobile ? 'p-4' : 'p-6'} grid grid-cols-1 md:grid-cols-2 gap-4 sm:gap-6`}>
 
-                {/* First Name */}
-                <div className="relative">
-                    <label className={labelClasses}>First Name</label>
+                {/* Name */}
+                <div className="relative md:col-span-2">
+                    <label className={labelClasses}>Full Name</label>
                     <div className="relative">
                         <div className="absolute left-2 top-[45%] -translate-y-1/2 text-gray-400 pointer-events-none z-10">
                             <User size={16} />
@@ -94,46 +190,18 @@ const PersonalInfoForm = ({
                         <input
                             style={{ padding:'8px 30px'}}
                             type="text"
-                            value={currentFirstName}
-                            onChange={(e) => {
-                                const newFirst = e.target.value;
-                                handleInputChange('firstName', newFirst);
-                                const currentLast = tempData.lastName !== undefined ? tempData.lastName : getLastName(tempData);
-                                handleInputChange('name', `${newFirst} ${currentLast}`.trim());
-                            }}
+                            value={isEditing ? tempData.name : profileData.name}
+                            onChange={(e) => handleInputChange('name', e.target.value)}
                             disabled={!isEditing}
-                            className={inputClasses}
-                            placeholder="Enter first name"
+                            className={`${inputClasses} ${errors.name ? 'border-red-500 ring-1 ring-red-500/20' : ''}`}
+                            placeholder="Enter your full name"
                         />
                     </div>
-                </div>
-
-                {/* Last Name */}
-                <div className="relative">
-                    <label className={labelClasses}>Last Name</label>
-                    <div className="relative">
-                        <div className="absolute left-2 top-[45%] -translate-y-1/2 text-gray-400 pointer-events-none z-10">
-                            <User size={16} />
-                        </div>
-                        <input
-                            style={{ padding:'8px 30px'}}
-                            type="text"
-                            value={currentLastName}
-                            onChange={(e) => {
-                                const newLast = e.target.value;
-                                handleInputChange('lastName', newLast);
-                                 const currentFirst = tempData.firstName !== undefined ? tempData.firstName : getFirstName(tempData);
-                                 handleInputChange('name', `${currentFirst} ${newLast}`.trim());
-                            }}
-                            disabled={!isEditing}
-                            className={inputClasses}
-                            placeholder="Enter last name"
-                        />
-                    </div>
+                    {errors.name && <p className="text-red-500 text-[10px] mt-1 ml-1">{errors.name}</p>}
                 </div>
 
                 {/* Email Address */}
-                <div className="relative">
+                {!isEditing && <div className="relative">
                     <label className={labelClasses}>Email Address</label>
                     <div className="relative">
                         <div className="absolute left-2 top-[45%] -translate-y-1/2 text-gray-400 pointer-events-none z-10">
@@ -145,11 +213,12 @@ const PersonalInfoForm = ({
                             value={isEditing ? tempData.email : profileData.email}
                             onChange={(e) => handleInputChange('email', e.target.value)}
                             disabled={!isEditing}
-                            className={inputClasses}
+                            className={`${inputClasses} ${errors.email ? 'border-red-500 ring-1 ring-red-500/20' : ''}`}
                             placeholder="name@example.com"
                         />
                     </div>
-                </div>
+                    {errors.email && <p className="text-red-500 text-[10px] mt-1 ml-1">{errors.email}</p>}
+                </div>}
 
                 {/* Phone Number */}
                 <div className="relative">
@@ -162,52 +231,16 @@ const PersonalInfoForm = ({
                             style={{ padding:'8px 30px'}}
                             type="tel"
                             value={isEditing ? tempData.phone : profileData.phone}
-                            onChange={(e) => handleInputChange('phone', e.target.value)}
+                            onChange={(e) => {
+                                const val = e.target.value.replace(/\D/g, '').slice(0, 10);
+                                handleInputChange('phone', val);
+                            }}
                             disabled={!isEditing}
-                            className={inputClasses}
-                            placeholder="+91 99999 99999"
+                            className={`${inputClasses} ${errors.phone ? 'border-red-500 ring-1 ring-red-500/20' : ''}`}
+                            placeholder="10-digit phone number"
                         />
                     </div>
-                </div>
-
-                {/* Date of Birth */}
-                <div className="relative">
-                    <label className={labelClasses}>Date of Birth</label>
-                    <div className="relative">
-                        <div className="absolute left-2 top-[45%] -translate-y-1/2 text-gray-400 pointer-events-none z-10">
-                            <Calendar size={16} />
-                        </div>
-                        <input
-                            style={{ padding:'8px 30px'}}
-                            type="date"
-                            value={isEditing ? tempData.dateOfBirth : profileData.dateOfBirth}
-                            onChange={(e) => handleInputChange('dateOfBirth', e.target.value)}
-                            disabled={!isEditing}
-                            className={inputClasses}
-                        />
-                    </div>
-                </div>
-
-                {/* Gender */}
-                <div className="relative">
-                    <label className={labelClasses}>Gender</label>
-                    <div className="relative">
-                        <div className="absolute left-2 top-[45%] -translate-y-1/2 text-gray-400 pointer-events-none z-10">
-                            <Users size={16} />
-                        </div>
-                        <select
-                            style={{ padding:'10px 30px'}}
-                            value={isEditing ? tempData.gender : profileData.gender}
-                            onChange={(e) => handleInputChange('gender', e.target.value)}
-                            disabled={!isEditing}
-                            className={inputClasses}
-                        >
-                            <option value="">Select Gender</option>
-                            <option value="Male">Male</option>
-                            <option value="Female">Female</option>
-                            <option value="Other">Other</option>
-                        </select>
-                    </div>
+                    {errors.phone && <p className="text-red-500 text-[10px] mt-1 ml-1">{errors.phone}</p>}
                 </div>
             </div>
         </Motion.div>

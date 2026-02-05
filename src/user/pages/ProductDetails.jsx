@@ -1,4 +1,4 @@
-import React, { useState } from 'react';
+import React, { useEffect, useState } from 'react';
 import { ArrowLeft, Heart } from 'lucide-react';
 import { useNavigate, useParams } from 'react-router-dom';
 import {
@@ -14,41 +14,68 @@ import { useProductDetails } from '@/shared/hooks/queries/useProductDetails';
 import { useProducts } from '@/shared/hooks/queries/useProducts';
 import { useReviews } from '@/shared/hooks/queries/useReviews';
 import { useAddToCart } from '@/shared/hooks/queries/useCartQuery';
+import { useAuthStore } from '@/store/useAuthStore';
+import { useCartStore } from '@/store/useCartStore';
 import useDataStore from '@/store/useDataStore';
 import BackButton from '@/shared/components/BackButton';
-
+import toastUtil from '@/shared/utils/toast';
+const productfetchapi = import.meta.env.VITE_MEDIA_CLOUD_BASE_URL;
 const ProductDetails = () => {
   const navigate = useNavigate();
   const { id } = useParams();
   const [selectedImage, setSelectedImage] = useState(0);
-  
+  const [isProductLoading, setIsProductLoading] = useState(true);
+
+  const [productDetails, setProductDetails] = useState(null);
+
+  console.log("product id : ", productDetails);
+
+  useEffect(() => {
+    const fetchProductDetails = async () => {
+      try {
+        setIsProductLoading(true);
+        const response = await fetch(`${productfetchapi}/api/v1/products/details/${id}`);
+        const data = await response.json();
+        setProductDetails(data.data);
+
+      } catch (error) {
+        console.error('Error fetching product details:', error);
+      } finally {
+        setIsProductLoading(false);
+      }
+    };
+    fetchProductDetails();
+  }, [id]);
+
   // Queries
-  const { data: productData, isLoading: isProductLoading } = useProductDetails(id);
-  const { data: reviewsData, isLoading: isReviewsLoading } = useReviews(id);
-  const { mutate: addToCart, isPending: isAddingToCart } = useAddToCart();
-  
-  const reviews = reviewsData?.data || [];
-  
+  // const { data: productData, isLoading: isProductLoading } = useProductDetails(id);
+  // const { data: reviewsData, isLoading: isReviewsLoading } = useReviews(id);
+  const { isAuthenticated } = useAuthStore();
+  const addItemToLocalCart = useCartStore((state) => state.addItem);
+  const { mutate: addToCartMutation, isPending: isAddingToCart } = useAddToCart();
+
+  // const reviews = reviewsData?.data || [];
+
   // Get product (service already normalizes and returns the object)
-  const fetchedProduct = productData;
+  const fetchedProduct = productDetails;
 
   // Fetch suggested items based on category of current product
   // Category identification must be done ONLY using _id
-  const categoryId = fetchedProduct?.categoryId || fetchedProduct?.category?._id || fetchedProduct?.category;
+  // const categoryId = fetchedProduct?.categoryId || fetchedProduct?.category?._id || fetchedProduct?.category;
 
-  const { data: suggestedData } = useProducts({ 
-      categoryId: categoryId, 
-      limit: 5,
-      page: 1 // Always first page for related products
-  });
-  
-  const suggestedItems = suggestedData?.data || [];
-  
+  // const { data: suggestedData } = useProducts({ 
+  //     categoryId: categoryId, 
+  //     limit: 5,
+  //     page: 1 // Always first page for related products
+  // });
+
+  // const suggestedItems = suggestedData?.data || [];
+
   // Wishlist functionality
   const wishlist = useDataStore((state) => state.wishlist);
   const addToWishlist = useDataStore((state) => state.addToWishlist);
   const removeFromWishlist = useDataStore((state) => state.removeFromWishlist);
-  
+
   const isInWishlist = wishlist.some((item) => item.id === id);
 
   // If loading, show skeleton (implemented simply for now)
@@ -61,15 +88,15 @@ const ProductDetails = () => {
   // Use real data or fallback object structure 
   const product = fetchedProduct ? {
     ...fetchedProduct,
-    images: fetchedProduct.images && fetchedProduct.images.length > 0 
-      ? fetchedProduct.images 
+    images: fetchedProduct.images && fetchedProduct.images.length > 0
+      ? fetchedProduct.images
       : (fetchedProduct.image ? [fetchedProduct.image] : []),
     stock: Number(fetchedProduct.stock ?? 50),
     originalPrice: fetchedProduct.originalPrice || fetchedProduct.mrp || fetchedProduct.price,
     discount: fetchedProduct.discount || (fetchedProduct.mrp > fetchedProduct.price ? Math.round(((fetchedProduct.mrp - fetchedProduct.price) / fetchedProduct.mrp) * 100) : 0),
     specialOffer: fetchedProduct.specialOffer || {
-        title: 'Bank Offer: 10% instant discount',
-        code: 'SBI10'
+      title: 'Bank Offer: 10% instant discount',
+      code: 'SBI10'
     }
   } : null;
 
@@ -88,15 +115,37 @@ const ProductDetails = () => {
   };
 
   const handleAddToCart = () => {
-    addToCart({
-      productId: product.id || product._id,
-      quantity: 1,
-      price: Number(product.discountedPrice || product.price) || 0,
-      name: product.name,
-      image: product.images?.[0] || product.image
-    });
+    if (!productDetails) return;
+
+    // User requested strict usage of 'rid' from product data
+    const productRid = productDetails.rid;
+
+    if (isAuthenticated) {
+      if (!productRid) {
+        toastUtil.error("Product RID missing. Cannot add to cart.");
+        return;
+      }
+      // Authenticated flow
+      addToCartMutation({
+        rid: productRid,
+        image: productDetails?.images?.[0]?.url || productDetails?.image,
+        quantity: 1,
+      });
+    } else {
+      // Guest flow
+      addItemToLocalCart({
+        ...productDetails,
+        // Ensure properties needed for local cart calculation are correct
+        id: productDetails.id || productDetails._id,
+        rid: productDetails.rid,
+        image: productDetails.images?.[0]?.url || productDetails?.image
+      }, 1);
+
+      toastUtil.info("Login to sync your cart!");
+      navigate(`/login?redirect=${window.location.pathname}`);
+    }
   };
-  
+
   const handleWishlistToggle = () => {
     if (isInWishlist) {
       removeFromWishlist(id);
@@ -152,7 +201,7 @@ const ProductDetails = () => {
                 }
               `}</style>
                 <ProductImageGallery
-                  images={product.images}
+                  images={productDetails?.images}
                   selectedImage={selectedImage}
                   onImageSelect={setSelectedImage}
                   onScroll={scrollThumbnails}
@@ -171,35 +220,35 @@ const ProductDetails = () => {
                         flex: 1
                       }}
                     >
-                      {product.name}
+                      {productDetails?.name}
                     </h1>
-                    
+
                     {/* Wishlist Button */}
-                    <button
+                    {/* <button
                       onClick={handleWishlistToggle}
                       className="p-2 rounded-full hover:bg-gray-100 transition-colors flex-shrink-0"
                       aria-label={isInWishlist ? 'Remove from wishlist' : 'Add to wishlist'}
                     >
-                      <Heart 
-                        size={24} 
-                        className={isInWishlist ? 'fill-red-500 text-red-500' : 'text-gray-400'} 
+                      <Heart
+                        size={24}
+                        className={isInWishlist ? 'fill-red-500 text-red-500' : 'text-gray-400'}
                       />
-                    </button>
+                    </button> */}
                   </div>
 
                   <ProductPriceSection
-                    price={product.price}
-                    originalPrice={product.originalPrice}
-                    discount={product.discount}
-                    stock={product.stock}
-                    specialOffer={product.specialOffer}
+                    price={productDetails?.MRP}
+                    originalPrice={productDetails?.MRP}
+                    discount={productDetails?.discount}
+                    stock={productDetails?.stock}
+                    specialOffer={product?.specialOffer}
                   />
 
                   <ProductActionButtons
                     onAddToCart={handleAddToCart}
                     onViewCart={() => navigate('/cart')}
                     isAdding={isAddingToCart}
-                    isOutOfStock={product.stock === 0}
+                    isOutOfStock={productDetails?.stock === 0}
                   />
                 </div>
               </div>
@@ -208,10 +257,10 @@ const ProductDetails = () => {
               <ProductDescription product={product} />
 
               {/* Reviews Section */}
-              <ProductReviews reviews={reviews} isLoading={isReviewsLoading} />
+              {/* <ProductReviews reviews={reviews} isLoading={isReviewsLoading} /> */}
 
               {/* Suggested Medicine Section */}
-              <SuggestedItemsSection
+              {/* <SuggestedItemsSection
                 title="Suggested Medicine"
                 items={suggestedItems}
                 className="mb-5"
@@ -221,7 +270,7 @@ const ProductDetails = () => {
                   lineHeight: '1.2'
                 }}
                 containerStyle={{}}
-              />
+              /> */}
             </div>
           </div>
         </main>

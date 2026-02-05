@@ -6,6 +6,8 @@
 
 import apiClient from "./api/apiClient";
 import { API_ENDPOINTS } from "./api/baseURL";
+export const apiKushal =
+  import.meta.env.VITE_MEDIA_CLOUD_BASE_URL || "http://localhost:5000";
 
 export const categoryService = {
   /**
@@ -19,27 +21,31 @@ export const categoryService = {
   getAllCategories: async (params = {}) => {
     try {
       const { search = "", page = 1, limit = 10 } = params;
-      const response = await apiClient.get(API_ENDPOINTS.CATEGORIES, {
+      const response = await apiClient.get(`${apiKushal}/api/v1/categories`, {
         params: { search, page, limit },
       });
 
       const data = response.data;
       // Backend structure: { data: [...], pagination: { totalItems, ... } }
-      const categories = data.data || [];
-      const pagination = data.pagination || {};
+      const categories = data.data.categories || [];
+      const pagination = data.data.pagination || {};
 
       return {
         categories: categories.map((cat) => {
-          // Flatten image URL if it's an object { public_id, url }
+          // Flatten image URL for UI components that expect a string, 
+          // but keep the record of the original image object/array for deletion
           let imageUrl = cat.image;
           if (cat.image && typeof cat.image === "object" && cat.image.url) {
             imageUrl = cat.image.url;
+          } else if (cat.images && cat.images.length > 0 && cat.images[0].url) {
+            imageUrl = cat.images[0].url;
           }
 
           return {
             ...cat,
             id: cat.id || cat._id,
             image: imageUrl,
+            images: cat.images || (cat.image && typeof cat.image === 'object' ? [cat.image] : []),
             visibility:
               cat.visibility !== undefined ? cat.visibility : cat.isVisible,
           };
@@ -70,12 +76,15 @@ export const categoryService = {
         category.image.url
       ) {
         imageUrl = category.image.url;
+      } else if (category.images && category.images.length > 0 && category.images[0].url) {
+        imageUrl = category.images[0].url;
       }
 
       return {
         ...category,
         id: category.id || category._id,
         image: imageUrl,
+        images: category.images || (category.image && typeof category.image === 'object' ? [category.image] : []),
         visibility:
           category.visibility !== undefined
             ? category.visibility
@@ -92,16 +101,9 @@ export const categoryService = {
    */
   createCategory: async (categoryData) => {
     try {
-      const config = {
-        headers: {
-          "Content-Type": "multipart/form-data",
-        },
-      };
-
       const response = await apiClient.post(
-        API_ENDPOINTS.CATEGORY_CREATE,
+        `${apiKushal}/api/v1/categories`,
         categoryData,
-        config,
       );
       return response.data;
     } catch (error) {
@@ -115,16 +117,9 @@ export const categoryService = {
    */
   updateCategory: async (id, categoryData) => {
     try {
-      const config = {
-        headers: {
-          "Content-Type": "multipart/form-data",
-        },
-      };
-
       const response = await apiClient.put(
-        API_ENDPOINTS.CATEGORY_UPDATE(id),
+        `${apiKushal}/api/v1/categories/${id}`,
         categoryData,
-        config,
       );
       return response.data;
     } catch (error) {
@@ -138,7 +133,7 @@ export const categoryService = {
    */
   deleteCategory: async (id) => {
     try {
-      await apiClient.delete(API_ENDPOINTS.CATEGORY_DELETE(id));
+      await apiClient.delete(`${apiKushal}/api/v1/categories/${id}`);
     } catch (error) {
       console.error(`Error deleting category ${id}:`, error);
       throw error;

@@ -1,33 +1,49 @@
+import React from 'react';
 import { useNavigate } from 'react-router-dom';
-import CartIcon from '@/assets/icons/Cart.png';
+import { ShoppingBag } from 'lucide-react';
+import { cn } from '@/shared/utils';
 
 /**
- * Cart button component with badge showing item count
+ * Cart button component with item count badge
+ * @param {Object} props
+ * @param {number} props.totalCartItems - Number of items in cart
+ * @param {string} props.className - Additional CSS classes
+ * @param {Function} props.onClick - Optional click handler
  */
-export const CartButton = ({ totalCartItems, className = '' }) => {
+export const CartButton = ({ 
+  totalCartItems = 0, 
+  className = '', 
+  onClick,
+  ...props 
+}) => {
   const navigate = useNavigate();
+
+  const handleClick = (e) => {
+    if (onClick) {
+      onClick(e);
+    } else {
+      navigate('/cart');
+    }
+  };
 
   return (
     <button
-      aria-label="Shopping cart"
-      tabIndex={0}
-      type="button"
-      onClick={() => navigate('/cart')}
-      className={`relative rounded-full w-[30px] h-[28px] lg:w-9 lg:h-9 bg-white flex items-center justify-center border-none cursor-pointer transition-all duration-200 ease-out shadow-md outline-none hover:scale-110 hover:shadow-lg focus:outline-2 focus:outline-black/30 focus:outline-offset-2 ${className}`}
+      onClick={handleClick}
+      className={cn(
+        "relative flex items-center justify-center rounded-full bg-white border border-gray-200 shadow-sm hover:shadow-md hover:border-emerald-300 transition-all duration-200 active:scale-95 focus:outline-none focus:ring-2 focus:ring-emerald-500 focus:ring-offset-2",
+        className
+      )}
+      {...props}
     >
-      <img
-        src={CartIcon}
-        alt="Cart"
-        style={{
-          objectFit: 'contain'
-        }}
-        className='w-4 h-4 lg:w-5 lg:h-5'
-      />
+      <ShoppingBag className="w-5 h-5 text-gray-700" />
+      
       {totalCartItems > 0 && (
-        <span className="absolute -top-1 -right-1 bg-red-500 text-white text-[6px] rounded-full w-3 h-3 lg:w-4 lg:h-4 flex items-center justify-center font-bold">
-          {totalCartItems}
+        <span className="absolute -top-2 -right-2 bg-emerald-500 text-white text-[10px] font-bold rounded-full h-5 w-5 flex items-center justify-center shadow-sm">
+          {totalCartItems > 99 ? '99+' : totalCartItems}
         </span>
       )}
     </button>
   );
 };
+
+export default CartButton;

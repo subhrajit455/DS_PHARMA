@@ -1,16 +1,21 @@
-import React, { useState, useEffect, useCallback, useRef } from 'react';
+import React, { useState, useEffect, useCallback } from 'react';
 import { useParams, useNavigate } from 'react-router-dom';
 import { motion as Motion } from 'framer-motion';
-import { Package, PackageX, Loader2 } from 'lucide-react';
+import { Package, PackageX, Loader2, Plus } from 'lucide-react';
 import { PharmacyProductCard } from '@/user/components/product';
 import productService from '@/services/productService';
 import BackButton from '@/shared/components/BackButton';
 import { ProductGridSkeleton } from '@/shared/components/skeletons/ProductSkeleton';
+import axios from 'axios';
+
+const apiurl = import.meta.env.VITE_MEDIA_CLOUD_BASE_URL;
 
 const CategoryProducts = () => {
   const { categoryId } = useParams();
   const navigate = useNavigate();
 
+  // PAGE_LIMIT constant
+  const PAGE_LIMIT = 25;
   // State
   const [products, setProducts] = useState([]);
   const [categoryName, setCategoryName] = useState('Category Products');
@@ -21,149 +26,61 @@ const CategoryProducts = () => {
   const [hasMore, setHasMore] = useState(true);
   const [totalItems, setTotalItems] = useState(0);
 
-  // Refs for infinite scroll tracking
-  const observerRef = useRef(null);
-  const fetchingRef = useRef(false);
-  const currentCategoryRef = useRef(null);
-  
-  // PAGE_LIMIT constant
-  const PAGE_LIMIT = 12;
-
-  // 1. Fetch Category Details & Initial Products
-  useEffect(() => {
-    let isMounted = true;
-    
-    // Track category changes to reset and cleanup
-    if (currentCategoryRef.current !== categoryId) {
-      if (currentCategoryRef.current) {
-        productService.cleanupActiveRequests(`category_${currentCategoryRef.current}`);
-      }
-      currentCategoryRef.current = categoryId;
-    }
-    
-    const initFetch = async () => {
-      if (!categoryId) return;
-      
+  const fetchProducts = async (pageNum, isInitial = false) => {
+    if (isInitial) {
       setLoading(true);
       setError(false);
-      setPage(1);
-      setProducts([]);
-      setHasMore(true);
-      fetchingRef.current = false;
-      
-      try {
-        // Parallel fetch for speed: categories (for name) and first page items
-        const [categories, productRes] = await Promise.all([
-          productService.getAllCategories(),
-          productService.getProductsByCategory(categoryId, 1, PAGE_LIMIT)
-        ]);
-
-        if (!isMounted) return;
-
-        // Set Category Name (from cache or new fetch)
-        const currentCat = categories.find(c => c.id === categoryId || c._id === categoryId);
-        if (currentCat) {
-          setCategoryName(currentCat.name);
-        } else {
-          // Fallback if not in list - identifier might be name already
-          const isObjectId = /^[a-f\d]{24}$/i.test(categoryId);
-          if (!isObjectId) setCategoryName(categoryId);
-        }
-
-        // Set Initial Products
-        if (productRes) {
-          const fetchedProducts = productRes.data || [];
-          setProducts(fetchedProducts);
-          setTotalItems(productRes.pagination?.totalItems || fetchedProducts.length);
-          setHasMore(productRes.pagination?.hasMore || false);
-        }
-      } catch (err) {
-        if (isMounted) {
-          console.error("CategoryProducts initial fetch failed:", err);
-          setError(true);
-        }
-      } finally {
-        if (isMounted) setLoading(false);
-      }
-    };
-
-    initFetch();
-    
-    return () => { 
-      isMounted = false;
-    };
-  }, [categoryId]);
-
-  // 2. Fetch Next Page Function
-  const fetchNextPage = useCallback(async () => {
-    // Prevent duplicate or invalid calls
-    if (fetchingRef.current || !hasMore || loading || loadingMore) {
-      return;
+    } else {
+      setLoadingMore(true);
     }
-    
-    fetchingRef.current = true;
-    setLoadingMore(true);
-    
-    const nextPage = page + 1;
-    
+
     try {
-      const result = await productService.getProductsByCategory(categoryId, nextPage, PAGE_LIMIT);
-      
-      if (result && Array.isArray(result.data) && result.data.length > 0) {
-        setProducts(prev => {
-          // Simple duplicate check by ID
-          const existingIds = new Set(prev.map(p => p.id || p._id));
-          const newUniqueProducts = result.data.filter(p => !existingIds.has(p.id || p._id));
-          return [...prev, ...newUniqueProducts];
-        });
-        
-        setPage(nextPage);
-        setHasMore(result.pagination?.hasMore || false);
-      } else {
-        // End of data
-        setHasMore(false);
+      const response = await axios.get(`${apiurl}/api/v1/products/category/${categoryId}?page=${pageNum}&limit=${PAGE_LIMIT}`);
+      if (response && response.data) {
+        const productData = response.data.data;
+        const fetchedProducts = productData.products || [];
+
+        if (isInitial) {
+          setProducts(fetchedProducts);
+          // Try to get category name if possible
+          if (fetchedProducts.length > 0 && fetchedProducts[0].category) {
+            setCategoryName(typeof fetchedProducts[0].category === 'string' ? fetchedProducts[0].category : (fetchedProducts[0].category.name || 'Category Products'));
+          }
+        } else {
+          setProducts(prev => {
+            // Filter out any duplicates just in case
+            const existingIds = new Set(prev.map(p => p._id));
+            const uniqueNew = fetchedProducts.filter(p => !existingIds.has(p._id));
+            return [...prev, ...uniqueNew];
+          });
+        }
+
+        setTotalItems(productData.totalItems || 0);
+        setHasMore(productData.hasMore || false);
       }
     } catch (err) {
-      console.error("Failed to fetch next page for category:", err);
-      // We don't mark error = true here to avoid breaking the UI; just stop loading more
-      setHasMore(false);
+      console.error("Failed to fetch products:", err);
+      if (isInitial) setError(true);
     } finally {
+      setLoading(false);
       setLoadingMore(false);
-      fetchingRef.current = false;
     }
-  }, [categoryId, hasMore, page, loading, loadingMore]);
+  };
 
-  // 3. Infinite Scroll Intersection Observer
-  const lastElementRef = useCallback(node => {
-    if (loading) return; 
-    
-    if (observerRef.current) observerRef.current.disconnect();
-
-    observerRef.current = new IntersectionObserver(
-      entries => {
-        if (entries[0].isIntersecting && hasMore && !fetchingRef.current) {
-          fetchNextPage();
-        }
-      },
-      {
-        root: null,
-        rootMargin: '200px', // Fetch slightly before user reaches bottom
-        threshold: 0.1,
-      }
-    );
-
-    if (node) observerRef.current.observe(node);
-  }, [loading, hasMore, fetchNextPage]);
-  
-  // Cleanup observer
   useEffect(() => {
-    return () => {
-      if (observerRef.current) observerRef.current.disconnect();
-    };
-  }, []);
+    setPage(1);
+    fetchProducts(1, true);
+  }, [categoryId]);
+
+  const handleLoadMore = () => {
+    if (loadingMore || !hasMore) return;
+    const nextPage = page + 1;
+    setPage(nextPage);
+    fetchProducts(nextPage, false);
+  };
 
   const handleProductClick = (product) => {
-    navigate(`/product/${product.id || product._id}`);
+    navigate(`/product/${product.rid || product._id}`);
   };
 
   // Animation Variants
@@ -201,7 +118,7 @@ const CategoryProducts = () => {
       <div className="category-container flex flex-col min-h-screen bg-gray-50">
         <main className="grow">
           <div className="category-products-container flex flex-col items-center w-full px-4 md:px-6 lg:px-12">
-            <div className="mx-auto max-w-7xl w-full">
+            <div className="mx-auto max-w-7xl w-full pb-20">
               {/* Top Header */}
               <div className="mb-6" style={{ marginBottom: '1.5rem' }}>
                 <BackButton fallbackRoute="/" label="Back to Home" className="inline-flex" />
@@ -253,7 +170,7 @@ const CategoryProducts = () => {
                     Failed to load {categoryName} category
                   </h2>
                   <p className="text-gray-500 max-w-sm mb-8">We couldn't retrieve the products. Please try refreshing or check your connection.</p>
-                  <button 
+                  <button
                     onClick={() => window.location.reload()}
                     className="px-8 py-3 bg-emerald-600 text-white rounded-xl font-bold hover:bg-emerald-700 transition-all active:scale-95 shadow-lg shadow-emerald-100"
                     style={{ fontFamily: 'Gyrotrope' }}
@@ -279,30 +196,55 @@ const CategoryProducts = () => {
                 </div>
               ) : (
                 <>
-                  <Motion.div 
+                  <Motion.div
                     className="grid grid-cols-2 sm:grid-cols-3 md:grid-cols-4 lg:grid-cols-5 xl:grid-cols-6 gap-4 sm:gap-6"
                     variants={containerVariants}
                     initial="hidden"
                     animate="visible"
                   >
                     {products.map((product, index) => (
-                      <Motion.div 
+                      <Motion.div
                         key={`${product.id || product._id}-${index}`}
                         variants={itemVariants}
-                        ref={index === products.length - 1 ? lastElementRef : null}
                       >
-                        <PharmacyProductCard 
-                           {...product} 
-                           onCardClick={() => handleProductClick(product)}
+                        <PharmacyProductCard
+                          id={product._id}
+                          rid={product.rid}
+                          name={product.name}
+                          price={product.MRP}
+                          imageUrl={product.images?.[0]?.url}
+                          image={product.images}
+                          description={product.description}
+                          stock={product.stock}
+                          inStock={product.stock > 0}
+                          quantity={product.quantity}
+                          onCardClick={() => handleProductClick(product)}
                         />
                       </Motion.div>
                     ))}
                   </Motion.div>
 
-                  {/* Loading More Indicator */}
-                  {loadingMore && (
-                    <div className="mt-12 flex justify-center py-4">
-                       <Loader2 className="w-8 h-8 text-emerald-600 animate-spin" />
+                  {/* Load More Button */}
+                  {hasMore && (
+                    <div className="mt-16 flex justify-center">
+                      <button
+                        onClick={handleLoadMore}
+                        disabled={loadingMore}
+                        className="flex items-center gap-2 px-8 py-3 bg-white border-2 border-emerald-600 text-emerald-600 rounded-xl font-bold hover:bg-emerald-50 transition-all active:scale-95 disabled:opacity-50 disabled:cursor-not-allowed shadow-md"
+                        style={{ fontFamily: 'Gyrotrope' }}
+                      >
+                        {loadingMore ? (
+                          <>
+                            <Loader2 className="w-5 h-5 animate-spin" />
+                            <span>Loading...</span>
+                          </>
+                        ) : (
+                          <>
+                            <Plus className="w-5 h-5" />
+                            <span>Load More Products</span>
+                          </>
+                        )}
+                      </button>
                     </div>
                   )}
 
@@ -310,21 +252,21 @@ const CategoryProducts = () => {
                   {!hasMore && products.length > 0 && (
                     <div className="mt-16 text-center" style={{ paddingTop: '1.5rem', paddingBottom: '1.5rem' }}>
                       <div className="inline-flex items-center gap-3 px-6 py-2 bg-gray-100 rounded-full">
-                         <div className="w-1.5 h-1.5 rounded-full bg-gray-400" />
-                         <span
-                           style={{
-                             fontFamily: 'Gyrotrope',
-                             fontSize: '12px',
-                             fontWeight: 700,
-                             color: '#6B7280',
-                             textTransform: 'uppercase',
-                             letterSpacing: '0.1em',
-                             marginTop: '3px'
-                           }}
-                         >
-                           End of {categoryName} category collection
-                         </span>
-                         <div className="w-1.5 h-1.5 rounded-full bg-gray-400" />
+                        <div className="w-1.5 h-1.5 rounded-full bg-gray-400" />
+                        <span
+                          style={{
+                            fontFamily: 'Gyrotrope',
+                            fontSize: '12px',
+                            fontWeight: 700,
+                            color: '#6B7280',
+                            textTransform: 'uppercase',
+                            letterSpacing: '0.1em',
+                            marginTop: '3px'
+                          }}
+                        >
+                          End of {categoryName} category collection
+                        </span>
+                        <div className="w-1.5 h-1.5 rounded-full bg-gray-400" />
                       </div>
                     </div>
                   )}
@@ -339,3 +281,4 @@ const CategoryProducts = () => {
 };
 
 export default CategoryProducts;
+

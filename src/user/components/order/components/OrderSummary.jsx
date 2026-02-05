@@ -7,6 +7,7 @@ import {
   Banknote,
   Smartphone,
 } from "lucide-react";
+import { useNavigate } from "react-router-dom";
 
 const OrderSummary = ({
   deliveryAddress,
@@ -23,6 +24,8 @@ const OrderSummary = ({
   cartItems = [],
 }) => {
   const [paymentMethod, setPaymentMethod] = useState("online");
+
+  const navigate = useNavigate()
 
   return (
     <div className="sticky top-32 space-y-3">
@@ -69,10 +72,18 @@ const OrderSummary = ({
         >
           {deliveryAddress ? (
             <>
-              <div style={{ fontWeight: 600, marginBottom: "2px", color: "#000000" }}>
+              <div
+                style={{
+                  fontWeight: 600,
+                  marginBottom: "2px",
+                  color: "#000000",
+                }}
+              >
                 {deliveryAddress.name} - {deliveryAddress.phone}
               </div>
-              <div className="line-clamp-2">{deliveryAddress.address}, {deliveryAddress.city}</div>
+              <div className="line-clamp-2">
+                {deliveryAddress.address}, {deliveryAddress.city}
+              </div>
             </>
           ) : (
             <div className="text-gray-400 italic">No address selected</div>
@@ -80,7 +91,7 @@ const OrderSummary = ({
         </div>
 
         <div className="flex gap-2">
-          <button
+          {/* <button
             onClick={onAddNewAddress}
             className="flex-1 text-[12px] sm:text-xs transition-colors cursor-pointer hover:opacity-90"
             style={{
@@ -94,8 +105,8 @@ const OrderSummary = ({
               height: "30px",
             }}
           >
-            + Add New Adderss
-          </button>
+            + Add New Address
+          </button> */}
 
           <button
             onClick={onChangeAddress}
@@ -113,9 +124,24 @@ const OrderSummary = ({
           >
             Change Address
           </button>
+          <button
+            onClick={()=>{navigate("/profile")}}
+            className="flex-1 transition-colors text-[12px] sm:text-xs cursor-pointer hover:bg-gray-50 flex items-center justify-center gap-1"
+            style={{
+              fontFamily: "Gyrotrope",
+              fontWeight: 600,
+              color: "#000000",
+              border: "1px solid #D1D5DB",
+              borderRadius: "8px",
+              padding: "6px 10px",
+              height: "30px",
+              backgroundColor: "transparent",
+            }}
+          >
+            Add Address
+          </button>
         </div>
       </div>
-
       {/* Apply Coupon */}
       <div
         className="bg-orange-100"
@@ -133,7 +159,7 @@ const OrderSummary = ({
             fontSize: "16px",
             fontWeight: 600,
             color: "#F97316",
-            padding:'0px 5px',
+            padding: "0px 5px",
             marginBottom: "6px",
             letterSpacing: "-0.01em",
           }}
@@ -148,7 +174,7 @@ const OrderSummary = ({
               onChange={onCouponChange}
               placeholder="Enter coupon code"
               disabled={!!appliedCoupon}
-              className={`w-full focus:outline-none focus:ring-2 focus:ring-orange-400 ${appliedCoupon ? 'bg-orange-50 border-orange-300' : 'bg-white border-orange-400'}`}
+              className={`w-full focus:outline-none focus:ring-2 focus:ring-orange-400 ${appliedCoupon ? "bg-orange-50 border-orange-300" : "bg-white border-orange-400"}`}
               style={{
                 fontFamily: "Gyrotrope",
                 fontSize: "11px",
@@ -159,7 +185,10 @@ const OrderSummary = ({
               }}
             />
             {appliedCoupon && (
-              <div className="absolute left-0 -bottom-5.5 flex items-center gap-1" style={{padding:'5px 0px'}}>
+              <div
+                className="absolute left-0 -bottom-5.5 flex items-center gap-1"
+                style={{ padding: "5px 0px" }}
+              >
                 <Check className="w-4 h-3 font-bold text-green-800" />
                 <span className="text-[9px] font-bold text-green-700 capitalize">
                   {appliedCoupon.code}: {appliedCoupon.type}
@@ -169,21 +198,20 @@ const OrderSummary = ({
           </div>
           <button
             onClick={appliedCoupon ? onRemoveCoupon : onApplyCoupon}
-            className={`transition-colors cursor-pointer hover:opacity-90 px-3 ${appliedCoupon ? 'bg-orange-500 text-white border-none' : 'bg-white text-black border border-orange-500'}`}
+            className={`transition-colors cursor-pointer hover:opacity-90 px-3 ${appliedCoupon ? "bg-orange-500 text-white border-none" : "bg-white text-black border border-orange-500"}`}
             style={{
               fontFamily: "Gyrotrope",
               fontSize: "11px",
               fontWeight: 600,
               borderRadius: "8px",
               height: "30px",
-              padding:'0px 5px',
+              padding: "0px 5px",
             }}
           >
-            {appliedCoupon ? 'Remove' : 'Apply'}
+            {appliedCoupon ? "Remove" : "Apply"}
           </button>
         </div>
       </div>
-
       {/* Payment Breakdown */}
       <div
         style={{
@@ -377,7 +405,6 @@ const OrderSummary = ({
             Payment Method
           </h4>
           <div className="space-y-2">
-            {/* Online Payment */}
             <button
               type="button"
               onClick={() => setPaymentMethod("online")}
@@ -427,8 +454,7 @@ const OrderSummary = ({
                 )}
               </div>
             </button>
-
-            {/* Card Payment */}
+            {/* Card Payment
             <button
               type="button"
               onClick={() => setPaymentMethod("card")}
@@ -477,9 +503,7 @@ const OrderSummary = ({
                   <div className="w-1.5 h-1.5 rounded-full bg-white" />
                 )}
               </div>
-            </button>
-
-            {/* COD */}
+            </button> */}
             <button
               type="button"
               onClick={() => setPaymentMethod("cod")}
@@ -528,7 +552,6 @@ const OrderSummary = ({
           </div>
         </div>
 
-        {/* Order Now Button */}
         <button
           onClick={() => onOrderNow(paymentMethod)}
           disabled={isPlacingOrder || cartItems.length === 0}
@@ -551,6 +574,7 @@ const OrderSummary = ({
             : `Proceed to Pay ₹${totals.total}`}
         </button>
       </div>
+ 
     </div>
   );
 };

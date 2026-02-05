@@ -25,13 +25,21 @@ const ForgotPasswordPage = lazy(() => import("./user/pages/ForgotPasswordPage"))
 const ResetPasswordPage = lazy(() => import("./user/pages/ResetPasswordPage"));
 const SearchPage = lazy(() => import("./user/pages/SearchPage"));
 const FeaturedProductsPage = lazy(() => import("./user/pages/FeaturedProductsPage"));
-const AllProductsPage = lazy(() => import("./user/pages/AllProductsPage"));
+const AllProductsPage = lazy(() => import('./user/pages/AllProductsPage'));
+const LoadMoreProductsPage = lazy(() => import('./user/pages/LoadMoreProductsPage'));
 const NotFoundPage = lazy(() => import("./user/pages/NotFoundPage"));
 const AdminRouter = lazy(() => import("./admin/AdminRouter"));
 
 import { useAuthStore } from './store/useAuthStore';
 import { decodeToken } from './shared/utils/decodeToken';
 import ProtectedRoute from './shared/components/ProtectedRoute';
+import CategoryPage from './user/pages/CategoryPage';
+
+import ContactPage from './user/pages/ContactPage';
+import AboutPage from './user/pages/AboutPage';
+import PrivacyPolicyPage from './user/pages/PrivacyPolicyPage';
+import TermOfServicePage from './user/pages/TermOfServicePage';
+
 
 
 
@@ -103,15 +111,15 @@ function App() {
                 <Route path="/reset-password/:id" element={<ResetPasswordPage />} />
 
                 {/* Admin Routes */}
-                <Route 
-                  path="/admin/*" 
+                <Route
+                  path="/admin/*"
                   element={
                     <ProtectedRoute adminOnly={true}>
                       <AdminRouter />
                     </ProtectedRoute>
-                  } 
+                  }
                 />
-                
+
                 {/* Standalone Routes (No Layout) */}
                 <Route path="/order-confirmation/:orderId" element={<OrderConfirmation />} />
 
@@ -121,36 +129,42 @@ function App() {
                   <Route path="/cart" element={<CartDetails />} />
                   <Route path="/product/:id" element={<ProductDetails />} />
                   <Route path="/category/:categoryId" element={<CategoryProducts />} />
-                  
+                  <Route path="/categories" element={<CategoryPage />} />
+                  <Route path="/about" element={<AboutPage />} />
+                  <Route path="/contact" element={<ContactPage />} />
+                  <Route path="/privacy-policy" element={<PrivacyPolicyPage />} />
+                  <Route path="/terms-of-service" element={<TermOfServicePage />} />
+
                   {/* Protected User Routes */}
-                  <Route 
-                    path="/orders" 
+                  <Route
+                    path="/orders"
                     element={
                       <ProtectedRoute>
                         <Orders />
                       </ProtectedRoute>
-                    } 
+                    }
                   />
-                  <Route 
-                    path="/orders/:id" 
+                  <Route
+                    path="/orders/:id"
                     element={
                       <ProtectedRoute>
                         <OrderDetails />
                       </ProtectedRoute>
-                    } 
+                    }
                   />
-                  <Route 
-                    path="/profile" 
+                  <Route
+                    path="/profile"
                     element={
                       <ProtectedRoute>
                         <UserProfile />
                       </ProtectedRoute>
-                    } 
+                    }
                   />
 
                   <Route path="/featured" element={<FeaturedProductsPage />} />
                   <Route path="/search" element={<SearchPage />} />
                   <Route path="/shop" element={<AllProductsPage />} />
+                  <Route path="/load-more-products" element={<LoadMoreProductsPage />} />
                 </Route>
 
                 {/* 404 - Not Found Route */}

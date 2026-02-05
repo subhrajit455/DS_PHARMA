@@ -4,22 +4,33 @@ import AdminSidebar from '@/admin/components/layout/AdminSidebar';
 import AdminHeader from '@/admin/components/layout/AdminHeader';
 import useDataStore from '@/store/useDataStore';
 import { cn } from '@/admin/utils/cn';
+import { useAuthStore } from '@/store/useAuthStore';
 
 const AdminLayout = () => {
   const [sidebarOpen, setSidebarOpen] = useState(false);
   const [isCollapsed, setIsCollapsed] = useState(false);
-  
-  const { isAuthenticated, currentUser } = useDataStore();
+
+
+  const {user, isAuthenticated} = useAuthStore();
+
+  // console.log("user from admin layout",user, isAuthenticated);
+
+// const isAuthenticated =true;
+// const user = {
+//   role: 'admin'
+// };
+
   const navigate = useNavigate();
+  // console.log(isAuthenticated, user);
 
   // Basic route protection
   useEffect(() => {
-    if (!isAuthenticated || currentUser?.role !== 'admin') {
+    if (!isAuthenticated || user?.role !== 'admin') {
       navigate('/login');
     }
-  }, [isAuthenticated, currentUser, navigate]);
+  }, [isAuthenticated, user, navigate]);
 
-  if (!isAuthenticated || currentUser?.role !== 'admin') return null;
+  if (!isAuthenticated || user?.role !== 'admin') return null;
 
   return (
     <div className="flex h-screen bg-gradient-to-br from-gray-50 via-emerald-50/20 to-teal-50/30 relative overflow-hidden max-w-full">

@@ -13,11 +13,14 @@ const ProductDetails = () => {
   const [product, setProduct] = useState(null);
   const [isLoading, setIsLoading] = useState(true);
 
+//   console.log("product from product details page : ",id);
+
   useEffect(() => {
     const fetchProduct = async () => {
       try {
         const data = await productService.getProduct(id);
         setProduct(data);
+        // console.log("product from product details page : ",data);
       } catch (error) {
         console.error(error);
         toastUtil.error('Product not found');

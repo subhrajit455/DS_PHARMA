@@ -12,6 +12,8 @@ const RETRY_DELAYS = [1000, 2000];
 const FALLBACK_IMAGE =
   "https://images.unsplash.com/photo-1584308666744-24d5c474f2ae?auto=format&fit=crop&w=400&q=80";
 
+const productfetchapi = import.meta.env.VITE_MEDIA_CLOUD_BASE_URL;
+
 // ============================================================
 // STATE MANAGEMENT
 // ============================================================
@@ -927,14 +929,21 @@ const getAllProducts = async ({ page = 1, limit = 12, filters = {} } = {}) => {
     const result = await resilientFetch(
       requestKey,
       async (signal) => {
-        const response = await apiClient.get(API_ENDPOINTS.PRODUCT_ALL, {
+        const response = await apiClient.get(`${productfetchapi}/api/v1/products`, {
           params: { page: pageNum, limit: limitNum, ...filters },
           signal,
         });
+        // console.log("response from getAllProducts in productService", response);
 
         const data = response.data?.data || response.data || [];
         const pagination = response.data?.pagination || {};
-
+        
+        // Calculate hasMore based on actual data received vs limit
+        // If we received exactly the limit amount and there are more pages, there might be more
+        const hasMore = Array.isArray(data) && data.length === limitNum && 
+                     ((pagination.totalPages && (pagination.currentPage || pageNum) < pagination.totalPages) ||
+                      !pagination.totalPages); // If no totalPages is provided, assume there could be more
+        
         return {
           data: Array.isArray(data)
             ? data.map(normalizeProduct).filter(Boolean)
@@ -943,9 +952,7 @@ const getAllProducts = async ({ page = 1, limit = 12, filters = {} } = {}) => {
             currentPage: pagination.currentPage || pageNum,
             totalPages: pagination.totalPages || 1,
             totalItems: pagination.totalItems || 0,
-            hasMore:
-              (pagination.currentPage || pageNum) <
-              (pagination.totalPages || 1),
+            hasMore,
           },
         };
       },

@@ -30,7 +30,7 @@ const ProductImageGallery = ({ images, selectedImage, onImageSelect, onScroll })
               whileTap={{ scale: 0.95 }}
             >
               <SafeImage
-                src={image}
+                src={image.url}
                 alt={`Product view ${index + 1}`}
                 className="object-cover w-full h-full"
               />
@@ -52,7 +52,7 @@ const ProductImageGallery = ({ images, selectedImage, onImageSelect, onScroll })
       <div className="relative flex-1 overflow-hidden bg-white border border-gray-200 rounded-lg shadow-sm group">
         <SafeImage
           key={selectedImage}
-          src={images && images.length > 0 ? images[selectedImage] : null}
+          src={images && images.length > 0 ? images[selectedImage].url : null}
           alt="Product"
           className="object-cover w-full h-full"
           style={{ minHeight: '300px', maxHeight: '420px' }}

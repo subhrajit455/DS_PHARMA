@@ -3,57 +3,63 @@ import apiClient from "@/services/api/apiClient";
 export const cartService = {
   /**
    * Add an item to the cart
-   * @param {Object} data - { productId, quantity }
+   * @param {Object} data - { rid, quantity, image } (rid MUST be product rid)
    */
   addToCart: async (data) => {
-    // 1. Validation & Sanitization
-    if (!data.productId) throw new Error("Product ID is required");
+    if (!data.rid) throw new Error("Product rid is required");
 
-    // Sanitize Price - Handle NaN, null, undefined values
-    let price = data.price;
-
-    // If price is not a valid number, try to extract from string
-    if (typeof price === "string") {
-      // Remove currency symbols and commas
-      price = parseFloat(price.replace(/[^0-9.]/g, ""));
-    }
-
-    // If still not valid, set to 0 as a fallback (instead of throwing error)
-    // This prevents the cart from failing due to bad price data
-    if (price == null || isNaN(price) || price < 0) {
-      console.warn(
-        `[CartService] Invalid price provided: ${data.price}, setting to 0`,
-      );
-      price = 0;
-    }
-
-    // Ensure we have a clean number
-    price = Number(price);
-
-    // SHOTGUN PAYLOAD: Send price in multiple likely locations
-    // to bypass backend "NaN" error caused by missing path read.
-    const cleanPrice = 100; // Hardcoded valid number
+    // Debug logging
+    console.log("[cartService] addToCart called with:", data);
 
     const payload = {
-      productId: data.productId,
+      rid: data.rid,
       quantity: Number(data.quantity) || 1,
-      price: cleanPrice, // Flat
-      product: { price: cleanPrice }, // Nested
+      image: data.image || '',
     };
 
-    console.log("[CartService] Sending SHOTGUN payload:", payload);
+    console.log("[cartService] Sending payload:", payload);
 
     const response = await apiClient.post("/cartadd", payload);
+    console.log("[Cart Service] addToCart response:", response.data);
     return response.data;
   },
 
-  /**
-   * Fetch all cart items
-   */
   getCart: async () => {
     const response = await apiClient.get("/cartget");
-    console.log("[Cart Service] getCart response:", response.data);
-    return response.data;
+    console.log("[Cart Service] getCart raw response:", response.data);
+
+
+    const rawItems = response.data?.data || response.data?.items || response.data || [];
+
+    if (!Array.isArray(rawItems)) {
+      console.warn("[Cart Service] Unexpected cart response structure:", response.data);
+      return [];
+    }
+
+    const normalizedItems = rawItems.map(item => {
+      const product = item.product || item.productId || {};
+      const isPopulated = !!(item.product || item.productId);
+
+      // If populated, use product details, otherwise fall back to item root properties
+      const baseDetails = isPopulated ? product : item;
+
+      return {
+        _id: item._id, // Cart Item ID (for remove/update)
+        id: baseDetails.id || baseDetails._id, // Product ID
+        rid: baseDetails.rid || baseDetails.RID || item.rid, // MARG ID
+        name: baseDetails.name || item.name || 'Unknown Product',
+        image: baseDetails.image || baseDetails.imageUrl || item.image || item.imageUrl,
+        price: Number(baseDetails.price) || Number(baseDetails.PRate) || Number(baseDetails.Rate) || Number(item.price) || 0,
+        originalPrice: Number(baseDetails.originalPrice) || Number(baseDetails.mrp) || Number(baseDetails.MRP) || undefined,
+        quantity: Number(item.quantity) || 1,
+        stock: baseDetails.stock !== undefined ? Number(baseDetails.stock) : undefined,
+        unit: baseDetails.unit || baseDetails.pack || item.unit || 'piece',
+        discount: baseDetails.discount || item.discount || 0
+      };
+    });
+
+    console.log("[Cart Service] Normalized items:", normalizedItems);
+    return { data: normalizedItems }; // Return consistent structure matching useCart expectations
   },
 
   /**

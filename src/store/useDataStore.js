@@ -159,6 +159,7 @@ const useDataStore = create(
       login: (user) =>
         set((state) => {
           // Merge guest cart with user saved cart
+          // console.log("user in useDataStore", user)
           const guestCart = state.cart || [];
           const userCart = user.cart || [];
 

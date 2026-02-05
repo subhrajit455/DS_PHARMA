@@ -2,13 +2,17 @@ import React from 'react';
 import { useNavigate } from 'react-router-dom';
 import { Heart } from 'lucide-react';
 import { useAddToCart } from '@/shared/hooks/queries/useCartQuery';
+import { useAuthStore } from '@/store/useAuthStore';
+import { useCartStore } from '@/store/useCartStore';
 import useDataStore from '@/store/useDataStore';
 import CartIcon from '@/assets/icons/Cart.png';
 import SafeImage from '@/shared/components/SafeImage';
+import toastUtil from '@/shared/utils/toast';
 
 
 const PharmacyProductCard = ({
   id,
+  rid, // Use rid for cart identification
   name,
   price,
   originalPrice,
@@ -24,25 +28,27 @@ const PharmacyProductCard = ({
   className = ''
 }) => {
   const navigate = useNavigate();
-  const { mutate: addToCart, isPending } = useAddToCart();
-  
-  // Wishlist from global store
+  const { isAuthenticated } = useAuthStore();
+  const addItemToLocalCart = useCartStore((state) => state.addItem);
+  const { mutate: addToCartMutation, isPending } = useAddToCart();
+
+  // Use useDataStore for wishlist (to avoid conflicting with new useCartStore for now if they are different)
   const wishlist = useDataStore((state) => state.wishlist);
   const addToWishlist = useDataStore((state) => state.addToWishlist);
   const removeFromWishlist = useDataStore((state) => state.removeFromWishlist);
-  
+
   const isInWishlist = wishlist.some((item) => item.id === id);
 
   // Handle image prop variation (image vs imageUrl)
   const displayImage = imageUrl || image;
-  
+
   // Use mrp or originalPrice for comparison price
   const comparisonPrice = mrp || originalPrice;
 
   const discountPercentage = comparisonPrice && price && comparisonPrice > price
     ? Math.round(((comparisonPrice - price) / comparisonPrice) * 100)
     : discount || 0;
-    
+
   // Determine if product is available
   // Robust check: Only treat as unavailable if explicitly inStock === false OR stock is explicitly 0
   const isAvailable = inStock !== false && (stock === undefined || Number(stock) > 0);
@@ -50,17 +56,45 @@ const PharmacyProductCard = ({
   const handleAddToCart = (e) => {
     e.stopPropagation();
     if (!isAvailable) return;
-    
-    addToCart({
-      productId: id,
-      name,
-      price: Number(price) || 0,
-      quantity: 1,
-      image: displayImage,
-      unit
-    });
+
+    // productId (rid) is required for both backend and local cart
+    // User requested strict usage of 'rid' from product data
+    const productRid = rid; 
+
+    if (isAuthenticated) {
+      if (!productRid) {
+        toastUtil.error("Product RID missing. Cannot add to cart.");
+        return;
+      }
+      // Logic for logged in users: Sync directly to backend
+      addToCartMutation({
+        image: displayImage,
+        name,
+        price,
+        originalPrice: comparisonPrice || price,
+        discount: discountPercentage,
+        rid: productRid,
+        quantity: 1,
+      });
+    } else {
+      // Logic for guest users: Save to local store and redirect to login
+      addItemToLocalCart({
+        id,
+        rid,
+        name,
+        price,
+        originalPrice: comparisonPrice || price,
+        discount: discountPercentage,
+        image: displayImage,
+        unit,
+        stock
+      }, 1);
+
+      toastUtil.info("Login to sync your cart!");
+      navigate(`/login?redirect=${window.location.pathname}`);
+    }
   };
-  
+
   const handleWishlistToggle = (e) => {
     e.stopPropagation();
     if (isInWishlist) {
@@ -84,14 +118,15 @@ const PharmacyProductCard = ({
     if (onCardClick) {
       onCardClick({ id, name, price, quantity, unit });
     } else {
-      navigate(`/product/${id}`);
+      // console.log("product id : ",rid);
+      navigate(`/product/${rid}`);
     }
   };
 
   // Check if transparent variant is requested via className or props (could be extended)
   const isTransparent = className.includes('bg-transparent');
   const baseBgClass = isTransparent ? '' : 'bg-white';
-  
+
   return (
     <>
       <style>{`
@@ -188,9 +223,9 @@ const PharmacyProductCard = ({
             className="object-cover w-full h-full px-2 py-2"
             loading="lazy"
           />
-          
+
           {/* Wishlist Button */}
-          <button
+          {/* <button
             onClick={handleWishlistToggle}
             className="absolute top-2 right-2 p-1.5 rounded-full bg-white/90 hover:bg-white shadow-sm transition-colors duration-150"
             aria-label={isInWishlist ? 'Remove from wishlist' : 'Add to wishlist'}
@@ -199,8 +234,8 @@ const PharmacyProductCard = ({
             <Heart
               className={isInWishlist ? 'fill-red-500 text-red-500 w-3 h-3 sm:w-4 sm:h-4' : 'text-gray-400 w-3 h-3 sm:w-4 sm:h-4'}
             />
-          </button>
-          
+          </button> */}
+
           {/* Out of Stock Badge */}
           {!isAvailable && (
             <div className="absolute inset-0 flex items-center justify-center bg-black/30">
@@ -209,14 +244,14 @@ const PharmacyProductCard = ({
               </span>
             </div>
           )}
-          
+
           {/* Discount Badge */}
           {discountPercentage > 0 && isAvailable && (
             <div className="absolute top-2 left-2 px-2 py-0.5 text-[8px] sm:text-[10px] font-bold text-white bg-green-500 rounded" style={{ padding: '1px  5px' }}>
               {discountPercentage}% OFF
             </div>
           )}
-          
+
           {/* Dark shadow gradient on upper half */}
           <div
             className="absolute top-0 left-0 right-0 pointer-events-none"
@@ -238,17 +273,17 @@ const PharmacyProductCard = ({
           <div className="flex flex-col gap-1 mb-3">
             {/* Effective Price and Discount Badge */}
             <div className="flex items-center flex-wrap gap-x-2 gap-y-1">
-               <span className="text-[12px] sm:text-[16px] font-bold text-gray-900 tracking-tight" title={`Selling Price: ₹${price}`}>
-                  ₹{Number(price).toLocaleString('en-IN')}
-               </span>
-               
-               {discountPercentage > 0 && (
-                 <div className="flex items-center gap-1.5">
-                   <span className="text-[8px] sm:text-[10px] text-gray-40font-bold text-white bg-emerald-600 px-2 py-0.5 rounded-md shadow-sm">
-                      {discountPercentage}% OFF
-                   </span>
-                 </div>
-               )}
+              <span className="text-[12px] sm:text-[16px] font-bold text-gray-900 tracking-tight" title={`Selling Price: ₹${price}`}>
+                ₹{Number(price).toLocaleString('en-IN')}
+              </span>
+
+              {discountPercentage > 0 && (
+                <div className="flex items-center gap-1.5">
+                  <span className="text-[8px] sm:text-[10px] text-gray-40font-bold text-white bg-emerald-600 px-2 py-0.5 rounded-md shadow-sm">
+                    {discountPercentage}% OFF
+                  </span>
+                </div>
+              )}
             </div>
 
             {/* MRP & Packing/Unit Details */}
@@ -264,7 +299,7 @@ const PharmacyProductCard = ({
                 </span>
               )}
               <span className="text-[8px] sm:text-[10px] text-gray-400 font-medium whitespace-nowrap">
-                 {unit || 'strip'}
+                {unit || 'strip'}
               </span>
             </div>
           </div>

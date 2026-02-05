@@ -1,5 +1,7 @@
 import { motion as Motion } from 'framer-motion';
 
+import doctorImg from "@/assets/images/Mask group.png";
+
 export const DoctorImage = () => {
   return (
     <Motion.div
@@ -11,7 +13,7 @@ export const DoctorImage = () => {
     >
       <div className="relative w-full  h-[600px] md:h-[700px] lg:h-[600px] max-w-[300px] md:max-w-[450px] lg:max-w-[400px]">
         <img
-          src="/src/assets/images/Mask group.png"
+          src={doctorImg}
           alt="Healthcare Professional"
           className="w-full h-full block object-contain"
         />

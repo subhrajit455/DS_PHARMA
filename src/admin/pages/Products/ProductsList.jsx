@@ -1,4 +1,4 @@
-import React, { useState } from "react";
+import React, { useEffect, useState } from "react";
 import { useNavigate } from "react-router-dom";
 import {
   Plus,
@@ -24,8 +24,12 @@ import { useMargProducts } from "@/shared/hooks/queries/useMargProducts";
 import ProductTableSkeleton from "@/admin/components/ui/ProductTableSkeleton";
 import { cn } from "@/admin/utils/cn";
 import { Badge } from "@/admin/components/ui/Badge";
+import axios from "axios";
+const categoryBaseUrl = `${import.meta.env.VITE_MEDIA_CLOUD_BASE_URL}/api/v1/categories`;
 
-const ProductRow = React.memo(({ product, onView, onImages }) => (
+const ProductRow = React.memo(({ product, onView, onImages }) => {
+  // console.log("product from ProductRow: ",product)
+  return (
   <TableRow
     className="group border-b border-gray-100/80 hover:bg-emerald-50/30 transition-all duration-150"
   >
@@ -34,7 +38,7 @@ const ProductRow = React.memo(({ product, onView, onImages }) => (
         <div className="relative shrink-0">
           {product.images?.[0] ? (
             <img
-              src={product.images[0]}
+              src={product.images[0].fileUrl || product.images[0].url || product.images[0]}
               alt={product.name}
               className="w-14 h-14 object-cover rounded-xl shadow-sm border border-gray-200"
             />
@@ -99,7 +103,7 @@ const ProductRow = React.memo(({ product, onView, onImages }) => (
           variant="ghost"
           size="icon"
           className="h-9 w-9 text-gray-500 hover:text-emerald-600 hover:bg-emerald-50 rounded-lg transition-colors"
-          onClick={() => onView(product.id)}
+          onClick={() => onView(product.rid)}
         >
           <Eye className="h-4 w-4" />
         </Button>
@@ -115,7 +119,8 @@ const ProductRow = React.memo(({ product, onView, onImages }) => (
       </div>
     </TableCell>
   </TableRow>
-));
+)
+});
 
 ProductRow.displayName = "ProductRow";
 
@@ -132,6 +137,24 @@ const ProductsList = () => {
   const [viewOpen, setViewOpen] = useState(false);
   const [imageModalOpen, setImageModalOpen] = useState(false);
 
+    const [allCategory , setAllCategory]=useState([])
+    
+    // console.log(" allCategory : ",allCategory)
+  
+    const getAllCategory = async () => {
+      try { 
+        const response = await axios.get(categoryBaseUrl);
+    //  console.log(" getAllCategory response : ",response)
+        setAllCategory(response.data.data.categories);
+      } catch (error) {
+        console.error(error);
+      }
+    };
+  
+    useEffect(() => {
+      getAllCategory();
+    }, []);
+
   // Fetch Marg Products using React Query
   const { 
     data, 
@@ -144,7 +167,7 @@ const ProductsList = () => {
     limit: pagination.limit,
     search: search
   });
-
+// console.log("product from list : ",data.products)
   const products = data?.products || [];
   const totalItems = data?.total || 0;
   const totalPages = data?.totalPages || 1;
@@ -167,12 +190,14 @@ const ProductsList = () => {
     setPagination((prev) => ({ ...prev, currentPage: 1 }));
   };
 
-  const handleViewProduct = (id) => {
-    setSelectedProductId(id);
+  const handleViewProduct = (rid) => {
+    console.log("rid : ",rid)
+    setSelectedProductId(rid);
     setViewOpen(true);
   };
 
   const handleOpenImages = (product) => {
+    // console.log("product from handleOpenImages: ",product)
     setSelectedProduct(product);
     setImageModalOpen(true);
   };
@@ -303,6 +328,7 @@ const ProductsList = () => {
         open={imageModalOpen}
         onOpenChange={setImageModalOpen}
         product={selectedProduct}
+        allCategory={allCategory}
       />
 
       <ViewProductModal

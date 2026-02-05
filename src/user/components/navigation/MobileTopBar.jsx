@@ -30,7 +30,7 @@ export const MobileTopBar = ({ totalCartItems }) => {
             letterSpacing: '0.05em'
           }}
         >
-          DS Pharma
+          DS Pharma 
         </span>
 
           <div className="flex items-center gap-3">

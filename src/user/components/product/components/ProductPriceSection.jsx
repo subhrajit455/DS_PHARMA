@@ -59,8 +59,10 @@ const ProductPriceSection = ({ price, originalPrice, discount, stock, specialOff
           </span>
         </div>
       </div>
-      <div style={{ marginBottom: '1rem' }}>
-        {/* Special Offer */}
+      
+     
+      {/* <div style={{ marginBottom: '1rem' }}>
+        
       <div
         className="mb-6 p-4 rounded-lg border-2"
         style={{
@@ -81,8 +83,9 @@ const ProductPriceSection = ({ price, originalPrice, discount, stock, specialOff
           Special Offer For You
         </h3>
         <div className="flex items-start gap-2 w-[220px] bg-white rounded-lg shadow-sm" style={{ padding: '5px' }}>
-          <div className="w-10 h-10 rounded-lg shadow-sm overflow-hidden">
-            <img src="" alt="" />
+          <div className="w-10 h-10 rounded-lg shadow-sm overflow-hidden flex items-center justify-center bg-green-50">
+            
+             <img src="https://cdn-icons-png.flaticon.com/512/726/726488.png" alt="Offer" className="w-6 h-6 object-contain" />
           </div>
           <div className="flex flex-col justify-center" style={{ marginTop: '5px' }}>
           <span
@@ -109,7 +112,7 @@ const ProductPriceSection = ({ price, originalPrice, discount, stock, specialOff
         </div>
         
       </div>
-      </div>
+      </div> */}
 
       
     </div>

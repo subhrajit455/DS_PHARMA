@@ -1,5 +1,7 @@
 import { motion as Motion } from 'framer-motion';
 
+import mascotImg from "@/assets/images/medicine-character.png";
+
 export const MascotCard = () => {
   return (
     <Motion.div
@@ -16,7 +18,7 @@ export const MascotCard = () => {
         
       }}>
         <img
-          src="/src/assets/images/medicine-character.png"
+          src={mascotImg}
           alt="DS Pharma Mascots"
           className="w-full h-auto block object-contain max-h-[200px] max-w-[250px] absolute mb-[100px] md:max-h-[200px] md:max-w-[120px] md:mb-2.5 lg:max-h-[150px] lg:max-w-[250px] lg:mb-2.5"
         />

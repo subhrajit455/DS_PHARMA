@@ -10,11 +10,12 @@ export const useActiveNavItem = () => {
     const path = location.pathname;
     if (path === "/") return "Home";
     if (path === "/shop") return "Shop";
+    if (path.startsWith("/categories") || path.startsWith("/category")) return "Categories";
     if (path.startsWith("/orders")) return "Orders";
-    // For hash-based navigation
-    if (location.hash === "#about") return "About Us";
-    if (location.hash === "#contact") return "Contact Us";
-    return "Home";
+    if (path.startsWith("/admin")) return "Admin Panel";
+    if (path === "/about") return "About";
+    if (path === "/contact") return "Contact";
+    return path === "/" ? "Home" : "";
   };
 
   return getActiveItem();

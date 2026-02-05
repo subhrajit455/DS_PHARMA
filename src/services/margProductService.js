@@ -1,6 +1,8 @@
 import axios from "axios";
 
-const MARG_API_URL = "http://192.168.0.144:8080/api/v1/products";
+const apiurl = import.meta.env.VITE_MEDIA_CLOUD_BASE_URL;
+
+const MARG_API_URL = `${apiurl}/api/v1/products`;
 
 /**
  * Normalizes raw Marg product data into UI model
@@ -18,6 +20,9 @@ export const normalizeMargProduct = (raw) => {
     code: raw.code,
     salt: (raw.Salt || "").trim(),
     images: Array.isArray(raw.images) ? raw.images : [],
+    rid: raw.rid,
+
+
   };
 };
 
@@ -32,7 +37,9 @@ export const margProductService = {
         params: { page, limit, search },
       });
 
-      console.log("[MargProductService] Response:", response.data);
+      console.log("response : ",response)
+
+      // console.log("[MargProductService] Response:", response.data);
 
       const rawData = response.data;
       const productsData =

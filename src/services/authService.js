@@ -26,6 +26,7 @@ export const authService = {
   login: async (credentials) => {
     try {
       const response = await apiClient.post(API_ENDPOINTS.LOGIN, credentials);
+      // console.log("login response ", response)
       return response.data;
     } catch (error) {
       throw error.response?.data || error;

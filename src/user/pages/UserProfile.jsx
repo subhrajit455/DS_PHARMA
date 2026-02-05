@@ -23,6 +23,7 @@ import ProfileSidebar from '@/user/components/profile/ProfileSidebar';
 import WishlistSection from '@/user/components/profile/WishlistSection';
 import { Heart } from 'lucide-react';
 import useIsMobile from '@/shared/hooks/useIsMobile';
+import UserAddress from '../components/profile/UserAddress';
 
 
 const UserProfile = () => {
@@ -96,10 +97,10 @@ const UserProfile = () => {
 
     const sections = [
         { id: 'overview', label: 'Overview', icon: User, desc: 'Personal details' },
-        { id: 'orders', label: 'Orders', icon: ShoppingBag, desc: 'Track & Buy again' },
-        { id: 'wishlist', label: 'Wishlist', icon: Heart, desc: 'Saved for later' },
+        // { id: 'orders', label: 'Orders', icon: ShoppingBag, desc: 'Track & Buy again' },
+        // { id: 'wishlist', label: 'Wishlist', icon: Heart, desc: 'Saved for later' },
         { id: 'addresses', label: 'Addresses', icon: MapPin, desc: 'Manage locations' },
-        { id: 'account', label: 'Settings', icon: Settings, desc: 'Account actions' }
+        // { id: 'account', label: 'Settings', icon: Settings, desc: 'Account actions' }
     ];
 
     if (isLoading || isLoadingAddresses) {
@@ -162,33 +163,24 @@ const UserProfile = () => {
                                 >
                                     {activeSection === 'overview' && (
                                         <div className="space-y-4 sm:space-y-6">
-                                            <PersonalInfoForm
-                                                profileData={profileData}
-                                                tempData={tempProfileData}
-                                                isEditing={isEditingProfile}
-                                                handleEdit={handleEditProfile}
-                                                handleSave={handleSaveProfile}
-                                                handleCancel={handleCancelProfile}
-                                                handleInputChange={handleProfileChange}
-                                                isSaving={isUpdating}
-                                            />
+                                            <PersonalInfoForm />
                                             <div className="">
-                                                <OrdersPreview />
+                                                {/* <OrdersPreview /> */}
                                                 
                                             </div>
                                         </div>
                                     )}
 
-                                    {activeSection === 'orders' && (
+                                    {/* {activeSection === 'orders' && (
                                         <div className="space-y-4 sm:space-y-6">
                                            <OrdersList />
                                         </div>
-                                    )}
+                                    )} */}
                                     
-                                    {activeSection === 'wishlist' && <WishlistSection />}
+                                    {/* {activeSection === 'wishlist' && <WishlistSection />} */}
                                     
                                     {activeSection === 'addresses' && (
-                                        <AddressesList 
+                                        <UserAddress 
                                             addressesData={addressesData}
                                             addAddress={addAddress}
                                             updateAddress={updateAddress}

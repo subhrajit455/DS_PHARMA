@@ -67,8 +67,7 @@ const WhyChooseUsSection = () => {
         width: '100%',
         paddingTop: '1rem',
         background: 'linear-gradient(135deg, #D5F5ED 0%, #C1EDE3 50%, #B8E8DD 100%)',
-        paddingBottom: '1rem',
-        marginBottom: '2rem'
+        paddingBottom: '1rem'
       }}
     >
       {/* Background Vector Pattern - Full Width */}

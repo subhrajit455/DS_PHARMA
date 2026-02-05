@@ -1,5 +1,5 @@
 import { useMutation, useQueryClient } from "@tanstack/react-query";
-import useDataStore from "@/store/useDataStore";
+import { useCartStore } from "@/store/useCartStore";
 import { useToastStore } from "@/store/useToastStore";
 
 export const useUpdateCart = () => {
@@ -8,8 +8,8 @@ export const useUpdateCart = () => {
 
   return useMutation({
     mutationFn: async ({ productId, quantity }) => {
-      // Direct update to Global Data Store
-      useDataStore.getState().updateCartQuantity(productId, quantity);
+      // Direct update to Cart Store
+      useCartStore.getState().updateQuantity(productId, quantity);
       return { success: true };
     },
 

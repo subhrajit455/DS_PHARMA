@@ -96,7 +96,7 @@ const ProfileSidebar = ({
                             </div>
                         )}
 
-                        {/* Loading Overlay */}
+                 
                         {isProcessing && (
                             <div className="absolute inset-0 bg-black/40 backdrop-blur-[2px] rounded-full flex items-center justify-center z-10">
                                 <Loader2 className="w-8 h-8 text-white animate-spin" />
@@ -104,7 +104,7 @@ const ProfileSidebar = ({
                         )}
                     </div>
 
-                    {/* Camera Icon Overlay or Confirm/Cancel Buttons */}
+                
                     {!isProcessing && (
                         <>
                             {preview ? (
@@ -129,21 +129,21 @@ const ProfileSidebar = ({
                                     className="absolute bottom-0 right-0 p-2 bg-white rounded-full text-emerald-600 shadow-lg border-2 border-white cursor-pointer hover:bg-white transition-all duration-200 transform group-hover:scale-110"
                                     onClick={triggerFileInput}
                                 >
-                                    <Camera className="w-4 h-4" />
+                                    {/* <Camera className="w-4 h-4" /> */}
                                 </div>
                             )}
                         </>
                     )}
 
-                    {/* Hidden File Input */}
-                    <input
+             
+                    {/* <input
                         ref={fileInputRef}
                         type="file"
                         accept="image/*"
                         onChange={handleFileSelect}
                         className="hidden"
                         disabled={isProcessing}
-                    />
+                    /> */}
                 </div>
 
                 <div className="space-y-1" style={{marginTop: isMobile ? '8px' : '10px'}}>
@@ -164,10 +164,10 @@ const ProfileSidebar = ({
                     </button>
                 )}
 
-                <div className="w-full mt-4 pt-4 border-t border-gray-50 flex justify-between text-xs sm:text-[11px]" style={{ fontSize: isMobile ? '10px' : undefined }}>
+                {/* <div className="w-full mt-4 pt-4 border-t border-gray-50 flex justify-between text-xs sm:text-[11px]" style={{ fontSize: isMobile ? '10px' : undefined }}>
                     <span className="text-gray-400">Member since</span>
                     <span className="font-semibold text-gray-700">2023</span>
-                </div>
+                </div> */}
 
             </div>
 

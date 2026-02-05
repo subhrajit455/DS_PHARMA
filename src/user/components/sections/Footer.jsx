@@ -22,9 +22,11 @@ const XIcon = () => (
 const Footer = () => {
   const quickLinks = [
     { id: 1, label: 'Home', href: '/' },
-    { id: 2, label: 'Home', href: '/' },
-    { id: 3, label: 'Home', href: '/' },
-    { id: 4, label: 'Home', href: '/' }
+    { id: 2, label: 'About', href: '/about' },
+    { id: 3, label: 'Contact', href: '/contact' },
+    { id: 4, label: 'Categories', href: '/categories' },
+    { id: 5, label: 'Privacy Policy', href: '/privacy-policy' },
+    { id: 6, label: 'Terms of Service', href: '/terms-of-service' }
   ];
 
   const socialLinks = [
@@ -88,7 +90,7 @@ const Footer = () => {
             transition={{ duration: 0.5, delay: 0.1 }}
             className="flex flex-col items-center md:items-center col-span-1 md:col-span-4 " 
           >
-            <div className="flex flex-col items-center md:text-start">
+            <div className="flex flex-col items-start md:text-start">
               <h3
                 style={{
                   fontFamily: 'Gyrotrope',
@@ -158,7 +160,7 @@ const Footer = () => {
                   lineHeight: '1.4'
                 }}
               >
-                Gmail
+                dscommunication3@gmail.com
               </p>
               <p
                 style={{
@@ -170,7 +172,7 @@ const Footer = () => {
                   lineHeight: '1.4'
                 }}
               >
-                Mobile No
+                9382713623 / 9564200437
               </p>
               <p
                 style={{
@@ -182,7 +184,7 @@ const Footer = () => {
                   lineHeight: '1.4'
                 }}
               >
-                Address
+                Berachapa Haroa Road North 24 Pargana, 19-West Bengal
               </p>
             </div>
 

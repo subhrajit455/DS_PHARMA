@@ -14,6 +14,7 @@ import CategoryForm from './pages/Categories/CategoryForm';
 import AnnouncementsList from './pages/Announcements/AnnouncementsList';
 import MarqueeForm from './pages/Announcements/MarqueeForm';
 import FeaturedProducts from './pages/Products/FeaturedProducts';
+import ContactList from './pages/Contact/ContactList';
 
 const AdminRouter = () => {
   return (
@@ -46,6 +47,10 @@ const AdminRouter = () => {
         <Route path="announcements" element={<AnnouncementsList />} />
         <Route path="announcements/marquee/new" element={<MarqueeForm />} />
         <Route path="announcements/marquee/:id/edit" element={<MarqueeForm />} />
+
+        {/* Contact */}
+        <Route path="/contact" element={<ContactList />} />
+
       </Route>
 
       <Route path="*" element={<Navigate to="/admin/dashboard" replace />} />

@@ -11,7 +11,7 @@ const LoginPage = () => {
         password: '',
         rememberMe: false
     });
-    const [errors, setErrors] = useState({});
+    const [errors, setErrors] = useState({}); 
 
     const validateForm = () => {
         const newErrors = {};

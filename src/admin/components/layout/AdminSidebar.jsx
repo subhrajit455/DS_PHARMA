@@ -12,7 +12,8 @@ import {
   Sparkles,
   Megaphone,
   Tags,
-  Star
+  Star,
+  MessageSquare
 } from 'lucide-react';
 import { cn } from '@/admin/utils/cn';
 import Button from '@/shared/components/ui/Button';
@@ -31,6 +32,7 @@ const AdminSidebar = ({ isCollapsed, toggleCollapse, isMobile, onCloseMobile }) 
     { name: 'Featured', href: '/admin/products/featured', icon: Star },
     { name: 'Customers', href: '/admin/customers', icon: Users },
     { name: 'Announcements', href: '/admin/announcements', icon: Megaphone },
+    { name: 'Contact', href: '/admin/contact', icon: MessageSquare },
   ];
 
   const NavItem = ({ item }) => {

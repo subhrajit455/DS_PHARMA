@@ -144,6 +144,19 @@ const FeaturedProducts = () => {
     ? products.slice((currentPage - 1) * itemsPerPage, currentPage * itemsPerPage)
     : [];
 
+    // console.log("paginatedProducts", paginatedProducts);
+
+   function formatYYYYMMDDtoDDMMYYYY(value) {
+  if (!value || value.length !== 8) return "";
+
+  const day = value.slice(6, 8);
+  const month = value.slice(4, 6);
+  const year = value.slice(0, 4);
+
+  return `${day}/${month}/${year}`;
+}
+
+
   return (
     <div
       className="h-full flex flex-col space-y-4 p-2 sm:p-4"
@@ -192,8 +205,8 @@ const FeaturedProducts = () => {
                 <TableRow style={{ background: "linear-gradient(to right, #f0fdf4, #f0fdfa)" }}>
                   <TableHead className="font-semibold text-gray-700 text-sm">Product Name</TableHead>
                   <TableHead className="font-semibold text-gray-700 text-sm hidden sm:table-cell">Category</TableHead>
-                  <TableHead className="font-semibold text-gray-700 text-sm">Price</TableHead>
-                  <TableHead className="font-semibold text-gray-700 text-sm text-center">Status</TableHead>
+                  <TableHead className="font-semibold text-gray-700 text-sm">MRP</TableHead>
+                  <TableHead className="font-semibold text-gray-700 text-sm text-center">Expiry Date</TableHead>
                   <TableHead className="text-right font-semibold text-gray-700 text-sm">Actions</TableHead>
                 </TableRow>
               </TableHeader>
@@ -210,25 +223,26 @@ const FeaturedProducts = () => {
                 ) : paginatedProducts.length > 0 ? (
                   paginatedProducts.map((featured) => {
                     const product = featured.productId;
+                    // console.log("product", featured);
                     return (
                       <TableRow key={featured._id} className="hover:bg-emerald-50/50 transition-all duration-200 border-b border-gray-100">
                         <TableCell className="font-medium text-gray-900 text-sm">
                           <div className="flex items-center gap-2">
                             <div className="p-1.5 sm:p-2 bg-gray-100 rounded-lg text-gray-600">
-                              {product?.image && product.image.length > 0 ? (
-                                <img src={product.image[0].url} alt="" className="w-8 h-8 object-cover rounded" />
+                              {featured?.images && featured.images.length > 0 ? (
+                                <img src={featured.images[0].url} alt="" className="w-8 h-8 object-cover rounded" />
                               ) : (
                                 <Package className="h-4 w-4" />
                               )}
                             </div>
-                            {product?.name}
+                            {featured?.name}
                           </div>
                         </TableCell>
-                        <TableCell className="text-gray-500 text-sm hidden sm:table-cell">{product?.category}</TableCell>
-                        <TableCell className="text-gray-900 font-bold text-sm">₹{Number(product?.price || 0).toFixed(2)}</TableCell>
+                        <TableCell className="text-gray-500 text-sm hidden sm:table-cell">{featured?.categoryDetails?.name}</TableCell>
+                        <TableCell className="text-gray-900 font-bold text-sm">₹{Number(featured?.MRP || 0).toFixed(2)}</TableCell>
                         <TableCell className="text-center">
                           <span className="capitalize text-xs font-medium text-emerald-600 bg-emerald-50 px-2 py-0.5 rounded-full">
-                            {product?.status}
+                            {formatYYYYMMDDtoDDMMYYYY(featured?.exp)}
                           </span>
                         </TableCell>
                         <TableCell className="text-right">
