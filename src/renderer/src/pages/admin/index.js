@@ -6,6 +6,8 @@ import Settings from '@/pages/admin/Settings'
 import Billing from '@/pages/admin/Billing'
 import Customers from '@/pages/admin/Customers'
 import IncomingOrders from '@/pages/admin/IncomingOrders'
+import Invoices from '@/pages/admin/Invoices'
+import StockExpiry from '@/pages/admin/StockExpiry'
 
 export {
   Layout as AdminLayout,
@@ -15,5 +17,7 @@ export {
   Settings as AdminSettings,
   Billing as AdminBilling,
   Customers as AdminCustomers,
-  IncomingOrders as AdminIncomingOrders
+  IncomingOrders as AdminIncomingOrders,
+  Invoices as AdminInvoices,
+  StockExpiry as AdminStockExpiry
 }

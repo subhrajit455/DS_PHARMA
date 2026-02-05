@@ -1,16 +1,10 @@
-import { Link, Outlet } from 'react-router'
+import { categoryApi } from '@/api'
 import { Button } from '@/components/ui/button'
+import { setCategories, setError, setLoading } from '@/store/features/categorySlice'
+import { useEffect } from 'react'
 import toast, { Toaster } from 'react-hot-toast'
 import { useDispatch } from 'react-redux'
-import { setCategories, setError, setLoading } from './store/features/categorySlice'
-import { useEffect } from 'react'
-import axios from 'axios'
-import { categoryUrl, customerUrl } from './config'
-import {
-  setCustomers,
-  setError as setCustomerError,
-  setLoading as setCustomerLoading
-} from './store/features/customerSlice'
+import { Link, Outlet } from 'react-router'
 
 function App() {
   const dispatch = useDispatch()
@@ -19,9 +13,12 @@ function App() {
     dispatch(setLoading(true))
     dispatch(setError(null))
     try {
-      const res = await axios.get(categoryUrl.getPaginatedCategories)
-      dispatch(setCategories(res.data.data || []))
-      console.log('Fetched categories:', res.data.data)
+      const res = await categoryApi.getAllCategories({
+        query: '',
+        all: true
+      })
+
+      dispatch(setCategories(res.data || []))
     } catch (err) {
       console.error(err)
       toast.error('Failed to load categories')
@@ -31,25 +28,8 @@ function App() {
     }
   }
 
-  const fetchCustomers = async () => {
-    dispatch(setCustomerLoading(true))
-    dispatch(setCustomerError(null))
-    try {
-      const res = await axios.get(customerUrl.getAllCustomers)
-      dispatch(setCustomers(res.data.data || []))
-      console.log('Fetched customers:', res.data.data)
-    } catch (err) {
-      console.error(err)
-      toast.error('Failed to load customers')
-      dispatch(setCustomerError(err.message))
-    } finally {
-      dispatch(setCustomerLoading(false))
-    }
-  }
-
   useEffect(() => {
     fetchCategories()
-    // fetchCustomers()
   }, [])
 
   return (
@@ -63,7 +43,18 @@ function App() {
           <Button>Staff</Button>
         </Link>
       </main>
-      <Toaster position="bottom-right" reverseOrder={false} />
+      <Toaster
+        position="top-right"
+        reverseOrder={false}
+        toastOptions={{
+          className: '',
+          style: {
+            padding: '10px',
+            color: '#27272a',
+            borderRadius: '0px'
+          }
+        }}
+      />
     </div>
   )
 }

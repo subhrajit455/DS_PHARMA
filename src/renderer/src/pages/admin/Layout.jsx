@@ -6,8 +6,7 @@ export default function Layout() {
   return (
     <SidebarProvider>
       <AdminAppSidebar />
-      <main className="w-full max-h-screen overflow-y-auto">
-        {/* <SidebarTrigger /> */}
+      <main className="w-full overflow-y-auto bg-[#f4f4f5]">
         <Outlet />
       </main>
     </SidebarProvider>

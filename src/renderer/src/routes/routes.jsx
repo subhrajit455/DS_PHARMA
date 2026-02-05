@@ -5,8 +5,10 @@ import {
   AdminDashboard,
   AdminIncomingOrders,
   AdminInventory,
+  AdminInvoices,
   AdminLayout,
-  AdminSettings
+  AdminSettings,
+  AdminStockExpiry
 } from '@/pages/admin'
 import App from '../App'
 import {
@@ -48,12 +50,24 @@ export const routes = [
             element: <AdminBilling />
           },
           {
+            path: 'billing/:id',
+            element: <AdminBilling />
+          },
+          {
             path: 'customers',
             element: <AdminCustomers />
           },
           {
             path: 'incoming-orders',
             element: <AdminIncomingOrders />
+          },
+          {
+            path: 'invoices',
+            element: <AdminInvoices />
+          },
+          {
+            path: 'stock-expiry',
+            element: <AdminStockExpiry />
           }
         ]
       },

@@ -1,3 +1,4 @@
+import { incomingOrderApi } from '@/api'
 import CustomerSearchComponent from '@/components/CustomerSearchComponent'
 import ProductSearchComponent from '@/components/ProductSearchComponent'
 import { Button } from '@/components/ui/button'
@@ -25,8 +26,15 @@ import {
 } from 'lucide-react'
 import { useEffect, useState } from 'react'
 import toast from 'react-hot-toast'
+import { IoIosRefresh } from 'react-icons/io'
+import { RxReset } from 'react-icons/rx'
+import { useParams } from 'react-router'
 
 function Billing() {
+  const { id } = useParams()
+
+  console.log(id)
+
   // Order Information (Marg API Format)
   const [orderData, setOrderData] = useState({
     OrderID: generateOrderId(),
@@ -63,15 +71,65 @@ function Billing() {
     OrderFrom: 'MARGLIVE'
   })
 
+  const [isLoading, setIsLoading] = useState(false)
+  const [billItems, setBillItems] = useState([])
+  const [selectedCustomer, setSelectedCustomer] = useState(null)
+  const [selectedProduct, setSelectedProduct] = useState(null)
+
+  const fetchIncomingOrderDetails = async () => {
+    setIsLoading(true)
+    try {
+      const response = await incomingOrderApi.getIncomingOrderById(id)
+      console.log('Full API Response:', response)
+      return response
+    } catch (error) {
+      console.error('Error fetching order:', error)
+      toast.error('Failed to load order details')
+      return null
+    } finally {
+      setIsLoading(false)
+    }
+  }
+
   // Auto-generate Order ID when component mounts
   useEffect(() => {
     const newOrderId = generateOrderId()
     setOrderData((prev) => ({ ...prev, OrderID: newOrderId }))
-  }, [])
 
-  const [billItems, setBillItems] = useState([])
-  const [selectedCustomer, setSelectedCustomer] = useState(null)
-  const [selectedProduct, setSelectedProduct] = useState(null)
+    if (id) {
+      // Properly handle async operation
+      fetchIncomingOrderDetails().then((data) => {
+        console.log('Fetched Order Data:', data)
+
+        if (data?.orders?.orderItems && Array.isArray(data.orders.orderItems)) {
+          const mappedItems = data.orders.orderItems.map((item) => ({
+            ...item,
+            code: item?.productCode || item?.ProductCode || '-',
+            name: item?.name || '-',
+            company: item?.company || '-',
+            MRP: parseFloat(item?.price || item?.MRP) || 0,
+            Rate: parseFloat(item?.price || item?.Rate) || 0,
+            Quantity: parseInt(item?.Quantity) || 1,
+            Deal: parseInt(item?.Deal) || 0,
+            Free: parseInt(item?.Free) || 0,
+            DiscAmt: parseFloat(item?.DiscAmt) || 0,
+            Disc: parseFloat(item?.Disc) || 0,
+            Subtotal: parseFloat(item?.Subtotal) || 0,
+            FreeQuantity: parseInt(item?.FreeQuantity) || 0
+          }))
+
+          console.log('Mapped Bill Items:', mappedItems)
+          setBillItems(mappedItems)
+          toast.success('Order loaded successfully')
+        } else {
+          console.warn('No order items found in response')
+          toast.error('No items found in this order')
+        }
+      })
+    } else {
+      setBillItems([])
+    }
+  }, [id])
 
   const handleOrderChange = (e) => {
     const { name, value } = e.target
@@ -199,11 +257,11 @@ function Billing() {
   }
 
   const calculateSubtotal = () => {
-    return billItems.reduce((sum, item) => sum + item.Rate * item.Quantity, 0)
+    return billItems ? billItems.reduce((sum, item) => sum + item.Rate * item.Quantity, 0) : 0
   }
 
   const calculateTotalDiscount = () => {
-    return billItems.reduce((sum, item) => sum + (item.DiscAmt || 0), 0)
+    return billItems ? billItems.reduce((sum, item) => sum + (item.DiscAmt || 0), 0) : 0
   }
 
   const calculateTotal = () => {
@@ -224,7 +282,7 @@ function Billing() {
       return
     }
 
-    if (billItems.length === 0) {
+    if (billItems?.length === 0) {
       toast.error('Please add items to the bill')
       return
     }
@@ -237,9 +295,9 @@ function Billing() {
       Margid: orderData.Margid || '',
       Type: orderData.Type || 'S',
       Sid: orderData.Sid || '',
-      ProductCode: billItems.map((item) => item.code).join(','), // All product codes
-      Quantity: billItems.reduce((sum, item) => sum + item.Quantity, 0), // Total quantity
-      Free: billItems.reduce((sum, item) => sum + (item.FreeQuantity || 0), 0), // Total free items
+      ProductCode: billItems?.map((item) => item.code).join(','), // All product codes
+      Quantity: billItems?.reduce((sum, item) => sum + item.Quantity, 0), // Total quantity
+      Free: billItems?.reduce((sum, item) => sum + (item.FreeQuantity || 0), 0), // Total free items
       Lat: orderData.Lat || '',
       Lng: orderData.Lng || '',
       Address: orderData.Address || '',
@@ -318,6 +376,52 @@ function Billing() {
     toast.success('Printing bill...')
   }
 
+  const handleRefresh = () => {
+    const newOrderId = generateOrderId()
+    setOrderData((prev) => ({ ...prev, OrderID: newOrderId }))
+  }
+
+  const handleReset = () => {
+    setOrderData({
+      OrderID: generateOrderId(),
+      OrderNo: '',
+      CustomerID: '',
+      Margid: '',
+      Type: 'S',
+      Sid: '',
+      ProductCode: '',
+      Quantity: '',
+      Free: '',
+      Lat: '',
+      Lng: '',
+      Address: '',
+      GpsID: '',
+      UserType: 1,
+      Points: 0,
+      Discounts: 0,
+      Transport: '',
+      Delivery: '',
+      BankName: '',
+      BankAdd1: '',
+      BankAdd2: '',
+      ShipName: '',
+      ShipAdd1: '',
+      ShipAdd2: '',
+      ShipAdd3: '',
+      PaymentMode: '',
+      PaymentmodeAmount: 0,
+      Payment_remarks: '',
+      Order_remarks: '',
+      CustMobile: '',
+      CompanyCode: 'MARGLIVE',
+      OrderFrom: 'MARGLIVE'
+    })
+
+    setBillItems([])
+    setSelectedCustomer(null)
+    setSelectedProduct(null)
+  }
+
   return (
     <div className="flex-1 space-y-4 p-8 pt-6">
       {/* Header */}
@@ -326,6 +430,14 @@ function Billing() {
           Create New Bill - ORD-{orderData.OrderID}
         </h2>
         <div className="flex items-center space-x-2">
+          <Button variant="outline" onClick={handleRefresh}>
+            <IoIosRefresh className="h-4 w-4" />
+            Refresh
+          </Button>
+          <Button variant="outline" onClick={handleReset}>
+            <RxReset className="h-4 w-4" />
+            Reset
+          </Button>
           <Button variant="outline" onClick={handlePrint}>
             <Printer className="h-4 w-4" />
             Print
@@ -407,7 +519,7 @@ function Billing() {
               selectedProduct={selectedProduct}
             />
             <div className="mt-4">
-              {billItems.length === 0 ? (
+              {billItems && billItems.length === 0 ? (
                 <div className="text-center py-8 text-muted-foreground">
                   No items added to bill yet. Search and add products above.
                 </div>
@@ -429,95 +541,105 @@ function Billing() {
                       </TableRow>
                     </TableHeader>
                     <TableBody>
-                      {billItems.map((item) => (
-                        <TableRow key={item.code}>
-                          <TableCell className="font-medium">{item.code}</TableCell>
-                          <TableCell>
-                            <div className="flex flex-col">
-                              <span className="font-medium">{item.name}</span>
-                              {item.company && (
-                                <span className="text-xs text-muted-foreground">
-                                  {item.company}
-                                </span>
-                              )}
-                            </div>
-                          </TableCell>
-                          <TableCell className="text-muted-foreground">
-                            ₹{(item.MRP || 0).toFixed(2)}
-                          </TableCell>
-                          <TableCell>
-                            <Input
-                              type="number"
-                              min="0"
-                              step="0.01"
-                              value={item.Rate}
-                              onChange={(e) => {
-                                const newRate = parseFloat(e.target.value) || 0
-                                const discount = calculateDiscount(item.MRP, newRate, item.Quantity)
-                                setBillItems(
-                                  billItems.map((i) =>
-                                    i.code === item.code ? { ...i, Rate: newRate, ...discount } : i
+                      {billItems &&
+                        billItems.map((item) => (
+                          <TableRow key={item?.code}>
+                            <TableCell className="font-medium">{item?.code}</TableCell>
+                            <TableCell>
+                              <div className="flex flex-col">
+                                <span className="font-medium">{item?.name}</span>
+                                {item?.company && (
+                                  <span className="text-xs text-muted-foreground">
+                                    {item?.company}
+                                  </span>
+                                )}
+                              </div>
+                            </TableCell>
+                            <TableCell className="text-muted-foreground">
+                              ₹{(item?.MRP || 0).toFixed(2)}
+                            </TableCell>
+                            <TableCell>
+                              <Input
+                                type="number"
+                                min="0"
+                                step="0.01"
+                                value={item?.Rate}
+                                onChange={(e) => {
+                                  const newRate = parseFloat(e.target.value) || 0
+                                  const discount = calculateDiscount(
+                                    item?.MRP,
+                                    newRate,
+                                    item?.Quantity
                                   )
-                                )
-                              }}
-                              className="w-24"
-                            />
-                          </TableCell>
-                          <TableCell>
-                            <Input
-                              type="number"
-                              min="1"
-                              value={item.Quantity}
-                              onChange={(e) => updateQuantity(item.code, e.target.value)}
-                              className="w-20"
-                            />
-                          </TableCell>
-                          <TableCell className="text-center">
-                            {item.Deal > 0 ? (
-                              <span className="text-sm font-medium text-blue-600">
-                                {item.Deal}+{item.Free}
-                              </span>
-                            ) : (
-                              <span className="text-muted-foreground">-</span>
-                            )}
-                          </TableCell>
-                          <TableCell className="text-center">
-                            {item.FreeQuantity > 0 ? (
-                              <span className="text-sm font-semibold text-green-600">
-                                {item.FreeQuantity}
-                              </span>
-                            ) : (
-                              <span className="text-muted-foreground">0</span>
-                            )}
-                          </TableCell>
-                          <TableCell>
-                            <div className="flex flex-col">
-                              <span className="text-red-600 font-medium">
-                                ₹{(item.DiscAmt || 0).toFixed(2)}
-                              </span>
-                              {item.Disc > 0 && (
-                                <span className="text-xs text-muted-foreground">
-                                  ({item.Disc.toFixed(2)}%)
+                                  setBillItems(
+                                    billItems.map((i) =>
+                                      i?.code === item?.code
+                                        ? { ...i, Rate: newRate, ...discount }
+                                        : i
+                                    )
+                                  )
+                                }}
+                                className="w-24"
+                              />
+                            </TableCell>
+                            <TableCell>
+                              <Input
+                                type="number"
+                                min="1"
+                                value={item?.Quantity}
+                                onChange={(e) => updateQuantity(item?.code, e.target.value)}
+                                className="w-20"
+                              />
+                            </TableCell>
+                            <TableCell className="text-center">
+                              {item?.Deal > 0 ? (
+                                <span className="text-sm font-medium text-blue-600">
+                                  {item?.Deal}+{item?.Free}
                                 </span>
+                              ) : (
+                                <span className="text-muted-foreground">-</span>
                               )}
-                            </div>
-                          </TableCell>
-                          <TableCell className="font-medium">
-                            ₹{((item.Rate || 0) * item.Quantity - (item.DiscAmt || 0)).toFixed(2)}
-                          </TableCell>
-                          <TableCell className="text-right">
-                            <Button
-                              type="button"
-                              variant="ghost"
-                              size="icon"
-                              onClick={() => removeItem(item.code)}
-                              className="text-red-600 hover:text-red-700"
-                            >
-                              <Trash2 className="h-4 w-4" />
-                            </Button>
-                          </TableCell>
-                        </TableRow>
-                      ))}
+                            </TableCell>
+                            <TableCell className="text-center">
+                              {item?.FreeQuantity > 0 ? (
+                                <span className="text-sm font-semibold text-green-600">
+                                  {item?.FreeQuantity}
+                                </span>
+                              ) : (
+                                <span className="text-muted-foreground">0</span>
+                              )}
+                            </TableCell>
+                            <TableCell>
+                              <div className="flex flex-col">
+                                <span className="text-red-600 font-medium">
+                                  ₹{(item?.DiscAmt || 0).toFixed(2)}
+                                </span>
+                                {item?.Disc > 0 && (
+                                  <span className="text-xs text-muted-foreground">
+                                    ({item?.Disc.toFixed(2)}%)
+                                  </span>
+                                )}
+                              </div>
+                            </TableCell>
+                            <TableCell className="font-medium">
+                              ₹
+                              {((item?.Rate || 0) * item?.Quantity - (item?.DiscAmt || 0)).toFixed(
+                                2
+                              )}
+                            </TableCell>
+                            <TableCell className="text-right">
+                              <Button
+                                type="button"
+                                variant="ghost"
+                                size="icon"
+                                onClick={() => removeItem(item?.code)}
+                                className="text-red-600 hover:text-red-700"
+                              >
+                                <Trash2 className="h-4 w-4" />
+                              </Button>
+                            </TableCell>
+                          </TableRow>
+                        ))}
                     </TableBody>
                   </Table>
                 </div>

@@ -1,19 +1,18 @@
 import {
-  Home,
-  ClipboardList,
-  Users,
-  Truck,
-  FileText,
-  BarChart,
   AlertTriangle,
-  Settings,
-  Pill,
-  LogOut,
+  ClipboardList,
+  Home,
   Layers,
-  Package
+  LogOut,
+  Package,
+  Settings,
+  Truck,
+  Users
 } from 'lucide-react'
 import { Link, useLocation } from 'react-router'
 
+import { syncApi } from '@/api'
+import { Button } from '@/components/ui/button'
 import {
   Sidebar,
   SidebarContent,
@@ -27,7 +26,12 @@ import {
   SidebarMenuButton,
   SidebarMenuItem
 } from '@/components/ui/sidebar'
+import { useState } from 'react'
+import { AiOutlineCloudSync } from 'react-icons/ai'
 import { BiAlarm } from 'react-icons/bi'
+import { LiaFileInvoiceSolid } from 'react-icons/lia'
+import { VscGraphLine } from 'react-icons/vsc'
+import toast from 'react-hot-toast'
 
 // Menu items.
 const items = [
@@ -62,9 +66,9 @@ const items = [
     icon: BiAlarm
   },
   {
-    title: 'Sales',
-    url: '/admin/sales',
-    icon: BarChart
+    title: 'Invoices',
+    url: '/admin/invoices',
+    icon: LiaFileInvoiceSolid
   },
   {
     title: 'Suppliers',
@@ -73,14 +77,14 @@ const items = [
   },
   {
     title: 'Stock & Expiry',
-    url: '/admin/stock',
+    url: '/admin/stock-expiry',
     icon: AlertTriangle,
     badge: 'Low'
   },
   {
-    title: 'GST Reports',
-    url: '/admin/gst-reports',
-    icon: FileText
+    title: 'Reports',
+    url: '/admin/reports',
+    icon: VscGraphLine
   },
   {
     title: 'Settings',
@@ -92,22 +96,38 @@ const items = [
 export function AdminAppSidebar() {
   const location = useLocation()
 
+  const [syncing, setSyncing] = useState(false)
+
+  const syncMasterData = async () => {
+    setSyncing(true)
+    toast.loading('Syncing data...')
+    try {
+      const response = await syncApi.syncMasterData()
+      console.log(response)
+
+      if (response.success) {
+        toast.dismiss()
+        toast.success('Data synced successfully')
+      }
+    } catch (error) {
+      toast.dismiss()
+      toast.error('Failed to sync data')
+    } finally {
+      setSyncing(false)
+    }
+  }
+
   return (
     <Sidebar className="border-0">
-            
-      <SidebarHeader>
-                <SidebarGroupLabel>DS Pharmacy</SidebarGroupLabel>
-              
+      <SidebarHeader className="p-2 border-b">
+        <SidebarGroupLabel className="text-xl font-medium text-sidebar-foreground">
+          Admin Panel
+        </SidebarGroupLabel>
       </SidebarHeader>
-            
       <SidebarContent>
-                
         <SidebarGroup>
-                    
           <SidebarGroupContent>
-                        
             <SidebarMenu>
-                            
               {items.map((item, index) => {
                 const isActive = location.pathname.split('/')[2] === item.url.split('/')[2]
 
@@ -137,15 +157,11 @@ export function AdminAppSidebar() {
                     <SidebarMenuButton asChild isActive={isActive} tooltip={item.title}>
                                             
                       <Link to={item.url} className="flex items-center">
-                                                
                         <span
-                          className={`inline-flex items-center justify-center size-7 rounded-md bg-gradient-to-tr ${color} text-white mr-3 shadow-sm`}
+                          className={`inline-flex items-center justify-center size-7 rounded-md bg-linear-to-tr ${color} text-white mr-3 shadow-sm`}
                         >
-                                                    
                           <item.icon className="size-4" />
-                                                  
                         </span>
-                                                
                         <span
                           className={
                             isActive
@@ -153,57 +169,46 @@ export function AdminAppSidebar() {
                               : 'text-sidebar-foreground/90'
                           }
                         >
-                                                    {item.title}
-                                                  
+                          {item.title}
                         </span>
-                                                
                         {item.badge && (
                           <SidebarMenuBadge className="ml-auto">{item.badge}</SidebarMenuBadge>
                         )}
-                                              
                       </Link>
-                                          
                     </SidebarMenuButton>
-                                      
                   </SidebarMenuItem>
                 )
               })}
-                          
             </SidebarMenu>
-                      
           </SidebarGroupContent>
-                  
         </SidebarGroup>
-              
       </SidebarContent>
-            
       <SidebarFooter>
-                
         <SidebarGroupContent>
-                    
           <SidebarMenu>
-                        
             <SidebarMenuItem>
-                            
               <SidebarMenuButton asChild>
-                                
-                <a href="/logout">
-                                    
-                  <LogOut />
-                                    <span>Logout</span>
-                                  
-                </a>
-                              
+                <Button
+                  onClick={syncMasterData}
+                  disabled={syncing}
+                  className="bg-blue-600 hover:bg-blue-700 rounded-none"
+                >
+                  <AiOutlineCloudSync />
+                  {syncing ? 'Syncing...' : 'Sync Data'}
+                </Button>
               </SidebarMenuButton>
-                          
             </SidebarMenuItem>
-                      
+            <SidebarMenuItem>
+              <SidebarMenuButton asChild>
+                <Button variant="destructive" className="rounded-none hover:bg-red-700">
+                  <LogOut />
+                  <span>Logout</span>
+                </Button>
+              </SidebarMenuButton>
+            </SidebarMenuItem>
           </SidebarMenu>
-                  
         </SidebarGroupContent>
-              
       </SidebarFooter>
-          
     </Sidebar>
   )
 }

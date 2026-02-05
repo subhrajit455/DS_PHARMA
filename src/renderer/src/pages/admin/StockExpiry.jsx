@@ -22,28 +22,29 @@ import {
 import ViewProductDialog from '@/components/ViewProductDialog'
 import {
   AlertTriangle,
+  Calendar,
   ChevronLeft,
   ChevronRight,
-  DollarSign,
+  Clock,
   Eye,
   Loader2,
   Package,
   Pencil,
   Search,
-  TrendingUp
+  TrendingDown
 } from 'lucide-react'
 import { useEffect, useState } from 'react'
 import toast from 'react-hot-toast'
 import { IoIosRefresh } from 'react-icons/io'
 
-export default function Inventory() {
+function StockExpiry() {
   const [products, setProducts] = useState([])
   const [loading, setLoading] = useState(false)
   const [stats, setStats] = useState({
     total: 0,
-    inStock: 0,
+    lowStock: 0,
     outStock: 0,
-    totalValue: 0
+    expiringSoon: 0
   })
   const [pagination, setPagination] = useState({
     page: 1,
@@ -53,7 +54,7 @@ export default function Inventory() {
   })
   const [query, setQuery] = useState('')
   const [searchInput, setSearchInput] = useState('')
-  const [sort, setSort] = useState('name')
+  const [sort, setSort] = useState('exp')
   const [sortOrder, setSortOrder] = useState(1)
   const [stockStatus, setStockStatus] = useState(1)
   const [isDeleted, setIsDeleted] = useState(0)
@@ -64,7 +65,7 @@ export default function Inventory() {
 
   const fetchProducts = async () => {
     setLoading(true)
-    toast.loading('Fetching Products...')
+    toast.loading('Fetching products...')
     try {
       const response = await productApi.getAllProducts({
         page: pagination.page,
@@ -79,7 +80,7 @@ export default function Inventory() {
       if (response.success) {
         const data = response.data
         toast.dismiss()
-        toast.success(response.message)
+        toast.success(response.message || 'Products loaded successfully')
 
         setProducts(data.products || [])
         setPagination({
@@ -89,11 +90,27 @@ export default function Inventory() {
           totalPages: data.totalPages
         })
 
+        // Calculate low stock and expiring soon
+        const lowStock = data.products.filter(
+          (p) => parseFloat(p.stock) > 0 && parseFloat(p.stock) <= 10
+        ).length
+        const expiringSoon = data.products.filter((p) => {
+          if (!p.exp || p.exp === '        ') return false
+          const expDate = new Date(
+            p.exp.slice(0, 4),
+            parseInt(p.exp.slice(4, 6)) - 1,
+            p.exp.slice(6, 8)
+          )
+          const today = new Date()
+          const daysUntilExpiry = Math.floor((expDate - today) / (1000 * 60 * 60 * 24))
+          return daysUntilExpiry >= 0 && daysUntilExpiry <= 90
+        }).length
+
         setStats({
           total: data.totalProducts,
-          inStock: data.totalInStock,
+          lowStock: lowStock,
           outStock: data.totalOutStock,
-          totalValue: data.totalInventoryValue
+          expiringSoon: expiringSoon
         })
       }
     } catch (error) {
@@ -136,7 +153,7 @@ export default function Inventory() {
     <div className="flex flex-col h-full overflow-hidden p-8 pt-6 gap-4">
       {/* Header */}
       <div className="flex items-center justify-between shrink-0">
-        <h2 className="text-3xl font-bold tracking-tight">Inventory</h2>
+        <h2 className="text-3xl font-bold tracking-tight">Stock & Expiry</h2>
       </div>
 
       {/* Stats Cards */}
@@ -154,12 +171,12 @@ export default function Inventory() {
 
         <Card>
           <CardHeader className="flex flex-row items-center justify-between space-y-0 pb-2">
-            <CardTitle className="text-sm font-medium">In Stock</CardTitle>
-            <TrendingUp className="h-4 w-4 text-muted-foreground" />
+            <CardTitle className="text-sm font-medium">Low Stock</CardTitle>
+            <TrendingDown className="h-4 w-4 text-muted-foreground" />
           </CardHeader>
           <CardContent>
-            <div className="text-2xl font-bold">{stats.inStock}</div>
-            <p className="text-xs text-muted-foreground">Available for sale</p>
+            <div className="text-2xl font-bold text-orange-600">{stats.lowStock}</div>
+            <p className="text-xs text-muted-foreground">Stock ≤ 10 units</p>
           </CardContent>
         </Card>
 
@@ -176,12 +193,12 @@ export default function Inventory() {
 
         <Card>
           <CardHeader className="flex flex-row items-center justify-between space-y-0 pb-2">
-            <CardTitle className="text-sm font-medium">Total Value</CardTitle>
-            <DollarSign className="h-4 w-4 text-muted-foreground" />
+            <CardTitle className="text-sm font-medium">Expiring Soon</CardTitle>
+            <Clock className="h-4 w-4 text-muted-foreground" />
           </CardHeader>
           <CardContent>
-            <div className="text-2xl font-bold">₹{stats.totalValue.toFixed(2)}</div>
-            <p className="text-xs text-muted-foreground">Inventory worth</p>
+            <div className="text-2xl font-bold text-yellow-600">{stats.expiringSoon}</div>
+            <p className="text-xs text-muted-foreground">Within 90 days</p>
           </CardContent>
         </Card>
       </div>
@@ -204,11 +221,10 @@ export default function Inventory() {
               <SelectValue placeholder="Sort by" />
             </SelectTrigger>
             <SelectContent>
+              <SelectItem value="exp">Expiry Date</SelectItem>
+              <SelectItem value="stock">Stock Level</SelectItem>
               <SelectItem value="name">Name</SelectItem>
               <SelectItem value="code">Code</SelectItem>
-              <SelectItem value="mrp">MRP</SelectItem>
-              <SelectItem value="p_rate">Purchase Rate</SelectItem>
-              <SelectItem value="stock">Stock</SelectItem>
             </SelectContent>
           </Select>
           <Select value={sortOrder} onValueChange={(value) => setSortOrder(value)}>
@@ -243,13 +259,16 @@ export default function Inventory() {
                   <TableRow>
                     <TableHead className="bg-primary text-white">Code</TableHead>
                     <TableHead className="bg-primary text-white">Name</TableHead>
-                    <TableHead className="bg-primary text-white">Company</TableHead>
-                    <TableHead className="bg-primary text-white">MRP</TableHead>
-                    <TableHead className="bg-primary text-white">Rate</TableHead>
-                    <TableHead className="bg-primary text-white">P.Rate</TableHead>
+                    <TableHead className="bg-primary text-white">Batch</TableHead>
+                    <TableHead className="bg-primary text-white">Expiry</TableHead>
                     <TableHead className="text-center bg-primary text-white">Stock</TableHead>
-                    <TableHead className="text-center bg-primary text-white">Deal</TableHead>
-                    <TableHead className="text-center bg-primary text-white">Status</TableHead>
+                    <TableHead className="bg-primary text-white">MRP</TableHead>
+                    <TableHead className="text-center bg-primary text-white">
+                      Stock Status
+                    </TableHead>
+                    <TableHead className="text-center bg-primary text-white">
+                      Expiry Status
+                    </TableHead>
                     <TableHead className="text-right bg-primary text-white">Actions</TableHead>
                   </TableRow>
                 </TableHeader>
@@ -279,23 +298,28 @@ export default function Inventory() {
                         <TableCell>
                           <div className="flex flex-col">
                             <span className="font-medium">{product.name}</span>
-                            {product.packing && (
+                            {product.company && (
                               <span className="text-xs text-muted-foreground">
-                                {product.packing}
+                                {product.company}
                               </span>
                             )}
                           </div>
                         </TableCell>
 
-                        <TableCell className="text-sm">{product.company || '-'}</TableCell>
-
-                        <TableCell className="font-medium">
-                          ₹{Number(product.MRP || 0).toFixed(2)}
+                        <TableCell className="text-sm font-mono">
+                          {product.curbatch || '-'}
                         </TableCell>
 
-                        <TableCell>₹{Number(product.Rate || 0).toFixed(2)}</TableCell>
-
-                        <TableCell>₹{Number(product.PRate || 0).toFixed(2)}</TableCell>
+                        <TableCell>
+                          {(() => {
+                            if (!product.exp || product.exp === '        ') return '-'
+                            const expStr = product.exp
+                            const year = expStr.slice(0, 4)
+                            const month = expStr.slice(4, 6)
+                            const day = expStr.slice(6, 8)
+                            return `${day}/${month}/${year}`
+                          })()}
+                        </TableCell>
 
                         <TableCell className="text-center">
                           <span
@@ -311,14 +335,8 @@ export default function Inventory() {
                           </span>
                         </TableCell>
 
-                        <TableCell className="text-center">
-                          {product.Deal > 0 ? (
-                            <span className="text-sm font-medium text-blue-600">
-                              {product.Deal}+{product.Free}
-                            </span>
-                          ) : (
-                            <span className="text-muted-foreground">-</span>
-                          )}
+                        <TableCell className="font-medium">
+                          ₹{Number(product.MRP || 0).toFixed(2)}
                         </TableCell>
 
                         <TableCell className="text-center">
@@ -337,6 +355,46 @@ export default function Inventory() {
                                 ? 'Low Stock'
                                 : 'In Stock'}
                           </Badge>
+                        </TableCell>
+
+                        <TableCell className="text-center">
+                          {(() => {
+                            if (!product.exp || product.exp === '        ')
+                              return <Badge variant="outline">No Expiry</Badge>
+                            const expDate = new Date(
+                              product.exp.slice(0, 4),
+                              parseInt(product.exp.slice(4, 6)) - 1,
+                              product.exp.slice(6, 8)
+                            )
+                            const today = new Date()
+                            const daysUntilExpiry = Math.floor(
+                              (expDate - today) / (1000 * 60 * 60 * 24)
+                            )
+
+                            if (daysUntilExpiry < 0)
+                              return (
+                                <Badge variant="destructive" className="bg-red-600">
+                                  Expired
+                                </Badge>
+                              )
+                            if (daysUntilExpiry <= 30)
+                              return (
+                                <Badge variant="destructive" className="bg-orange-600">
+                                  {daysUntilExpiry}d left
+                                </Badge>
+                              )
+                            if (daysUntilExpiry <= 90)
+                              return (
+                                <Badge variant="secondary" className="bg-yellow-600 text-white">
+                                  {daysUntilExpiry}d left
+                                </Badge>
+                              )
+                            return (
+                              <Badge variant="default" className="bg-green-600">
+                                {daysUntilExpiry}d left
+                              </Badge>
+                            )
+                          })()}
                         </TableCell>
 
                         <TableCell className="text-right flex gap-1">
@@ -426,3 +484,5 @@ export default function Inventory() {
     </div>
   )
 }
+
+export default StockExpiry

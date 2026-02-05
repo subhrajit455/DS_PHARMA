@@ -2,6 +2,7 @@ import React, { useState } from 'react'
 import AsyncSelect from 'react-select/async'
 import { productUrl } from '../config'
 import axios from 'axios'
+import { productApi } from '@/api'
 
 function ProductSearchComponent({ onProductSelect, selectedProduct }) {
   const [isLoading, setIsLoading] = useState(false)
@@ -9,9 +10,17 @@ function ProductSearchComponent({ onProductSelect, selectedProduct }) {
   const fetchProducts = async (searchQuery = '') => {
     setIsLoading(true)
     try {
-      const response = await axios.get(`${productUrl.getAllProducts}?query=${searchQuery}`)
+      // const response = await axios.get(`${productUrl.getAllProducts}?query=${searchQuery}`)
 
-      return response.data.data.products
+      const response = await productApi.getAllProducts({
+        limit:100,
+        query: searchQuery,
+        stock: 1
+      })
+
+      console.log(response)
+
+      return response.data.products
     } catch (error) {
       console.error('Error fetching products:', error)
       return []
@@ -25,7 +34,7 @@ function ProductSearchComponent({ onProductSelect, selectedProduct }) {
       const products = await fetchProducts(inputValue)
       const options = products.map((product) => ({
         value: product.rid,
-        label: `${product.name}-${product.code ? `(${product.code})` : ''}-${Number(product.stock) > 0 ? `(${product.stock})` : 'Out of Stock'}`,
+        label: `${product.name}-${product.company}-${product.code ? `(${product.code})` : ''}-${Number(product.stock) > 0 ? `(${product.stock})` : 'Out of Stock'}`,
         product: product
       }))
       callback(options)

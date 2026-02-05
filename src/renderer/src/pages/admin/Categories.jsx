@@ -1,18 +1,8 @@
-import {
-  CheckCircle2,
-  ChevronLeft,
-  ChevronRight,
-  Eye,
-  EyeOff,
-  Package,
-  Pencil,
-  Plus,
-  Search,
-  Trash2
-} from 'lucide-react'
-import { useEffect, useState } from 'react'
+import { categoryApi } from '@/api'
+import CreateEditCategory from '@/components/CreateEditCategoryDialog'
 import { Badge } from '@/components/ui/badge'
 import { Button } from '@/components/ui/button'
+import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card'
 import { Input } from '@/components/ui/input'
 import {
   Select,
@@ -21,17 +11,18 @@ import {
   SelectTrigger,
   SelectValue
 } from '@/components/ui/select'
-import {
-  Table,
-  TableBody,
-  TableCell,
-  TableHead,
-  TableHeader,
-  TableRow
-} from '@/components/ui/table'
-import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card'
 import { categoryUrl } from '@/config'
 import axios from 'axios'
+import {
+  CheckCircle2,
+  ChevronLeft,
+  ChevronRight,
+  EyeOff,
+  Package,
+  Plus,
+  Search
+} from 'lucide-react'
+import { useEffect, useState } from 'react'
 import toast from 'react-hot-toast'
 import { IoIosRefresh } from 'react-icons/io'
 
@@ -51,19 +42,20 @@ function Categories() {
   })
   const [query, setQuery] = useState('')
   const [searchInput, setSearchInput] = useState('')
+  const [open, setOpen] = useState(false)
+  const [selectedCategory, setSelectedCategory] = useState(null)
 
   const fetchCategories = async () => {
     setLoading(true)
     try {
-      const response = await axios.get(categoryUrl.getPaginatedCategories, {
-        params: {
-          page: pagination.page,
-          limit: pagination.limit,
-          query
-        }
+      const response = await categoryApi.getAllCategories({
+        page: pagination.page,
+        limit: pagination.limit,
+        query
       })
 
-      const data = response.data.data
+      const data = response.data
+
       setCategories(data.categories || [])
       setPagination({
         page: data.currentPage,
@@ -72,7 +64,6 @@ function Categories() {
         totalPages: data.totalPages
       })
 
-      // Calculate stats
       const active = data.categories.filter((cat) => cat.visibility).length
       const hidden = data.categories.filter((cat) => !cat.visibility).length
 
@@ -93,6 +84,12 @@ function Categories() {
     fetchCategories()
   }, [pagination.page, pagination.limit, query])
 
+  useEffect(() => {
+    if (!open) {
+      setSelectedCategory(null)
+    }
+  }, [open])
+
   const handleSearch = () => {
     setQuery(searchInput)
     setPagination((prev) => ({ ...prev, page: 1 }))
@@ -104,6 +101,11 @@ function Categories() {
 
   const handleLimitChange = (newLimit) => {
     setPagination((prev) => ({ ...prev, limit: parseInt(newLimit), page: 1 }))
+  }
+
+  const handleEdit = (category) => {
+    setSelectedCategory(category)
+    setOpen(true)
   }
 
   const handleDelete = async (categoryId) => {
@@ -123,19 +125,23 @@ function Categories() {
   }
 
   return (
-    <div className="flex flex-col h-screen overflow-hidden p-8 pt-6 gap-4">
-      {/* Header */}
+    <div className="flex flex-col h-full overflow-hidden p-8 pt-6 gap-4">
       <div className="flex items-center justify-between shrink-0">
         <h2 className="text-3xl font-bold tracking-tight">Categories</h2>
-        <Button>
+        <Button
+          onClick={() => {
+            setSelectedCategory(null)
+            setOpen(true)
+          }}
+        >
           <Plus className="h-4 w-4" />
-          Add New
+          Create New Category
         </Button>
       </div>
 
-      <div className="grid gap-4 md:grid-cols-3 shrink-0">
+      <div className="grid gap-4 md:grid-cols-4 shrink-0">
         <Card>
-          <CardHeader className="flex flex-row items-center justify-between space-y-0 pb-2">
+          <CardHeader className="flex flex-row items-center justify-between space-y-0">
             <CardTitle className="text-sm font-medium">Total Categories</CardTitle>
             <Package className="h-4 w-4 text-muted-foreground" />
           </CardHeader>
@@ -146,7 +152,7 @@ function Categories() {
         </Card>
 
         <Card>
-          <CardHeader className="flex flex-row items-center justify-between space-y-0 pb-2">
+          <CardHeader className="flex flex-row items-center justify-between space-y-0">
             <CardTitle className="text-sm font-medium">Active</CardTitle>
             <CheckCircle2 className="h-4 w-4 text-muted-foreground" />
           </CardHeader>
@@ -157,7 +163,7 @@ function Categories() {
         </Card>
 
         <Card>
-          <CardHeader className="flex flex-row items-center justify-between space-y-0 pb-2">
+          <CardHeader className="flex flex-row items-center justify-between space-y-0">
             <CardTitle className="text-sm font-medium">Hidden</CardTitle>
             <EyeOff className="h-4 w-4 text-muted-foreground" />
           </CardHeader>
@@ -225,7 +231,7 @@ function Categories() {
                     key={category._id}
                     className="group overflow-hidden shadow-lg transition-all"
                   >
-                    <div className="relative h-32 overflow-hidden bg-muted">
+                    <div className="relative h-40 overflow-hidden">
                       <img
                         src={category.images[0]?.url}
                         alt={category.name}
@@ -242,7 +248,7 @@ function Categories() {
                       </Badge>
                     </div>
 
-                    <div className="p-2">
+                    <div className="p-2 bg-white">
                       <h3
                         className="font-semibold text-sm truncate capitalize"
                         title={category.name}
@@ -258,13 +264,26 @@ function Categories() {
                         })}
                       </p>
 
-                      <div className="flex items-center justify-between mt-2 pt-2 border-t">
+                      <Button
+                        variant="outline"
+                        size="sm"
+                        className="w-full mt-2"
+                        onClick={() => {
+                          setSelectedCategory(category)
+                          setOpen(true)
+                        }}
+                      >
+                        Edit
+                      </Button>
+
+                      {/* <div className="flex items-center justify-between mt-2 pt-2 border-t">
                         <div className="flex gap-0.5">
                           <Button
                             title="Edit"
                             size="icon"
                             variant="ghost"
                             className="h-7 w-7 text-blue-600"
+                            onClick={() => handleEdit(category)}
                           >
                             <Pencil className="h-3.5 w-3.5" />
                           </Button>
@@ -294,7 +313,7 @@ function Categories() {
                         >
                           <Trash2 className="h-3.5 w-3.5" />
                         </Button>
-                      </div>
+                      </div> */}
                     </div>
                   </div>
                 ))}
@@ -348,6 +367,14 @@ function Categories() {
           </div>
         )}
       </div>
+
+      <CreateEditCategory
+        open={open}
+        setOpen={setOpen}
+        setCategories={setCategories}
+        isEdit={Boolean(selectedCategory)}
+        categoryData={selectedCategory}
+      />
     </div>
   )
 }

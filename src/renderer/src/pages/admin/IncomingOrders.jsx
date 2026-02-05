@@ -26,11 +26,15 @@ import {
   Clock,
   CheckCircle,
   DollarSign,
-  Search
+  Search,
+  Eye
 } from 'lucide-react'
 import { useEffect, useState } from 'react'
 import toast from 'react-hot-toast'
 import { IoIosRefresh } from 'react-icons/io'
+import ViewIncomingOrderDialog from '@/components/ViewIncomingOrderDialog'
+import { incomingOrderApi } from '@/api'
+import { Link } from 'react-router'
 
 function IncomingOrders() {
   const [orders, setOrders] = useState([])
@@ -49,34 +53,36 @@ function IncomingOrders() {
   })
   const [query, setQuery] = useState('')
   const [searchInput, setSearchInput] = useState('')
+  const [selectedOrder, setSelectedOrder] = useState(null)
+  const [viewOrderDialogOpen, setViewOrderDialogOpen] = useState(false)
 
   const fetchOrders = async () => {
     setLoading(true)
     try {
-      const response = await axios.get(websiteOrderUrl.getIncomingOrders, {
-        params: {
-          page: pagination.page,
-          limit: pagination.limit,
-          query
-        }
+      const response = await incomingOrderApi.getAllIncomingOrders({
+        page: pagination.page,
+        limit: pagination.limit,
+        query
       })
 
-      const data = response.data
-      setOrders(data.data || [])
+      console.log(response)
+
+      const { data, pagination: resPagination } = response
+      setOrders(data || [])
       setPagination({
-        page: data.pagination.currentPage,
-        limit: data.pagination.limit,
-        total: data.pagination.totalItems,
-        totalPages: data.pagination.totalPages
+        page: resPagination.currentPage,
+        limit: resPagination.limit,
+        total: resPagination.totalItems,
+        totalPages: resPagination.totalPages
       })
 
       // Calculate stats
-      const processing = data.data.filter((order) => order.orderStatus === 'Processing').length
-      const completed = data.data.filter((order) => order.orderStatus === 'Completed').length
-      const totalRevenue = data.data.reduce((sum, order) => sum + (order.totalPrice || 0), 0)
+      const processing = data.filter((order) => order.orderStatus === 'Processing').length
+      const completed = data.filter((order) => order.orderStatus === 'Completed').length
+      const totalRevenue = data.reduce((sum, order) => sum + (order.totalPrice || 0), 0)
 
       setStats({
-        total: data.pagination.totalItems,
+        total: resPagination.totalItems,
         processing: processing,
         completed: completed,
         totalRevenue: totalRevenue
@@ -119,14 +125,17 @@ function IncomingOrders() {
     }
   }
 
+  const handleViewOrder = (order) => {
+    setSelectedOrder(order)
+    setViewOrderDialogOpen(true)
+  }
+
   return (
     <div className="flex flex-col h-screen overflow-hidden p-8 pt-6 gap-4">
-      {/* Header */}
       <div className="flex items-center justify-between shrink-0">
         <h2 className="text-3xl font-bold tracking-tight">Incoming Orders</h2>
       </div>
 
-      {/* Stats Cards */}
       <div className="grid gap-4 md:grid-cols-2 lg:grid-cols-4 shrink-0">
         <Card>
           <CardHeader className="flex flex-row items-center justify-between space-y-0 pb-2">
@@ -173,7 +182,6 @@ function IncomingOrders() {
         </Card>
       </div>
 
-      {/* Search and Table */}
       <div className="flex flex-col flex-1 overflow-hidden gap-4">
         <div className="flex items-center gap-2 shrink-0">
           <div className="relative flex-1">
@@ -193,34 +201,34 @@ function IncomingOrders() {
           </Button>
         </div>
 
-        {loading ? (
-          <div className="flex items-center justify-center flex-1 text-muted-foreground">
-            Loading orders...
-          </div>
-        ) : orders.length === 0 ? (
-          <div className="flex items-center justify-center flex-1 text-muted-foreground">
-            No orders found
-          </div>
-        ) : (
-          <div className="flex flex-col flex-1 overflow-hidden border">
-            <div className="flex-1 overflow-auto relative">
-              <div className="absolute inset-0 overflow-auto">
-                <Table>
-                  <TableHeader className="sticky top-0 bg-muted z-10 shadow-sm">
-                    <TableRow>
-                      <TableHead className="bg-muted">Order ID</TableHead>
-                      <TableHead className="bg-muted">Customer</TableHead>
-                      <TableHead className="bg-muted">Items</TableHead>
-                      <TableHead className="bg-muted">Address</TableHead>
-                      <TableHead className="bg-muted">Payment</TableHead>
-                      <TableHead className="text-center bg-muted">Status</TableHead>
-                      <TableHead className="text-right bg-muted">Total</TableHead>
-                      <TableHead className="text-right bg-muted">Date</TableHead>
-                      <TableHead className="text-right bg-muted">Actions</TableHead>
-                    </TableRow>
-                  </TableHeader>
-                  <TableBody>
-                    {orders.map((order) => (
+        <div className="flex flex-col flex-1 overflow-hidden border">
+          <div className="flex-1 overflow-auto relative">
+            <div className="absolute inset-0 overflow-auto">
+              <Table>
+                <TableHeader className="sticky top-0 bg-muted z-10 shadow-sm">
+                  <TableRow>
+                    <TableHead className="bg-muted">Order ID</TableHead>
+                    <TableHead className="bg-muted">Customer</TableHead>
+                    <TableHead className="bg-muted">Items</TableHead>
+                    <TableHead className="bg-muted">Address</TableHead>
+                    <TableHead className="bg-muted">Payment</TableHead>
+                    <TableHead className="text-center bg-muted">Status</TableHead>
+                    <TableHead className="text-right bg-muted">Total</TableHead>
+                    <TableHead className="text-right bg-muted">Date</TableHead>
+                    <TableHead className="text-right bg-muted">Actions</TableHead>
+                  </TableRow>
+                </TableHeader>
+                <TableBody>
+                  {loading ? (
+                    <div className="flex items-center justify-center flex-1 text-muted-foreground">
+                      Loading orders...
+                    </div>
+                  ) : orders.length === 0 ? (
+                    <div className="flex items-center justify-center flex-1 text-muted-foreground">
+                      No orders found
+                    </div>
+                  ) : (
+                    orders.map((order) => (
                       <TableRow key={order._id}>
                         <TableCell className="font-medium font-mono text-xs">
                           {order._id.slice(-8).toUpperCase()}
@@ -265,66 +273,82 @@ function IncomingOrders() {
                           {new Date(order.createdAt).toLocaleDateString('en-IN')}
                         </TableCell>
                         <TableCell className="text-right">
-                          <Button variant="ghost" size="sm">
-                            View
+                          <Button
+                            variant="outline"
+                            size="icon"
+                            onClick={() => handleViewOrder(order)}
+                            className="h-8 w-8"
+                          >
+                            <Eye className="h-4 w-4" />
+                          </Button>
+                          <Button>
+                            <Link to={`/admin/billing/${order._id}`}>
+                              Go
+                            </Link>
                           </Button>
                         </TableCell>
                       </TableRow>
-                    ))}
-                  </TableBody>
-                </Table>
-              </div>
-            </div>
-
-            {/* Pagination */}
-            <div className="flex items-center justify-between p-2 border-t shrink-0 bg-background">
-              <div className="flex items-center gap-2">
-                <span className="text-sm text-muted-foreground">Show</span>
-                <Select value={pagination.limit.toString()} onValueChange={handleLimitChange}>
-                  <SelectTrigger className="w-20">
-                    <SelectValue />
-                  </SelectTrigger>
-                  <SelectContent>
-                    <SelectItem value="25">25</SelectItem>
-                    <SelectItem value="50">50</SelectItem>
-                    <SelectItem value="100">100</SelectItem>
-                    <SelectItem value="150">150</SelectItem>
-                    <SelectItem value="200">200</SelectItem>
-                  </SelectContent>
-                </Select>
-                <span className="text-sm text-muted-foreground">
-                  Showing {(pagination.page - 1) * pagination.limit + 1} to{' '}
-                  {Math.min(pagination.page * pagination.limit, pagination.total)} of{' '}
-                  {pagination.total}
-                </span>
-              </div>
-              <div className="flex items-center gap-2">
-                <Button
-                  variant="outline"
-                  size="sm"
-                  onClick={() => handlePageChange(pagination.page - 1)}
-                  disabled={pagination.page === 1}
-                >
-                  <ChevronLeft className="h-4 w-4" />
-                  Previous
-                </Button>
-                <div className="text-sm">
-                  Page {pagination.page} of {pagination.totalPages}
-                </div>
-                <Button
-                  variant="outline"
-                  size="sm"
-                  onClick={() => handlePageChange(pagination.page + 1)}
-                  disabled={pagination.page >= pagination.totalPages}
-                >
-                  Next
-                  <ChevronRight className="h-4 w-4" />
-                </Button>
-              </div>
+                    ))
+                  )}
+                </TableBody>
+              </Table>
             </div>
           </div>
-        )}
+
+          {/* Pagination */}
+          <div className="flex items-center justify-between p-2 border-t shrink-0 bg-background">
+            <div className="flex items-center gap-2">
+              <span className="text-sm text-muted-foreground">Show</span>
+              <Select value={pagination.limit.toString()} onValueChange={handleLimitChange}>
+                <SelectTrigger className="w-20">
+                  <SelectValue />
+                </SelectTrigger>
+                <SelectContent>
+                  <SelectItem value="25">25</SelectItem>
+                  <SelectItem value="50">50</SelectItem>
+                  <SelectItem value="100">100</SelectItem>
+                  <SelectItem value="150">150</SelectItem>
+                  <SelectItem value="200">200</SelectItem>
+                </SelectContent>
+              </Select>
+              <span className="text-sm text-muted-foreground">
+                Showing {(pagination.page - 1) * pagination.limit + 1} to{' '}
+                {Math.min(pagination.page * pagination.limit, pagination.total)} of{' '}
+                {pagination.total}
+              </span>
+            </div>
+            <div className="flex items-center gap-2">
+              <Button
+                variant="outline"
+                size="sm"
+                onClick={() => handlePageChange(pagination.page - 1)}
+                disabled={pagination.page === 1}
+              >
+                <ChevronLeft className="h-4 w-4" />
+                Previous
+              </Button>
+              <div className="text-sm">
+                Page {pagination.page} of {pagination.totalPages}
+              </div>
+              <Button
+                variant="outline"
+                size="sm"
+                onClick={() => handlePageChange(pagination.page + 1)}
+                disabled={pagination.page >= pagination.totalPages}
+              >
+                Next
+                <ChevronRight className="h-4 w-4" />
+              </Button>
+            </div>
+          </div>
+        </div>
       </div>
+
+      <ViewIncomingOrderDialog
+        open={viewOrderDialogOpen}
+        setOpen={setViewOrderDialogOpen}
+        orderData={selectedOrder}
+      />
     </div>
   )
 }
