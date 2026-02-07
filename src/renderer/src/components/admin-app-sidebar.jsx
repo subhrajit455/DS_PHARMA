@@ -11,7 +11,7 @@ import {
 } from 'lucide-react'
 import { Link, useLocation } from 'react-router'
 
-import { syncApi } from '@/api'
+import { authApi, syncApi } from '@/api'
 import { Button } from '@/components/ui/button'
 import {
   Sidebar,
@@ -51,6 +51,11 @@ const items = [
     icon: Users
   },
   {
+    title: 'Staff',
+    url: '/admin/staff',
+    icon: Users
+  },
+  {
     title: 'Inventory',
     url: '/admin/inventory',
     icon: Package
@@ -61,19 +66,14 @@ const items = [
     icon: ClipboardList
   },
   {
-    title: 'Incoming Orders',
-    url: '/admin/incoming-orders',
+    title: 'E-commerce Orders',
+    url: '/admin/ecommerce-orders',
     icon: BiAlarm
   },
   {
     title: 'Invoices',
     url: '/admin/invoices',
     icon: LiaFileInvoiceSolid
-  },
-  {
-    title: 'Suppliers',
-    url: '/admin/suppliers',
-    icon: Truck
   },
   {
     title: 'Stock & Expiry',
@@ -114,6 +114,20 @@ export function AdminAppSidebar() {
       toast.error('Failed to sync data')
     } finally {
       setSyncing(false)
+    }
+  }
+
+  const handleLogout = async () => {
+    try {
+      const response = await authApi.logout()
+
+      if (response.success) {
+        localStorage.removeItem('user')
+        toast.success('Logged out successfully')
+        navigate('/login')
+      }
+    } catch (error) {
+      toast.error(error || 'Failed to logout')
     }
   }
 
@@ -200,7 +214,11 @@ export function AdminAppSidebar() {
             </SidebarMenuItem>
             <SidebarMenuItem>
               <SidebarMenuButton asChild>
-                <Button variant="destructive" className="rounded-none hover:bg-red-700">
+                <Button
+                  variant="destructive"
+                  className="rounded-none hover:bg-red-700"
+                  onClick={handleLogout}
+                >
                   <LogOut />
                   <span>Logout</span>
                 </Button>

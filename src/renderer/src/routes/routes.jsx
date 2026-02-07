@@ -8,6 +8,7 @@ import {
   AdminInvoices,
   AdminLayout,
   AdminSettings,
+  AdminStaff,
   AdminStockExpiry
 } from '@/pages/admin'
 import App from '../App'
@@ -19,6 +20,7 @@ import {
   StaffCategories
 } from '@/pages/staff'
 import NotFound from '@/pages/NotFound'
+import { Login } from '@/pages/auth'
 
 export const routes = [
   {
@@ -58,7 +60,7 @@ export const routes = [
             element: <AdminCustomers />
           },
           {
-            path: 'incoming-orders',
+            path: 'ecommerce-orders',
             element: <AdminIncomingOrders />
           },
           {
@@ -68,6 +70,10 @@ export const routes = [
           {
             path: 'stock-expiry',
             element: <AdminStockExpiry />
+          },
+          {
+            path: 'staff',
+            element: <AdminStaff />
           }
         ]
       },
@@ -92,6 +98,10 @@ export const routes = [
             element: <StaffCategories />
           }
         ]
+      },
+      {
+        path: 'login',
+        element: <Login />
       }
     ]
   },

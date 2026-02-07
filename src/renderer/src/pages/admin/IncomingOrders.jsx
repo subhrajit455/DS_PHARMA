@@ -1,3 +1,5 @@
+import { incomingOrderApi } from '@/api'
+import { Badge } from '@/components/ui/badge'
 import { Button } from '@/components/ui/button'
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card'
 import { Input } from '@/components/ui/input'
@@ -16,24 +18,25 @@ import {
   TableHeader,
   TableRow
 } from '@/components/ui/table'
-import { Badge } from '@/components/ui/badge'
-import { websiteOrderUrl } from '@/config'
-import axios from 'axios'
+import ViewIncomingOrderDialog from '@/components/ViewIncomingOrderDialog'
 import {
+  Check,
+  CheckCircle,
   ChevronLeft,
   ChevronRight,
-  Package,
   Clock,
-  CheckCircle,
   DollarSign,
+  Eye,
+  Package,
+  Plus,
   Search,
-  Eye
+  ShoppingBag,
+  Truck,
+  X
 } from 'lucide-react'
 import { useEffect, useState } from 'react'
 import toast from 'react-hot-toast'
 import { IoIosRefresh } from 'react-icons/io'
-import ViewIncomingOrderDialog from '@/components/ViewIncomingOrderDialog'
-import { incomingOrderApi } from '@/api'
 import { Link } from 'react-router'
 
 function IncomingOrders() {
@@ -114,11 +117,17 @@ function IncomingOrders() {
 
   const getStatusVariant = (status) => {
     switch (status) {
+      case 'Pending':
+        return 'outline'
       case 'Processing':
         return 'secondary'
-      case 'Completed':
+      case 'Shipped':
+        return 'default'
+      case 'Delivered':
         return 'default'
       case 'Cancelled':
+        return 'destructive'
+      case 'Rejected':
         return 'destructive'
       default:
         return 'outline'
@@ -130,10 +139,30 @@ function IncomingOrders() {
     setViewOrderDialogOpen(true)
   }
 
+  const handleUpdateOrderStatus = async (orderId, status) => {
+    try {
+      const response = await incomingOrderApi.updateIncomingOrder(orderId, {
+        status
+      })
+
+      if (response.success) {
+        setOrders((prevOrders) =>
+          prevOrders.map((order) =>
+            order._id === orderId ? { ...order, orderStatus: status } : order
+          )
+        )
+        toast.success('Order marked as ' + status)
+      }
+    } catch (error) {
+      console.error('Error updating order status:', error)
+      toast.error('Failed to update order status')
+    }
+  }
+
   return (
     <div className="flex flex-col h-screen overflow-hidden p-8 pt-6 gap-4">
       <div className="flex items-center justify-between shrink-0">
-        <h2 className="text-3xl font-bold tracking-tight">Incoming Orders</h2>
+        <h2 className="text-3xl font-bold tracking-tight">E-commerce Orders</h2>
       </div>
 
       <div className="grid gap-4 md:grid-cols-2 lg:grid-cols-4 shrink-0">
@@ -205,17 +234,17 @@ function IncomingOrders() {
           <div className="flex-1 overflow-auto relative">
             <div className="absolute inset-0 overflow-auto">
               <Table>
-                <TableHeader className="sticky top-0 bg-muted z-10 shadow-sm">
+                <TableHeader className="sticky top-0 bg-primary text-white z-10 shadow-sm">
                   <TableRow>
-                    <TableHead className="bg-muted">Order ID</TableHead>
-                    <TableHead className="bg-muted">Customer</TableHead>
-                    <TableHead className="bg-muted">Items</TableHead>
-                    <TableHead className="bg-muted">Address</TableHead>
-                    <TableHead className="bg-muted">Payment</TableHead>
-                    <TableHead className="text-center bg-muted">Status</TableHead>
-                    <TableHead className="text-right bg-muted">Total</TableHead>
-                    <TableHead className="text-right bg-muted">Date</TableHead>
-                    <TableHead className="text-right bg-muted">Actions</TableHead>
+                    <TableHead className="text-white">Order ID</TableHead>
+                    <TableHead className="text-white">Customer</TableHead>
+                    <TableHead className="text-white">Items</TableHead>
+                    <TableHead className="text-white">Address</TableHead>
+                    <TableHead className="text-white">Payment</TableHead>
+                    <TableHead className="text-center text-white">Status</TableHead>
+                    <TableHead className="text-right text-white">Total</TableHead>
+                    <TableHead className="text-right text-white">Date</TableHead>
+                    <TableHead className="text-right text-white">Actions</TableHead>
                   </TableRow>
                 </TableHeader>
                 <TableBody>
@@ -272,20 +301,51 @@ function IncomingOrders() {
                         <TableCell className="text-right text-sm text-muted-foreground">
                           {new Date(order.createdAt).toLocaleDateString('en-IN')}
                         </TableCell>
-                        <TableCell className="text-right">
+                        <TableCell className="text-right flex justify-end gap-1">
                           <Button
                             variant="outline"
-                            size="icon"
                             onClick={() => handleViewOrder(order)}
-                            className="h-8 w-8"
+                            className="h-8 w-8 text-blue-600 hover:text-blue-700"
+                            title="View Order Details"
                           >
-                            <Eye className="h-4 w-4" />
+                            <Eye className="h-6 w-6" />
                           </Button>
-                          <Button>
-                            <Link to={`/admin/billing/${order._id}`}>
-                              Go
-                            </Link>
-                          </Button>
+
+                          {order.orderStatus === 'Pending' ? (
+                            <Button
+                              variant="outline"
+                              className=" h-8 w-8 text-green-600 hover:text-green-700"
+                              title="Accept Order"
+                              onClick={() => handleUpdateOrderStatus(order._id, 'Processing')}
+                            >
+                              <Check className="h-6 w-6" />
+                            </Button>
+                          ) : order.orderStatus === 'Processing' ? (
+                            <Button
+                              variant="outline"
+                              className=" h-8 w-8 text-green-600 hover:text-green-700"
+                              title="Create Invoice"
+                              onClick={() => handleUpdateOrderStatus(order._id, 'Processing')}
+                            >
+                              <Plus className="h-6 w-6" />
+                            </Button>
+                          ) : (
+                            <></>
+                          )}
+
+                          {order.orderStatus !== 'Shipped' &&
+                            order.orderStatus !== 'Delivered' &&
+                            order.orderStatus !== 'Cancelled' &&
+                            order.orderStatus !== 'Rejected' && (
+                              <Button
+                                variant="outline"
+                                className=" h-8 w-8 text-red-600 hover:text-red-700"
+                                title="Reject Order"
+                                onClick={() => handleUpdateOrderStatus(order._id, 'Rejected')}
+                              >
+                                <X className="h-6 w-6" />
+                              </Button>
+                            )}
                         </TableCell>
                       </TableRow>
                     ))
