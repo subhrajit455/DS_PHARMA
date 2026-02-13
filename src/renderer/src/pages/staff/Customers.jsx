@@ -128,7 +128,12 @@ function Customers() {
   }
 
   return (
-    <div className="flex flex-col h-full overflow-hidden px-6 py-4 gap-4">
+    <div className="flex flex-col h-screen overflow-hidden p-8 pt-6 gap-4">
+      {/* Header */}
+      <div className="flex items-center justify-between shrink-0">
+        <h2 className="text-3xl font-bold tracking-tight">Customers</h2>
+      </div>
+
       {/* Stats Cards */}
       <div className="grid gap-4 md:grid-cols-2 lg:grid-cols-4 shrink-0">
         <Card>

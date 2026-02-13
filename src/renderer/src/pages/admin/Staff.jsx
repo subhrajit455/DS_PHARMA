@@ -152,22 +152,7 @@ function Staff() {
   }
 
   return (
-    <div className="flex flex-col h-full overflow-hidden p-8 pt-6 gap-4">
-      {/* Header */}
-      <div className="flex items-center justify-between shrink-0">
-        <h2 className="text-3xl font-bold tracking-tight">Staff Management</h2>
-        <Button
-          onClick={() => {
-            setSelectedStaff(null)
-            setOpenAdd(true)
-          }}
-          className="gap-2"
-        >
-          <Plus className="h-4 w-4" />
-          Add Staff
-        </Button>
-      </div>
-
+    <div className="flex flex-col h-full overflow-hidden px-6 py-4 gap-4">
       {/* Stats Cards */}
       <div className="grid gap-4 md:grid-cols-2 shrink-0">
         <Card>
@@ -209,6 +194,17 @@ function Staff() {
         <Button onClick={() => fetchStaff()} disabled={loading} variant="outline">
           <IoIosRefresh className={loading ? 'animate-spin' : ''} />
           Refresh
+        </Button>
+        <Button
+          onClick={() => {
+            setSelectedStaff(null)
+            setOpenAdd(true)
+          }}
+          className="gap-2"
+          title="Add New Staff"
+        >
+          <Plus className="h-4 w-4" />
+          Add Staff
         </Button>
       </div>
 

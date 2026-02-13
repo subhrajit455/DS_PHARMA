@@ -1,266 +1,380 @@
-import { CheckCircle2, Eye, EyeOff, Package, Pencil, Plus, Search, Trash2 } from 'lucide-react'
-import { useState } from 'react'
-import { useSelector } from 'react-redux'
+import { categoryApi } from '@/api'
+import CreateEditCategory from '@/components/CreateEditCategoryDialog'
 import { Badge } from '@/components/ui/badge'
 import { Button } from '@/components/ui/button'
+import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card'
 import { Input } from '@/components/ui/input'
 import {
-  Pagination,
-  PaginationContent,
-  PaginationItem,
-  PaginationLink,
-  PaginationNext,
-  PaginationPrevious
-} from '@/components/ui/pagination'
-import { deleteCategory } from '@/store/features/categorySlice'
+  Select,
+  SelectContent,
+  SelectItem,
+  SelectTrigger,
+  SelectValue
+} from '@/components/ui/select'
+import { categoryUrl } from '@/config'
+import axios from 'axios'
+import {
+  CheckCircle2,
+  ChevronLeft,
+  ChevronRight,
+  EyeOff,
+  Package,
+  Plus,
+  Search
+} from 'lucide-react'
+import { useEffect, useState } from 'react'
+import toast from 'react-hot-toast'
+import { IoIosRefresh } from 'react-icons/io'
 
 function Categories() {
-  const { categories } = useSelector((state) => state.category)
-  const [currentPage, setCurrentPage] = useState(1)
-  const [searchTerm, setSearchTerm] = useState('')
-  const itemsPerPage = 12
+  const [categories, setCategories] = useState([])
+  const [loading, setLoading] = useState(false)
+  const [stats, setStats] = useState({
+    total: 0,
+    active: 0,
+    hidden: 0
+  })
+  const [pagination, setPagination] = useState({
+    page: 1,
+    limit: 12,
+    total: 0,
+    totalPages: 0
+  })
+  const [query, setQuery] = useState('')
+  const [searchInput, setSearchInput] = useState('')
+  const [open, setOpen] = useState(false)
+  const [selectedCategory, setSelectedCategory] = useState(null)
 
-  // Filter categories based on search
-  const filteredCategories = categories.filter((category) =>
-    category.name.toLowerCase().includes(searchTerm.toLowerCase())
-  )
+  const fetchCategories = async () => {
+    setLoading(true)
+    try {
+      const response = await categoryApi.getAllCategories({
+        page: pagination.page,
+        limit: pagination.limit,
+        query
+      })
 
-  const totalCategories = categories.length
-  const activeCategories = categories.filter((c) => c.visibility).length
-  const hiddenCategories = categories.filter((c) => !c.visibility).length
+      const data = response.data
 
-  // Pagination Logic
-  const totalPages = Math.ceil(filteredCategories.length / itemsPerPage)
-  const startIndex = (currentPage - 1) * itemsPerPage
-  const paginatedCategories = filteredCategories.slice(startIndex, startIndex + itemsPerPage)
+      setCategories(data.categories || [])
+      setPagination({
+        page: data.currentPage,
+        limit: pagination.limit,
+        total: data.totalCategories,
+        totalPages: data.totalPages
+      })
 
-  const handlePageChange = (page) => {
-    if (page >= 1 && page <= totalPages) {
-      setCurrentPage(page)
+      const active = data.categories.filter((cat) => cat.visibility).length
+      const hidden = data.categories.filter((cat) => !cat.visibility).length
+
+      setStats({
+        total: data.totalCategories,
+        active: active,
+        hidden: hidden
+      })
+    } catch (error) {
+      console.error('Error fetching categories:', error)
+      toast.error('Failed to fetch categories')
+    } finally {
+      setLoading(false)
     }
+  }
+
+  useEffect(() => {
+    fetchCategories()
+  }, [pagination.page, pagination.limit, query])
+
+  useEffect(() => {
+    if (!open) {
+      setSelectedCategory(null)
+    }
+  }, [open])
+
+  const handleSearch = () => {
+    setQuery(searchInput)
+    setPagination((prev) => ({ ...prev, page: 1 }))
+  }
+
+  const handlePageChange = (newPage) => {
+    setPagination((prev) => ({ ...prev, page: newPage }))
+  }
+
+  const handleLimitChange = (newLimit) => {
+    setPagination((prev) => ({ ...prev, limit: parseInt(newLimit), page: 1 }))
+  }
+
+  const handleEdit = (category) => {
+    setSelectedCategory(category)
+    setOpen(true)
   }
 
   const handleDelete = async (categoryId) => {
     if (!confirm('Are you sure you want to delete this category?')) return
 
     try {
-      await deleteCategory(categoryId)
+      const response = await axios.delete(`${categoryUrl.deleteCategory}/${categoryId}`)
+
+      if (response.data.success) {
+        toast.success(response.data.message)
+        fetchCategories()
+      }
     } catch (error) {
       console.log(error)
+      toast.error(error.response.data.message)
     }
   }
 
   return (
-    <div className="flex flex-col gap-4 p-4 animate-in fade-in zoom-in-95 duration-500">
-      {/* Header Section */}
-      <div className="flex flex-col md:flex-row md:items-center justify-between gap-3">
-        <div>
-          <h1 className="text-2xl font-bold tracking-tight bg-linear-to-r from-primary to-primary/60 bg-clip-text text-transparent">
-            Categories
-          </h1>
-          <p className="text-xs text-muted-foreground mt-1">
-            Manage your product categories and their visibility.
-          </p>
-        </div>
+    <div className="flex flex-col h-full overflow-hidden p-8 pt-6 gap-4">
+      <div className="flex items-center justify-between shrink-0">
+        <h2 className="text-3xl font-bold tracking-tight">Categories</h2>
         <Button
-          size="sm"
-          className="w-full md:w-auto shadow-sm hover:shadow-primary/25 transition-all duration-300"
+          onClick={() => {
+            setSelectedCategory(null)
+            setOpen(true)
+          }}
         >
-          <Plus className="h-3.5 w-3.5" /> Add New
+          <Plus className="h-4 w-4" />
+          Create New Category
         </Button>
       </div>
 
-      {/* Stats Section */}
-      <div className="grid grid-cols-1 sm:grid-cols-3 gap-3">
-        {/* Total */}
-        <div className="rounded-sm border border-muted/60 border-l-4 border-l-primary/60 bg-white p-3 transition-all duration-200 hover:shadow-sm hover:-translate-y-[1px]">
-          <div className="flex items-center justify-between">
-            <span className="text-[11px] font-medium uppercase tracking-wider text-muted-foreground">
-              Total
-            </span>
+      <div className="grid gap-4 md:grid-cols-4 shrink-0">
+        <Card>
+          <CardHeader className="flex flex-row items-center justify-between space-y-0">
+            <CardTitle className="text-sm font-medium">Total Categories</CardTitle>
             <Package className="h-4 w-4 text-muted-foreground" />
-          </div>
+          </CardHeader>
+          <CardContent>
+            <div className="text-2xl font-bold">{stats.total}</div>
+            <p className="text-xs text-muted-foreground">All categories</p>
+          </CardContent>
+        </Card>
 
-          <div className="mt-1.5">
-            <div className="text-2xl font-semibold leading-none">{totalCategories}</div>
-            <p className="text-[11px] text-muted-foreground mt-1">All registered categories</p>
-          </div>
-        </div>
+        <Card>
+          <CardHeader className="flex flex-row items-center justify-between space-y-0">
+            <CardTitle className="text-sm font-medium">Active</CardTitle>
+            <CheckCircle2 className="h-4 w-4 text-muted-foreground" />
+          </CardHeader>
+          <CardContent>
+            <div className="text-2xl font-bold text-green-600">{stats.active}</div>
+            <p className="text-xs text-muted-foreground">Visible on store</p>
+          </CardContent>
+        </Card>
 
-        {/* Active */}
-        <div className="rounded-sm border border-muted/60 border-l-4 border-l-green-500/60 bg-white p-3 transition-all duration-200 hover:shadow-sm hover:-translate-y-[1px]">
-          <div className="flex items-center justify-between">
-            <span className="text-[11px] font-medium uppercase tracking-wider text-muted-foreground">
-              Active
-            </span>
-            <CheckCircle2 className="h-4 w-4 text-green-500" />
-          </div>
-
-          <div className="mt-1.5">
-            <div className="text-2xl font-semibold leading-none">{activeCategories}</div>
-            <p className="text-[11px] text-muted-foreground mt-1">Visible on store</p>
-          </div>
-        </div>
-
-        {/* Hidden */}
-        <div className="rounded-sm border border-muted/60 border-l-4 border-l-gray-500/60 bg-white p-3 transition-all duration-200 hover:shadow-sm hover:-translate-y-[1px]">
-          <div className="flex items-center justify-between">
-            <span className="text-[11px] font-medium uppercase tracking-wider text-muted-foreground">
-              Hidden
-            </span>
-            <EyeOff className="h-4 w-4 text-gray-500" />
-          </div>
-
-          <div className="mt-1.5">
-            <div className="text-2xl font-semibold leading-none">{hiddenCategories}</div>
-            <p className="text-[11px] text-muted-foreground mt-1">Hidden categories</p>
-          </div>
-        </div>
+        <Card>
+          <CardHeader className="flex flex-row items-center justify-between space-y-0">
+            <CardTitle className="text-sm font-medium">Hidden</CardTitle>
+            <EyeOff className="h-4 w-4 text-muted-foreground" />
+          </CardHeader>
+          <CardContent>
+            <div className="text-2xl font-bold text-gray-600">{stats.hidden}</div>
+            <p className="text-xs text-muted-foreground">Not visible</p>
+          </CardContent>
+        </Card>
       </div>
 
-      {/* Main Content Area */}
-      <div className="flex flex-col gap-4">
-        {/* Search Bar */}
-        <div className="flex items-center gap-2">
+      <div className="flex flex-col flex-1 overflow-hidden gap-4">
+        <div className="flex items-center gap-2 shrink-0">
           <div className="relative flex-1">
-            <Search className="absolute left-2.5 top-2.5 h-3.5 w-3.5 text-muted-foreground" />
+            <Search className="absolute left-3 top-1/2 h-4 w-4 -translate-y-1/2 text-muted-foreground" />
             <Input
-              type="search"
               placeholder="Search categories..."
-              className="pl-8 h-9 text-sm w-full md:w-[550px] bg-background shadow-sm"
-              value={searchTerm}
-              onChange={(e) => {
-                setSearchTerm(e.target.value)
-                setCurrentPage(1) // Reset to page 1 on search
-              }}
+              value={searchInput}
+              onChange={(e) => setSearchInput(e.target.value)}
+              onKeyDown={(e) => e.key === 'Enter' && handleSearch()}
+              className="pl-9"
             />
           </div>
+          <Button onClick={handleSearch}>Search</Button>
+          <Button onClick={() => fetchCategories()} disabled={loading} variant="outline">
+            <IoIosRefresh className={loading ? 'animate-spin' : ''} />
+            Refresh
+          </Button>
         </div>
 
-        {/* Categories Grid */}
-        {paginatedCategories.length > 0 ? (
-          <div className="grid grid-cols-2 md:grid-cols-4 lg:grid-cols-5 xl:grid-cols-6 gap-3">
-            {paginatedCategories.map((category) => (
-              <div
-                key={category._id}
-                className="group border border-muted/60 rounded-sm overflow-hidden bg-white hover:shadow-sm transition-shadow duration-200 shadow-md"
-              >
-                {/* Image */}
-                <div className="relative h-40 overflow-hidden bg-muted">
-                  <img
-                    src={category.image.url}
-                    alt={category.name}
-                    className="w-full h-full object-cover group-hover:scale-105 transition-transform duration-300"
-                  />
-
-                  {/* Status Badge */}
-                  <Badge
-                    className={`absolute top-1 right-1 leading-4 text-white ${
-                      category.visibility ? 'bg-green-200/90 text-green-600' : ''
-                    }`}
-                    variant={category.visibility ? 'default' : 'destructive'}
-                  >
-                    {category.visibility ? 'Active' : 'Hidden'}
-                  </Badge>
+        {loading ? (
+          <div className="grid grid-cols-2 md:grid-cols-4 lg:grid-cols-6 gap-3">
+            {Array.from({ length: 6 }).map((_, index) => (
+              <div key={index} className="overflow-hidden shadow-lg">
+                <div className="relative h-32 bg-muted animate-pulse">
+                  <div className="absolute top-1.5 right-1.5 h-4 w-10 rounded-sm bg-muted-foreground/30" />
                 </div>
 
-                {/* Content */}
-                <div className="px-2 py-1.5">
-                  <h3 className="text-sm font-semibold truncate capitalize" title={category.name}>
-                    {category.name}
-                  </h3>
+                <div className="p-2 space-y-2">
+                  <div className="h-4 w-3/4 rounded bg-muted-foreground/30 animate-pulse" />
 
-                  <p className="text-xs text-muted-foreground">
-                    {new Date(category.createdAt).toLocaleDateString('en-IN', {
-                      day: '2-digit',
-                      month: 'short',
-                      year: 'numeric'
-                    })}
-                  </p>
-                </div>
+                  <div className="h-3 w-1/3 rounded bg-muted-foreground/20 animate-pulse" />
 
-                {/* Actions */}
-                <div className="flex items-center justify-between px-2 py-1 border-t border-muted/60">
-                  <div className="flex gap-0.5">
-                    <Button
-                      title="Edit"
-                      size="icon"
-                      variant="outline"
-                      className="h-6 flex items-center justify-center text-blue-600"
-                    >
-                      <Pencil className="h-3 w-3" />
-                    </Button>
+                  <div className="flex items-center justify-between pt-2 border-t">
+                    <div className="flex gap-1">
+                      <div className="h-7 w-7 rounded bg-muted-foreground/30 animate-pulse" />
+                      <div className="h-7 w-7 rounded bg-muted-foreground/30 animate-pulse" />
+                    </div>
 
-                    <Button
-                      title={category.visibility ? 'Hide' : 'Show'}
-                      size="icon"
-                      variant="outline"
-                      className={`h-6 flex items-center justify-center rounded-sm hover:bg-gray-100 ${
-                        category.visibility ? 'text-gray-600' : 'text-green-600'
-                      }`}
-                    >
-                      {category.visibility ? (
-                        <EyeOff className="h-3 w-3" />
-                      ) : (
-                        <Eye className="h-3 w-3" />
-                      )}
-                    </Button>
+                    <div className="h-7 w-7 rounded bg-muted-foreground/30 animate-pulse" />
                   </div>
-
-                  <Button
-                    title="Delete"
-                    size="icon"
-                    variant="outline"
-                    className="h-6 flex items-center justify-center text-red-600"
-                    onClick={() => handleDelete(category._id)}
-                  >
-                    <Trash2 className="h-3 w-3" />
-                  </Button>
                 </div>
               </div>
             ))}
           </div>
-        ) : (
-          <div className="text-center py-8 text-muted-foreground">
-            <p className="text-sm">No categories found.</p>
+        ) : categories.length === 0 ? (
+          <div className="flex items-center justify-center flex-1 text-muted-foreground">
+            No categories found
           </div>
-        )}
+        ) : (
+          <div className="flex flex-col flex-1 overflow-hidden">
+            <div className="flex-1 overflow-auto p-1">
+              <div className="grid grid-cols-2 md:grid-cols-4 lg:grid-cols-6 gap-3">
+                {categories.map((category) => (
+                  <div
+                    key={category._id}
+                    className="group overflow-hidden shadow-lg transition-all"
+                  >
+                    <div className="relative h-40 overflow-hidden">
+                      <img
+                        src={category.images[0]?.url}
+                        alt={category.name}
+                        className="w-full h-full object-cover group-hover:scale-105 transition-transform duration-300"
+                      />
 
-        {/* Pagination */}
-        {filteredCategories.length > itemsPerPage && (
-          <div className="mt-2 text-xs">
-            <Pagination className="justify-end">
-              <PaginationContent>
-                <PaginationItem>
-                  <PaginationPrevious
-                    onClick={() => handlePageChange(currentPage - 1)}
-                    className={`h-7 px-2 text-xs ${currentPage === 1 ? 'pointer-events-none opacity-50' : 'cursor-pointer'}`}
-                  />
-                </PaginationItem>
+                      {/* Status Badge */}
+                      <Badge
+                        className={`absolute top-1.5 right-1.5 text-xs px-1.5 py-0.5 ${
+                          category.visibility ? 'bg-green-500' : 'bg-gray-500'
+                        }`}
+                      >
+                        {category.visibility ? 'Active' : 'Hidden'}
+                      </Badge>
+                    </div>
 
-                {Array.from({ length: totalPages }, (_, i) => i + 1).map((page) => (
-                  <PaginationItem key={page}>
-                    <PaginationLink
-                      isActive={currentPage === page}
-                      onClick={() => handlePageChange(page)}
-                      className="h-7 w-7 text-xs cursor-pointer"
-                    >
-                      {page}
-                    </PaginationLink>
-                  </PaginationItem>
+                    <div className="p-2 bg-white">
+                      <h3
+                        className="font-semibold text-sm truncate capitalize"
+                        title={category.name}
+                      >
+                        {category.name}
+                      </h3>
+
+                      <p className="text-[10px] text-muted-foreground mt-0.5">
+                        {new Date(category.createdAt).toLocaleDateString('en-IN', {
+                          day: '2-digit',
+                          month: 'short',
+                          year: 'numeric'
+                        })}
+                      </p>
+
+                      <Button
+                        variant="outline"
+                        size="sm"
+                        className="w-full mt-2"
+                        onClick={() => {
+                          setSelectedCategory(category)
+                          setOpen(true)
+                        }}
+                      >
+                        Edit
+                      </Button>
+
+                      {/* <div className="flex items-center justify-between mt-2 pt-2 border-t">
+                        <div className="flex gap-0.5">
+                          <Button
+                            title="Edit"
+                            size="icon"
+                            variant="ghost"
+                            className="h-7 w-7 text-blue-600"
+                            onClick={() => handleEdit(category)}
+                          >
+                            <Pencil className="h-3.5 w-3.5" />
+                          </Button>
+
+                          <Button
+                            title={category.visibility ? 'Hide' : 'Show'}
+                            size="icon"
+                            variant="ghost"
+                            className={`h-7 w-7 ${
+                              category.visibility ? 'text-gray-600' : 'text-green-600'
+                            }`}
+                          >
+                            {category.visibility ? (
+                              <EyeOff className="h-3.5 w-3.5" />
+                            ) : (
+                              <Eye className="h-3.5 w-3.5" />
+                            )}
+                          </Button>
+                        </div>
+
+                        <Button
+                          title="Delete"
+                          size="icon"
+                          variant="ghost"
+                          className="h-7 w-7 text-red-600"
+                          onClick={() => handleDelete(category._id)}
+                        >
+                          <Trash2 className="h-3.5 w-3.5" />
+                        </Button>
+                      </div> */}
+                    </div>
+                  </div>
                 ))}
+              </div>
+            </div>
 
-                <PaginationItem>
-                  <PaginationNext
-                    onClick={() => handlePageChange(currentPage + 1)}
-                    className={`h-7 px-2 text-xs ${currentPage === totalPages ? 'pointer-events-none opacity-50' : 'cursor-pointer'}`}
-                  />
-                </PaginationItem>
-              </PaginationContent>
-            </Pagination>
+            <div className="flex items-center justify-between p-2 border-t shrink-0 bg-background">
+              <div className="flex items-center gap-2">
+                <span className="text-sm text-muted-foreground">Show</span>
+                <Select value={pagination.limit.toString()} onValueChange={handleLimitChange}>
+                  <SelectTrigger className="w-20">
+                    <SelectValue />
+                  </SelectTrigger>
+                  <SelectContent>
+                    <SelectItem value="12">12</SelectItem>
+                    <SelectItem value="24">24</SelectItem>
+                    <SelectItem value="48">48</SelectItem>
+                    <SelectItem value="96">96</SelectItem>
+                  </SelectContent>
+                </Select>
+                <span className="text-sm text-muted-foreground">
+                  Showing {(pagination.page - 1) * pagination.limit + 1} to{' '}
+                  {Math.min(pagination.page * pagination.limit, pagination.total)} of{' '}
+                  {pagination.total}
+                </span>
+              </div>
+              <div className="flex items-center gap-2">
+                <Button
+                  variant="outline"
+                  size="sm"
+                  onClick={() => handlePageChange(pagination.page - 1)}
+                  disabled={pagination.page === 1}
+                >
+                  <ChevronLeft className="h-4 w-4" />
+                  Previous
+                </Button>
+                <div className="text-sm">
+                  Page {pagination.page} of {pagination.totalPages}
+                </div>
+                <Button
+                  variant="outline"
+                  size="sm"
+                  onClick={() => handlePageChange(pagination.page + 1)}
+                  disabled={pagination.page >= pagination.totalPages}
+                >
+                  Next
+                  <ChevronRight className="h-4 w-4" />
+                </Button>
+              </div>
+            </div>
           </div>
         )}
       </div>
+
+      <CreateEditCategory
+        open={open}
+        setOpen={setOpen}
+        setCategories={setCategories}
+        isEdit={Boolean(selectedCategory)}
+        categoryData={selectedCategory}
+      />
     </div>
   )
 }

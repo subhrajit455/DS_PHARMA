@@ -17,12 +17,14 @@ export const categorySlice = createSlice({
       state.categories.push(action.payload)
     },
     updateCategory: (state, action) => {
-      state.categories = state.categories.map((category) =>
-        category.id === action.payload.id ? action.payload : category
-      )
+      const { _id, data } = action.payload
+      const index = state.categories.findIndex((category) => category._id === _id)
+      if (index !== -1) {
+        state.categories[index] = data
+      }
     },
     deleteCategory: (state, action) => {
-      state.categories = state.categories.filter((category) => category.id !== action.payload)
+      state.categories = state.categories.filter((category) => category._id !== action.payload)
     },
     setLoading: (state, action) => {
       state.loading = action.payload

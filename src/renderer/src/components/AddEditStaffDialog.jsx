@@ -85,6 +85,7 @@ function AddEditStaffDialog({ open, setOpen, onSuccess, isEdit = false, staffDat
         response = await staffApi.updateStaff(staffData._id, updateData)
       } else {
         // include all selected staff details if selected
+        console.log('Selected staff user:', formData)
         const payload = { ...formData }
         if (selectedStaffUser && formData.assignedTo !== 'none') {
           // Include all staff details from the selected user
@@ -202,6 +203,7 @@ function AddEditStaffDialog({ open, setOpen, onSuccess, isEdit = false, staffDat
                 const selected = staffOptions.find((opt) => opt.UserID === value)
                 setSelectedStaffUser(selected || null)
                 setFormData({
+                  assignedTo: selected?.UserID || '',
                   name: selected?.Name || '',
                   email: selected?.Email || '',
                   phone: selected?.Phone || ''

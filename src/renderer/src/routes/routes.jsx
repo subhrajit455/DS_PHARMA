@@ -7,6 +7,7 @@ import {
   AdminInventory,
   AdminInvoices,
   AdminLayout,
+  AdminReports,
   AdminSettings,
   AdminStaff,
   AdminStockExpiry
@@ -17,7 +18,12 @@ import {
   StaffDashboard,
   StaffSettings,
   StaffInventory,
-  StaffCategories
+  StaffCategories,
+  StaffInvoices,
+  StaffBilling,
+  StaffCustomers,
+  StaffIncomingOrders,
+  StaffStockExpiry
 } from '@/pages/staff'
 import NotFound from '@/pages/NotFound'
 import { Login } from '@/pages/auth'
@@ -27,6 +33,10 @@ export const routes = [
     path: '/',
     element: <App />,
     children: [
+      {
+        path: '',
+        element: <Login />
+      },
       {
         path: 'admin',
         element: <AdminLayout />,
@@ -74,6 +84,10 @@ export const routes = [
           {
             path: 'staff',
             element: <AdminStaff />
+          },
+          {
+            path: 'reports',
+            element: <AdminReports />
           }
         ]
       },
@@ -90,21 +104,42 @@ export const routes = [
             element: <StaffInventory />
           },
           {
-            path: 'settings',
-            element: <StaffSettings />
+            path: 'customers',
+            element: <StaffCustomers />
           },
           {
             path: 'categories',
             element: <StaffCategories />
+          },
+          {
+            path: 'billing',
+            element: <StaffBilling />
+          },
+          {
+            path: 'incoming-orders',
+            element: <StaffIncomingOrders />
+          },
+          {
+            path: 'incoming-orders',
+            element: <StaffIncomingOrders />
+          },
+          {
+            path: 'invoices',
+            element: <StaffInvoices />
+          },
+          {
+            path: 'stock-expiry',
+            element: <StaffStockExpiry />
+          },
+          {
+            path: 'settings',
+            element: <StaffSettings />
           }
         ]
-      },
-      {
-        path: 'login',
-        element: <Login />
       }
     ]
   },
+
   {
     path: '*',
     element: <NotFound />

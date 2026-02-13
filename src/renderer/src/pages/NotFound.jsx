@@ -1,13 +1,16 @@
 import React from 'react'
-import { useNavigate } from 'react-router'
+import { useLocation, useNavigate } from 'react-router'
 
 function NotFound() {
   const navigate = useNavigate()
+  const location = useLocation()
 
   return (
     <div className="min-h-screen flex items-center justify-center bg-gray-50 px-4">
       <div className="max-w-md w-full text-center bg-white rounded-xl shadow-lg p-8">
-        <h1 className="text-7xl font-extrabold text-gray-900 tracking-tight">404</h1>
+        <h1 className="text-7xl font-extrabold text-gray-900 tracking-tight">
+          404 {location.pathname}
+        </h1>
 
         <p className="mt-4 text-xl font-semibold text-gray-800">Page not found</p>
 

@@ -11,11 +11,15 @@ import {
   SelectValue
 } from '@/components/ui/select'
 import { deleteImage, uploadImage } from '@/config/mediaService'
+import { addCategory, updateCategory } from '@/store/features/categorySlice'
 import { Loader2, Plus } from 'lucide-react'
 import { useEffect, useState } from 'react'
 import toast from 'react-hot-toast'
+import { useDispatch } from 'react-redux'
 
-function CreateEditCategory({ open, setOpen, setCategories, isEdit = false, categoryData }) {
+function CreateEditCategory({ open, setOpen, isEdit = false, categoryData }) {
+  const dispatch = useDispatch()
+
   const [formData, setFormData] = useState({
     name: isEdit ? categoryData?.name : '',
     visibility: isEdit ? categoryData?.visibility : 'true',
@@ -87,7 +91,11 @@ function CreateEditCategory({ open, setOpen, setCategories, isEdit = false, cate
           visibility: 'true',
           images: []
         })
-        setCategories((prev) => isEdit ? prev.map((cat) => cat._id === categoryData._id ? response.data : cat) : [...prev, response.data])
+        dispatch(
+          isEdit
+            ? updateCategory({ _id: categoryData._id, data: response.data })
+            : addCategory(response.data)
+        )
       }
     } catch (error) {
       console.log(error)

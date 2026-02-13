@@ -1,10 +1,11 @@
-import { categoryApi } from '@/api'
+import { categoryApi, dashboardApi, productApi } from '@/api'
 import { Button } from '@/components/ui/button'
 import { setCategories, setError, setLoading } from '@/store/features/categorySlice'
 import { useEffect } from 'react'
 import toast, { Toaster } from 'react-hot-toast'
 import { useDispatch } from 'react-redux'
 import { Link, Outlet } from 'react-router'
+import { setExpiredProducts, setLowStockProducts } from './store/features/dashboardSlice'
 
 function App() {
   const dispatch = useDispatch()
@@ -28,20 +29,43 @@ function App() {
     }
   }
 
+  const fetchLowStockProducts = async () => {
+    try {
+      const response = await productApi.getLowStockProducts()
+
+      console.log('low stock :: ', response)
+
+      dispatch(setLowStockProducts(response.data.products))
+    } catch (error) {
+      console.error('Error fetching low stock products:', error)
+    }
+  }
+
+  const fetchExpiredProducts = async () => {
+    try {
+      const response = await dashboardApi.getExpiredProducts()
+      dispatch(setExpiredProducts(response.data))
+    } catch (error) {
+      console.error('Error fetching expired products:', error)
+    }
+  }
+
   useEffect(() => {
     fetchCategories()
+    fetchLowStockProducts()
+    // fetchExpiredProducts()
   }, [])
 
   return (
     <div className="flex flex-col w-full">
       <main className="flex flex-col w-full">
         <Outlet />
-        <Link to="/admin/dashboard">
+        {/* <Link to="/admin/dashboard">
           <Button>Admin</Button>
         </Link>
         <Link to="/staff/dashboard">
           <Button>Staff</Button>
-        </Link>
+        </Link> */}
       </main>
       <Toaster
         position="top-right"

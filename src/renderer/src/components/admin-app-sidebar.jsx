@@ -1,17 +1,7 @@
-import {
-  AlertTriangle,
-  ClipboardList,
-  Home,
-  Layers,
-  LogOut,
-  Package,
-  Settings,
-  Truck,
-  Users
-} from 'lucide-react'
-import { Link, useLocation } from 'react-router'
+import { ClipboardList, Home, Layers, LogOut, Package, Settings, Users } from 'lucide-react'
+import { Link, useLocation, useNavigate } from 'react-router'
 
-import { authApi, syncApi } from '@/api'
+import { syncApi } from '@/api'
 import { Button } from '@/components/ui/button'
 import {
   Sidebar,
@@ -27,11 +17,11 @@ import {
   SidebarMenuItem
 } from '@/components/ui/sidebar'
 import { useState } from 'react'
+import toast from 'react-hot-toast'
 import { AiOutlineCloudSync } from 'react-icons/ai'
 import { BiAlarm } from 'react-icons/bi'
 import { LiaFileInvoiceSolid } from 'react-icons/lia'
 import { VscGraphLine } from 'react-icons/vsc'
-import toast from 'react-hot-toast'
 
 // Menu items.
 const items = [
@@ -76,12 +66,6 @@ const items = [
     icon: LiaFileInvoiceSolid
   },
   {
-    title: 'Stock & Expiry',
-    url: '/admin/stock-expiry',
-    icon: AlertTriangle,
-    badge: 'Low'
-  },
-  {
     title: 'Reports',
     url: '/admin/reports',
     icon: VscGraphLine
@@ -95,6 +79,7 @@ const items = [
 
 export function AdminAppSidebar() {
   const location = useLocation()
+  const navigate = useNavigate()
 
   const [syncing, setSyncing] = useState(false)
 
@@ -106,6 +91,7 @@ export function AdminAppSidebar() {
       console.log(response)
 
       if (response.success) {
+        localStorage.setItem('lastSyncAt', JSON.stringify(response.data.DateTime))
         toast.dismiss()
         toast.success('Data synced successfully')
       }
@@ -118,23 +104,25 @@ export function AdminAppSidebar() {
   }
 
   const handleLogout = async () => {
-    try {
-      const response = await authApi.logout()
+    navigate('/')
 
-      if (response.success) {
-        localStorage.removeItem('user')
-        toast.success('Logged out successfully')
-        navigate('/login')
-      }
-    } catch (error) {
-      toast.error(error || 'Failed to logout')
-    }
+    // try {
+    //   const response = await authApi.logout()
+
+    //   if (response.success) {
+    //     localStorage.removeItem('user')
+    //     toast.success('Logged out successfully')
+    //     navigate('/login')
+    //   }
+    // } catch (error) {
+    //   toast.error(error || 'Failed to logout')
+    // }
   }
 
   return (
     <Sidebar className="border-0">
-      <SidebarHeader className="p-2 border-b">
-        <SidebarGroupLabel className="text-xl font-medium text-sidebar-foreground">
+      <SidebarHeader className="h-16 border-b border-gray-200 p-0">
+        <SidebarGroupLabel className="h-full text-xl font-medium text-sidebar-foreground flex items-center justify-center">
           Admin Panel
         </SidebarGroupLabel>
       </SidebarHeader>
@@ -200,6 +188,11 @@ export function AdminAppSidebar() {
       <SidebarFooter>
         <SidebarGroupContent>
           <SidebarMenu>
+            <SidebarMenuItem>
+              <p className="text-xs text-sidebar-foreground/50">
+                Last Sync : {JSON.parse(localStorage.getItem('lastSyncAt'))}
+              </p>
+            </SidebarMenuItem>
             <SidebarMenuItem>
               <SidebarMenuButton asChild>
                 <Button

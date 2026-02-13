@@ -9,6 +9,14 @@ export const authApi = {
   logout: () => desktopApi.post('/auth/logout')
 }
 
+export const dashboardApi = {
+  getExpiredProducts: (params) => desktopApi.get('/dashboard/expired', { params }),
+  getExpiringProducts: (params) => desktopApi.get('/dashboard/expiring', { params }),
+  getInventoryStats: () => desktopApi.get('/dashboard/inventory-stats'),
+  getStockTrends: (params) => desktopApi.get('/dashboard/stock-trends', { params }),
+  getCategoryDistribution: () => desktopApi.get('/dashboard/category-distribution')
+}
+
 export const customerApi = {
   getAllCustomers: (params) => desktopApi.get('/parties', { params }),
   getCustomerById: (id) => desktopApi.get(`/parties/${id}`),
@@ -30,7 +38,10 @@ export const productApi = {
   getProductById: (id) => desktopApi.get(`/products/${id}`),
   createProduct: (data) => desktopApi.post('/products', data),
   updateProduct: (id, data) => desktopApi.put(`/products/update/${id}`, data),
-  deleteProduct: (id) => desktopApi.delete(`/products/${id}`)
+  deleteProduct: (id) => desktopApi.delete(`/products/${id}`),
+  getLowStockProducts: (params) => desktopApi.get('/products/low-stock', { params }),
+  getExpiringProducts: (params) => desktopApi.get('/products/expiring', { params }),
+  getExpiredProducts: (params) => desktopApi.get('/products/expired', { params })
 }
 
 export const incomingOrderApi = {

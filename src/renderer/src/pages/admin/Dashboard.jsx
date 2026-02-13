@@ -1,27 +1,26 @@
-import React from 'react'
-import { Card, CardContent, CardHeader, CardTitle, CardDescription } from '@/components/ui/card'
+import { Button } from '@/components/ui/button'
 import {
-  BarChart,
+  Card,
+  CardContent,
+  CardDescription,
+  CardFooter,
+  CardHeader,
+  CardTitle
+} from '@/components/ui/card'
+import { Activity, AlertTriangle, CreditCard, DollarSign, Users } from 'lucide-react'
+import { useDispatch, useSelector } from 'react-redux'
+import { Link } from 'react-router'
+import {
+  Area,
+  AreaChart,
   Bar,
-  XAxis,
-  YAxis,
+  BarChart,
   CartesianGrid,
   Tooltip as RechartsTooltip,
   ResponsiveContainer,
-  LineChart,
-  Line,
-  AreaChart,
-  Area
+  XAxis,
+  YAxis
 } from 'recharts'
-import {
-  DollarSign,
-  Users,
-  CreditCard,
-  Activity,
-  TrendingUp,
-  Package,
-  AlertTriangle
-} from 'lucide-react'
 
 // Dummy Data
 const salesData = [
@@ -80,11 +79,16 @@ const lowStockItems = [
 ]
 
 function Dashboard() {
+  const dispatch = useDispatch()
+  const { lowStockProducts, expiredProducts } = useSelector((state) => state.dashboard)
+
+  console.log('lowStockProducts :: ', lowStockProducts)
+
   return (
     <div className="flex-1 space-y-4 p-8 pt-6">
-      <div className="flex items-center justify-between space-y-2">
+      {/* <div className="flex items-center justify-between space-y-2">
         <h2 className="text-3xl font-bold tracking-tight">Dashboard</h2>
-      </div>
+      </div> */}
 
       {/* Stats Cards */}
       <div className="grid gap-4 md:grid-cols-2 lg:grid-cols-4">
@@ -205,7 +209,7 @@ function Dashboard() {
         </Card>
       </div>
 
-      <div className="grid gap-4 md:grid-cols-2 lg:grid-cols-7">
+      <div className="grid gap-3 md:grid-cols-2 lg:grid-cols-7">
         {/* Low Stock Alerts */}
         <Card className="col-span-3">
           <CardHeader>
@@ -216,26 +220,29 @@ function Dashboard() {
             <CardDescription>Medicines running low on inventory.</CardDescription>
           </CardHeader>
           <CardContent>
-            <div className="space-y-4">
-              {lowStockItems.map((item, index) => (
-                <div
-                  key={index}
-                  className="flex items-center justify-between rounded-lg border p-3 shadow-sm bg-destructive/5 border-destructive/20"
-                >
-                  <div className="space-y-0.5">
-                    <div className="text-sm font-medium">{item.name}</div>
-                    <div className="text-xs text-muted-foreground">
-                      Current Stock:{' '}
-                      <span className="font-bold text-destructive">{item.stock}</span>
+            <div className="space-y-2">
+              {lowStockProducts &&
+                lowStockProducts.slice(0, 5).map((item, index) => (
+                  <div
+                    key={index}
+                    className="flex items-center justify-between border p-3 shadow-sm bg-destructive/5 border-destructive/20"
+                  >
+                    <div className="space-y-0.5">
+                      <div className="text-sm font-medium">{item.name}</div>
+                      <div className="text-xs text-muted-foreground">
+                        Current Stock:{' '}
+                        <span className="font-bold text-destructive">{item.stock}</span>
+                      </div>
                     </div>
                   </div>
-                  <div className="text-xs font-medium bg-white px-2 py-1 rounded border border-destructive/20">
-                    Min: {item.minLevel}
-                  </div>
-                </div>
-              ))}
+                ))}
             </div>
           </CardContent>
+          <CardFooter>
+            <Button className="w-full" variant="outline" asChild>
+              <Link to="/admin/stock-expiry">View All</Link>
+            </Button>
+          </CardFooter>
         </Card>
 
         {/* Another Chart (Area) */}

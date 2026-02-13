@@ -36,34 +36,42 @@ function Login() {
       return
     }
 
-    setLoading(true)
-
-    try {
-      const response = await authApi.login(formData)
-
-      if (response.success) {
-        const user = response.data
-
-        // Store user data in localStorage
-        localStorage.setItem('user', JSON.stringify(user))
-
-        // Redirect based on role
-        if (user.role === 'admin') {
-          navigate('/admin/dashboard')
-        } else if (user.role === 'staff') {
-          navigate('/staff/dashboard')
-        } else {
-          setError('Invalid user role')
-        }
-      } else {
-        setError(response.message || 'Login failed')
-      }
-    } catch (err) {
-      console.error('Login error:', err)
-      setError(err.message || 'An error occurred during login. Please try again.')
-    } finally {
-      setLoading(false)
+    if (formData.userId === 'admin' && formData.password === 'admin') {
+      navigate('/admin/dashboard')
+    } else if (formData.userId === 'staff' && formData.password === 'staff') {
+      navigate('/staff/dashboard')
+    } else {
+      setError('Invalid credentials')
     }
+
+    // setLoading(true)
+
+    // try {
+    //   const response = await authApi.login(formData)
+
+    //   if (response.success) {
+    //     const user = response.data
+
+    //     // Store user data in localStorage
+    //     localStorage.setItem('user', JSON.stringify(user))
+
+    //     // Redirect based on role
+    //     if (user.role === 'admin') {
+    //       navigate('/admin/dashboard')
+    //     } else if (user.role === 'staff') {
+    //       navigate('/staff/dashboard')
+    //     } else {
+    //       setError('Invalid user role')
+    //     }
+    //   } else {
+    //     setError(response.message || 'Login failed')
+    //   }
+    // } catch (err) {
+    //   console.error('Login error:', err)
+    //   setError(err.message || 'An error occurred during login. Please try again.')
+    // } finally {
+    //   setLoading(false)
+    // }
   }
 
   return (

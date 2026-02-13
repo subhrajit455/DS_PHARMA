@@ -12,6 +12,7 @@ import {
   SelectValue
 } from '@/components/ui/select'
 import { categoryUrl } from '@/config'
+import { deleteCategory, setCategories } from '@/store/features/categorySlice'
 import axios from 'axios'
 import {
   CheckCircle2,
@@ -25,9 +26,13 @@ import {
 import { useEffect, useState } from 'react'
 import toast from 'react-hot-toast'
 import { IoIosRefresh } from 'react-icons/io'
+import { useDispatch, useSelector } from 'react-redux'
 
 function Categories() {
-  const [categories, setCategories] = useState([])
+  const { categories } = useSelector((state) => state.category)
+
+  const dispatch = useDispatch()
+
   const [loading, setLoading] = useState(false)
   const [stats, setStats] = useState({
     total: 0,
@@ -56,7 +61,7 @@ function Categories() {
 
       const data = response.data
 
-      setCategories(data.categories || [])
+      dispatch(setCategories(data.categories || []))
       setPagination({
         page: data.currentPage,
         limit: pagination.limit,
@@ -79,10 +84,6 @@ function Categories() {
       setLoading(false)
     }
   }
-
-  useEffect(() => {
-    fetchCategories()
-  }, [pagination.page, pagination.limit, query])
 
   useEffect(() => {
     if (!open) {
@@ -116,7 +117,7 @@ function Categories() {
 
       if (response.data.success) {
         toast.success(response.data.message)
-        fetchCategories()
+        dispatch(deleteCategory(categoryId))
       }
     } catch (error) {
       console.log(error)
@@ -125,20 +126,7 @@ function Categories() {
   }
 
   return (
-    <div className="flex flex-col h-full overflow-hidden p-8 pt-6 gap-4">
-      <div className="flex items-center justify-between shrink-0">
-        <h2 className="text-3xl font-bold tracking-tight">Categories</h2>
-        <Button
-          onClick={() => {
-            setSelectedCategory(null)
-            setOpen(true)
-          }}
-        >
-          <Plus className="h-4 w-4" />
-          Create New Category
-        </Button>
-      </div>
-
+    <div className="flex flex-col h-full overflow-hidden px-6 py-4 gap-4">
       <div className="grid gap-4 md:grid-cols-4 shrink-0">
         <Card>
           <CardHeader className="flex flex-row items-center justify-between space-y-0">
@@ -191,6 +179,16 @@ function Categories() {
             <IoIosRefresh className={loading ? 'animate-spin' : ''} />
             Refresh
           </Button>
+          <Button
+            onClick={() => {
+              setSelectedCategory(null)
+              setOpen(true)
+            }}
+            title="Create New Category"
+          >
+            <Plus className="h-4 w-4" />
+            Create
+          </Button>
         </div>
 
         {loading ? (
@@ -226,97 +224,59 @@ function Categories() {
           <div className="flex flex-col flex-1 overflow-hidden">
             <div className="flex-1 overflow-auto p-1">
               <div className="grid grid-cols-2 md:grid-cols-4 lg:grid-cols-6 gap-3">
-                {categories.map((category) => (
-                  <div
-                    key={category._id}
-                    className="group overflow-hidden shadow-lg transition-all"
-                  >
-                    <div className="relative h-40 overflow-hidden">
-                      <img
-                        src={category.images[0]?.url}
-                        alt={category.name}
-                        className="w-full h-full object-cover group-hover:scale-105 transition-transform duration-300"
-                      />
+                {categories &&
+                  categories?.map((category) => (
+                    <div
+                      key={category._id}
+                      className="group overflow-hidden shadow-lg transition-all"
+                    >
+                      <div className="relative h-40 overflow-hidden">
+                        <img
+                          src={category?.images[0]?.url}
+                          alt={category?.name}
+                          className="w-full h-full object-cover group-hover:scale-105 transition-transform duration-300"
+                        />
 
-                      {/* Status Badge */}
-                      <Badge
-                        className={`absolute top-1.5 right-1.5 text-xs px-1.5 py-0.5 ${
-                          category.visibility ? 'bg-green-500' : 'bg-gray-500'
-                        }`}
-                      >
-                        {category.visibility ? 'Active' : 'Hidden'}
-                      </Badge>
-                    </div>
+                        {/* Status Badge */}
+                        <Badge
+                          className={`absolute top-1.5 right-1.5 text-xs px-1.5 py-0.5 ${
+                            category?.visibility ? 'bg-green-500' : 'bg-gray-500'
+                          }`}
+                        >
+                          {category?.visibility ? 'Active' : 'Hidden'}
+                        </Badge>
+                      </div>
 
-                    <div className="p-2 bg-white">
-                      <h3
-                        className="font-semibold text-sm truncate capitalize"
-                        title={category.name}
-                      >
-                        {category.name}
-                      </h3>
+                      <div className="p-2 bg-white">
+                        <h3
+                          className="font-semibold text-sm truncate capitalize"
+                          title={category?.name}
+                        >
+                          {category?.name}
+                        </h3>
 
-                      <p className="text-[10px] text-muted-foreground mt-0.5">
-                        {new Date(category.createdAt).toLocaleDateString('en-IN', {
-                          day: '2-digit',
-                          month: 'short',
-                          year: 'numeric'
-                        })}
-                      </p>
-
-                      <Button
-                        variant="outline"
-                        size="sm"
-                        className="w-full mt-2"
-                        onClick={() => {
-                          setSelectedCategory(category)
-                          setOpen(true)
-                        }}
-                      >
-                        Edit
-                      </Button>
-
-                      {/* <div className="flex items-center justify-between mt-2 pt-2 border-t">
-                        <div className="flex gap-0.5">
-                          <Button
-                            title="Edit"
-                            size="icon"
-                            variant="ghost"
-                            className="h-7 w-7 text-blue-600"
-                            onClick={() => handleEdit(category)}
-                          >
-                            <Pencil className="h-3.5 w-3.5" />
-                          </Button>
-
-                          <Button
-                            title={category.visibility ? 'Hide' : 'Show'}
-                            size="icon"
-                            variant="ghost"
-                            className={`h-7 w-7 ${
-                              category.visibility ? 'text-gray-600' : 'text-green-600'
-                            }`}
-                          >
-                            {category.visibility ? (
-                              <EyeOff className="h-3.5 w-3.5" />
-                            ) : (
-                              <Eye className="h-3.5 w-3.5" />
-                            )}
-                          </Button>
-                        </div>
+                        <p className="text-[10px] text-muted-foreground mt-0.5">
+                          {new Date(category?.createdAt).toLocaleDateString('en-IN', {
+                            day: '2-digit',
+                            month: 'short',
+                            year: 'numeric'
+                          })}
+                        </p>
 
                         <Button
-                          title="Delete"
-                          size="icon"
-                          variant="ghost"
-                          className="h-7 w-7 text-red-600"
-                          onClick={() => handleDelete(category._id)}
+                          variant="outline"
+                          size="sm"
+                          className="w-full mt-2"
+                          onClick={() => {
+                            setSelectedCategory(category)
+                            setOpen(true)
+                          }}
                         >
-                          <Trash2 className="h-3.5 w-3.5" />
+                          Edit
                         </Button>
-                      </div> */}
+                      </div>
                     </div>
-                  </div>
-                ))}
+                  ))}
               </div>
             </div>
 
@@ -371,7 +331,6 @@ function Categories() {
       <CreateEditCategory
         open={open}
         setOpen={setOpen}
-        setCategories={setCategories}
         isEdit={Boolean(selectedCategory)}
         categoryData={selectedCategory}
       />

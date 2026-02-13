@@ -1,5 +1,6 @@
-import { productApi } from '@/api'
+import { dashboardApi, productApi } from '@/api'
 import EditProductDialog from '@/components/EditProductDialog'
+import ProductTable from '@/components/ProductTable'
 import { Badge } from '@/components/ui/badge'
 import { Button } from '@/components/ui/button'
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card'
@@ -19,33 +20,72 @@ import {
   TableHeader,
   TableRow
 } from '@/components/ui/table'
+import { Tabs, TabsContent, TabsList, TabsTrigger } from '@/components/ui/tabs'
 import ViewProductDialog from '@/components/ViewProductDialog'
 import {
   AlertTriangle,
+  BarChart3,
   ChevronLeft,
   ChevronRight,
+  Clock,
   DollarSign,
   Eye,
   Loader2,
   Package,
   Pencil,
   Search,
-  TrendingUp
+  TrendingUp,
+  XCircle
 } from 'lucide-react'
 import { useEffect, useState } from 'react'
 import toast from 'react-hot-toast'
 import { IoIosRefresh } from 'react-icons/io'
+import {
+  Area,
+  AreaChart,
+  Bar,
+  BarChart,
+  CartesianGrid,
+  Cell,
+  Legend,
+  Line,
+  LineChart,
+  Pie,
+  PieChart,
+  ResponsiveContainer,
+  Tooltip,
+  XAxis,
+  YAxis
+} from 'recharts'
+
+const COLORS = ['#ef4444', '#f97316', '#eab308', '#22c55e', '#3b82f6', '#8b5cf6']
 
 export default function Inventory() {
+  const [activeTab, setActiveTab] = useState('all')
   const [products, setProducts] = useState([])
+  const [lowStockProducts, setLowStockProducts] = useState([])
+  const [expiringProducts, setExpiringProducts] = useState([])
   const [loading, setLoading] = useState(false)
   const [stats, setStats] = useState({
     total: 0,
-    inStock: 0,
-    outStock: 0,
+    lowStock: 0,
+    expiringSoon: 0,
+    expired: 0,
     totalValue: 0
   })
   const [pagination, setPagination] = useState({
+    page: 1,
+    limit: 25,
+    total: 0,
+    totalPages: 0
+  })
+  const [lowStockPagination, setLowStockPagination] = useState({
+    page: 1,
+    limit: 25,
+    total: 0,
+    totalPages: 0
+  })
+  const [expiringPagination, setExpiringPagination] = useState({
     page: 1,
     limit: 25,
     total: 0,
@@ -56,11 +96,15 @@ export default function Inventory() {
   const [sort, setSort] = useState('name')
   const [sortOrder, setSortOrder] = useState(1)
   const [stockStatus, setStockStatus] = useState(1)
-  const [isDeleted, setIsDeleted] = useState(0)
+  const [expiryDays, setExpiryDays] = useState(30)
 
   const [editDialog, setEditDialog] = useState(false)
   const [selectedProduct, setSelectedProduct] = useState(null)
   const [viewDialog, setViewDialog] = useState(false)
+
+  // Analytics data
+  const [stockTrends, setStockTrends] = useState([])
+  const [categoryDistribution, setCategoryDistribution] = useState([])
 
   const fetchProducts = async () => {
     setLoading(true)
@@ -73,7 +117,7 @@ export default function Inventory() {
         sortBy: sort,
         order: sortOrder,
         stock: stockStatus,
-        is_deleted: isDeleted
+        is_deleted: 0
       })
 
       if (response.success) {
@@ -88,13 +132,6 @@ export default function Inventory() {
           total: data.totalProducts,
           totalPages: data.totalPages
         })
-
-        setStats({
-          total: data.totalProducts,
-          inStock: data.totalInStock,
-          outStock: data.totalOutStock,
-          totalValue: data.totalInventoryValue
-        })
       }
     } catch (error) {
       toast.dismiss()
@@ -105,314 +142,300 @@ export default function Inventory() {
     }
   }
 
+  const fetchLowStockProducts = async () => {
+    setLoading(true)
+    try {
+      const response = await productApi.getLowStockProducts({
+        page: lowStockPagination.page,
+        limit: lowStockPagination.limit
+      })
+      if (response.success) {
+        setLowStockProducts(response.data.lowStockProducts || [])
+        setLowStockPagination({
+          page: response.data.currentPage || 1,
+          limit: lowStockPagination.limit,
+          total: response.data.totalProducts || 0,
+          totalPages: response.data.totalPages || 0
+        })
+        setStats((prev) => ({
+          ...prev,
+          lowStock: response.data.totalProducts || 0
+        }))
+      }
+    } catch (error) {
+      console.error('Error fetching low stock products:', error)
+    } finally {
+      setLoading(false)
+    }
+  }
+
+  const fetchExpiringProducts = async () => {
+    setLoading(true)
+    try {
+      const response = await productApi.getExpiringProducts({
+        days: expiryDays,
+        page: expiringPagination.page,
+        limit: expiringPagination.limit
+      })
+      if (response.success) {
+        setExpiringProducts(response.data.expiringProducts || [])
+        setExpiringPagination({
+          page: response.data.currentPage || 1,
+          limit: expiringPagination.limit,
+          total: response.data.totalProducts || 0,
+          totalPages: response.data.totalPages || 0
+        })
+        setStats((prev) => ({
+          ...prev,
+          expiringSoon: response.data.totalProducts || 0
+        }))
+      }
+    } catch (error) {
+      console.error('Error fetching expiring products:', error)
+    } finally {
+      setLoading(false)
+    }
+  }
+
+  const fetchExpiredProducts = async () => {
+    setLoading(true)
+    try {
+      const response = await productApi.getExpiredProducts({
+        page: expiringPagination.page,
+        limit: expiringPagination.limit
+      })
+      if (response.success) {
+        setExpiringProducts(response.data.expiringProducts || [])
+        setExpiringPagination({
+          page: response.data.currentPage || 1,
+          limit: expiringPagination.limit,
+          total: response.data.totalProducts || 0,
+          totalPages: response.data.totalPages || 0
+        })
+        setStats((prev) => ({
+          ...prev,
+          expiringSoon: response.data.totalProducts || 0
+        }))
+      }
+    } catch (error) {
+      console.error('Error fetching expiring products:', error)
+    } finally {
+      setLoading(false)
+    }
+  }
+
+  const fetchAnalyticsData = async () => {
+    try {
+      // Mock data for now - replace with actual API calls when backend is ready
+      setStockTrends([
+        { date: '2026-01-01', avgStock: 450, lowStockItems: 12 },
+        { date: '2026-01-15', avgStock: 420, lowStockItems: 18 },
+        { date: '2026-02-01', avgStock: 380, lowStockItems: 24 },
+        { date: '2026-02-10', avgStock: 350, lowStockItems: 28 }
+      ])
+
+      setCategoryDistribution([
+        { name: 'Antibiotics', value: 8 },
+        { name: 'Pain Relief', value: 12 },
+        { name: 'Vitamins', value: 5 },
+        { name: 'Antiseptics', value: 3 },
+        { name: 'Others', value: 6 }
+      ])
+    } catch (error) {
+      console.error('Error fetching analytics:', error)
+    }
+  }
+
+  const fetchStats = async () => {
+    try {
+      const [products, lowStockProducts, expiringProducts, expiredProducts] = await Promise.all([
+        productApi.getAllProducts(),
+        productApi.getLowStockProducts(),
+        productApi.getExpiringProducts(),
+        productApi.getExpiredProducts()
+      ])
+
+      console.log({
+        products,
+        lowStockProducts,
+        expiringProducts
+      })
+
+      setStats({
+        totalProducts: products.data.totalProducts,
+        lowStockProducts: lowStockProducts.data.totalProducts,
+        expiringProducts: expiringProducts.data.totalProducts,
+        expiredProducts: expiredProducts.data.totalProducts
+      })
+    } catch (error) {
+      console.error('Error fetching stats:', error)
+    }
+  }
+
   useEffect(() => {
-    fetchProducts()
-  }, [pagination.page, pagination.limit, query, sort, sortOrder, stockStatus, isDeleted])
-
-  const handleSearch = () => {
-    setQuery(searchInput)
-    setPagination((prev) => ({ ...prev, page: 1 }))
-  }
-
-  const handlePageChange = (newPage) => {
-    setPagination((prev) => ({ ...prev, page: newPage }))
-  }
-
-  const handleLimitChange = (newLimit) => {
-    setPagination((prev) => ({ ...prev, limit: parseInt(newLimit), page: 1 }))
-  }
-
-  const handleEdit = (product) => {
-    setSelectedProduct(product)
-    setEditDialog(true)
-  }
-
-  const handleView = (product) => {
-    setSelectedProduct(product)
-    setViewDialog(true)
-  }
+    fetchStats()
+  }, [])
 
   return (
-    <div className="flex flex-col h-full overflow-hidden p-8 pt-6 gap-4">
-      {/* Header */}
-      <div className="flex items-center justify-between shrink-0">
-        <h2 className="text-3xl font-bold tracking-tight">Inventory</h2>
-      </div>
-
-      {/* Stats Cards */}
+    <div className="flex flex-col h-full overflow-hidden px-6 py-4 gap-4">
+      {/* KPI Cards */}
       <div className="grid gap-4 md:grid-cols-2 lg:grid-cols-4 shrink-0">
-        <Card>
+        <Card
+          className="cursor-pointer hover:shadow-md transition-shadow"
+          onClick={() => setActiveTab('all')}
+        >
           <CardHeader className="flex flex-row items-center justify-between space-y-0 pb-2">
             <CardTitle className="text-sm font-medium">Total Products</CardTitle>
             <Package className="h-4 w-4 text-muted-foreground" />
           </CardHeader>
           <CardContent>
-            <div className="text-2xl font-bold">{stats.total}</div>
+            <div className="text-2xl font-bold">{pagination.total}</div>
             <p className="text-xs text-muted-foreground">All products in inventory</p>
           </CardContent>
         </Card>
 
-        <Card>
+        <Card
+          className="cursor-pointer hover:shadow-md transition-shadow"
+          onClick={() => setActiveTab('low-stock')}
+        >
           <CardHeader className="flex flex-row items-center justify-between space-y-0 pb-2">
-            <CardTitle className="text-sm font-medium">In Stock</CardTitle>
-            <TrendingUp className="h-4 w-4 text-muted-foreground" />
+            <CardTitle className="text-sm font-medium">Low Stock</CardTitle>
+            <AlertTriangle className="h-4 w-4 text-destructive" />
           </CardHeader>
           <CardContent>
-            <div className="text-2xl font-bold">{stats.inStock}</div>
-            <p className="text-xs text-muted-foreground">Available for sale</p>
+            <div className="text-2xl font-bold text-destructive">{stats.lowStock}</div>
+            <p className="text-xs text-muted-foreground">Below minimum level</p>
           </CardContent>
         </Card>
 
-        <Card>
+        <Card
+          className="cursor-pointer hover:shadow-md transition-shadow"
+          onClick={() => setActiveTab('expiring')}
+        >
           <CardHeader className="flex flex-row items-center justify-between space-y-0 pb-2">
-            <CardTitle className="text-sm font-medium">Out of Stock</CardTitle>
-            <AlertTriangle className="h-4 w-4 text-muted-foreground" />
+            <CardTitle className="text-sm font-medium">Expiring Soon</CardTitle>
+            <Clock className="h-4 w-4 text-orange-500" />
           </CardHeader>
           <CardContent>
-            <div className="text-2xl font-bold text-red-600">{stats.outStock}</div>
-            <p className="text-xs text-muted-foreground">Unavailable items</p>
+            <div className="text-2xl font-bold text-orange-600">{stats.expiringSoon}</div>
+            <p className="text-xs text-muted-foreground">Within 30 days</p>
           </CardContent>
         </Card>
 
-        <Card>
+        <Card className="cursor-pointer hover:shadow-md transition-shadow">
           <CardHeader className="flex flex-row items-center justify-between space-y-0 pb-2">
-            <CardTitle className="text-sm font-medium">Total Value</CardTitle>
-            <DollarSign className="h-4 w-4 text-muted-foreground" />
+            <CardTitle className="text-sm font-medium">Expired</CardTitle>
+            <XCircle className="h-4 w-4 text-red-700" />
           </CardHeader>
           <CardContent>
-            <div className="text-2xl font-bold">₹{stats.totalValue.toFixed(2)}</div>
-            <p className="text-xs text-muted-foreground">Inventory worth</p>
+            <div className="text-2xl font-bold text-red-700">{stats.expired}</div>
+            <p className="text-xs text-muted-foreground">Past expiry date</p>
           </CardContent>
         </Card>
       </div>
 
-      <div className="flex flex-col flex-1 overflow-hidden gap-4">
-        <div className="flex items-center gap-2 shrink-0">
-          <div className="relative flex-1">
-            <Search className="absolute left-3 top-1/2 h-4 w-4 -translate-y-1/2 text-muted-foreground" />
-            <Input
-              placeholder="Search products by name or code..."
-              value={searchInput}
-              onChange={(e) => setSearchInput(e.target.value)}
-              onKeyDown={(e) => e.key === 'Enter' && handleSearch()}
-              className="pl-9"
-            />
+      {/* Tabs */}
+      <Tabs
+        value={activeTab}
+        onValueChange={setActiveTab}
+        className="flex flex-col flex-1 overflow-hidden"
+      >
+        <TabsList className="shrink-0">
+          <TabsTrigger value="all">All Products</TabsTrigger>
+          <TabsTrigger value="low-stock">Low Stock</TabsTrigger>
+          <TabsTrigger value="expiring">Expiring Soon</TabsTrigger>
+          <TabsTrigger value="analytics">Analytics</TabsTrigger>
+        </TabsList>
+
+        {/* All Products Tab */}
+        <TabsContent value="all" className="flex flex-col flex-1 overflow-hidden gap-4 mt-4">
+          <ProductTable apiFn={productApi.getAllProducts} tableType="all" />
+        </TabsContent>
+
+        {/* Low Stock Tab */}
+        <TabsContent value="low-stock" className="flex flex-col flex-1 overflow-hidden gap-4 mt-4">
+          <ProductTable apiFn={productApi.getLowStockProducts} tableType="lowStock" />
+        </TabsContent>
+
+        {/* Expiring Soon Tab */}
+        <TabsContent value="expiring" className="flex flex-col flex-1 overflow-hidden gap-4 mt-4">
+          <ProductTable
+            apiFn={productApi.getExpiringProducts}
+            tableType="expiring"
+            apiParams={{ days: 30 }}
+          />
+        </TabsContent>
+
+        {/* Analytics Tab */}
+        <TabsContent value="analytics" className="flex flex-col flex-1 overflow-auto gap-4 mt-4">
+          <div className="grid gap-4 md:grid-cols-2">
+            {/* Stock Trend Chart */}
+            <Card>
+              <CardHeader>
+                <CardTitle className="text-base">Stock Level Trend</CardTitle>
+              </CardHeader>
+              <CardContent>
+                <ResponsiveContainer width="100%" height={250}>
+                  <LineChart data={stockTrends}>
+                    <CartesianGrid strokeDasharray="3 3" />
+                    <XAxis dataKey="date" fontSize={12} />
+                    <YAxis fontSize={12} />
+                    <Tooltip />
+                    <Legend />
+                    <Line type="monotone" dataKey="avgStock" stroke="#3b82f6" name="Avg Stock" />
+                    <Line
+                      type="monotone"
+                      dataKey="lowStockItems"
+                      stroke="#ef4444"
+                      name="Low Stock Items"
+                    />
+                  </LineChart>
+                </ResponsiveContainer>
+              </CardContent>
+            </Card>
+
+            {/* Category Distribution */}
+            <Card>
+              <CardHeader>
+                <CardTitle className="text-base">Low Stock by Category</CardTitle>
+              </CardHeader>
+              <CardContent>
+                <ResponsiveContainer width="100%" height={250}>
+                  <PieChart>
+                    <Pie
+                      data={categoryDistribution}
+                      cx="50%"
+                      cy="50%"
+                      labelLine={false}
+                      label={({ name, percent }) => `${name} ${(percent * 100).toFixed(0)}%`}
+                      outerRadius={80}
+                      fill="#8884d8"
+                      dataKey="value"
+                    >
+                      {categoryDistribution.map((entry, index) => (
+                        <Cell key={`cell-${index}`} fill={COLORS[index % COLORS.length]} />
+                      ))}
+                    </Pie>
+                    <Tooltip />
+                  </PieChart>
+                </ResponsiveContainer>
+              </CardContent>
+            </Card>
+
+            {/* Placeholder for more charts */}
+            <Card className="md:col-span-2">
+              <CardHeader>
+                <CardTitle className="text-base">Inventory Insights</CardTitle>
+              </CardHeader>
+              <CardContent>
+                <div className="text-sm text-muted-foreground text-center py-8">
+                  Additional analytics charts will be displayed here
+                </div>
+              </CardContent>
+            </Card>
           </div>
-          <Button onClick={handleSearch}>Search</Button>
-          <Select value={sort} onValueChange={(value) => setSort(value)}>
-            <SelectTrigger>
-              <SelectValue placeholder="Sort by" />
-            </SelectTrigger>
-            <SelectContent>
-              <SelectItem value="name">Name</SelectItem>
-              <SelectItem value="code">Code</SelectItem>
-              <SelectItem value="mrp">MRP</SelectItem>
-              <SelectItem value="p_rate">Purchase Rate</SelectItem>
-              <SelectItem value="stock">Stock</SelectItem>
-            </SelectContent>
-          </Select>
-          <Select value={sortOrder} onValueChange={(value) => setSortOrder(value)}>
-            <SelectTrigger>
-              <SelectValue placeholder="Sort order" />
-            </SelectTrigger>
-            <SelectContent>
-              <SelectItem value={1}>Ascending</SelectItem>
-              <SelectItem value={-1}>Descending</SelectItem>
-            </SelectContent>
-          </Select>
-          <Select value={stockStatus} onValueChange={(value) => setStockStatus(value)}>
-            <SelectTrigger>
-              <SelectValue placeholder="Stock status" />
-            </SelectTrigger>
-            <SelectContent>
-              <SelectItem value={0}>Out of Stock</SelectItem>
-              <SelectItem value={1}>In Stock</SelectItem>
-              <SelectItem value={2}>All</SelectItem>
-            </SelectContent>
-          </Select>
-          <Button onClick={() => fetchProducts()} disabled={loading} variant="outline">
-            <IoIosRefresh className={loading ? 'animate-spin' : ''} />
-            Refresh
-          </Button>
-        </div>
-        <div className="flex flex-col flex-1 overflow-hidden border">
-          <div className="flex-1 overflow-auto relative">
-            <div className="absolute inset-0 overflow-auto">
-              <Table>
-                <TableHeader className="sticky top-0 bg-primary text-white z-10 shadow-sm">
-                  <TableRow>
-                    <TableHead className="bg-primary text-white">Code</TableHead>
-                    <TableHead className="bg-primary text-white">Name</TableHead>
-                    <TableHead className="bg-primary text-white">Company</TableHead>
-                    <TableHead className="bg-primary text-white">MRP</TableHead>
-                    <TableHead className="bg-primary text-white">Rate</TableHead>
-                    <TableHead className="bg-primary text-white">P.Rate</TableHead>
-                    <TableHead className="text-center bg-primary text-white">Stock</TableHead>
-                    <TableHead className="text-center bg-primary text-white">Deal</TableHead>
-                    <TableHead className="text-center bg-primary text-white">Status</TableHead>
-                    <TableHead className="text-right bg-primary text-white">Actions</TableHead>
-                  </TableRow>
-                </TableHeader>
-                <TableBody>
-                  {loading ? (
-                    <TableRow>
-                      <TableCell colSpan={10} className="text-center py-6">
-                        <div className="flex items-center justify-center gap-2 text-muted-foreground">
-                          <Loader2 className="h-4 w-4 animate-spin" />
-                          Loading products...
-                        </div>
-                      </TableCell>
-                    </TableRow>
-                  ) : products.length === 0 ? (
-                    <TableRow>
-                      <TableCell colSpan={10} className="text-center py-6 text-muted-foreground">
-                        No products found
-                      </TableCell>
-                    </TableRow>
-                  ) : (
-                    products.map((product) => (
-                      <TableRow key={product._id}>
-                        <TableCell className="font-medium font-mono text-xs">
-                          {product.code}
-                        </TableCell>
-
-                        <TableCell>
-                          <div className="flex flex-col">
-                            <span className="font-medium">{product.name}</span>
-                            {product.packing && (
-                              <span className="text-xs text-muted-foreground">
-                                {product.packing}
-                              </span>
-                            )}
-                          </div>
-                        </TableCell>
-
-                        <TableCell className="text-sm">{product.company || '-'}</TableCell>
-
-                        <TableCell className="font-medium">
-                          ₹{Number(product.MRP || 0).toFixed(2)}
-                        </TableCell>
-
-                        <TableCell>₹{Number(product.Rate || 0).toFixed(2)}</TableCell>
-
-                        <TableCell>₹{Number(product.PRate || 0).toFixed(2)}</TableCell>
-
-                        <TableCell className="text-center">
-                          <span
-                            className={
-                              product.stock <= 0
-                                ? 'text-red-600 font-medium'
-                                : product.stock <= 10
-                                  ? 'text-orange-600 font-medium'
-                                  : 'text-green-600 font-medium'
-                            }
-                          >
-                            {product.stock ?? 0}
-                          </span>
-                        </TableCell>
-
-                        <TableCell className="text-center">
-                          {product.Deal > 0 ? (
-                            <span className="text-sm font-medium text-blue-600">
-                              {product.Deal}+{product.Free}
-                            </span>
-                          ) : (
-                            <span className="text-muted-foreground">-</span>
-                          )}
-                        </TableCell>
-
-                        <TableCell className="text-center">
-                          <Badge
-                            variant={
-                              product.stock <= 0
-                                ? 'destructive'
-                                : product.stock <= 10
-                                  ? 'secondary'
-                                  : 'default'
-                            }
-                          >
-                            {product.stock <= 0
-                              ? 'Out of Stock'
-                              : product.stock <= 10
-                                ? 'Low Stock'
-                                : 'In Stock'}
-                          </Badge>
-                        </TableCell>
-
-                        <TableCell className="text-right flex gap-1">
-                          <Button
-                            variant="outline"
-                            size="icon"
-                            onClick={() => handleEdit(product)}
-                            className="h-8 w-8"
-                          >
-                            <Pencil className="h-4 w-4" />
-                          </Button>
-                          <Button
-                            variant="outline"
-                            size="icon"
-                            onClick={() => handleView(product)}
-                            className="h-8 w-8"
-                          >
-                            <Eye className="h-4 w-4" />
-                          </Button>
-                        </TableCell>
-                      </TableRow>
-                    ))
-                  )}
-                </TableBody>
-              </Table>
-            </div>
-          </div>
-
-          {/* Pagination */}
-          <div className="flex items-center justify-between p-2 border-t shrink-0 bg-background">
-            <div className="flex items-center gap-2">
-              <span className="text-sm text-muted-foreground">Show</span>
-              <Select value={pagination.limit.toString()} onValueChange={handleLimitChange}>
-                <SelectTrigger className="w-20">
-                  <SelectValue />
-                </SelectTrigger>
-                <SelectContent>
-                  <SelectItem value="25">25</SelectItem>
-                  <SelectItem value="50">50</SelectItem>
-                  <SelectItem value="100">100</SelectItem>
-                  <SelectItem value="150">150</SelectItem>
-                  <SelectItem value="200">200</SelectItem>
-                </SelectContent>
-              </Select>
-              <span className="text-sm text-muted-foreground">
-                Showing {(pagination.page - 1) * pagination.limit + 1} to{' '}
-                {Math.min(pagination.page * pagination.limit, pagination.total)} of{' '}
-                {pagination.total}
-              </span>
-            </div>
-            <div className="flex items-center gap-2">
-              <Button
-                variant="outline"
-                size="sm"
-                onClick={() => handlePageChange(pagination.page - 1)}
-                disabled={pagination.page === 1}
-              >
-                <ChevronLeft className="h-4 w-4" />
-                Previous
-              </Button>
-              <div className="text-sm">
-                Page {pagination.page} of {pagination.totalPages}
-              </div>
-              <Button
-                variant="outline"
-                size="sm"
-                onClick={() => handlePageChange(pagination.page + 1)}
-                disabled={pagination.page >= pagination.totalPages}
-              >
-                Next
-                <ChevronRight className="h-4 w-4" />
-              </Button>
-            </div>
-          </div>
-        </div>
-      </div>
+        </TabsContent>
+      </Tabs>
 
       <ViewProductDialog open={viewDialog} setOpen={setViewDialog} productData={selectedProduct} />
 
