@@ -16,7 +16,8 @@ app.use(
     origin: [
       "http://localhost:5173",
       "http://192.168.0.113:5173",
-      "http:192.168.0.168:5173",
+      "http://192.168.0.168:5173",
+      "http://192.168.0.123:5173",
       "https://www.dspharma.online",
       "https://dspharma.online",
       "https://dspharma.pages.dev",
@@ -30,6 +31,10 @@ app.use(express.static("public"));
 app.use(cookieParser());
 app.use(morgan(":method :url :status - :response-time ms"));
 
+// Cron jobs
+import { syncMasterDataCron } from "./cron/masterSync.cron.js";
+// syncMasterDataCron();
+
 app.get("/status", (req, res) => {
   res.send("Server is running");
 });
@@ -42,6 +47,8 @@ import productRoute from "./modules/products/product.route.js";
 import partyRouter from "./modules/party/party.route.js";
 import orderRouter from "./modules/order/order.route.js";
 import staffRouter from "./modules/staff/staff.route.js";
+import dashboardRouter from "./modules/dashboard/dashboard.route.js";
+import hsnRouter from "./modules/hsncode/hsn.route.js";
 
 // Middleware import
 import { errorHandler } from "./middlewares/errorHandler.middleware.js";
@@ -50,10 +57,12 @@ import { errorHandler } from "./middlewares/errorHandler.middleware.js";
 app.use("/api/v1/auth", authRouter);
 app.use("/api/v1/products", productRoute);
 app.use("/api/v1/categories", categoryRouter);
+app.use("/api/v1/hsn", hsnRouter);
 app.use("/api/v1/parties", partyRouter);
 app.use("/api/v1/order", orderRouter);
 app.use("/api/v1/staff", staffRouter);
 app.use("/api/v1/master-sync", masterSyncRouter);
+app.use("/api/v1/dashboard", dashboardRouter);
 
 // Global error handler - MUST be after all routes
 app.use(errorHandler);

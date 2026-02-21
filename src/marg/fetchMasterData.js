@@ -42,6 +42,7 @@ export const fetchMasterOrderData = async (
     CompanyCode: margClient.CompanyCode,
     Sid: Number(salesManId),
     Type: type,
+    OrderFrom:margClient.CompanyCode,
     ...data,
   };
 

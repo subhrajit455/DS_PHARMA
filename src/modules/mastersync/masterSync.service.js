@@ -48,6 +48,8 @@ export const syncMastersDataService = async (dateTime, index = 0) => {
           total: pro_N.length,
         });
 
+        console.log("Pro N", pro_N[0]);
+
         // Step 3: Create ProductInfo entries with default images for products without them
         const defaultImageUrl =
           process.env.DEFAULT_PRODUCT_IMAGE_URL ||
@@ -216,12 +218,14 @@ export const syncMasterOrderDispatchDataService = async (
 export const syncMasterOrderDataService = async (
   salesManId = "",
   type = "S",
-  data
+  data,
 ) => {
   try {
     console.log("Master Sync Service");
     // Call Marg service to fetch all master data
     const margData = await fetchMasterOrderData(salesManId, type, data);
+
+    console.log("margData", margData);
 
     return margData.Details;
   } catch (error) {

@@ -1,10 +1,11 @@
 import axios from "axios";
 import { vaisBucketApiKey, vaisBucketFolderId } from "../config/credentials.js";
+import FormData from "form-data";
 
 const url = "https://apibucket.vais.co.in/api/v1/user/files/upload";
 
 export const uploadImage = async (file) => {
-  console.log({ file });
+  // console.log({ file });
 
   try {
     const formData = new FormData();
@@ -19,10 +20,10 @@ export const uploadImage = async (file) => {
       },
     });
 
-    console.log(response.data);
+    console.log("upload image response", response);
     return response.data;
   } catch (error) {
-    // console.error("Upload failed:", error);
+    console.error("Upload failed:", error);
     throw error.response.data;
   }
 };

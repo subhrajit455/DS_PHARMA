@@ -1,0 +1,23 @@
+import ApiResponse from "../../utils/ApiResponse.js";
+import asyncHandler from "../../utils/asyncHandler.js";
+import { createHsnService, fetchHsnService } from "./hsn.service.js";
+
+export const createHSN = asyncHandler(async (req, res) => {
+  const { hsnCode, description, taxRate } = req.body;
+
+  const hsn = await createHsnService({
+    hsnCode: hsnCode.split("+")[0],
+    description,
+    taxRate: hsnCode.split("+")[1],
+  });
+
+  res.status(201).json(new ApiResponse(201, hsn, "HSN created successfully"));
+});
+
+export const fetchHSN = asyncHandler(async (req, res) => {
+  const hsn = await fetchHsnService();
+
+  res
+    .status(200)
+    .json(new ApiResponse(200, { hsn }, "HSN fetched successfully"));
+});

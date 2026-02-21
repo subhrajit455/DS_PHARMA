@@ -75,35 +75,49 @@ export const decryptData = (encryptedBase64, key = margDecryptionKey) => {
 
   try {
     // Step 1: AES-128-CBC Decrypt
-    const decrypted = aesDecrypt(encryptedBase64, key);
-
-    if (!decrypted) {
-      console.warn("AES decryption returned empty result");
-      return null;
-    }
-
-    // Step 2: Deflate Decompress (the decrypted data is Base64 encoded deflate)
-    const jsonString = deflateDecompress(decrypted);
-
-    // Step 3: Parse JSON
-    return JSON.parse(jsonString);
-  } catch (error) {
-    console.error("Marg Response Decoding Failed:", error.message);
-
-    // Fallback: Try direct deflate only (for wservices API which doesn't use AES)
+    let decrypted = null;
     try {
-      const binaryString = window.atob(encryptedBase64);
-      const bytes = new Uint8Array(binaryString.length);
-      for (let i = 0; i < binaryString.length; i++) {
-        bytes[i] = binaryString.charCodeAt(i);
-      }
-      let json = inflateRaw(bytes, { to: "string" });
-      if (json.charCodeAt(0) === 0xfeff) json = json.slice(1);
-      return JSON.parse(json);
+      decrypted = aesDecrypt(encryptedBase64, key);
     } catch (e) {
-      console.error("Fallback deflate also failed:", e.message);
+      // AES decryption failed (wrong key or not encrypted)
+    }
+
+    // Step 2: Deflate Decompress
+    // If AES decryption worked, the result is the decompressed string (because aesDecrypt returns string)
+    // Wait, let's look at the original logic:
+    // Original: aesDecrypt returns string -> deflateDecompress(decrypted) -> JSON.parse
+
+    // If AES decryption returns a non-empty string, try to decompress it
+    if (decrypted) {
+      try {
+        const jsonString = deflateDecompress(decrypted);
+        return JSON.parse(jsonString);
+      } catch (e) {
+        // If decompression of "decrypted" data fails, maybe it wasn't encrypted after all?
+        // But if aesDecrypt returned something, it means it "succeeded" in keeping it as a string.
+        // Let's rely on the fallback below if this fails.
+        console.warn(
+          "AES decryption succeeded but decompression/parsing failed. Trying fallback.",
+          e.message,
+        );
+      }
+    }
+
+    // Fallback: Try direct deflate only (for wservices API and InsertOrderDetail which isn't AES encrypted)
+    // The input is Base64 encoded deflate data
+    try {
+      const jsonString = deflateDecompress(encryptedBase64);
+      return JSON.parse(jsonString);
+    } catch (e) {
+      console.error(
+        "Marg Response Decoding Failed (both AES and Direct):",
+        e.message,
+      );
       return null;
     }
+  } catch (error) {
+    console.error("Marg Response Decoding Critical Error:", error.message);
+    return null;
   }
 };
 

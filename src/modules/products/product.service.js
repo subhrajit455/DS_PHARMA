@@ -1,5 +1,7 @@
+import { uploadImage } from "../../config/vaisBucket.js";
 import ProductInfo from "./productInfo.model.js";
 import ProN from "./proN.model.js";
+import fs from "fs";
 
 export const fetchProductsService = async (
   page,
@@ -8,13 +10,15 @@ export const fetchProductsService = async (
   sortBy = "name",
   order = 1,
   stock,
-  is_deleted = "0",
+  minPrice = 0,
+  maxPrice = 0,
 ) => {
   try {
     const pipeline = [
       {
         $match: {
           Is_Deleted: "0",
+          // ProductCode: { $ne: "" },
           $or: [
             { name: { $regex: query, $options: "i" } },
             { company: { $regex: query, $options: "i" } },
@@ -23,6 +27,22 @@ export const fetchProductsService = async (
           ],
         },
       },
+      ...(minPrice > 0 || maxPrice > 0
+        ? [
+            {
+              $match: {
+                $expr: {
+                  $and: [
+                    { $gte: [{ $toDouble: "$MRP" }, minPrice] },
+                    ...(maxPrice > 0
+                      ? [{ $lte: [{ $toDouble: "$MRP" }, maxPrice] }]
+                      : []),
+                  ],
+                },
+              },
+            },
+          ]
+        : []),
       ...(stock === 1
         ? [
             {
@@ -81,23 +101,18 @@ export const fetchProductsService = async (
                     false,
                   ],
                 },
-              },
-            },
-            {
-              $addFields: {
-                categoryIdObject: {
-                  $cond: {
-                    if: { $ne: ["$categoryId", ""] },
-                    then: { $toObjectId: "$categoryId" },
-                    else: null,
-                  },
+                hsnCode: {
+                  $ifNull: [
+                    { $arrayElemAt: ["$productInfoData.hsnCode", 0] },
+                    "",
+                  ],
                 },
               },
             },
             {
               $lookup: {
                 from: "categories",
-                localField: "categoryIdObject",
+                localField: "categoryId",
                 foreignField: "_id",
                 as: "categoryDetails",
               },
@@ -110,6 +125,21 @@ export const fetchProductsService = async (
               },
             },
             {
+              $lookup: {
+                from: "hsns",
+                localField: "hsnCode",
+                foreignField: "_id",
+                as: "hsnDetails",
+              },
+            },
+            {
+              $addFields: {
+                hsnDetails: {
+                  $ifNull: [{ $arrayElemAt: ["$hsnDetails", 0] }, {}],
+                },
+              },
+            },
+            {
               $project: {
                 productInfoData: 0,
                 categoryId: 0,
@@ -117,6 +147,7 @@ export const fetchProductsService = async (
                 categoryIdObject: 0,
                 "categoryDetails.images": 0,
                 stockValue: 0,
+                hsnCode: 0,
               },
             },
             {
@@ -226,23 +257,15 @@ export const getProductDetailsService = async (rid) => {
               false,
             ],
           },
-        },
-      },
-      {
-        $addFields: {
-          categoryIdObject: {
-            $cond: {
-              if: { $ne: ["$categoryId", ""] },
-              then: { $toObjectId: "$categoryId" },
-              else: null,
-            },
+          hsnCode: {
+            $ifNull: [{ $arrayElemAt: ["$productInfoData.hsnCode", 0] }, ""],
           },
         },
       },
       {
         $lookup: {
           from: "categories",
-          localField: "categoryIdObject",
+          localField: "categoryId",
           foreignField: "_id",
           as: "categoryDetails",
         },
@@ -255,11 +278,26 @@ export const getProductDetailsService = async (rid) => {
         },
       },
       {
+        $lookup: {
+          from: "hsns",
+          localField: "hsnCode",
+          foreignField: "_id",
+          as: "hsnDetails",
+        },
+      },
+      {
+        $addFields: {
+          hsnDetails: {
+            $ifNull: [{ $arrayElemAt: ["$hsnDetails", 0] }, {}],
+          },
+        },
+      },
+      {
         $project: {
           productInfoData: 0,
           categoryId: 0,
-          categoryIdObject: 0,
           "categoryDetails.images": 0,
+          hsnCode: 0,
         },
       },
     ]);
@@ -482,19 +520,26 @@ export const updateProductDetailsService = async (
   images,
   categoryId,
   isFeatured,
+  hsnCode,
 ) => {
   try {
     const existedProduct = await ProductInfo.findOne({ rid });
 
     if (!existedProduct) {
-      await ProductInfo.create({ rid, categoryId, images, isFeatured });
+      await ProductInfo.create({
+        rid,
+        categoryId,
+        images,
+        isFeatured,
+        hsnCode,
+      });
 
       return getProductDetailsService(rid);
     }
 
     await ProductInfo.findOneAndUpdate(
       { rid },
-      { images, categoryId, isFeatured },
+      { images, categoryId, isFeatured, hsnCode },
       { new: true },
     );
 
@@ -509,28 +554,37 @@ export const uploadProductImageService = async (rid, images) => {
   try {
     console.log({ rid, images });
 
-    const existingProduct = await ProductInfo.findOne({ rid });
+    for (const image of images) {
+      const file = fs.createReadStream(image.path);
 
-    if (!existingProduct) {
-      const newProductInfo = new ProductInfo({
-        rid,
-        images,
-      });
-      await newProductInfo.save();
+      // console.log(image.path);
 
-      console.log(newProductInfo);
-
-      return newProductInfo;
+      const uploadedImage = await uploadImage(file);
+      // console.log({ uploadedImage });
     }
 
-    const updatedProduct = await ProductInfo.findOneAndUpdate(
-      { rid },
-      { images: [...existingProduct.images, ...images] },
-      { new: true },
-    );
+    // const existingProduct = await ProductInfo.findOne({ rid });
 
-    console.log(updatedProduct);
-    return updatedProduct;
+    // if (!existingProduct) {
+    //   const newProductInfo = new ProductInfo({
+    //     rid,
+    //     images,
+    //   });
+    //   await newProductInfo.save();
+
+    //   console.log(newProductInfo);
+
+    //   return newProductInfo;
+    // }
+
+    // const updatedProduct = await ProductInfo.findOneAndUpdate(
+    //   { rid },
+    //   { images: [...existingProduct.images, ...images] },
+    //   { new: true },
+    // );
+
+    // console.log(updatedProduct);
+    // return updatedProduct;
   } catch (error) {
     throw error;
   }
@@ -573,5 +627,290 @@ export const addCategoryToProductService = async (rid, categoryId) => {
     return updatedProductInfo;
   } catch (error) {
     throw error;
+  }
+};
+
+export const fetchLowStockProductsService = async (page, limit, query) => {
+  try {
+    const result = await ProN.aggregate([
+      {
+        $match: {
+          Is_Deleted: "0",
+          $or: [
+            { name: { $regex: query, $options: "i" } },
+            { company: { $regex: query, $options: "i" } },
+            { code: { $regex: query, $options: "i" } },
+            { curbatch: { $regex: query, $options: "i" } },
+          ],
+          $expr: {
+            $and: [
+              { $gt: [{ $toDouble: "$stock" }, 0] },
+              { $lt: [{ $toDouble: "$stock" }, 20] },
+            ],
+          },
+        },
+      },
+      {
+        $sort: {
+          stock: 1, // Sort by stock ascending (lowest first)
+        },
+      },
+      {
+        $skip: (page - 1) * limit,
+      },
+      {
+        $limit: parseInt(limit),
+      },
+    ]);
+
+    const totalCount = await ProN.countDocuments({
+      Is_Deleted: "0",
+      $or: [
+        { name: { $regex: query, $options: "i" } },
+        { company: { $regex: query, $options: "i" } },
+        { code: { $regex: query, $options: "i" } },
+        { curbatch: { $regex: query, $options: "i" } },
+      ],
+      $expr: {
+        $and: [
+          { $gt: [{ $toDouble: "$stock" }, 0] },
+          { $lt: [{ $toDouble: "$stock" }, 20] },
+        ],
+      },
+    });
+
+    const totalPages = Math.ceil(totalCount / limit);
+
+    return {
+      lowStockProducts: result,
+      totalProducts: totalCount,
+      totalPages,
+    };
+  } catch (error) {
+    throw new Error(error.message);
+  }
+};
+
+export const fetchExpiringProductsService = async (
+  page,
+  limit,
+  days = 30,
+  query,
+) => {
+  try {
+    const expiryDate = new Date();
+    expiryDate.setDate(expiryDate.getDate() + days);
+
+    const result = await ProN.aggregate([
+      {
+        $match: {
+          Is_Deleted: "0",
+          $or: [
+            { name: { $regex: query, $options: "i" } },
+            { company: { $regex: query, $options: "i" } },
+            { code: { $regex: query, $options: "i" } },
+            { curbatch: { $regex: query, $options: "i" } },
+          ],
+          $expr: {
+            $gt: [{ $toDouble: "$stock" }, 0],
+          },
+          exp: { $ne: "" },
+        },
+      },
+      {
+        $addFields: {
+          expDate: {
+            $dateFromString: {
+              dateString: "$exp",
+              format: "%Y%m%d",
+              onError: null,
+              onNull: null,
+            },
+          },
+        },
+      },
+      {
+        $match: {
+          expDate: {
+            $ne: null,
+            $lte: expiryDate,
+            $gte: new Date(),
+          },
+        },
+      },
+      {
+        $sort: {
+          expDate: 1,
+        },
+      },
+      {
+        $skip: (page - 1) * limit,
+      },
+      {
+        $limit: parseInt(limit),
+      },
+      {
+        $project: {
+          expDate: 0,
+        },
+      },
+    ]);
+
+    const totalCountResult = await ProN.aggregate([
+      {
+        $match: {
+          Is_Deleted: "0",
+          $or: [
+            { name: { $regex: query, $options: "i" } },
+            { company: { $regex: query, $options: "i" } },
+            { code: { $regex: query, $options: "i" } },
+            { curbatch: { $regex: query, $options: "i" } },
+          ],
+          exp: { $ne: "" },
+        },
+      },
+      {
+        $addFields: {
+          expDate: {
+            $dateFromString: {
+              dateString: "$exp",
+              format: "%Y%m%d",
+              onError: null,
+              onNull: null,
+            },
+          },
+        },
+      },
+      {
+        $match: {
+          expDate: {
+            $ne: null,
+            $lte: expiryDate,
+            $gte: new Date(),
+          },
+        },
+      },
+      {
+        $count: "total",
+      },
+    ]);
+
+    const totalCount = totalCountResult[0]?.total || 0;
+    const totalPages = Math.ceil(totalCount / limit);
+
+    return {
+      expiringProducts: result,
+      totalProducts: totalCount,
+      totalPages,
+    };
+  } catch (error) {
+    throw new Error(error.message);
+  }
+};
+
+export const fetchExpiredProductsService = async (page, limit, query) => {
+  try {
+    const result = await ProN.aggregate([
+      {
+        $match: {
+          Is_Deleted: "0",
+          $or: [
+            { name: { $regex: query, $options: "i" } },
+            { company: { $regex: query, $options: "i" } },
+            { code: { $regex: query, $options: "i" } },
+            { curbatch: { $regex: query, $options: "i" } },
+          ],
+          $expr: {
+            $gt: [{ $toDouble: "$stock" }, 0],
+          },
+          exp: { $ne: "" },
+        },
+      },
+      {
+        $addFields: {
+          expDate: {
+            $dateFromString: {
+              dateString: "$exp",
+              format: "%Y%m%d",
+              onError: null,
+              onNull: null,
+            },
+          },
+        },
+      },
+      {
+        $match: {
+          expDate: {
+            $ne: null,
+            $lt: new Date(),
+          },
+        },
+      },
+      {
+        $sort: {
+          expDate: -1,
+        },
+      },
+      {
+        $skip: (page - 1) * limit,
+      },
+      {
+        $limit: parseInt(limit),
+      },
+      {
+        $project: {
+          expDate: 0,
+        },
+      },
+    ]);
+
+    const totalCountResult = await ProN.aggregate([
+      {
+        $match: {
+          Is_Deleted: "0",
+          $or: [
+            { name: { $regex: query, $options: "i" } },
+            { company: { $regex: query, $options: "i" } },
+            { code: { $regex: query, $options: "i" } },
+            { curbatch: { $regex: query, $options: "i" } },
+          ],
+          exp: { $ne: "" },
+        },
+      },
+      {
+        $addFields: {
+          expDate: {
+            $dateFromString: {
+              dateString: "$exp",
+              format: "%Y%m%d",
+              onError: null,
+              onNull: null,
+            },
+          },
+        },
+      },
+      {
+        $match: {
+          expDate: {
+            $ne: null,
+            $lt: new Date(),
+          },
+        },
+      },
+      {
+        $count: "total",
+      },
+    ]);
+
+    const totalCount = totalCountResult[0]?.total || 0;
+    const totalPages = Math.ceil(totalCount / limit);
+
+    return {
+      expiredProducts: result,
+      totalProducts: totalCount,
+      totalPages,
+    };
+  } catch (error) {
+    throw new Error(error.message);
   }
 };

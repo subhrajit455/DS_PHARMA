@@ -61,7 +61,9 @@ export const loginService = async (payload) => {
 };
 
 export const getUserProfile = async (userId) => {
-  const user = await UserModel.findById(userId).select("-password");
+  const user = await Staff.findOne({ userId }).select("-password");
+
+  console.log("user", user);
 
   if (!user) {
     throw new ApiError(404, "User not found");

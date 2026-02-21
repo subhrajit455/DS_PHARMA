@@ -15,7 +15,7 @@ export const makeRequest = async (endpoint, payload) => {
       body: JSON.stringify(payload),
     });
 
-    console.log("response", response);
+    // console.log("response", response);
 
     console.log(`Response status for ${endpoint}:`, response.status);
 

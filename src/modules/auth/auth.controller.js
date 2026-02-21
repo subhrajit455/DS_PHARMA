@@ -1,7 +1,11 @@
 import ApiError from "../../utils/apiError.js";
 import ApiResponse from "../../utils/apiResponse.js";
 import asyncHandler from "../../utils/asyncHandler.js";
-import { getUserProfile, loginService, registerService } from "./auth.service.js";
+import {
+  getUserProfile,
+  loginService,
+  registerService,
+} from "./auth.service.js";
 
 export const registerController = asyncHandler(async (req, res) => {
   const user = await registerService(req.body);
@@ -29,14 +33,23 @@ export const loginController = asyncHandler(async (req, res) => {
 
   const { user, token } = await loginService({ userId, password });
 
+  console.log({
+    user,
+    token,
+  });
+
+  const isProduction = process.env.NODE_ENV === "production";
+
   res.cookie("token", token, {
     httpOnly: true,
-    secure: true,
-    sameSite: "strict",
+    secure: isProduction,
+    sameSite: isProduction ? "none" : "lax",
     maxAge: 24 * 60 * 60 * 1000,
   });
 
-  return res.json(new ApiResponse(200, user, "User logged in successfully"));
+  return res.json(
+    new ApiResponse(200, { user, token }, "User logged in successfully"),
+  );
 });
 
 export const logoutController = asyncHandler(async (req, res) => {
@@ -46,13 +59,9 @@ export const logoutController = asyncHandler(async (req, res) => {
 });
 
 export const getProfileController = asyncHandler(async (req, res) => {
-  const user = await getUserProfile(req.user.id);
+  console.log("user id", req.user.userId);
 
-  return res.json(
-    new ApiResponse(
-      200,
-      user,
-      "Profile fetched successfully",
-    ),
-  );
+  const user = await getUserProfile(req.user.userId);
+
+  return res.json(new ApiResponse(200, user, "Profile fetched successfully"));
 });

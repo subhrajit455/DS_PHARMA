@@ -7,7 +7,8 @@ const productInfoSchema = new mongoose.Schema(
       required: true,
     },
     categoryId: {
-      type: String,
+      type: mongoose.Schema.Types.ObjectId,
+      ref: "Category",
     },
     images: {
       type: Array,
@@ -15,6 +16,10 @@ const productInfoSchema = new mongoose.Schema(
     isFeatured: {
       type: Boolean,
       default: false,
+    },
+    hsnCode: {
+      type: mongoose.Schema.Types.ObjectId,
+      ref: "Hsn",
     },
   },
   {
