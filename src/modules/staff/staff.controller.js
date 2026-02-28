@@ -4,6 +4,7 @@ import ApiResponse from "../../utils/apiResponse.js";
 import {
   assignStaffService,
   fetchMargUsersService,
+  fetchSalesmanMonthlyReportService,
   fetchStaffByIdService,
   fetchStaffService,
   updateStaffService,
@@ -74,9 +75,53 @@ export const fetchStaffById = asyncHandler(async (req, res) => {
     throw new ApiError(400, "User ID is required");
   }
 
-  const staff = await fetchStaffByIdService(userId);
+  const { staff, staffReport } = await fetchStaffByIdService(userId);
 
   return res
     .status(200)
-    .json(new ApiResponse(200, staff, "Staff fetched successfully"));
+    .json(
+      new ApiResponse(
+        200,
+        { staff, staffReport },
+        "Staff fetched successfully",
+      ),
+    );
+});
+
+export const fetchStaffReport = asyncHandler(async (req, res) => {
+  const { userId } = req.params;
+
+  if (!userId) {
+    throw new ApiError(400, "User ID is required");
+  }
+
+  const { staffReport } = await fetchStaffByIdService(userId);
+
+  return res
+    .status(200)
+    .json(new ApiResponse(200, { staffReport }, "Staff fetched successfully"));
+});
+
+export const fetchSalesmanMonthlyReport = asyncHandler(async (req, res) => {
+  const { userId } = req.params;
+  const { year = String(new Date().getFullYear()) } = req.query;
+
+  if (!userId) {
+    throw new ApiError(400, "User ID is required");
+  }
+
+  const { monthlyReport, summary } = await fetchSalesmanMonthlyReportService(
+    userId,
+    year,
+  );
+
+  return res
+    .status(200)
+    .json(
+      new ApiResponse(
+        200,
+        { summary, monthlyReport },
+        "Salesman monthly report fetched successfully",
+      ),
+    );
 });

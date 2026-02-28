@@ -69,5 +69,16 @@ export const getUserProfile = async (userId) => {
     throw new ApiError(404, "User not found");
   }
 
-  return user;
+  const token = generateToken({
+    id: user._id,
+    userId: user.userId,
+    role: user.role,
+  });
+
+  console.log("token :: ", token);
+
+  return {
+    user,
+    token,
+  };
 };

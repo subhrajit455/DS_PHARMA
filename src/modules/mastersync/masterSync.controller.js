@@ -29,9 +29,9 @@ export const syncMasterOrderDispatchData = asyncHandler(async (req, res) => {
     const { salesManId } = req.params;
 
     const data = await syncMasterOrderDispatchDataService(
+      String(salesManId),
       datetime,
       index,
-      String(salesManId),
       type,
     );
 

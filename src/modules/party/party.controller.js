@@ -4,6 +4,10 @@ import {
   fetchPartiesService,
   getPartiesService,
   getPartyDetailsService,
+  partyRegisterService,
+  partyLoginService,
+  updatePartyService,
+  getPartyByUserIdService,
 } from "./party.service.js";
 
 export const getParties = asyncHandler(async (req, res) => {
@@ -88,3 +92,68 @@ export const getPartyDetails = asyncHandler(async (req, res) => {
     .status(200)
     .json(new ApiResponse(200, party, "Party details fetched successfully"));
 });
+
+export const partyRegisterController = asyncHandler(async (req, res) => {
+  const { name, phone1, email1, address, MargCode, GSTIN, DlNo, password } =
+    req.body;
+
+  const party = await partyRegisterService({
+    name,
+    phone1,
+    email1,
+    address,
+    MargCode,
+    GSTIN,
+    DlNo,
+    password,
+  });
+
+  return res
+    .status(201)
+    .json(new ApiResponse(201, party, "Party registered successfully"));
+});
+
+export const partyLoginController = asyncHandler(async (req, res) => {
+  const { userId, password } = req.body;
+
+  const { party, token } = await partyLoginService({ userId, password });
+
+  const isProduction = process.env.NODE_ENV === "production";
+
+  res.cookie("token", token, {
+    httpOnly: true,
+    secure: isProduction,
+    sameSite: isProduction ? "none" : "lax",
+    maxAge: 24 * 60 * 60 * 1000,
+  });
+
+  return res
+    .status(200)
+    .json(
+      new ApiResponse(200, { party, token }, "Party logged in successfully"),
+    );
+});
+
+export const updatePartyController = asyncHandler(async (req, res) => {
+  const party = await updatePartyService(req?.party?._id, req.body);
+
+  return res
+    .status(200)
+    .json(new ApiResponse(200, party, "Party profile updated successfully"));
+});
+
+export const logoutPartyController = asyncHandler(async (req, res) => {
+  res.clearCookie("token");
+
+  return res
+    .status(200)
+    .json(new ApiResponse(200, {}, "Logged out successfully"));
+});
+
+export const getPartyByUserId = async (req, res) => {
+  const { userId } = req.user;
+  const party = await getPartyByUserIdService(userId);
+  return res
+    .status(200)
+    .json({ message: " User fetched successfully", data: party });
+};

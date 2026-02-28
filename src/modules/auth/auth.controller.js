@@ -1,11 +1,11 @@
-import ApiError from "../../utils/apiError.js";
-import ApiResponse from "../../utils/apiResponse.js";
-import asyncHandler from "../../utils/asyncHandler.js";
+import ApiError from '../../utils/apiError.js';
+import ApiResponse from '../../utils/apiResponse.js';
+import asyncHandler from '../../utils/asyncHandler.js';
 import {
   getUserProfile,
   loginService,
   registerService,
-} from "./auth.service.js";
+} from './auth.service.js';
 
 export const registerController = asyncHandler(async (req, res) => {
   const user = await registerService(req.body);
@@ -19,7 +19,7 @@ export const registerController = asyncHandler(async (req, res) => {
         email: user.email,
         role: user.role,
       },
-      "User registered successfully",
+      'User registered successfully',
     ),
   );
 });
@@ -28,7 +28,7 @@ export const loginController = asyncHandler(async (req, res) => {
   const { userId, password } = req.body;
 
   if (!userId || !password) {
-    throw new ApiError(400, "All fields are required");
+    throw new ApiError(400, 'All fields are required');
   }
 
   const { user, token } = await loginService({ userId, password });
@@ -38,30 +38,41 @@ export const loginController = asyncHandler(async (req, res) => {
     token,
   });
 
-  const isProduction = process.env.NODE_ENV === "production";
+  const isProduction = process.env.NODE_ENV === 'production';
 
-  res.cookie("token", token, {
+  res.cookie('token', token, {
     httpOnly: true,
     secure: isProduction,
-    sameSite: isProduction ? "none" : "lax",
+    sameSite: isProduction ? 'none' : 'lax',
     maxAge: 24 * 60 * 60 * 1000,
   });
 
   return res.json(
-    new ApiResponse(200, { user, token }, "User logged in successfully"),
+    new ApiResponse(200, { user, token }, 'User logged in successfully'),
   );
 });
 
 export const logoutController = asyncHandler(async (req, res) => {
-  res.clearCookie("token");
+  res.clearCookie('token');
 
-  return res.json(new ApiResponse(200, {}, "Logged out successfully"));
+  return res.json(new ApiResponse(200, {}, 'Logged out successfully'));
 });
 
 export const getProfileController = asyncHandler(async (req, res) => {
-  console.log("user id", req.user.userId);
+  console.log('user id', req.user.userId);
 
-  const user = await getUserProfile(req.user.userId);
+  const { user, token } = await getUserProfile(req.user.userId);
 
-  return res.json(new ApiResponse(200, user, "Profile fetched successfully"));
+  const isProduction = process.env.NODE_ENV === 'production';
+
+  res.cookie('token', token, {
+    httpOnly: true,
+    secure: isProduction,
+    sameSite: isProduction ? 'none' : 'lax',
+    maxAge: 24 * 60 * 60 * 1000,
+  });
+
+  return res.json(
+    new ApiResponse(200, { user, token }, 'Profile fetched successfully'),
+  );
 });

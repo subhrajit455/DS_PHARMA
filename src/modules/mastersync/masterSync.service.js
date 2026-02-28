@@ -4,14 +4,67 @@ import {
   fetchMasterOrderDispatchData,
 } from "../../marg/fetchMasterData.js";
 import Party from "../party/party.model.js";
-import ProN from "../products/proN.model.js";
 import ProductInfo from "../products/productInfo.model.js";
-import Stype from "../stype/stype.model.js";
 import MargUser from "../staff/margUser.model.js";
+import Stype from "../stype/stype.model.js";
+import MargParties from "./marg_parties.model.js";
+import MargProducts from "./marg_products.model.js";
+
+const BATCH_SIZE = 1000; // records per batch
+const CONCURRENCY = 10; // batches running in parallel
+
+// Run bulkWrite ops in parallel batches, return aggregated counts
+const parallelBulkWrite = async (model, ops) => {
+  const batches = [];
+  for (let i = 0; i < ops.length; i += BATCH_SIZE)
+    batches.push(ops.slice(i, i + BATCH_SIZE));
+
+  let matched = 0,
+    modified = 0,
+    upserted = 0;
+
+  for (let i = 0; i < batches.length; i += CONCURRENCY) {
+    const group = batches.slice(i, i + CONCURRENCY);
+    const results = await Promise.all(
+      group.map((batch) => model.bulkWrite(batch, { ordered: false })),
+    );
+    for (const r of results) {
+      matched += r.matchedCount;
+      modified += r.modifiedCount;
+      upserted += r.upsertedCount ?? 0;
+    }
+    console.log(
+      `  bulkWrite progress: ${Math.min(i + CONCURRENCY, batches.length)}/${batches.length} batches done`,
+    );
+  }
+
+  return { matched, modified, upserted };
+};
+
+// Run insertMany in parallel batches
+const parallelInsertMany = async (model, docs, opts = {}) => {
+  const batches = [];
+  for (let i = 0; i < docs.length; i += BATCH_SIZE)
+    batches.push(docs.slice(i, i + BATCH_SIZE));
+
+  let inserted = 0;
+  for (let i = 0; i < batches.length; i += CONCURRENCY) {
+    const group = batches.slice(i, i + CONCURRENCY);
+    const results = await Promise.all(
+      group.map((batch) =>
+        model.insertMany(batch, { ordered: false, ...opts }).catch(() => []),
+      ),
+    );
+    for (const r of results) inserted += r.length;
+    console.log(
+      `  insertMany progress: ${Math.min(i + CONCURRENCY, batches.length)}/${batches.length} batches done`,
+    );
+  }
+  return inserted;
+};
 
 export const syncMastersDataService = async (dateTime, index = 0) => {
   try {
-    console.log("Master Sync Service");
     // Call Marg service to fetch all master data
     const margData = await fetchMasterData(dateTime, index);
 
@@ -25,74 +78,100 @@ export const syncMastersDataService = async (dateTime, index = 0) => {
       Users: users,
     } = margData.Details;
 
-    // Sync pro_N data to ProN model - FULL REPLACEMENT
-    if (pro_N && Array.isArray(pro_N) && pro_N.length > 0) {
+    // pro_N + pro_U: Full catalog replacement
+    // pro_N = new products, pro_U = updated products.
+    // Since pro_N triggers a full deleteMany, pro_U records won't exist after that.
+    // Merging both into one insertMany is much faster than 29k individual upserts.
+    const hasNewProducts = pro_N && Array.isArray(pro_N) && pro_N.length > 0;
+    const hasUpdatedProducts =
+      pro_U && Array.isArray(pro_U) && pro_U.length > 0;
+
+    if (hasNewProducts || hasUpdatedProducts) {
+      const allProducts = [...(pro_N || []), ...(pro_U || [])];
       console.log(
-        `Replacing database with ${pro_N.length} products from Marg...`,
+        `Full product sync: ${allProducts.length} products (pro_N: ${(pro_N || []).length}, pro_U: ${(pro_U || []).length})`,
       );
 
       try {
-        // Step 1: Delete all existing products
-        const deleteResult = await ProN.deleteMany({});
+        // Step 1: Delete all existing products (clean slate)
+        const deleteResult = await MargProducts.deleteMany({});
         console.log(`Deleted ${deleteResult.deletedCount} existing products`);
 
-        // Step 2: Insert all new products
-        const insertResult = await ProN.insertMany(pro_N, {
-          ordered: false, // Continue on error
-          lean: true,
-        });
+        // Step 2: Insert all products in parallel batches (insertMany >> upsert for fresh inserts)
+        const inserted = await parallelInsertMany(MargProducts, allProducts);
+        console.log(
+          `Product sync completed: ${inserted}/${allProducts.length} inserted`,
+        );
 
-        console.log(`Products sync completed:`, {
-          deleted: deleteResult.deletedCount,
-          inserted: insertResult.length,
-          total: pro_N.length,
-        });
-
-        console.log("Pro N", pro_N[0]);
-
-        // Step 3: Create ProductInfo entries with default images for products without them
+        // Step 3: Create ProductInfo entries (ignore duplicates via ordered:false)
         const defaultImageUrl =
           process.env.DEFAULT_PRODUCT_IMAGE_URL ||
           "https://jetsonpharma.com/wp-content/uploads/2023/05/medicine-placeholder-300x300.png";
 
-        console.log(`Setting up default images for products...`);
-
-        // Get all RIDs from synced products
-        const productRids = pro_N.map((product) => product.rid);
-
-        // Find existing ProductInfo entries
-        const existingProductInfos = await ProductInfo.find({
-          rid: { $in: productRids },
-        }).select("rid");
-
-        const existingRids = new Set(existingProductInfos.map((p) => p.rid));
-
-        // Find products without ProductInfo
-        const newProductInfos = productRids
-          .filter((rid) => !existingRids.has(rid))
-          .map((rid) => ({
-            rid,
-            images: [{ url: defaultImageUrl }],
-            // isFeatured: false,
-          }));
-
-        // Bulk insert new ProductInfo entries
-        if (newProductInfos.length > 0) {
-          await ProductInfo.insertMany(newProductInfos, { ordered: false });
-          console.log(
-            `Created ${newProductInfos.length} ProductInfo entries with default images`,
-          );
-        } else {
-          console.log("All products already have ProductInfo entries");
-        }
+        const productInfoDocs = allProducts.map((p) => ({
+          rid: p.rid,
+          images: [{ url: defaultImageUrl }],
+        }));
+        await parallelInsertMany(ProductInfo, productInfoDocs);
+        console.log(`ProductInfo sync done`);
       } catch (dbError) {
-        console.error("Database sync error:", dbError);
-        throw new Error(
-          `Failed to sync products to database: ${dbError.message}`,
-        );
+        console.error("Product sync error:", dbError);
+        throw new Error(`Failed to sync products: ${dbError.message}`);
       }
     } else {
-      console.log("No products to sync (pro_N is empty or invalid)");
+      console.log(
+        "No new or updated products from Marg (pro_N and pro_U are empty)",
+      );
+    }
+
+    // pro_S: Stock updated — update only stock field, matched by code
+    if (pro_S && Array.isArray(pro_S) && pro_S.length > 0) {
+      console.log(`Updating stock for ${pro_S.length} products (pro_S)...`);
+      try {
+        const bulkOps = pro_S.map((p) => ({
+          updateOne: {
+            filter: { code: p.code },
+            update: { $set: { stock: p.stock } },
+          },
+        }));
+        const result = await parallelBulkWrite(MargProducts, bulkOps);
+        console.log(`pro_S stock sync completed:`, result);
+      } catch (dbError) {
+        console.error("pro_S sync error:", dbError);
+        throw new Error(`Failed to sync pro_S: ${dbError.message}`);
+      }
+    } else {
+      console.log("No stock updates to sync (pro_S is empty or invalid)");
+    }
+
+    // pro_R: Rate + stock updated — update pricing & stock fields, matched by code
+    if (pro_R && Array.isArray(pro_R) && pro_R.length > 0) {
+      console.log(`Updating rates for ${pro_R.length} products (pro_R)...`);
+      try {
+        const bulkOps = pro_R.map((p) => ({
+          updateOne: {
+            filter: { code: p.code },
+            update: {
+              $set: {
+                stock: p.stock,
+                MRP: p.MRP,
+                Rate: p.Rate,
+                Deal: p.Deal,
+                Free: p.Free,
+                PRate: p.PRate,
+                curbatch: p.Curbatch,
+              },
+            },
+          },
+        }));
+        const result = await parallelBulkWrite(MargProducts, bulkOps);
+        console.log(`pro_R rate sync completed:`, result);
+      } catch (dbError) {
+        console.error("pro_R sync error:", dbError);
+        throw new Error(`Failed to sync pro_R: ${dbError.message}`);
+      }
+    } else {
+      console.log("No rate updates to sync (pro_R is empty or invalid)");
     }
 
     // Sync party data to Party model - FULL REPLACEMENT
@@ -102,20 +181,72 @@ export const syncMastersDataService = async (dateTime, index = 0) => {
       );
 
       try {
-        // Step 1: Delete all existing products
-        const deleteResult = await Party.deleteMany({});
-        console.log(`Deleted ${deleteResult.deletedCount} existing products`);
+        // Step 1: Delete all existing parties
+        const deleteResult = await MargParties.deleteMany({});
+        console.log(`Deleted ${deleteResult.deletedCount} existing parties`);
 
-        // Step 2: Insert all new products
-        const insertResult = await Party.insertMany(party, {
-          ordered: false, // Continue on error
+        // Step 2: Insert all new parties
+        const insertResult = await MargParties.insertMany(party, {
+          ordered: false,
           lean: true,
         });
 
-        console.log(`Party sync completed:`, {
+        console.log(`Party sync completed (marg_parties):`, {
           deleted: deleteResult.deletedCount,
           inserted: insertResult.length,
           total: party.length,
+        });
+
+        // Step 3: Upsert into 'parties' collection, preserving app-specific fields
+        // (userId, password, isVerified) for existing parties
+        const partyBulkOps = party.map((p) => ({
+          updateOne: {
+            filter: { rid: p.rid },
+            update: {
+              $set: {
+                rid: p.rid,
+                area: p.area,
+                code: p.code,
+                address: p.address,
+                name: p.name,
+                balance: p.balance,
+                pdc: p.pdc,
+                gcode: p.gcode,
+                opening: p.opening,
+                Is_Deleted: p.Is_Deleted,
+                phone1: p.phone1,
+                phone2: p.phone2,
+                phone3: p.phone3,
+                phone4: p.phone4,
+                email1: p.email1,
+                email2: p.email2,
+                email3: p.email3,
+                bank: p.bank,
+                branch: p.branch,
+                MargCode: p.MargCode,
+                GSTIN: p.GSTIN,
+                DlNo: p.DlNo,
+                LedgerCode: p.LedgerCode,
+              },
+              // $setOnInsert only runs when a NEW document is created
+              $setOnInsert: {
+                userId: null,
+                password: null,
+                isVerified: false,
+              },
+            },
+            upsert: true,
+          },
+        }));
+
+        const partyUpsertResult = await Party.bulkWrite(partyBulkOps, {
+          ordered: false,
+        });
+
+        console.log(`Party upsert into 'parties' completed:`, {
+          matched: partyUpsertResult.matchedCount,
+          upserted: partyUpsertResult.upsertedCount,
+          modified: partyUpsertResult.modifiedCount,
         });
       } catch (dbError) {
         console.error("Database sync error:", dbError);
@@ -194,9 +325,9 @@ export const syncMastersDataService = async (dateTime, index = 0) => {
 };
 
 export const syncMasterOrderDispatchDataService = async (
-  dateTime,
-  index = 0,
   salesManId = "",
+  dateTime = "",
+  index = 0,
   type = "S",
 ) => {
   try {

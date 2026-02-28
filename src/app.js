@@ -44,11 +44,17 @@ import authRouter from "./modules/auth/auth.route.js";
 import categoryRouter from "./modules/category/category.route.js";
 import masterSyncRouter from "./modules/mastersync/masterSync.route.js";
 import productRoute from "./modules/products/product.route.js";
-import partyRouter from "./modules/party/party.route.js";
+import partyRouter, { partyAuthRouter } from "./modules/party/party.route.js";
 import orderRouter from "./modules/order/order.route.js";
 import staffRouter from "./modules/staff/staff.route.js";
 import dashboardRouter from "./modules/dashboard/dashboard.route.js";
 import hsnRouter from "./modules/hsncode/hsn.route.js";
+import addressRouter from "./modules/address/address.route.js";
+import cartRouter from "./modules/cart/cart.route.js";
+import contactRouter from "./modules/contact/contact.route.js";
+import featuredRouter from "./modules/featured/featured.route.js";
+import titleRouter from "./modules/title/title.route.js";
+import wishlistRouter from "./modules/wishlist/wishlist.route.js";
 
 // Middleware import
 import { errorHandler } from "./middlewares/errorHandler.middleware.js";
@@ -63,6 +69,14 @@ app.use("/api/v1/order", orderRouter);
 app.use("/api/v1/staff", staffRouter);
 app.use("/api/v1/master-sync", masterSyncRouter);
 app.use("/api/v1/dashboard", dashboardRouter);
+
+app.use(partyAuthRouter);
+app.use(addressRouter);
+app.use(cartRouter);
+app.use(contactRouter);
+app.use(featuredRouter);
+app.use(titleRouter);
+app.use(wishlistRouter);
 
 // Global error handler - MUST be after all routes
 app.use(errorHandler);

@@ -14,7 +14,7 @@ export const fetchMasterData = async (datetime = "", index = 0) => {
 };
 
 export const fetchMasterOrderDispatchData = async (
-  datetime,
+  datetime = "",
   index = 0,
   salesManId = "",
   type = "S",

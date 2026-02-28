@@ -1,6 +1,6 @@
 import mongoose from 'mongoose';
 
-const partySchema = new mongoose.Schema(
+const margPartiesSchema = new mongoose.Schema(
   {
     rid: String,
     area: String,
@@ -25,31 +25,13 @@ const partySchema = new mongoose.Schema(
     GSTIN: String,
     DlNo: String,
     LedgerCode: String,
-    userId: {
-      type: String,
-      default: null,
-    },
-    password: {
-      type: String,
-      default: null,
-    },
-    isVerified: {
-      type: Boolean,
-      default: false,
-    },
-    addresses: [
-      {
-        type: mongoose.Schema.Types.ObjectId,
-        ref: 'Address',
-      },
-    ],
   },
   {
     timestamps: true,
-    collection: 'parties',
+    collection: 'marg_parties',
   },
 );
 
-const Party = mongoose.model('Party', partySchema);
+const MargParties = mongoose.model('MargParty', margPartiesSchema);
 
-export default Party;
+export default MargParties;

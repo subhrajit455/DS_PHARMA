@@ -6,6 +6,10 @@ export const staffSchema = new mongoose.Schema(
       type: String,
       required: true,
     },
+    rid: {
+      type: String,
+      required: true,
+    },
     name: {
       type: String,
       required: true,
