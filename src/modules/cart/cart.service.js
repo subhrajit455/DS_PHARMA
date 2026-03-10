@@ -1,6 +1,6 @@
 import mongoose from "mongoose";
+import MargProducts from "../mastersync/marg_products.model.js";
 import Cart from "./cart.model.js";
-import Product from "../products/proN.model.js";
 
 function parsePrice(val) {
   if (val === undefined || val === null) return 0;
@@ -21,7 +21,7 @@ export const addToCartService = async (
     throw error;
   }
 
-  const product = await Product.findOne({ rid });
+  const product = await MargProducts.findOne({ rid });
   if (!product) {
     const error = new Error("Product not found");
     error.statusCode = 404;
@@ -48,7 +48,7 @@ export const getCartService = async (userId) => {
     { $match: { user: new mongoose.Types.ObjectId(userId) } },
     {
       $lookup: {
-        from: "products",
+        from: "marg_products",
         localField: "rid",
         foreignField: "rid",
         as: "product",
@@ -69,7 +69,7 @@ export const updateCartItemService = async (cartId, userId, quantity) => {
     throw error;
   }
 
-  const product = await Product.findOne({ rid: cartItem.rid });
+  const product = await MargProducts.findOne({ rid: cartItem.rid });
   const unitPrice = parsePrice(product?.MRP);
   const qty = Number(quantity) || 0;
 

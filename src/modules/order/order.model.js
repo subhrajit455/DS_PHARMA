@@ -1,6 +1,6 @@
-import mongoose from "mongoose";
+import mongoose from 'mongoose';
 
-const margOrderSchema = new mongoose.Schema(
+const orderSchema = new mongoose.Schema(
   {
     Sid: {
       type: String,
@@ -26,13 +26,21 @@ const margOrderSchema = new mongoose.Schema(
       type: Object,
       default: {},
     },
+    OTP: {
+      type: String,
+    },
+    Status: {
+      type: String,
+      enum: ['Pending', 'Confirmed', 'Delivered', 'Cancelled'],
+      default: 'Pending',
+    },
   },
   {
     timestamps: true,
-    collection: "margOrders",
+    collection: 'orders',
   },
 );
 
-const margOrder = mongoose.model("margOrder", margOrderSchema);
+const Orders = mongoose.model('orders', orderSchema);
 
-export default margOrder;
+export default Orders;

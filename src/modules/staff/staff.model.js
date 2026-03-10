@@ -1,35 +1,28 @@
-import mongoose from "mongoose";
+import mongoose from 'mongoose';
 
 export const staffSchema = new mongoose.Schema(
   {
-    userId: {
-      type: String,
-      required: true,
-    },
-    rid: {
-      type: String,
-      required: true,
-    },
     name: {
       type: String,
       required: true,
     },
     email: {
       type: String,
+    },
+    phone: {
+      type: String,
       required: true,
     },
-    phone: String,
-    address1: String,
-    address2: String,
-    address3: String,
+    address: String,
     password: {
       type: String,
       required: true,
     },
     role: {
       type: String,
-      enum: ["admin", "staff", "delivery"],
-      default: "staff",
+      enum: ['SUPER_ADMIN', 'ADMIN', 'STAFF'],
+      required: true,
+      default: 'STAFF',
     },
     isActive: {
       type: Boolean,
@@ -41,6 +34,6 @@ export const staffSchema = new mongoose.Schema(
   },
 );
 
-const Staff = mongoose.model("Staff", staffSchema);
+const Staff = mongoose.model('Staff', staffSchema);
 
 export default Staff;

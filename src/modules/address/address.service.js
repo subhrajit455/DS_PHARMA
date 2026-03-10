@@ -1,5 +1,5 @@
-import Address from "./address.model.js";
-import Party from "../party/party.model.js";
+import Address from './address.model.js';
+import Party from '../party/party.model.js';
 
 export const addAddressService = async (userId, body) => {
   const {
@@ -14,14 +14,6 @@ export const addAddressService = async (userId, body) => {
     landmark,
     isDefault,
   } = body;
-
-  const existingParty = await Party.findById(userId);
-
-  if (!existingParty || !existingParty.name || !existingParty.phone1) {
-    const error = new Error("Please Update Your Profile");
-    error.statusCode = 400;
-    throw error;
-  }
 
   const addressCount = await Address.countDocuments({ user: userId });
   const setDefault = addressCount === 0 ? true : !!isDefault;
@@ -44,7 +36,7 @@ export const addAddressService = async (userId, body) => {
   return newAddress;
 };
 
-export const getAddressesService = async (userId) => {
+export const getAddressesService = async userId => {
   const addresses = await Address.find({ user: userId });
   return addresses;
 };
@@ -57,7 +49,7 @@ export const updateAddressService = async (addressId, userId, updateData) => {
   );
 
   if (!address) {
-    const error = new Error("Address not found");
+    const error = new Error('Address not found');
     error.statusCode = 404;
     throw error;
   }
@@ -72,19 +64,13 @@ export const deleteAddressService = async (addressId, userId) => {
     isDefault: true,
   });
 
-  if (isDefault) {
-    const error = new Error("Cannot delete delivery address");
-    error.statusCode = 400;
-    throw error;
-  }
-
   const address = await Address.findOneAndDelete({
     _id: addressId,
     user: userId,
   });
 
   if (!address) {
-    const error = new Error("Address not found");
+    const error = new Error('Address not found');
     error.statusCode = 404;
     throw error;
   }
@@ -109,7 +95,7 @@ export const setDefaultAddressService = async (
   return updatedAddress;
 };
 
-export const getDefaultAddressService = async (userId) => {
+export const getDefaultAddressService = async userId => {
   const address = await Address.findOne({ user: userId, isDefault: true });
   return address;
 };

@@ -4,12 +4,10 @@ import {
   getProfileController,
   loginController,
   logoutController,
-  registerController
 } from "./auth.controller.js";
 
 const authRouter = Router();
 
-authRouter.post("/register", registerController);
 authRouter.post("/login", loginController);
 authRouter.post("/logout", authMiddleware, logoutController);
 authRouter.get("/profile", authMiddleware, getProfileController);

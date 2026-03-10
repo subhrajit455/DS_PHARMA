@@ -1,27 +1,28 @@
-import Party from "./party.model.js";
-import ApiError from "../../utils/apiError.js";
-import bcrypt from "bcryptjs";
-import { generateToken } from "../../helpers/token.js";
-import { generateUserId } from "../../helpers/generateUserId.js";
-import { sendRegistraionMail } from "../../helpers/sendMails.js";
+import bcrypt from 'bcryptjs';
+import { generateUserId } from '../../helpers/generateUserId.js';
+import { sendRegistraionMail } from '../../helpers/sendMails.js';
+import { generateToken } from '../../helpers/token.js';
+import ApiError from '../../utils/apiError.js';
+import Address from '../address/address.model.js';
+import MargParties from '../mastersync/marg_parties.model.js';
 
-export const getPartiesService = async (page, limit, query = "") => {
+export const getPartiesService = async (page, limit, query = '') => {
   try {
-    const parties = await Party.find({
+    const parties = await MargParties.find({
       $or: [
-        { name: { $regex: query, $options: "i" } },
-        { code: { $regex: query, $options: "i" } },
-        { GSTIN: { $regex: query, $options: "i" } },
+        { name: { $regex: query, $options: 'i' } },
+        { code: { $regex: query, $options: 'i' } },
+        { GSTIN: { $regex: query, $options: 'i' } },
       ],
     })
       .skip((page - 1) * limit)
       .limit(limit);
 
-    const totalParties = await Party.countDocuments({
+    const totalParties = await MargParties.countDocuments({
       $or: [
-        { name: { $regex: query, $options: "i" } },
-        { code: { $regex: query, $options: "i" } },
-        { GSTIN: { $regex: query, $options: "i" } },
+        { name: { $regex: query, $options: 'i' } },
+        { code: { $regex: query, $options: 'i' } },
+        { GSTIN: { $regex: query, $options: 'i' } },
       ],
     });
     const totalPages = Math.ceil(totalParties / limit);
@@ -35,25 +36,25 @@ export const getPartiesService = async (page, limit, query = "") => {
 export const fetchPartiesService = async (
   page,
   limit,
-  query = "",
-  sortBy = "rid",
-  is_deleted = "",
+  query = '',
+  sortBy = 'rid',
+  is_deleted = '',
   order = 1,
 ) => {
   try {
     const searchFilter = query
       ? {
           $or: [
-            { name: { $regex: query, $options: "i" } },
-            { code: { $regex: query, $options: "i" } },
-            { MargCode: { $regex: query, $options: "i" } },
-            { GSTIN: { $regex: query, $options: "i" } },
-            { address: { $regex: query, $options: "i" } },
+            { name: { $regex: query, $options: 'i' } },
+            { code: { $regex: query, $options: 'i' } },
+            { MargCode: { $regex: query, $options: 'i' } },
+            { GSTIN: { $regex: query, $options: 'i' } },
+            { address: { $regex: query, $options: 'i' } },
           ],
         }
       : {};
 
-    const parties = await Party.find({
+    const parties = await MargParties.find({
       Is_Deleted: is_deleted,
       ...searchFilter,
     })
@@ -61,22 +62,22 @@ export const fetchPartiesService = async (
       .skip((page - 1) * limit)
       .limit(limit);
 
-    const totalParties = await Party.countDocuments({
+    const totalParties = await MargParties.countDocuments({
       Is_Deleted: is_deleted,
       ...searchFilter,
     });
 
-    const totalActiveParties = await Party.countDocuments({
-      Is_Deleted: "0",
+    const totalActiveParties = await MargParties.countDocuments({
+      Is_Deleted: '0',
       ...searchFilter,
     });
 
-    const totalDeletedParties = await Party.countDocuments({
-      Is_Deleted: "1",
+    const totalDeletedParties = await MargParties.countDocuments({
+      Is_Deleted: '1',
       ...searchFilter,
     });
 
-    const totalBalance = await Party.aggregate([
+    const totalBalance = await MargParties.aggregate([
       {
         $match: {
           Is_Deleted: is_deleted,
@@ -86,12 +87,12 @@ export const fetchPartiesService = async (
       {
         $group: {
           _id: null,
-          totalBalance: { $sum: { $toDouble: "$balance" } },
+          totalBalance: { $sum: { $toDouble: '$balance' } },
         },
       },
     ]);
 
-    const totalPDC = await Party.aggregate([
+    const totalPDC = await MargParties.aggregate([
       {
         $match: {
           Is_Deleted: is_deleted,
@@ -101,7 +102,7 @@ export const fetchPartiesService = async (
       {
         $group: {
           _id: null,
-          totalPDC: { $sum: { $toDouble: "$pdc" } },
+          totalPDC: { $sum: { $toDouble: '$pdc' } },
         },
       },
     ]);
@@ -122,9 +123,9 @@ export const fetchPartiesService = async (
   }
 };
 
-export const getPartyDetailsService = async (rid) => {
+export const getPartyDetailsService = async rid => {
   try {
-    const party = await Party.findOne({ rid });
+    const party = await MargParties.findOne({ rid });
     return party;
   } catch (error) {
     throw new ApiError(500, error.message);
@@ -133,16 +134,13 @@ export const getPartyDetailsService = async (rid) => {
 
 export const getAllPartiesService = async () => {
   try {
-    const parties = await Party.find();
+    const parties = await MargParties.find();
     return parties;
   } catch (error) {
     throw new ApiError(500, error.message);
   }
 };
 
-// Register a party:
-// - If a matching party is found (by phone1 or MargCode) → attach credentials to it
-// - If NOT found → create a new party document with the provided details
 export const partyRegisterService = async ({
   name,
   phone1,
@@ -155,19 +153,20 @@ export const partyRegisterService = async ({
 }) => {
   try {
     if (!password || !name) {
-      throw new ApiError(400, "name and password are required");
+      throw new ApiError(400, 'name and password are required');
     }
-
-    const userId = generateUserId();
 
     // Try to find an existing party by phone1 or DlNo
     const searchFilter = [];
     if (phone1) searchFilter.push({ phone1 });
     if (DlNo) searchFilter.push({ DlNo });
+    if (MargCode) searchFilter.push({ MargCode });
+    if (GSTIN) searchFilter.push({ GSTIN });
+    if (email1) searchFilter.push({ email1 });
 
     const existingParty =
       searchFilter.length > 0
-        ? await Party.findOne({ $or: searchFilter })
+        ? await MargParties.findOne({ $or: searchFilter })
         : null;
 
     const hashedPassword = await bcrypt.hash(password, 10);
@@ -176,12 +175,11 @@ export const partyRegisterService = async ({
 
     if (existingParty) {
       // Party already exists in Marg — just attach credentials
-      // if (existingParty.userId) {
-      //   throw new ApiError(
-      //     400,
-      //     'This party already has an account. Please login.',
-      //   );
-      // }
+      if (existingParty.userId) {
+        throw new ApiError(400, 'Already registered. Please login.');
+      }
+
+      const userId = generateUserId();
 
       existingParty.userId = userId;
       existingParty.password = hashedPassword;
@@ -191,7 +189,7 @@ export const partyRegisterService = async ({
       party = existingParty;
     } else {
       // New party — create a fresh document (rid will be null until Marg sync)
-      party = await Party.create({
+      party = await MargParties.create({
         name,
         phone1,
         email1,
@@ -202,6 +200,13 @@ export const partyRegisterService = async ({
         userId,
         password: hashedPassword,
         isVerified: false,
+      });
+
+      await Address.create({
+        name,
+        phone: phone1,
+        address,
+        isDefault: true,
       });
     }
 
@@ -217,35 +222,24 @@ export const partyRegisterService = async ({
   }
 };
 
-// Login a party using userId + password
 export const partyLoginService = async ({ userId, password }) => {
   try {
     if (!userId || !password) {
-      throw new ApiError(400, "userId and password are required");
+      throw new ApiError(400, 'userId and password are required');
     }
 
-    const party = await Party.findOne({ userId });
+    const party = await MargParties.findOne({ userId, password });
 
-    if (!party || !party.password) {
-      throw new ApiError(400, "Invalid credentials");
+    console.log(party);
+
+    if (!party) {
+      throw new ApiError(400, 'Invalid credentials');
     }
-
-    const isMatch = await bcrypt.compare(password, party.password);
-    if (!isMatch) {
-      throw new ApiError(400, "Invalid credentials");
-    }
-
-    // if (!party.isVerified) {
-    //   throw new ApiError(
-    //     403,
-    //     "Account not verified. Please contact the distributor.",
-    //   );
-    // }
 
     const token = generateToken({
       id: party._id,
       userId: party.userId,
-      role: "party",
+      role: 'party',
       rid: party.rid ? party.rid : null,
     });
 
@@ -259,30 +253,28 @@ export const partyLoginService = async ({ userId, password }) => {
   }
 };
 
-// Update party's own profile details (local only — does NOT sync back to Marg)
-// Marg-controlled fields (rid, balance, pdc, opening, Is_Deleted) cannot be updated here
 export const updatePartyService = async (partyId, updates) => {
   try {
     const allowedFields = [
-      "name",
-      "address",
-      "phone1",
-      "phone2",
-      "phone3",
-      "phone4",
-      "email1",
-      "email2",
-      "email3",
-      "bank",
-      "branch",
-      "MargCode",
-      "GSTIN",
-      "DlNo",
-      "area",
-      "code",
-      "gcode",
-      "LedgerCode",
-      "isVerified",
+      'name',
+      'address',
+      'phone1',
+      'phone2',
+      'phone3',
+      'phone4',
+      'email1',
+      'email2',
+      'email3',
+      'bank',
+      'branch',
+      'MargCode',
+      'GSTIN',
+      'DlNo',
+      'area',
+      'code',
+      'gcode',
+      'LedgerCode',
+      'isVerified',
     ];
 
     // Only pick allowed fields from the update payload
@@ -294,17 +286,17 @@ export const updatePartyService = async (partyId, updates) => {
     }
 
     if (Object.keys(safeUpdates).length === 0) {
-      throw new ApiError(400, "No valid fields provided to update");
+      throw new ApiError(400, 'No valid fields provided to update');
     }
 
-    const party = await Party.findByIdAndUpdate(
+    const party = await MargParties.findByIdAndUpdate(
       partyId,
       { $set: safeUpdates },
       { new: true, runValidators: true },
-    ).select("-password");
+    ).select('-password');
 
     if (!party) {
-      throw new ApiError(404, "Party not found");
+      throw new ApiError(404, 'Party not found');
     }
 
     return party;
@@ -314,9 +306,9 @@ export const updatePartyService = async (partyId, updates) => {
   }
 };
 
-export const getPartyByUserIdService = async (userId) => {
+export const getPartyByUserIdService = async userId => {
   try {
-    const party = await Party.findOne({ userId });
+    const party = await MargParties.findOne({ userId });
     return party;
   } catch (error) {
     throw new ApiError(500, error.message);

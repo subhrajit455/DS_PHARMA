@@ -1,56 +1,32 @@
-import { generateToken } from "../../helpers/token.js";
-import ApiError from "../../utils/apiError.js";
-import Staff from "../staff/staff.model.js";
-import UserModel from "./auth.model.js";
-import bcrypt from "bcryptjs";
+import { generateToken } from '../../helpers/token.js';
+import ApiError from '../../utils/apiError.js';
+import Staff from '../staff/staff.model.js';
+import bcrypt from 'bcryptjs';
 
-export const registerService = async (payload) => {
-  const { employeeId, name, email, password } = payload;
-
-  if (!employeeId || !name || !email || !password) {
-    throw new ApiError(400, "All fields are required");
-  }
-
-  const existingUser = await UserModel.findOne({
-    $or: [{ employeeId }, { email }],
-  });
-
-  if (existingUser) {
-    throw new ApiError(400, "User already exists");
-  }
-
-  const hashedPassword = await bcrypt.hash(password, 10);
-
-  const user = await UserModel.create({
-    employeeId,
-    name,
-    email,
-    password: hashedPassword,
-  });
-
-  return user;
-};
-
-export const loginService = async (payload) => {
+export const loginService = async payload => {
   const { userId, password } = payload;
 
-  const user = await Staff.findOne({ userId });
+  const user = await Staff.findOne({ phone: userId });
 
   if (!user) {
-    throw new ApiError(400, "Staff not assigned yet");
+    throw new ApiError(400, 'Staff not found. Please contact admin.');
+  }
+
+  if (!user.isActive) {
+    throw new ApiError(403, 'Account is disabled. Please contact admin.');
   }
 
   const isPasswordMatched = await bcrypt.compare(password, user.password);
 
   if (!isPasswordMatched) {
-    throw new ApiError(400, "Incorrect password");
+    throw new ApiError(400, 'Incorrect password');
   }
 
-  const userDetails = await Staff.findOne({ userId }).select("-password");
+  const userDetails = await Staff.findOne({ phone: userId }).select('-password');
 
   const token = generateToken({
     id: userDetails._id,
-    userId: userDetails.userId,
+    userId: userDetails.phone,
     role: userDetails.role,
   });
 
@@ -60,13 +36,11 @@ export const loginService = async (payload) => {
   };
 };
 
-export const getUserProfile = async (userId) => {
-  const user = await Staff.findOne({ userId }).select("-password");
-
-  console.log("user", user);
+export const getUserProfile = async userId => {
+  const user = await Staff.findOne({ userId }).select('-password');
 
   if (!user) {
-    throw new ApiError(404, "User not found");
+    throw new ApiError(404, 'User not found');
   }
 
   const token = generateToken({
@@ -74,8 +48,6 @@ export const getUserProfile = async (userId) => {
     userId: user.userId,
     role: user.role,
   });
-
-  console.log("token :: ", token);
 
   return {
     user,

@@ -1,61 +1,55 @@
-import ApiError from "../../utils/apiError.js";
-import { syncMasterOrderDataService } from "../mastersync/masterSync.service.js";
-import margOrder from "./order.model.js";
+import { generateOTP } from '../../helpers/generateOTP.js';
+import ApiError from '../../utils/apiError.js';
+import { syncMasterOrderDataService } from '../mastersync/masterSync.service.js';
+import Orders from './order.model.js';
 
 export const createOrderService = async (
   salesManId,
   { OrderID, OrderNo, CustomerDetails, ProductDetails, PaymentDetails },
-  type = "S",
+  type = 'S',
 ) => {
   try {
-    // console.log({
-    //   OrderID,
-    //   OrderNo,
-    //   CustomerDetails,
-    //   ProductDetails,
-    //   PaymentDetails
-    // })
-
-    // return
-
     await syncMasterOrderDataService(String(salesManId), type, {
-      OrderID: OrderID,
-      OrderNo: OrderNo,
-      CustomerID: String(CustomerDetails.CustomerID),
-      ProductCode: ProductDetails.map((item) => item.code).join(","),
-      Quantity: ProductDetails.map((item) => item.Quantity).join(","),
-      Free: ProductDetails.map((item) => item.Free).join(","),
-      Lat: CustomerDetails.Lat,
-      Lng: CustomerDetails.Lng,
-      Address: CustomerDetails.Address || "",
-      GpsID: "0",
-      UserType: "1",
-      Points: parseFloat(CustomerDetails.Points || 0).toFixed(2),
-      Discounts: CustomerDetails.Discounts || "0",
-      Transport: CustomerDetails.Transport || "",
-      Delivery: CustomerDetails.Delivery || "",
-      Bankname: CustomerDetails.BankName || "",
-      BankAdd1: CustomerDetails.BankAdd1 || "",
-      BankAdd2: CustomerDetails.BankAdd2 || "",
-      shipname: CustomerDetails.ShipName || "",
-      shipAdd1: CustomerDetails.ShipAdd1 || "",
-      shipAdd2: CustomerDetails.ShipAdd2 || "",
-      shipAdd3: CustomerDetails.ShipAdd3 || "",
-      paymentmode: PaymentDetails.paymentmode || "",
-      paymentmodeAmount: PaymentDetails.paymentmodeAmount || "0",
-      payment_remarks: PaymentDetails.payment_remarks || "",
-      order_remarks: CustomerDetails.OrderRemarks || "",
-      CustName: CustomerDetails.ShipName || "",
-      CustMobile: CustomerDetails.CustMobile || "",
+      OrderID: String(OrderID),
+      OrderNo: String(OrderNo),
+      CustomerID: String(CustomerDetails?.CustomerID),
+      ProductCode: String(ProductDetails?.map(item => item.code).join(',')),
+      Quantity: String(ProductDetails?.map(item => item.Quantity).join(',')),
+      Free: String(ProductDetails?.map(item => item.Free).join(',')),
+      Lat: String(CustomerDetails?.Lat) || '',
+      Lng: String(CustomerDetails?.Lng) || '',
+      Address: String(CustomerDetails?.Address) || '',
+      GpsID: '0',
+      UserType: '1',
+      Points: parseFloat(CustomerDetails?.Points || 0).toFixed(2),
+      Discounts: String(CustomerDetails?.Discounts) || '0',
+      Transport: String(CustomerDetails?.Transport) || '',
+      Delivery: String(CustomerDetails?.Delivery) || '',
+      Bankname: String(CustomerDetails?.BankName) || '',
+      BankAdd1: String(CustomerDetails?.BankAdd1) || '',
+      BankAdd2: String(CustomerDetails?.BankAdd2) || '',
+      shipname: String(CustomerDetails?.ShipName) || '',
+      shipAdd1: String(CustomerDetails?.ShipAdd1) || '',
+      shipAdd2: String(CustomerDetails?.ShipAdd2) || '',
+      shipAdd3: String(CustomerDetails?.ShipAdd3) || '',
+      paymentmode: String(PaymentDetails?.paymentmode) || '',
+      paymentmodeAmount: String(PaymentDetails?.paymentmodeAmount) || '0',
+      payment_remarks: String(PaymentDetails?.payment_remarks) || '',
+      order_remarks: String(CustomerDetails?.OrderRemarks) || '',
+      CustName: String(CustomerDetails?.ShipName) || '',
+      CustMobile: String(CustomerDetails?.CustMobile) || '',
     });
 
-    const newOrder = await margOrder.create({
+    const otp = generateOTP();
+
+    const newOrder = await Orders.create({
       OrderID: OrderID,
       OrderNo: OrderNo,
       Sid: salesManId,
       CustomerDetails,
       PaymentDetails,
       ProductDetails,
+      OTP: otp,
     });
 
     return newOrder;
@@ -65,39 +59,37 @@ export const createOrderService = async (
 };
 
 export const fetchOrdersService = async (page, limit, query) => {
+  const parsedPage = Math.max(parseInt(page, 10) || 1, 1);
+  const parsedLimit = Math.max(parseInt(limit, 10) || 10, 1);
+
   try {
-    const orders = await margOrder
-      .find({
-        // Sid: String(salesManId),
-        ...(query && {
-          $or: [
-            { CustName: { $regex: query, $options: "i" } },
-            { OrderID: { $regex: query, $options: "i" } },
-          ],
-        }),
-      })
-      .skip((page - 1) * limit)
-      .limit(limit)
-      .sort({ createdAt: -1 });
+    const filter = {};
 
-    const totalOrders = await margOrder.countDocuments({
-      // Sid: String(salesManId),
-      ...(query && {
-        $or: [
-          { CustName: { $regex: query, $options: "i" } },
-          { OrderID: { $regex: query, $options: "i" } },
-        ],
-      }),
-    });
+    if (query) {
+      filter.$or = [
+        { CustName: { $regex: query, $options: 'i' } },
+        { OrderID: { $regex: query, $options: 'i' } },
+      ];
+    }
 
-    const totalPages = Math.ceil(totalOrders / limit);
+    const baseQuery = Orders.find(filter)
+      .sort({ createdAt: -1 })
+      .select('-OTP')
+      .lean();
+
+    const [orders, totalOrders] = await Promise.all([
+      baseQuery.skip((parsedPage - 1) * parsedLimit).limit(parsedLimit),
+      Orders.countDocuments(filter),
+    ]);
+
+    const totalPages = Math.ceil(totalOrders / parsedLimit);
 
     return {
       orders,
       totalOrders,
       totalPages,
-      currentPage: Number(page),
-      hasMore: Number(page) < Number(totalPages),
+      currentPage: parsedPage,
+      hasMore: parsedPage < totalPages,
     };
   } catch (error) {
     throw new ApiError(500, error.message);
@@ -113,48 +105,144 @@ export const fetchOrdersBySalesmanService = async (
   month,
   year,
 ) => {
-  try {
-    const parsedMonth = month ? parseInt(month, 10) : null;
-    const parsedYear = year ? parseInt(year, 10) : new Date().getFullYear();
+  if (!salesManId) {
+    throw new ApiError(400, 'salesManId is required');
+  }
 
-    const filter = {
-      Sid: String(salesManId),
-    };
+  const parsedPage = Math.max(parseInt(page, 10) || 1, 1);
+  const parsedLimit = Math.max(parseInt(limit, 10) || 10, 1);
+
+  try {
+    const filter = { Sid: String(salesManId) };
 
     if (query) {
       filter.$or = [
-        { CustName: { $regex: query, $options: "i" } },
-        { OrderID: { $regex: query, $options: "i" } },
+        { CustName: { $regex: query, $options: 'i' } },
+        { OrderID: { $regex: query, $options: 'i' } },
       ];
     }
 
-    if (parsedMonth && parsedYear) {
-      filter.createdAt = {
-        $gte: new Date(parsedYear, parsedMonth - 1, 1),
-        $lt: new Date(parsedYear, parsedMonth, 1),
-      };
+    if (month && year) {
+      const parsedMonth = parseInt(month, 10);
+      const parsedYear = parseInt(year, 10);
+
+      const startDate = new Date(parsedYear, parsedMonth - 1, 1);
+      const endDate = new Date(parsedYear, parsedMonth, 1);
+
+      filter.createdAt = { $gte: startDate, $lt: endDate };
     }
 
-    let ordersQuery = margOrder.find(filter).sort({ createdAt: -1 });
+    const queryBuilder = Orders.find(filter)
+      .sort({ createdAt: -1 })
+      .select('-OTP')
+      .lean();
 
-    if (!all) {
-      const skip = (page - 1) * limit;
-      ordersQuery = ordersQuery.skip(skip).limit(limit);
-    }
+    const [orders, totalOrders] = await Promise.all([
+      all
+        ? queryBuilder
+        : queryBuilder.skip((parsedPage - 1) * parsedLimit).limit(parsedLimit),
+      Orders.countDocuments(filter),
+    ]);
 
-    const orders = await ordersQuery;
-
-    const totalOrders = await margOrder.countDocuments(filter);
-
-    const totalPages = all ? 1 : Math.ceil(totalOrders / limit);
+    const totalPages = all ? 1 : Math.ceil(totalOrders / parsedLimit);
 
     return {
       orders,
       totalOrders,
       totalPages,
-      currentPage: Number(page),
-      hasMore: !all && page < totalPages,
+      currentPage: parsedPage,
+      hasMore: !all && parsedPage < totalPages,
     };
+  } catch (error) {
+    throw new ApiError(500, error.message);
+  }
+};
+
+export const resendOTPService = async OrderID => {
+  if (!OrderID) {
+    throw new ApiError(400, 'OrderID is required');
+  }
+
+  try {
+    const order = await Orders.findOneAndUpdate(
+      { OrderID },
+      { $set: { OTP: generateOTP() } },
+      {
+        new: true,
+      },
+    );
+
+    if (!order) {
+      throw new ApiError(404, 'Invalid OrderID');
+    }
+
+    return order;
+  } catch (error) {
+    throw new ApiError(500, error.message);
+  }
+};
+
+export const updateOrderService = async (OrderID, status) => {
+  if (!OrderID) {
+    throw new ApiError(400, 'OrderID is required');
+  }
+
+  if (!status) {
+    throw new ApiError(400, 'Status is required');
+  }
+
+  try {
+    const order = await Orders.findOneAndUpdate(
+      { OrderID },
+      { $set: { Status: status } },
+      {
+        new: true,
+        runValidators: true,
+      },
+    );
+
+    if (!order) {
+      throw new ApiError(404, 'Order not found');
+    }
+
+    return order;
+  } catch (error) {
+    throw new ApiError(500, error.message);
+  }
+};
+
+export const fetchOrderByPartyService = async CustomerId => {
+  try {
+    const orders = await Orders.find({
+      'CustomerDetails.CustomerID': CustomerId,
+    });
+
+    return orders;
+  } catch (error) {
+    throw new ApiError(500, error.message);
+  }
+};
+
+export const updatePaymentStatusService = async (OrderID, status) => {
+  if (!OrderID) {
+    throw new ApiError(400, 'OrderID is required');
+  }
+
+  if (!status) {
+    throw new ApiError(400, 'Status is required');
+  }
+
+  try {
+    const order = await Orders.findOneAndUpdate(
+      { OrderID },
+      { $set: { 'PaymentDetails.paymentStatus': status } },
+      {
+        new: true,
+        runValidators: true,
+      },
+    );
+
+    return order;
   } catch (error) {
     throw new ApiError(500, error.message);
   }

@@ -1,129 +1,123 @@
-import Staff from "./staff.model.js";
-import ApiError from "../../utils/apiError.js";
-import bcrypt from "bcryptjs";
-import MargUser from "./margUser.model.js";
-import { syncMasterOrderDispatchDataService } from "../mastersync/masterSync.service.js";
-import margOrder from "../order/order.model.js";
+import ApiError from '../../utils/apiError.js';
+import { syncMasterOrderDispatchDataService } from '../mastersync/masterSync.service.js';
+import margOrder from '../order/order.model.js';
+import Staff from './staff.model.js';
 
-export const fetchMargUsersService = async () => {
+export const createStaffService = async (
+  name,
+  email = '',
+  phone,
+  password,
+  address,
+  role = 'STAFF',
+  isActive = true,
+) => {
+  if (!name || !phone || !password) {
+    throw new ApiError(500, 'Fill the required fields.');
+  }
+
   try {
-    const margUsers = await MargUser.find();
-    return margUsers;
+    const isExists = await Staff.findOne({ phone });
+
+    console.log(isExists);
+
+    if (isExists) {
+      throw new ApiError(500, 'Phone number already registered');
+    }
+
+    const staff = await Staff.create({
+      name,
+      email,
+      phone,
+      password,
+      address,
+      role: String(role).toUpperCase(),
+      isActive,
+    });
+
+    return staff;
   } catch (error) {
     throw new ApiError(500, error.message);
   }
 };
 
-export const assignStaffService = async ({
-  userId,
-  name,
-  email,
-  password,
-  ...payload
-}) => {
-  try {
-    const existingStaff = await Staff.findOne({ userId });
-
-    if (existingStaff) {
-      throw new ApiError(400, "Staff already assigned");
-    }
-
-    const hashedPassword = await bcrypt.hash(password, 10);
-
-    const newStaffData = await Staff.create({
-      userId,
-      name,
-      email,
-      password: hashedPassword,
-      ...payload,
-    });
-
-    const staff = await Staff.findById(newStaffData._id).select("-password");
-
-    return staff;
-  } catch (error) {
-    if (error instanceof ApiError) {
-      throw error;
-    }
-    throw new ApiError(500, error.message || "Internal server error");
-  }
-};
-
 export const fetchStaffService = async () => {
   try {
-    const staff = await Staff.find().select("-password");
-
-    const totalStaff = await Staff.countDocuments();
-
-    const totalActiveStaff = await Staff.countDocuments({ isActive: true });
-
-    const totalInactiveStaff = await Staff.countDocuments({ isActive: false });
+    const [staff, totalStaff, totalActiveStaff, totalInactiveStaff] =
+      await Promise.all([
+        Staff.find().select('-password').lean(),
+        Staff.countDocuments(),
+        Staff.countDocuments({ isActive: true }),
+        Staff.countDocuments({ isActive: false }),
+      ]);
 
     return { staff, totalStaff, totalActiveStaff, totalInactiveStaff };
   } catch (error) {
-    if (error instanceof ApiError) {
-      throw error;
-    }
-    throw new ApiError(500, error.message || "Internal server error");
+    throw new ApiError(500, error.message);
   }
 };
 
-export const updateStaffService = async (userId, payload) => {
+export const updateStaffService = async (staffId, payload) => {
+  if (!staffId) {
+    throw new ApiError(500, 'staffId is required.');
+  }
+
   try {
-    const staff = await Staff.findByIdAndUpdate(userId, payload, {
+    const staff = await Staff.findByIdAndUpdate(staffId, payload, {
       new: true,
       runValidators: true,
     });
+
     return staff;
   } catch (error) {
-    if (error instanceof ApiError) {
-      throw error;
-    }
-    throw new ApiError(500, error.message || "Internal server error");
+    throw new ApiError(500, error.message);
   }
 };
 
-export const fetchStaffByIdService = async (userId) => {
+export const deleteStaffService = async staffId => {
+  if (!staffId) {
+    throw new ApiError(500, 'staffId is required.');
+  }
+
   try {
-    const staff = await Staff.findOne({ userId }).select("-password");
+    await Staff.findByIdAndDelete(staffId);
+  } catch (error) {
+    throw new ApiError(500, error.message);
+  }
+};
 
-    const staffReport = await syncMasterOrderDispatchDataService(userId);
-
-    staff.staffReport = staffReport;
-
-    await staff.save();
+export const fetchStaffByIdService = async staffId => {
+  try {
+    const staff = await Staff.findById(staffId).select('-password');
 
     if (!staff) {
-      throw new ApiError(404, "Staff details not found");
+      throw new ApiError(404, 'Staff details not found');
     }
 
-    return { staff, staffReport };
+    return staff;
   } catch (error) {
-    if (error instanceof ApiError) {
-      throw error;
-    }
-    throw new ApiError(500, error.message || "Internal server error");
+    throw new ApiError(500, error.message);
   }
 };
 
 const MONTH_NAMES = [
-  "January",
-  "February",
-  "March",
-  "April",
-  "May",
-  "June",
-  "July",
-  "August",
-  "September",
-  "October",
-  "November",
-  "December",
+  'January',
+  'February',
+  'March',
+  'April',
+  'May',
+  'June',
+  'July',
+  'August',
+  'September',
+  'October',
+  'November',
+  'December',
 ];
 
 export const fetchSalesmanMonthlyReportService = async (salesManId, year) => {
   try {
-    const allYears = year === "all";
+    const allYears = year === 'all';
     const parsedYear = allYears
       ? null
       : parseInt(year, 10) || new Date().getFullYear();
@@ -144,27 +138,27 @@ export const fetchSalesmanMonthlyReportService = async (salesManId, year) => {
       matchStage,
       // Unwind products to sum quantities
       {
-        $unwind: { path: "$ProductDetails", preserveNullAndEmptyArrays: true },
+        $unwind: { path: '$ProductDetails', preserveNullAndEmptyArrays: true },
       },
       {
         $group: {
           _id: {
-            year: { $year: "$createdAt" },
-            month: { $month: "$createdAt" },
-            orderId: "$_id",
-            customerId: "$CustomerDetails.CustomerID",
+            year: { $year: '$createdAt' },
+            month: { $month: '$createdAt' },
+            orderId: '$_id',
+            customerId: '$CustomerDetails.CustomerID',
           },
           totalQty: {
             $sum: {
               $add: [
-                { $ifNull: [{ $toDouble: "$ProductDetails.Quantity" }, 0] },
-                { $ifNull: [{ $toDouble: "$ProductDetails.Free" }, 0] },
+                { $ifNull: [{ $toDouble: '$ProductDetails.Quantity' }, 0] },
+                { $ifNull: [{ $toDouble: '$ProductDetails.Free' }, 0] },
               ],
             },
           },
           orderValue: {
             $first: {
-              $ifNull: [{ $toDouble: "$PaymentDetails.paymentmodeAmount" }, 0],
+              $ifNull: [{ $toDouble: '$PaymentDetails.paymentmodeAmount' }, 0],
             },
           },
         },
@@ -172,22 +166,22 @@ export const fetchSalesmanMonthlyReportService = async (salesManId, year) => {
       // Group by year+month (one doc per order now)
       {
         $group: {
-          _id: { year: "$_id.year", month: "$_id.month" },
+          _id: { year: '$_id.year', month: '$_id.month' },
           totalOrders: { $sum: 1 },
-          totalItemsSold: { $sum: "$totalQty" },
-          uniqueCustomers: { $addToSet: "$_id.customerId" },
-          totalOrderValue: { $sum: "$orderValue" },
+          totalItemsSold: { $sum: '$totalQty' },
+          uniqueCustomers: { $addToSet: '$_id.customerId' },
+          totalOrderValue: { $sum: '$orderValue' },
         },
       },
       {
         $project: {
           _id: 0,
-          year: "$_id.year",
-          month: "$_id.month",
+          year: '$_id.year',
+          month: '$_id.month',
           totalOrders: 1,
           totalItemsSold: 1,
-          uniqueCustomers: { $size: "$uniqueCustomers" },
-          totalOrderValue: { $round: ["$totalOrderValue", 2] },
+          uniqueCustomers: { $size: '$uniqueCustomers' },
+          totalOrderValue: { $round: ['$totalOrderValue', 2] },
         },
       },
       { $sort: { year: 1, month: 1 } },
@@ -198,7 +192,7 @@ export const fetchSalesmanMonthlyReportService = async (salesManId, year) => {
     // Build full 12-month map for the requested year so graph has zero values for empty months
     let monthlyReport;
     if (!allYears && parsedYear) {
-      const monthMap = Object.fromEntries(rawReport.map((r) => [r.month, r]));
+      const monthMap = Object.fromEntries(rawReport.map(r => [r.month, r]));
       monthlyReport = MONTH_NAMES.map((name, idx) => {
         const monthNum = idx + 1;
         return {
@@ -212,7 +206,7 @@ export const fetchSalesmanMonthlyReportService = async (salesManId, year) => {
         };
       });
     } else {
-      monthlyReport = rawReport.map((r) => ({
+      monthlyReport = rawReport.map(r => ({
         ...r,
         monthName: MONTH_NAMES[r.month - 1],
       }));
@@ -220,7 +214,7 @@ export const fetchSalesmanMonthlyReportService = async (salesManId, year) => {
 
     // Yearly summary totals
     const summary = {
-      year: parsedYear || "all",
+      year: parsedYear || 'all',
       totalOrders: monthlyReport.reduce((s, m) => s + m.totalOrders, 0),
       totalItemsSold: monthlyReport.reduce((s, m) => s + m.totalItemsSold, 0),
       totalOrderValue: parseFloat(
@@ -235,6 +229,6 @@ export const fetchSalesmanMonthlyReportService = async (salesManId, year) => {
     return { monthlyReport, summary };
   } catch (error) {
     if (error instanceof ApiError) throw error;
-    throw new ApiError(500, error.message || "Internal server error");
+    throw new ApiError(500, error.message || 'Internal server error');
   }
 };

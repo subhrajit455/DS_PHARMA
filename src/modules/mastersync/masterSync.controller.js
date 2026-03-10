@@ -1,11 +1,10 @@
-import { formatDateTime } from "../../marg/formatDateTime.js";
 import ApiError from "../../utils/apiError.js";
 import ApiResponse from "../../utils/apiResponse.js";
 import asyncHandler from "../../utils/asyncHandler.js";
 import {
-  syncMasterOrderDataService,
-  syncMasterOrderDispatchDataService,
-  syncMastersDataService,
+    syncMasterOrderDataService,
+    syncMasterOrderDispatchDataService,
+    syncMastersDataService,
 } from "./masterSync.service.js";
 
 export const syncMastersData = asyncHandler(async (req, res) => {

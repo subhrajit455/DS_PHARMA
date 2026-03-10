@@ -1,78 +1,91 @@
+import {
+  adminPassword,
+  adminUserId,
+  adminId,
+  isProduction,
+} from '../../config/credentials.js';
+import { generateToken } from '../../helpers/token.js';
 import ApiError from '../../utils/apiError.js';
 import ApiResponse from '../../utils/apiResponse.js';
 import asyncHandler from '../../utils/asyncHandler.js';
-import {
-  getUserProfile,
-  loginService,
-  registerService,
-} from './auth.service.js';
+import { getUserProfile, loginService } from './auth.service.js';
 
-export const registerController = asyncHandler(async (req, res) => {
-  const user = await registerService(req.body);
-
-  return res.json(
-    new ApiResponse(
-      201,
-      {
-        employeeId: user.employeeId,
-        name: user.name,
-        email: user.email,
-        role: user.role,
-      },
-      'User registered successfully',
-    ),
-  );
-});
+const cookieOptions = {
+  httpOnly: true,
+  secure: isProduction,
+  sameSite: isProduction ? 'none' : 'lax',
+  maxAge: 8 * 60 * 60 * 1000,
+};
 
 export const loginController = asyncHandler(async (req, res) => {
   const { userId, password } = req.body;
 
   if (!userId || !password) {
-    throw new ApiError(400, 'All fields are required');
+    throw new ApiError(400, 'userId and password are required');
   }
 
-  const { user, token } = await loginService({ userId, password });
+  if (userId === adminUserId && password === adminPassword) {
+    const token = generateToken({
+      id: adminId,
+      userId: adminUserId,
+      role: 'admin',
+    });
 
-  console.log({
-    user,
-    token,
-  });
+    res.cookie('token', token, cookieOptions);
 
-  const isProduction = process.env.NODE_ENV === 'production';
+    return res.json(
+      new ApiResponse(
+        200,
+        {
+          user: {
+            id: adminId,
+            userId: adminUserId,
+            role: 'admin',
+          },
+          token,
+        },
+        'Logged in successfully',
+      ),
+    );
+  } else {
+    const { user, token } = await loginService({ userId, password });
 
-  res.cookie('token', token, {
-    httpOnly: true,
-    secure: isProduction,
-    sameSite: isProduction ? 'none' : 'lax',
-    maxAge: 24 * 60 * 60 * 1000,
-  });
+    res.cookie('token', token, cookieOptions);
 
-  return res.json(
-    new ApiResponse(200, { user, token }, 'User logged in successfully'),
-  );
+    return res.json(
+      new ApiResponse(200, { user, token }, 'Logged in successfully'),
+    );
+  }
 });
 
 export const logoutController = asyncHandler(async (req, res) => {
-  res.clearCookie('token');
+  res.clearCookie('token', cookieOptions);
 
   return res.json(new ApiResponse(200, {}, 'Logged out successfully'));
 });
 
 export const getProfileController = asyncHandler(async (req, res) => {
-  console.log('user id', req.user.userId);
+  const { userId, role } = req.user;
 
-  const { user, token } = await getUserProfile(req.user.userId);
+  if (userId === adminUserId && role === 'admin') {
+    return res.json(
+      new ApiResponse(
+        200,
+        {
+          user: {
+            id: adminId,
+            userId: adminUserId,
+            role: 'admin',
+          },
+        },
+        'Profile fetched successfully',
+      ),
+    );
+  } else {
+    const { user } = await getUserProfile(userId);
 
-  const isProduction = process.env.NODE_ENV === 'production';
-
-  res.cookie('token', token, {
-    httpOnly: true,
-    secure: isProduction,
-    sameSite: isProduction ? 'none' : 'lax',
-    maxAge: 24 * 60 * 60 * 1000,
-  });
-
-  return res.json(
-    new ApiResponse(200, { user, token }, 'Profile fetched successfully'),
-  );
+    return res.json(
+      new ApiResponse(200, { user }, 'Profile fetched successfully'),
+    );
+  }
 });

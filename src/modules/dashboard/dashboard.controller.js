@@ -1,5 +1,5 @@
 import asyncHandler from "../../utils/asyncHandler.js";
-import ApiResponse from "../../utils/ApiResponse.js";
+import ApiResponse from "../../utils/apiResponse.js";
 import { fetchCustomerDashboardDataService } from "./dashboard.service.js";
 import {
   fetchExpiringProductsService,

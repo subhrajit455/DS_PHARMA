@@ -22,9 +22,7 @@ export const getCart = async (req, res) => {
     const userId = req.user.id;
 
     const cart = await getCartService(userId);
-    if (!cart || cart.length === 0) {
-      return res.status(404).json({ message: "Cart not found" });
-    }
+
     res.status(200).json({ message: "Cart found", data: cart });
   } catch (error) {
     res.status(error.statusCode || 500).json({ message: error.message });

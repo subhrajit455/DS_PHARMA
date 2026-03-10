@@ -1,192 +1,169 @@
-import { uploadImage } from "../../config/vaisBucket.js";
-import ProductInfo from "./productInfo.model.js";
-import ProN from "./proN.model.js";
-import fs from "fs";
+import fs from 'fs';
+import { uploadImage } from '../../config/vaisBucket.js';
+import MargProducts from '../mastersync/marg_products.model.js';
+import ProductInfo from './productInfo.model.js';
 
 export const fetchProductsService = async (
   page,
   limit,
-  query = "",
-  sortBy = "name",
+  query = '',
+  sortBy = 'name',
   order = 1,
   stock,
   minPrice = 0,
   maxPrice = 0,
 ) => {
   try {
-    const pipeline = [
+    const parsedLimit = parseInt(limit);
+    const skip = (page - 1) * parsedLimit;
+
+    const allowedSortFields = ['name', 'MRP', 'stock', 'company'];
+    const safeSortField = allowedSortFields.includes(sortBy) ? sortBy : 'name';
+
+    const baseMatch = {
+      Is_Deleted: '0',
+      ...(query && {
+        $or: [
+          { name: { $regex: query, $options: 'i' } },
+          { company: { $regex: query, $options: 'i' } },
+          { code: { $regex: query, $options: 'i' } },
+          { curbatch: { $regex: query, $options: 'i' } },
+        ],
+      }),
+    };
+
+    const priceFilter =
+      minPrice > 0 || maxPrice > 0
+        ? {
+            $expr: {
+              $and: [
+                { $gte: [{ $toDouble: '$MRP' }, minPrice] },
+                ...(maxPrice > 0
+                  ? [{ $lte: [{ $toDouble: '$MRP' }, maxPrice] }]
+                  : []),
+              ],
+            },
+          }
+        : null;
+
+    const result = await MargProducts.aggregate([
+      { $match: baseMatch },
+      ...(priceFilter ? [{ $match: priceFilter }] : []),
+
+      // 🔹 Early projection (reduce memory)
       {
-        $match: {
-          Is_Deleted: "0",
-          // ProductCode: { $ne: "" },
-          $or: [
-            { name: { $regex: query, $options: "i" } },
-            { company: { $regex: query, $options: "i" } },
-            { code: { $regex: query, $options: "i" } },
-            { curbatch: { $regex: query, $options: "i" } },
-          ],
+        $project: {
+          rid: 1,
+          name: 1,
+          company: 1,
+          stock: 1,
+          MRP: 1,
+          Prate: 1,
+          code: 1,
+          curbatch: 1,
         },
       },
-      ...(minPrice > 0 || maxPrice > 0
-        ? [
-            {
-              $match: {
-                $expr: {
-                  $and: [
-                    { $gte: [{ $toDouble: "$MRP" }, minPrice] },
-                    ...(maxPrice > 0
-                      ? [{ $lte: [{ $toDouble: "$MRP" }, maxPrice] }]
-                      : []),
-                  ],
-                },
-              },
-            },
-          ]
-        : []),
-      ...(stock === 1
-        ? [
-            {
-              $match: {
-                $expr: {
-                  $gt: [{ $toDouble: "$stock" }, 0],
-                },
-              },
-            },
-          ]
-        : stock === 0
-          ? [
-              {
-                $match: {
-                  $expr: {
-                    $lte: [{ $toDouble: "$stock" }, 0],
-                  },
-                },
-              },
-            ]
-          : []),
-    ];
 
-    // Use $facet to run all aggregations in a single pipeline
-    const result = await ProN.aggregate([
-      ...pipeline,
       {
         $facet: {
-          // Facet 1: Paginated products with all lookups
+          // ---------------- PRODUCTS ----------------
           products: [
+            ...(stock === 1
+              ? [
+                  {
+                    $match: {
+                      $expr: { $gt: [{ $toDouble: '$stock' }, 0] },
+                    },
+                  },
+                ]
+              : stock === 0
+                ? [
+                    {
+                      $match: {
+                        $expr: { $lte: [{ $toDouble: '$stock' }, 0] },
+                      },
+                    },
+                  ]
+                : []),
+
+            { $sort: { [safeSortField]: order } },
+            { $skip: skip },
+            { $limit: parsedLimit },
+
+            // Lookup AFTER pagination (very important)
             {
               $lookup: {
-                from: "productinfos",
-                localField: "rid",
-                foreignField: "rid",
-                as: "productInfoData",
+                from: 'productinfos',
+                localField: 'rid',
+                foreignField: 'rid',
+                as: 'productInfoData',
               },
             },
             {
               $addFields: {
                 images: {
                   $ifNull: [
-                    { $arrayElemAt: ["$productInfoData.images", 0] },
+                    { $arrayElemAt: ['$productInfoData.images', 0] },
                     [],
                   ],
                 },
                 categoryId: {
                   $ifNull: [
-                    { $arrayElemAt: ["$productInfoData.categoryId", 0] },
-                    "",
+                    { $arrayElemAt: ['$productInfoData.categoryId', 0] },
+                    '',
                   ],
                 },
                 isFeatured: {
                   $ifNull: [
-                    { $arrayElemAt: ["$productInfoData.isFeatured", 0] },
+                    { $arrayElemAt: ['$productInfoData.isFeatured', 0] },
                     false,
                   ],
                 },
                 hsnCode: {
                   $ifNull: [
-                    { $arrayElemAt: ["$productInfoData.hsnCode", 0] },
-                    "",
+                    { $arrayElemAt: ['$productInfoData.hsnCode', 0] },
+                    '',
                   ],
                 },
-              },
-            },
-            {
-              $lookup: {
-                from: "categories",
-                localField: "categoryId",
-                foreignField: "_id",
-                as: "categoryDetails",
-              },
-            },
-            {
-              $addFields: {
-                categoryDetails: {
-                  $ifNull: [{ $arrayElemAt: ["$categoryDetails", 0] }, {}],
-                },
-              },
-            },
-            {
-              $lookup: {
-                from: "hsns",
-                localField: "hsnCode",
-                foreignField: "_id",
-                as: "hsnDetails",
-              },
-            },
-            {
-              $addFields: {
-                hsnDetails: {
-                  $ifNull: [{ $arrayElemAt: ["$hsnDetails", 0] }, {}],
+                description: {
+                  $ifNull: [
+                    { $arrayElemAt: ['$productInfoData.description', 0] },
+                    '',
+                  ],
                 },
               },
             },
             {
               $project: {
                 productInfoData: 0,
-                categoryId: 0,
-                categoryData: 0,
-                categoryIdObject: 0,
-                "categoryDetails.images": 0,
-                stockValue: 0,
-                hsnCode: 0,
               },
-            },
-            {
-              $sort: {
-                [sortBy]: order,
-              },
-            },
-            {
-              $skip: (page - 1) * limit,
-            },
-            {
-              $limit: parseInt(limit),
             },
           ],
-          // Facet 2: Total count
-          totalCount: [{ $count: "total" }],
-          // Facet 3: In-stock count (independent of stock filter)
+
+          // ---------------- TOTAL COUNT ----------------
+          totalCount: [{ $count: 'total' }],
+
+          // ---------------- GLOBAL IN-STOCK ----------------
           inStockCount: [
             {
               $match: {
-                $expr: {
-                  $gt: [{ $toDouble: "$stock" }, 0],
-                },
+                $expr: { $gt: [{ $toDouble: '$stock' }, 0] },
               },
             },
-            { $count: "total" },
+            { $count: 'total' },
           ],
-          // Facet 4: Out-of-stock count (independent of stock filter)
+
+          // ---------------- GLOBAL OUT-STOCK ----------------
           outStockCount: [
             {
               $match: {
-                $expr: {
-                  $lte: [{ $toDouble: "$stock" }, 0],
-                },
+                $expr: { $lte: [{ $toDouble: '$stock' }, 0] },
               },
             },
-            { $count: "total" },
+            { $count: 'total' },
           ],
-          // Facet 5: Inventory value
+
+          // ---------------- INVENTORY VALUE ----------------
           inventoryValue: [
             {
               $group: {
@@ -194,8 +171,8 @@ export const fetchProductsService = async (
                 total: {
                   $sum: {
                     $multiply: [
-                      { $toDouble: "$stock" },
-                      { $toDouble: "$Prate" },
+                      { $toDouble: '$stock' },
+                      { $toDouble: '$Prate' },
                     ],
                   },
                 },
@@ -206,13 +183,13 @@ export const fetchProductsService = async (
       },
     ]);
 
-    // Extract results from facets
     const products = result[0]?.products || [];
     const totalProducts = result[0]?.totalCount[0]?.total || 0;
     const totalInStock = result[0]?.inStockCount[0]?.total || 0;
     const totalOutStock = result[0]?.outStockCount[0]?.total || 0;
     const totalInventoryValue = result[0]?.inventoryValue[0]?.total || 0;
-    const totalPages = Math.ceil(totalProducts / limit);
+
+    const totalPages = parsedLimit ? Math.ceil(totalProducts / parsedLimit) : 0;
 
     return {
       products,
@@ -227,9 +204,9 @@ export const fetchProductsService = async (
   }
 };
 
-export const getProductDetailsService = async (rid) => {
+export const getProductDetailsService = async rid => {
   try {
-    const product = await ProN.aggregate([
+    const product = await MargProducts.aggregate([
       {
         $match: {
           rid,
@@ -237,58 +214,64 @@ export const getProductDetailsService = async (rid) => {
       },
       {
         $lookup: {
-          from: "productinfos",
-          localField: "rid",
-          foreignField: "rid",
-          as: "productInfoData",
+          from: 'productinfos',
+          localField: 'rid',
+          foreignField: 'rid',
+          as: 'productInfoData',
         },
       },
       {
         $addFields: {
           images: {
-            $ifNull: [{ $arrayElemAt: ["$productInfoData.images", 0] }, []],
+            $ifNull: [{ $arrayElemAt: ['$productInfoData.images', 0] }, []],
           },
           categoryId: {
-            $ifNull: [{ $arrayElemAt: ["$productInfoData.categoryId", 0] }, ""],
+            $ifNull: [{ $arrayElemAt: ['$productInfoData.categoryId', 0] }, ''],
           },
           isFeatured: {
             $ifNull: [
-              { $arrayElemAt: ["$productInfoData.isFeatured", 0] },
+              { $arrayElemAt: ['$productInfoData.isFeatured', 0] },
               false,
             ],
           },
           hsnCode: {
-            $ifNull: [{ $arrayElemAt: ["$productInfoData.hsnCode", 0] }, ""],
+            $ifNull: [{ $arrayElemAt: ['$productInfoData.hsnCode', 0] }, ''],
+          },
+          description: {
+            $ifNull: [
+              { $arrayElemAt: ['$productInfoData.description', 0] },
+              '',
+            ],
           },
         },
       },
       {
         $lookup: {
-          from: "categories",
-          localField: "categoryId",
-          foreignField: "_id",
-          as: "categoryDetails",
+          from: 'categories',
+          localField: 'categoryId',
+          foreignField: '_id',
+          as: 'categoryDetails',
         },
       },
       {
         $addFields: {
           categoryDetails: {
-            $ifNull: [{ $arrayElemAt: ["$categoryDetails", 0] }, {}],
+            $ifNull: [{ $arrayElemAt: ['$categoryDetails', 0] }, {}],
           },
         },
       },
       {
         $lookup: {
-          from: "hsns",
-          localField: "hsnCode",
-          foreignField: "_id",
-          as: "hsnDetails",
+          from: 'hsns',
+          localField: 'hsnCode',
+          foreignField: '_id',
+          as: 'hsnDetails',
         },
       },
       {
         $addFields: {
           hsnDetails: {
-            $ifNull: [{ $arrayElemAt: ["$hsnDetails", 0] }, {}],
+            $ifNull: [{ $arrayElemAt: ['$hsnDetails', 0] }, {}],
           },
         },
       },
@@ -296,17 +279,17 @@ export const getProductDetailsService = async (rid) => {
         $project: {
           productInfoData: 0,
           categoryId: 0,
-          "categoryDetails.images": 0,
+          'categoryDetails.images': 0,
           hsnCode: 0,
         },
       },
     ]);
 
-    console.log("product :: ", product);
+    console.log('product :: ', product);
 
     return product[0] || null;
   } catch (error) {
-    console.error("Error in getProductDetailsService:", error);
+    console.error('Error in getProductDetailsService:', error);
     throw error;
   }
 };
@@ -314,36 +297,36 @@ export const getProductDetailsService = async (rid) => {
 export const fetchProductsByCategoryService = async (
   page,
   limit,
-  query = "",
+  query = '',
   categoryId,
 ) => {
   try {
-    const products = await ProN.aggregate([
+    const products = await MargProducts.aggregate([
       {
         $match: {
-          $or: [{ name: { $regex: query, $options: "i" } }],
-          $or: [{ company: { $regex: query, $options: "i" } }],
+          $or: [{ name: { $regex: query, $options: 'i' } }],
+          $or: [{ company: { $regex: query, $options: 'i' } }],
         },
       },
       {
         $lookup: {
-          from: "productinfos",
-          localField: "rid",
-          foreignField: "rid",
-          as: "productInfoData",
+          from: 'productinfos',
+          localField: 'rid',
+          foreignField: 'rid',
+          as: 'productInfoData',
         },
       },
       {
         $addFields: {
           images: {
-            $ifNull: [{ $arrayElemAt: ["$productInfoData.images", 0] }, []],
+            $ifNull: [{ $arrayElemAt: ['$productInfoData.images', 0] }, []],
           },
           categoryId: {
-            $ifNull: [{ $arrayElemAt: ["$productInfoData.categoryId", 0] }, ""],
+            $ifNull: [{ $arrayElemAt: ['$productInfoData.categoryId', 0] }, ''],
           },
           isFeatured: {
             $ifNull: [
-              { $arrayElemAt: ["$productInfoData.isFeatured", 0] },
+              { $arrayElemAt: ['$productInfoData.isFeatured', 0] },
               false,
             ],
           },
@@ -358,8 +341,8 @@ export const fetchProductsByCategoryService = async (
         $addFields: {
           categoryIdObject: {
             $cond: {
-              if: { $ne: ["$categoryId", ""] },
-              then: { $toObjectId: "$categoryId" },
+              if: { $ne: ['$categoryId', ''] },
+              then: { $toObjectId: '$categoryId' },
               else: null,
             },
           },
@@ -367,16 +350,16 @@ export const fetchProductsByCategoryService = async (
       },
       {
         $lookup: {
-          from: "categories",
-          localField: "categoryIdObject",
-          foreignField: "_id",
-          as: "categoryDetails",
+          from: 'categories',
+          localField: 'categoryIdObject',
+          foreignField: '_id',
+          as: 'categoryDetails',
         },
       },
       {
         $addFields: {
           categoryDetails: {
-            $ifNull: [{ $arrayElemAt: ["$categoryDetails", 0] }, {}],
+            $ifNull: [{ $arrayElemAt: ['$categoryDetails', 0] }, {}],
           },
         },
       },
@@ -385,7 +368,7 @@ export const fetchProductsByCategoryService = async (
           productInfoData: 0,
           categoryId: 0,
           categoryIdObject: 0,
-          "categoryDetails.images": 0,
+          'categoryDetails.images': 0,
         },
       },
       {
@@ -397,25 +380,25 @@ export const fetchProductsByCategoryService = async (
     ]);
 
     // Count total products in this category matching the query
-    const allCategoryProducts = await ProN.aggregate([
+    const allCategoryProducts = await MargProducts.aggregate([
       {
         $match: {
-          $or: [{ name: { $regex: query, $options: "i" } }],
-          $or: [{ company: { $regex: query, $options: "i" } }],
+          $or: [{ name: { $regex: query, $options: 'i' } }],
+          $or: [{ company: { $regex: query, $options: 'i' } }],
         },
       },
       {
         $lookup: {
-          from: "productinfos",
-          localField: "rid",
-          foreignField: "rid",
-          as: "productInfoData",
+          from: 'productinfos',
+          localField: 'rid',
+          foreignField: 'rid',
+          as: 'productInfoData',
         },
       },
       {
         $addFields: {
           categoryId: {
-            $ifNull: [{ $arrayElemAt: ["$productInfoData.categoryId", 0] }, ""],
+            $ifNull: [{ $arrayElemAt: ['$productInfoData.categoryId', 0] }, ''],
           },
         },
       },
@@ -425,7 +408,7 @@ export const fetchProductsByCategoryService = async (
         },
       },
       {
-        $count: "total",
+        $count: 'total',
       },
     ]);
 
@@ -438,7 +421,7 @@ export const fetchProductsByCategoryService = async (
   }
 };
 
-export const fetchFeaturedProductsService = async (query = "") => {
+export const fetchFeaturedProductsService = async (query = '') => {
   try {
     const products = await ProductInfo.aggregate([
       {
@@ -448,16 +431,16 @@ export const fetchFeaturedProductsService = async (query = "") => {
       },
       {
         $lookup: {
-          from: "products",
-          localField: "rid",
-          foreignField: "rid",
-          as: "productData",
+          from: 'products',
+          localField: 'rid',
+          foreignField: 'rid',
+          as: 'productData',
         },
       },
       {
         $addFields: {
           productDetails: {
-            $ifNull: [{ $arrayElemAt: ["$productData", 0] }, {}],
+            $ifNull: [{ $arrayElemAt: ['$productData', 0] }, {}],
           },
         },
       },
@@ -465,8 +448,8 @@ export const fetchFeaturedProductsService = async (query = "") => {
         $addFields: {
           categoryIdObject: {
             $cond: {
-              if: { $ne: ["$categoryId", ""] },
-              then: { $toObjectId: "$categoryId" },
+              if: { $ne: ['$categoryId', ''] },
+              then: { $toObjectId: '$categoryId' },
               else: null,
             },
           },
@@ -474,16 +457,16 @@ export const fetchFeaturedProductsService = async (query = "") => {
       },
       {
         $lookup: {
-          from: "categories",
-          localField: "categoryIdObject",
-          foreignField: "_id",
-          as: "categoryDetails",
+          from: 'categories',
+          localField: 'categoryIdObject',
+          foreignField: '_id',
+          as: 'categoryDetails',
         },
       },
       {
         $addFields: {
           categoryDetails: {
-            $ifNull: [{ $arrayElemAt: ["$categoryDetails", 0] }, {}],
+            $ifNull: [{ $arrayElemAt: ['$categoryDetails', 0] }, {}],
           },
         },
       },
@@ -491,11 +474,11 @@ export const fetchFeaturedProductsService = async (query = "") => {
         $replaceRoot: {
           newRoot: {
             $mergeObjects: [
-              "$productDetails",
+              '$productDetails',
               {
-                images: "$images",
-                categoryDetails: "$categoryDetails",
-                isFeatured: "$isFeatured",
+                images: '$images',
+                categoryDetails: '$categoryDetails',
+                isFeatured: '$isFeatured',
               },
             ],
           },
@@ -504,7 +487,7 @@ export const fetchFeaturedProductsService = async (query = "") => {
       {
         $project: {
           categoryIdObject: 0,
-          "categoryDetails.images": 0,
+          'categoryDetails.images': 0,
         },
       },
     ]);
@@ -521,6 +504,7 @@ export const updateProductDetailsService = async (
   categoryId,
   isFeatured,
   hsnCode,
+  description,
 ) => {
   try {
     const existedProduct = await ProductInfo.findOne({ rid });
@@ -532,6 +516,7 @@ export const updateProductDetailsService = async (
         images,
         isFeatured,
         hsnCode,
+        description,
       });
 
       return getProductDetailsService(rid);
@@ -539,13 +524,13 @@ export const updateProductDetailsService = async (
 
     await ProductInfo.findOneAndUpdate(
       { rid },
-      { images, categoryId, isFeatured, hsnCode },
+      { images, categoryId, isFeatured, hsnCode, description },
       { new: true },
     );
 
     return getProductDetailsService(rid);
   } catch (error) {
-    console.error("Error in updateProductDetailsService:", error);
+    console.error('Error in updateProductDetailsService:', error);
     throw error;
   }
 };
@@ -632,20 +617,20 @@ export const addCategoryToProductService = async (rid, categoryId) => {
 
 export const fetchLowStockProductsService = async (page, limit, query) => {
   try {
-    const result = await ProN.aggregate([
+    const result = await MargProducts.aggregate([
       {
         $match: {
-          Is_Deleted: "0",
+          Is_Deleted: '0',
           $or: [
-            { name: { $regex: query, $options: "i" } },
-            { company: { $regex: query, $options: "i" } },
-            { code: { $regex: query, $options: "i" } },
-            { curbatch: { $regex: query, $options: "i" } },
+            { name: { $regex: query, $options: 'i' } },
+            { company: { $regex: query, $options: 'i' } },
+            { code: { $regex: query, $options: 'i' } },
+            { curbatch: { $regex: query, $options: 'i' } },
           ],
           $expr: {
             $and: [
-              { $gt: [{ $toDouble: "$stock" }, 0] },
-              { $lt: [{ $toDouble: "$stock" }, 20] },
+              { $gt: [{ $toDouble: '$stock' }, 0] },
+              { $lt: [{ $toDouble: '$stock' }, 20] },
             ],
           },
         },
@@ -663,18 +648,18 @@ export const fetchLowStockProductsService = async (page, limit, query) => {
       },
     ]);
 
-    const totalCount = await ProN.countDocuments({
-      Is_Deleted: "0",
+    const totalCount = await MargProducts.countDocuments({
+      Is_Deleted: '0',
       $or: [
-        { name: { $regex: query, $options: "i" } },
-        { company: { $regex: query, $options: "i" } },
-        { code: { $regex: query, $options: "i" } },
-        { curbatch: { $regex: query, $options: "i" } },
+        { name: { $regex: query, $options: 'i' } },
+        { company: { $regex: query, $options: 'i' } },
+        { code: { $regex: query, $options: 'i' } },
+        { curbatch: { $regex: query, $options: 'i' } },
       ],
       $expr: {
         $and: [
-          { $gt: [{ $toDouble: "$stock" }, 0] },
-          { $lt: [{ $toDouble: "$stock" }, 20] },
+          { $gt: [{ $toDouble: '$stock' }, 0] },
+          { $lt: [{ $toDouble: '$stock' }, 20] },
         ],
       },
     });
@@ -701,28 +686,28 @@ export const fetchExpiringProductsService = async (
     const expiryDate = new Date();
     expiryDate.setDate(expiryDate.getDate() + days);
 
-    const result = await ProN.aggregate([
+    const result = await MargProducts.aggregate([
       {
         $match: {
-          Is_Deleted: "0",
+          Is_Deleted: '0',
           $or: [
-            { name: { $regex: query, $options: "i" } },
-            { company: { $regex: query, $options: "i" } },
-            { code: { $regex: query, $options: "i" } },
-            { curbatch: { $regex: query, $options: "i" } },
+            { name: { $regex: query, $options: 'i' } },
+            { company: { $regex: query, $options: 'i' } },
+            { code: { $regex: query, $options: 'i' } },
+            { curbatch: { $regex: query, $options: 'i' } },
           ],
           $expr: {
-            $gt: [{ $toDouble: "$stock" }, 0],
+            $gt: [{ $toDouble: '$stock' }, 0],
           },
-          exp: { $ne: "" },
+          exp: { $ne: '' },
         },
       },
       {
         $addFields: {
           expDate: {
             $dateFromString: {
-              dateString: "$exp",
-              format: "%Y%m%d",
+              dateString: '$exp',
+              format: '%Y%m%d',
               onError: null,
               onNull: null,
             },
@@ -756,25 +741,25 @@ export const fetchExpiringProductsService = async (
       },
     ]);
 
-    const totalCountResult = await ProN.aggregate([
+    const totalCountResult = await MargProducts.aggregate([
       {
         $match: {
-          Is_Deleted: "0",
+          Is_Deleted: '0',
           $or: [
-            { name: { $regex: query, $options: "i" } },
-            { company: { $regex: query, $options: "i" } },
-            { code: { $regex: query, $options: "i" } },
-            { curbatch: { $regex: query, $options: "i" } },
+            { name: { $regex: query, $options: 'i' } },
+            { company: { $regex: query, $options: 'i' } },
+            { code: { $regex: query, $options: 'i' } },
+            { curbatch: { $regex: query, $options: 'i' } },
           ],
-          exp: { $ne: "" },
+          exp: { $ne: '' },
         },
       },
       {
         $addFields: {
           expDate: {
             $dateFromString: {
-              dateString: "$exp",
-              format: "%Y%m%d",
+              dateString: '$exp',
+              format: '%Y%m%d',
               onError: null,
               onNull: null,
             },
@@ -791,7 +776,7 @@ export const fetchExpiringProductsService = async (
         },
       },
       {
-        $count: "total",
+        $count: 'total',
       },
     ]);
 
@@ -810,28 +795,28 @@ export const fetchExpiringProductsService = async (
 
 export const fetchExpiredProductsService = async (page, limit, query) => {
   try {
-    const result = await ProN.aggregate([
+    const result = await MargProducts.aggregate([
       {
         $match: {
-          Is_Deleted: "0",
+          Is_Deleted: '0',
           $or: [
-            { name: { $regex: query, $options: "i" } },
-            { company: { $regex: query, $options: "i" } },
-            { code: { $regex: query, $options: "i" } },
-            { curbatch: { $regex: query, $options: "i" } },
+            { name: { $regex: query, $options: 'i' } },
+            { company: { $regex: query, $options: 'i' } },
+            { code: { $regex: query, $options: 'i' } },
+            { curbatch: { $regex: query, $options: 'i' } },
           ],
           $expr: {
-            $gt: [{ $toDouble: "$stock" }, 0],
+            $gt: [{ $toDouble: '$stock' }, 0],
           },
-          exp: { $ne: "" },
+          exp: { $ne: '' },
         },
       },
       {
         $addFields: {
           expDate: {
             $dateFromString: {
-              dateString: "$exp",
-              format: "%Y%m%d",
+              dateString: '$exp',
+              format: '%Y%m%d',
               onError: null,
               onNull: null,
             },
@@ -864,25 +849,25 @@ export const fetchExpiredProductsService = async (page, limit, query) => {
       },
     ]);
 
-    const totalCountResult = await ProN.aggregate([
+    const totalCountResult = await MargProducts.aggregate([
       {
         $match: {
-          Is_Deleted: "0",
+          Is_Deleted: '0',
           $or: [
-            { name: { $regex: query, $options: "i" } },
-            { company: { $regex: query, $options: "i" } },
-            { code: { $regex: query, $options: "i" } },
-            { curbatch: { $regex: query, $options: "i" } },
+            { name: { $regex: query, $options: 'i' } },
+            { company: { $regex: query, $options: 'i' } },
+            { code: { $regex: query, $options: 'i' } },
+            { curbatch: { $regex: query, $options: 'i' } },
           ],
-          exp: { $ne: "" },
+          exp: { $ne: '' },
         },
       },
       {
         $addFields: {
           expDate: {
             $dateFromString: {
-              dateString: "$exp",
-              format: "%Y%m%d",
+              dateString: '$exp',
+              format: '%Y%m%d',
               onError: null,
               onNull: null,
             },
@@ -898,7 +883,7 @@ export const fetchExpiredProductsService = async (page, limit, query) => {
         },
       },
       {
-        $count: "total",
+        $count: 'total',
       },
     ]);
 

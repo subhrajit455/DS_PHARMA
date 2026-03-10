@@ -25,6 +25,9 @@ const margPartiesSchema = new mongoose.Schema(
     GSTIN: String,
     DlNo: String,
     LedgerCode: String,
+    userId: { type: String, default: null },
+    password: { type: String, default: null },
+    isVerified: { type: Boolean, default: false },
   },
   {
     timestamps: true,

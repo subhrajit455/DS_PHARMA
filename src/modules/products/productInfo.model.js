@@ -1,4 +1,4 @@
-import mongoose from "mongoose";
+import mongoose from 'mongoose';
 
 const productInfoSchema = new mongoose.Schema(
   {
@@ -8,10 +8,13 @@ const productInfoSchema = new mongoose.Schema(
     },
     categoryId: {
       type: mongoose.Schema.Types.ObjectId,
-      ref: "Category",
+      ref: 'Category',
     },
     images: {
       type: Array,
+    },
+    description: {
+      type: String,
     },
     isFeatured: {
       type: Boolean,
@@ -19,7 +22,7 @@ const productInfoSchema = new mongoose.Schema(
     },
     hsnCode: {
       type: mongoose.Schema.Types.ObjectId,
-      ref: "Hsn",
+      ref: 'Hsn',
     },
   },
   {
@@ -30,6 +33,6 @@ const productInfoSchema = new mongoose.Schema(
 // Index for performance optimization
 productInfoSchema.index({ rid: 1 }, { unique: true }); // Unique index for rid lookups
 
-const ProductInfo = mongoose.model("ProductInfo", productInfoSchema);
+const ProductInfo = mongoose.model('ProductInfo', productInfoSchema);
 
 export default ProductInfo;
