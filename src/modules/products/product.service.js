@@ -24,10 +24,15 @@ export const fetchProductsService = async (
       Is_Deleted: '0',
       ...(query && {
         $or: [
-          { name: { $regex: query, $options: 'i' } },
-          { company: { $regex: query, $options: 'i' } },
-          { code: { $regex: query, $options: 'i' } },
-          { curbatch: { $regex: query, $options: 'i' } },
+          {
+            name: {
+              $regex: `^${query}`,
+              $options: 'i',
+            },
+          },
+          // { company: { $regex: query, $options: 'i' } },
+          // { code: { $regex: query, $options: 'i' } },
+          // { curbatch: { $regex: query, $options: 'i' } },
         ],
       }),
     };
@@ -51,19 +56,18 @@ export const fetchProductsService = async (
       ...(priceFilter ? [{ $match: priceFilter }] : []),
 
       // 🔹 Early projection (reduce memory)
-      {
-        $project: {
-          rid: 1,
-          name: 1,
-          company: 1,
-          stock: 1,
-          MRP: 1,
-          Prate: 1,
-          code: 1,
-          curbatch: 1,
-        },
-      },
-
+      // {
+      //   $project: {
+      //     rid: 1,
+      //     name: 1,
+      //     company: 1,
+      //     stock: 1,
+      //     MRP: 1,
+      //     Prate: 1,
+      //     code: 1,
+      //     curbatch: 1,
+      //   },
+      // },
       {
         $facet: {
           // ---------------- PRODUCTS ----------------

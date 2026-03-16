@@ -17,10 +17,7 @@ const staffRouter = Router();
 
 staffRouter.use(authMiddleware);
 
-staffRouter
-  .route('/')
-  .get(authorize('admin'), getAllStaff)
-  .post(authorize('admin'), createStaff);
+staffRouter.route('/').get(getAllStaff).post(createStaff);
 
 staffRouter
   .route('/:staffId')

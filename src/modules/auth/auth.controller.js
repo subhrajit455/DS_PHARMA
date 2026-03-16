@@ -24,38 +24,38 @@ export const loginController = asyncHandler(async (req, res) => {
     throw new ApiError(400, 'userId and password are required');
   }
 
-  if (userId === adminUserId && password === adminPassword) {
-    const token = generateToken({
-      id: adminId,
-      userId: adminUserId,
-      role: 'admin',
-    });
+  // if (userId === adminUserId && password === adminPassword) {
+  //   const token = generateToken({
+  //     id: adminId,
+  //     userId: adminUserId,
+  //     role: 'admin',
+  //   });
 
-    res.cookie('token', token, cookieOptions);
+  //   res.cookie('token', token, cookieOptions);
 
-    return res.json(
-      new ApiResponse(
-        200,
-        {
-          user: {
-            id: adminId,
-            userId: adminUserId,
-            role: 'admin',
-          },
-          token,
-        },
-        'Logged in successfully',
-      ),
-    );
-  } else {
-    const { user, token } = await loginService({ userId, password });
+  //   return res.json(
+  //     new ApiResponse(
+  //       200,
+  //       {
+  //         user: {
+  //           id: adminId,
+  //           userId: adminUserId,
+  //           role: 'admin',
+  //         },
+  //         token,
+  //       },
+  //       'Logged in successfully',
+  //     ),
+  //   );
+  // } else {
+  const { user, token } = await loginService({ userId, password });
 
-    res.cookie('token', token, cookieOptions);
+  res.cookie('token', token, cookieOptions);
 
-    return res.json(
-      new ApiResponse(200, { user, token }, 'Logged in successfully'),
-    );
-  }
+  return res.json(
+    new ApiResponse(200, { user, token }, 'Logged in successfully'),
+  );
+  // }
 });
 
 export const logoutController = asyncHandler(async (req, res) => {
@@ -65,27 +65,27 @@ export const logoutController = asyncHandler(async (req, res) => {
 });
 
 export const getProfileController = asyncHandler(async (req, res) => {
-  const { userId, role } = req.user;
+  const { userId } = req?.user;
 
-  if (userId === adminUserId && role === 'admin') {
-    return res.json(
-      new ApiResponse(
-        200,
-        {
-          user: {
-            id: adminId,
-            userId: adminUserId,
-            role: 'admin',
-          },
-        },
-        'Profile fetched successfully',
-      ),
-    );
-  } else {
-    const { user } = await getUserProfile(userId);
+  // if (userId === adminUserId && role === 'admin') {
+  //   return res.json(
+  //     new ApiResponse(
+  //       200,
+  //       {
+  //         user: {
+  //           id: adminId,
+  //           userId: adminUserId,
+  //           role: 'admin',
+  //         },
+  //       },
+  //       'Profile fetched successfully',
+  //     ),
+  //   );
+  // } else {
+  const { user, token } = await getUserProfile(userId);
 
-    return res.json(
-      new ApiResponse(200, { user }, 'Profile fetched successfully'),
-    );
-  }
+  return res.json(
+    new ApiResponse(200, { user }, 'Profile fetched successfully'),
+  );
+  // }
 });

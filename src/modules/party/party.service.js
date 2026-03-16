@@ -10,9 +10,9 @@ export const getPartiesService = async (page, limit, query = '') => {
   try {
     const parties = await MargParties.find({
       $or: [
-        { name: { $regex: query, $options: 'i' } },
-        { code: { $regex: query, $options: 'i' } },
-        { GSTIN: { $regex: query, $options: 'i' } },
+        { name: { $regex: `^${query}`, $options: 'i' } },
+        // { code: { $regex: query, $options: 'i' } },
+        // { GSTIN: { $regex: query, $options: 'i' } },
       ],
     })
       .skip((page - 1) * limit)
@@ -20,9 +20,9 @@ export const getPartiesService = async (page, limit, query = '') => {
 
     const totalParties = await MargParties.countDocuments({
       $or: [
-        { name: { $regex: query, $options: 'i' } },
-        { code: { $regex: query, $options: 'i' } },
-        { GSTIN: { $regex: query, $options: 'i' } },
+        { name: { $regex: `^${query}`, $options: 'i' } },
+        // { code: { $regex: query, $options: 'i' } },
+        // { GSTIN: { $regex: query, $options: 'i' } },
       ],
     });
     const totalPages = Math.ceil(totalParties / limit);
@@ -45,11 +45,16 @@ export const fetchPartiesService = async (
     const searchFilter = query
       ? {
           $or: [
-            { name: { $regex: query, $options: 'i' } },
-            { code: { $regex: query, $options: 'i' } },
-            { MargCode: { $regex: query, $options: 'i' } },
-            { GSTIN: { $regex: query, $options: 'i' } },
-            { address: { $regex: query, $options: 'i' } },
+            {
+              name: {
+                $regex: `${query.replace(/\s+/g, '').toLowerCase()}`,
+                $options: 'i',
+              },
+            },
+            // { code: { $regex: query, $options: 'i' } },
+            // { MargCode: { $regex: query, $options: 'i' } },
+            // { GSTIN: { $regex: query, $options: 'i' } },
+            // { address: { $regex: query, $options: 'i' } },
           ],
         }
       : {};
@@ -245,6 +250,8 @@ export const partyLoginService = async ({ userId, password }) => {
 
     const partyData = party.toObject();
     delete partyData.password;
+
+    console.log(partyData);
 
     return { party: partyData, token };
   } catch (error) {

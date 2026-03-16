@@ -1,26 +1,24 @@
-import { Router } from "express";
+import { Router } from 'express';
+import {
+  authMiddleware,
+  authorize,
+} from '../../middlewares/auth.middleware.js';
 import {
   addToWishlist,
   getWishlist,
-  getAdminWishlist,
   removeFromWishlist,
-} from "./wishlist.controller.js";
-import {
-  partyAuthMiddleware,
-  authMiddleware,
-} from "../../middlewares/auth.middleware.js";
+} from './wishlist.controller.js';
 
 const wishlistRouter = Router();
 
-wishlistRouter.post("/addwishlist", partyAuthMiddleware, addToWishlist);
-wishlistRouter.get("/getwishlist", partyAuthMiddleware, getWishlist);
+wishlistRouter.use(authMiddleware, authorize('party'));
+
+wishlistRouter.post('/addwishlist', addToWishlist);
+wishlistRouter.get('/getwishlist', getWishlist);
 wishlistRouter.delete(
-  "/deletewishlist/:id",
-  partyAuthMiddleware,
+  '/deletewishlist/:id',
+
   removeFromWishlist,
 );
-
-// Admin route — uses staff auth
-wishlistRouter.get("/admin/wishlist", authMiddleware, getAdminWishlist);
 
 export default wishlistRouter;

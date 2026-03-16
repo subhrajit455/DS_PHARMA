@@ -90,24 +90,39 @@ export const fetchStaffReport = asyncHandler(async (req, res) => {
 
 export const fetchSalesmanMonthlyReport = asyncHandler(async (req, res) => {
   const { userId } = req.params;
-  const { year = String(new Date().getFullYear()) } = req.query;
+  const {
+    mode = 'yearly',
+    year = String(new Date().getFullYear()),
+    month,
+    startDate,
+    endDate,
+  } = req.query;
 
   if (!userId) {
     throw new ApiError(400, 'User ID is required');
   }
 
-  const { monthlyReport, summary } = await fetchSalesmanMonthlyReportService(
-    userId,
-    year,
-  );
+  if (mode === 'monthly' && !month) {
+    throw new ApiError(400, 'month (1-12) is required for monthly mode');
+  }
 
-  return res
-    .status(200)
-    .json(
-      new ApiResponse(
-        200,
-        { summary, monthlyReport },
-        'Salesman monthly report fetched successfully',
-      ),
-    );
+  if (mode === 'custom' && (!startDate || !endDate)) {
+    throw new ApiError(400, 'startDate and endDate are required for custom mode');
+  }
+
+  const { report, summary } = await fetchSalesmanMonthlyReportService(userId, {
+    mode,
+    year,
+    month,
+    startDate,
+    endDate,
+  });
+
+  return res.status(200).json(
+    new ApiResponse(
+      200,
+      { summary, report },
+      'Salesman report fetched successfully',
+    ),
+  );
 });

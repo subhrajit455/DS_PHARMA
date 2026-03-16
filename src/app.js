@@ -33,7 +33,7 @@ app.use(morgan(':method :url :status - :response-time ms'));
 
 // Cron jobs
 import { syncMasterDataCron } from './cron/masterSync.cron.js';
-// syncMasterDataCron();
+syncMasterDataCron();
 
 app.get('/status', (req, res) => {
   res.send('Server is running');
@@ -77,7 +77,7 @@ app.use(cartRouter);
 app.use(featuredRouter);
 app.use(wishlistRouter);
 app.use(userOrder);
-// app.use(contactRouter);
+app.use('/api/v1/contact', contactRouter);
 
 // Global error handler - MUST be after all routes
 app.use(errorHandler);

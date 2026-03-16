@@ -1,4 +1,4 @@
-import { Router } from "express";
+import { Router } from 'express';
 import {
   addAddress,
   getAddresses,
@@ -6,16 +6,21 @@ import {
   deleteAddress,
   setaddress,
   getAddressesbyuser,
-} from "./address.controller.js";
-import { partyAuthMiddleware } from "../../middlewares/auth.middleware.js";
+} from './address.controller.js';
+import {
+  authMiddleware,
+  authorize,
+} from '../../middlewares/auth.middleware.js';
 
 const addressRouter = Router();
 
-addressRouter.post("/address", partyAuthMiddleware, addAddress);
-addressRouter.get("/address", partyAuthMiddleware, getAddresses);
-addressRouter.put("/address/:id", partyAuthMiddleware, updateAddress);
-addressRouter.delete("/address/:id", partyAuthMiddleware, deleteAddress);
-addressRouter.put("/address/set/:id", partyAuthMiddleware, setaddress);
-addressRouter.get("/addressbyuser", partyAuthMiddleware, getAddressesbyuser);
+addressRouter.use(authMiddleware, authorize('party'));
+
+addressRouter.post('/address', addAddress);
+addressRouter.get('/address', getAddresses);
+addressRouter.put('/address/:id', updateAddress);
+addressRouter.delete('/address/:id', deleteAddress);
+addressRouter.put('/address/set/:id', setaddress);
+addressRouter.get('/addressbyuser', getAddressesbyuser);
 
 export default addressRouter;

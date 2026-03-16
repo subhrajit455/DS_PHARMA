@@ -3,8 +3,8 @@ import mongoose from 'mongoose';
 const orderSchema = new mongoose.Schema(
   {
     Sid: {
-      type: String,
-      required: true,
+      type: mongoose.Schema.Types.ObjectId,
+      ref: 'Staff',
     },
     OrderID: {
       type: String,

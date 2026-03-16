@@ -16,13 +16,21 @@ export const loginService = async payload => {
     throw new ApiError(403, 'Account is disabled. Please contact admin.');
   }
 
-  const isPasswordMatched = await bcrypt.compare(password, user.password);
+  // const isPasswordMatched = await bcrypt.compare(password, user.password);
 
-  if (!isPasswordMatched) {
+  if (user.password !== password) {
     throw new ApiError(400, 'Incorrect password');
   }
 
-  const userDetails = await Staff.findOne({ phone: userId }).select('-password');
+  const userDetails = await Staff.findOne({ phone: userId }).select(
+    '-password',
+  );
+
+  console.log('details :: ', {
+    id: userDetails._id,
+    userId: userDetails.phone,
+    role: userDetails.role,
+  });
 
   const token = generateToken({
     id: userDetails._id,
@@ -37,7 +45,9 @@ export const loginService = async payload => {
 };
 
 export const getUserProfile = async userId => {
-  const user = await Staff.findOne({ userId }).select('-password');
+  const user = await Staff.findOne({ phone: userId }).select('-password');
+
+  console.log('user :: ', user);
 
   if (!user) {
     throw new ApiError(404, 'User not found');
@@ -45,12 +55,12 @@ export const getUserProfile = async userId => {
 
   const token = generateToken({
     id: user._id,
-    userId: user.userId,
+    userId: user.phone,
     role: user.role,
   });
 
   return {
     user,
-    token,
+    // token,
   };
 };
