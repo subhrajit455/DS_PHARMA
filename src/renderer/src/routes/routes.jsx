@@ -10,6 +10,7 @@ import {
   AdminReports,
   AdminSettings,
   AdminStaff,
+  AdminStaffDetails,
   AdminStockExpiry
 } from '@/pages/admin'
 import App from '../App'
@@ -27,6 +28,20 @@ import {
 } from '@/pages/staff'
 import NotFound from '@/pages/NotFound'
 import { Login } from '@/pages/auth'
+import ProtectedRoute from '@/components/ProtectedRoute'
+import { useSelector } from 'react-redux'
+import { Navigate } from 'react-router'
+
+// Redirect already-logged-in users away from the login page
+function GuestRoute({ children }) {
+  const { user } = useSelector((state) => state.auth)
+  if (user) {
+    const isAdmin = ['SUPER_ADMIN', 'ADMIN'].includes(user.role)
+    const redirect = isAdmin ? '/admin/dashboard' : '/staff/dashboard'
+    return <Navigate to={redirect} replace />
+  }
+  return children
+}
 
 export const routes = [
   {
@@ -35,11 +50,19 @@ export const routes = [
     children: [
       {
         path: '',
-        element: <Login />
+        element: (
+          // <GuestRoute>
+            <Login />
+          // </GuestRoute>
+        )
       },
       {
         path: 'admin',
-        element: <AdminLayout />,
+        element: (
+          // <ProtectedRoute role="admin">
+            <AdminLayout />
+          // </ProtectedRoute>
+        ),
         children: [
           {
             path: 'dashboard',
@@ -86,6 +109,10 @@ export const routes = [
             element: <AdminStaff />
           },
           {
+            path: 'staff/:staffId',
+            element: <AdminStaffDetails />
+          },
+          {
             path: 'reports',
             element: <AdminReports />
           }
@@ -93,7 +120,11 @@ export const routes = [
       },
       {
         path: 'staff',
-        element: <StaffLayout />,
+        element: (
+          // <ProtectedRoute role="staff">
+            <StaffLayout />
+          // </ProtectedRoute>
+        ),
         children: [
           {
             path: 'dashboard',
@@ -114,10 +145,6 @@ export const routes = [
           {
             path: 'billing',
             element: <StaffBilling />
-          },
-          {
-            path: 'incoming-orders',
-            element: <StaffIncomingOrders />
           },
           {
             path: 'incoming-orders',

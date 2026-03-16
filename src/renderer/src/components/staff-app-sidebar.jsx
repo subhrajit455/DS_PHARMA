@@ -1,16 +1,5 @@
-import {
-  AlertTriangle,
-  ClipboardList,
-  HelpCircle,
-  Home,
-  Layers,
-  LogOut,
-  Pill,
-  RotateCcw,
-  Settings,
-  Users
-} from 'lucide-react'
-import { Link, useLocation, useNavigate } from 'react-router'
+import { authApi, syncApi } from '@/api'
+import { Button } from '@/components/ui/button'
 import {
   Sidebar,
   SidebarContent,
@@ -24,11 +13,15 @@ import {
   SidebarMenuButton,
   SidebarMenuItem
 } from '@/components/ui/sidebar'
-import { Button } from '@/components/ui/button'
+import { ClipboardList, Home, Layers, LogOut, Pill, Settings, Users } from 'lucide-react'
+import { useState } from 'react'
+import toast from 'react-hot-toast'
+import { AiOutlineCloudSync } from 'react-icons/ai'
 import { BiAlarm } from 'react-icons/bi'
 import { LiaFileInvoiceSolid } from 'react-icons/lia'
-import { useState } from 'react'
-import { AiOutlineCloudSync } from 'react-icons/ai'
+import { Link, useLocation, useNavigate } from 'react-router'
+import { useDispatch } from 'react-redux'
+import { logout } from '@/store/features/authSlice'
 
 // Menu items.
 const items = [
@@ -58,31 +51,16 @@ const items = [
     icon: ClipboardList
   },
   {
-    title: 'Incoming Orders',
-    url: '/staff/incoming-orders',
-    icon: BiAlarm
-  },
-  {
     title: 'Invoices',
     url: '/staff/invoices',
     icon: LiaFileInvoiceSolid
-  },
-  {
-    title: 'Stock & Expiry',
-    url: '/staff/stock-expiry',
-    icon: AlertTriangle,
-    badge: 'Low'
-  },
-  {
-    title: 'Settings',
-    url: '/staff/settings',
-    icon: Settings
   }
 ]
 
 export function StaffAppSidebar() {
   const location = useLocation()
   const navigate = useNavigate()
+  const dispatch = useDispatch()
 
   const [syncing, setSyncing] = useState(false)
 
@@ -107,19 +85,20 @@ export function StaffAppSidebar() {
   }
 
   const handleLogout = async () => {
+    // Always clear local state immediately — don't wait for API
+    localStorage.removeItem('token')
+    localStorage.removeItem('salerId')
+    localStorage.removeItem('role')
+    dispatch(logout())
     navigate('/')
 
-    // try {
-    //   const response = await authApi.logout()
-
-    //   if (response.success) {
-    //     localStorage.removeItem('user')
-    //     toast.success('Logged out successfully')
-    //     navigate('/login')
-    //   }
-    // } catch (error) {
-    //   toast.error(error || 'Failed to logout')
-    // }
+    // Best-effort server-side session invalidation
+    try {
+      await authApi.logout()
+      toast.success('Logged out successfully')
+    } catch (error) {
+      // Already logged out locally, silently ignore
+    }
   }
 
   return (

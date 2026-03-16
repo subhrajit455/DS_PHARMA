@@ -1,29 +1,44 @@
+import { authApi } from '@/api'
+import Logo from '@/assets/logo.png'
 import { AdminAppSidebar } from '@/components/admin-app-sidebar'
 import { Avatar, AvatarFallback, AvatarImage } from '@/components/ui/avatar'
 import { Badge } from '@/components/ui/badge'
 import { Button } from '@/components/ui/button'
-import {
-  DropdownMenu,
-  DropdownMenuContent,
-  DropdownMenuItem,
-  DropdownMenuLabel,
-  DropdownMenuSeparator,
-  DropdownMenuTrigger
-} from '@/components/ui/dropdown-menu'
+import { DropdownMenu, DropdownMenuTrigger } from '@/components/ui/dropdown-menu'
 import { Input } from '@/components/ui/input'
 import { SidebarProvider } from '@/components/ui/sidebar'
-import { Bell, LogOut, Search, Settings, User } from 'lucide-react'
-import { useState } from 'react'
+import { setUser } from '@/store/features/authSlice'
+import { Bell, Search } from 'lucide-react'
+import { useEffect, useState } from 'react'
+import toast from 'react-hot-toast'
+import { useDispatch } from 'react-redux'
 import { Outlet, useNavigate } from 'react-router'
-import Logo from '@/assets/logo.png'
 
 export default function Layout() {
   const navigate = useNavigate()
-  const [notifications] = useState(3) // Example notification count
+  const dispatch = useDispatch()
 
-  const handleLogout = () => {
-    navigate('/')
+  const [notifications] = useState(3)
+
+  const fetchCurrentUser = async () => {
+    try {
+      const response = await authApi.me()
+
+      console.log({ response })
+
+      const { user } = response.data
+
+      dispatch(setUser({ user }))
+    } catch (error) {
+      console.log(error)
+      navigate('/')
+      toast.error('Something went wrong. Please login again.')
+    }
   }
+
+  useEffect(() => {
+    fetchCurrentUser()
+  }, [])
 
   return (
     <SidebarProvider>
@@ -33,14 +48,14 @@ export default function Layout() {
         <div className="h-16 shadow-md bg-white flex items-center justify-between px-6 py-2 shrink-0 sticky top-0 z-10">
           <img src={Logo} alt="Logo" className="h-14" />
 
-          <div className="relative w-3xl">
+          {/* <div className="relative w-3xl">
             <Search className="absolute left-3 top-1/2 -translate-y-1/2 h-4 w-4 text-gray-400" />
             <Input
               type="search"
               placeholder="Search products, customers, orders..."
               className="pl-10 bg-gray-50 border-gray-200 focus:bg-white"
             />
-          </div>
+          </div>*/}
 
           <div className="flex items-center gap-3">
             <DropdownMenu>
@@ -57,36 +72,14 @@ export default function Layout() {
                   )}
                 </Button>
               </DropdownMenuTrigger>
-              <DropdownMenuContent align="end" className="w-80">
-                <DropdownMenuLabel>Notifications</DropdownMenuLabel>
-                <DropdownMenuSeparator />
-                <DropdownMenuItem className="flex flex-col items-start py-3">
-                  <div className="font-medium">Low Stock Alert</div>
-                  <div className="text-sm text-muted-foreground">
-                    5 products are running low on stock
-                  </div>
-                  <div className="text-xs text-muted-foreground mt-1">2 hours ago</div>
-                </DropdownMenuItem>
-                <DropdownMenuItem className="flex flex-col items-start py-3">
-                  <div className="font-medium">New Order Received</div>
-                  <div className="text-sm text-muted-foreground">Order #12345 from e-commerce</div>
-                  <div className="text-xs text-muted-foreground mt-1">5 hours ago</div>
-                </DropdownMenuItem>
-                <DropdownMenuItem className="flex flex-col items-start py-3">
-                  <div className="font-medium">Products Expiring Soon</div>
-                  <div className="text-sm text-muted-foreground">3 products expiring in 7 days</div>
-                  <div className="text-xs text-muted-foreground mt-1">1 day ago</div>
-                </DropdownMenuItem>
-              </DropdownMenuContent>
             </DropdownMenu>
 
-            {/* User Menu */}
             <DropdownMenu>
               <DropdownMenuTrigger asChild>
                 <Button variant="ghost" className="flex items-center gap-2 px-2">
                   <Avatar className="h-8 w-8">
                     <AvatarImage src="" alt="User" />
-                    <AvatarFallback className="bg-gradient-to-br from-purple-400 to-purple-600 text-white">
+                    <AvatarFallback className="bg-linear-to-br from-purple-400 to-purple-600 text-white">
                       AD
                     </AvatarFallback>
                   </Avatar>
@@ -96,7 +89,7 @@ export default function Layout() {
                   </div>
                 </Button>
               </DropdownMenuTrigger>
-              <DropdownMenuContent align="end" className="w-56">
+              {/* <DropdownMenuContent align="end" className="w-56">
                 <DropdownMenuLabel>My Account</DropdownMenuLabel>
                 <DropdownMenuSeparator />
                 <DropdownMenuItem onClick={() => navigate('/admin/settings')}>
@@ -112,7 +105,7 @@ export default function Layout() {
                   <LogOut className="mr-2 h-4 w-4" />
                   <span>Logout</span>
                 </DropdownMenuItem>
-              </DropdownMenuContent>
+              </DropdownMenuContent> */}
             </DropdownMenu>
           </div>
         </div>

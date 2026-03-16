@@ -1,3 +1,4 @@
+import { outgoingOrderApi } from '@/api'
 import { Button } from '@/components/ui/button'
 import {
   Card,
@@ -7,8 +8,10 @@ import {
   CardHeader,
   CardTitle
 } from '@/components/ui/card'
-import { Activity, AlertTriangle, CreditCard, DollarSign, Users } from 'lucide-react'
-import { useDispatch, useSelector } from 'react-redux'
+import { AlertTriangle, CreditCard, Loader2, Package, ShoppingCart, TrendingUp } from 'lucide-react'
+import { lazy, Suspense, useEffect, useState } from 'react'
+import toast from 'react-hot-toast'
+import { useSelector } from 'react-redux'
 import { Link } from 'react-router'
 import {
   Area,
@@ -22,265 +25,369 @@ import {
   YAxis
 } from 'recharts'
 
-// Dummy Data
-const salesData = [
-  { name: 'Jan', total: 1500 },
-  { name: 'Feb', total: 2300 },
-  { name: 'Mar', total: 3400 },
-  { name: 'Apr', total: 2900 },
-  { name: 'May', total: 4500 },
-  { name: 'Jun', total: 3200 },
-  { name: 'Jul', total: 4800 }
-]
+const InventorySummary = lazy(() => import('@/components/InventorySummaryCard'))
+const LowStockProducts = lazy(() => import('@/components/LowStockProductCard'))
 
-const recentSales = [
-  {
-    name: 'John Doe',
-    email: 'john@example.com',
-    amount: '+$250.00',
-    status: 'Completed',
-    date: '2023-06-23'
-  },
-  {
-    name: 'Alice Smith',
-    email: 'alice@example.com',
-    amount: '+$120.50',
-    status: 'Processing',
-    date: '2023-06-23'
-  },
-  {
-    name: 'Bob Johnson',
-    email: 'bob@example.com',
-    amount: '+$450.00',
-    status: 'Completed',
-    date: '2023-06-22'
-  },
-  {
-    name: 'Sarah Wilson',
-    email: 'sarah@example.com',
-    amount: '+$89.99',
-    status: 'Completed',
-    date: '2023-06-22'
-  },
-  {
-    name: 'Tom Brown',
-    email: 'tom@example.com',
-    amount: '+$35.00',
-    status: 'Failed',
-    date: '2023-06-21'
-  }
-]
-
-const lowStockItems = [
-  { name: 'Paracetamol 500mg', stock: 15, minLevel: 50 },
-  { name: 'Amoxicillin 250mg', stock: 8, minLevel: 40 },
-  { name: 'Ibuprofen 400mg', stock: 22, minLevel: 60 },
-  { name: 'Cetirizine 10mg', stock: 5, minLevel: 30 }
+const CURRENT_YEAR = new Date().getFullYear()
+const YEAR_OPTIONS = Array.from({ length: CURRENT_YEAR - 2021 }, (_, i) => CURRENT_YEAR - i)
+const MONTH_OPTIONS = [
+  { value: 1, label: 'Jan' },
+  { value: 2, label: 'Feb' },
+  { value: 3, label: 'Mar' },
+  { value: 4, label: 'Apr' },
+  { value: 5, label: 'May' },
+  { value: 6, label: 'Jun' },
+  { value: 7, label: 'Jul' },
+  { value: 8, label: 'Aug' },
+  { value: 9, label: 'Sep' },
+  { value: 10, label: 'Oct' },
+  { value: 11, label: 'Nov' },
+  { value: 12, label: 'Dec' }
 ]
 
 function Dashboard() {
-  const dispatch = useDispatch()
+  const [invoices, setInvoices] = useState([])
+  const [loading, setLoading] = useState(false)
+
+  const [reportMode, setReportMode] = useState('yearly')
+  const [selectedYear, setSelectedYear] = useState(CURRENT_YEAR)
+  const [selectedMonth, setSelectedMonth] = useState(new Date().getMonth() + 1)
+  const [monthlyReport, setMonthlyReport] = useState([])
+  const [summary, setSummary] = useState(null)
+  const [loadingReports, setLoadingReports] = useState(false)
+
+  const fetchInvoices = async () => {
+    setLoading(true)
+    try {
+      const response = await outgoingOrderApi.getAllOrders({
+        page: 1,
+        limit: 5
+      })
+
+      if (response.success) {
+        const data = response.data
+        setInvoices(data.orders || [])
+      }
+    } catch (error) {
+      console.error('Error fetching invoices:', error)
+      toast.error('Failed to fetch invoices')
+    } finally {
+      setLoading(false)
+    }
+  }
+
+  const fetchReports = async () => {
+    setLoadingReports(true)
+    try {
+      const params =
+        reportMode === 'yearly'
+          ? { year: selectedYear }
+          : { mode: 'monthly', year: selectedYear, month: selectedMonth }
+
+      const res = await outgoingOrderApi.getOrdersReport(params)
+
+      setMonthlyReport(res.data?.report || res.data?.monthlyReport || [])
+      setSummary(res.data?.summary ?? null)
+    } catch (err) {
+      console.error('Failed to fetch reports', err)
+      setMonthlyReport([])
+      setSummary(null)
+    } finally {
+      setLoadingReports(false)
+    }
+  }
+
+  useEffect(() => {
+    fetchInvoices()
+  }, [])
+
+  useEffect(() => {
+    fetchReports()
+  }, [reportMode, selectedYear, selectedMonth])
+
   const { lowStockProducts, expiredProducts } = useSelector((state) => state.dashboard)
 
-  console.log('lowStockProducts :: ', lowStockProducts)
+  // Shape data for recharts
+  const chartData = monthlyReport.map((r) => ({
+    name: reportMode === 'yearly' ? r.monthName?.slice(0, 3) || '' : String(r.day || ''),
+    Orders: r.totalOrders ?? 0,
+    Value: r.totalOrderValue ?? 0
+  }))
 
   return (
     <div className="flex-1 space-y-4 p-8 pt-6">
-      {/* <div className="flex items-center justify-between space-y-2">
-        <h2 className="text-3xl font-bold tracking-tight">Dashboard</h2>
-      </div> */}
-
-      {/* Stats Cards */}
-      <div className="grid gap-4 md:grid-cols-2 lg:grid-cols-4">
-        <Card>
-          <CardHeader className="flex flex-row items-center justify-between space-y-0 pb-2">
-            <CardTitle className="text-sm font-medium">Total Revenue</CardTitle>
-            <DollarSign className="h-4 w-4 text-muted-foreground" />
-          </CardHeader>
-          <CardContent>
-            <div className="text-2xl font-bold">$45,231.89</div>
-            <p className="text-xs text-muted-foreground">+20.1% from last month</p>
-          </CardContent>
-        </Card>
-
-        <Card>
-          <CardHeader className="flex flex-row items-center justify-between space-y-0 pb-2">
-            <CardTitle className="text-sm font-medium">Active Customers</CardTitle>
-            <Users className="h-4 w-4 text-muted-foreground" />
-          </CardHeader>
-          <CardContent>
-            <div className="text-2xl font-bold">+2350</div>
-            <p className="text-xs text-muted-foreground">+180.1% from last month</p>
-          </CardContent>
-        </Card>
-
-        <Card>
-          <CardHeader className="flex flex-row items-center justify-between space-y-0 pb-2">
-            <CardTitle className="text-sm font-medium">Sales</CardTitle>
-            <CreditCard className="h-4 w-4 text-muted-foreground" />
-          </CardHeader>
-          <CardContent>
-            <div className="text-2xl font-bold">+12,234</div>
-            <p className="text-xs text-muted-foreground">+19% from last month</p>
-          </CardContent>
-        </Card>
-
-        <Card>
-          <CardHeader className="flex flex-row items-center justify-between space-y-0 pb-2">
-            <CardTitle className="text-sm font-medium">Active Now</CardTitle>
-            <Activity className="h-4 w-4 text-muted-foreground" />
-          </CardHeader>
-          <CardContent>
-            <div className="text-2xl font-bold">+573</div>
-            <p className="text-xs text-muted-foreground">+201 since last hour</p>
-          </CardContent>
-        </Card>
-      </div>
-
-      {/* Charts & Lists */}
       <div className="grid gap-4 md:grid-cols-2 lg:grid-cols-7">
         {/* Sales Overview Chart */}
         <Card className="col-span-4">
-          <CardHeader>
-            <CardTitle>Overview</CardTitle>
-            <CardDescription>Monthly revenue breakdown for the current year.</CardDescription>
+          <CardHeader className="flex flex-row items-center justify-between pb-2">
+            <div>
+              <CardTitle>Sales Overview</CardTitle>
+              <CardDescription>
+                {reportMode === 'yearly'
+                  ? `Yearly performance for ${selectedYear}.`
+                  : `Monthly performance for ${MONTH_OPTIONS.find((m) => m.value === selectedMonth)?.label} ${selectedYear}.`}
+              </CardDescription>
+            </div>
+            {/* Mode / Year / Month selectors */}
+            <div className="flex items-center gap-2">
+              <select
+                value={reportMode}
+                onChange={(e) => setReportMode(e.target.value)}
+                className="text-xs border border-gray-200 bg-background px-2 py-1 focus:outline-none focus:ring-1 focus:ring-ring rounded cursor-pointer"
+              >
+                <option value="yearly">Yearly</option>
+                <option value="monthly">Monthly</option>
+              </select>
+
+              {reportMode === 'monthly' && (
+                <select
+                  value={selectedMonth}
+                  onChange={(e) => setSelectedMonth(Number(e.target.value))}
+                  className="text-xs border border-gray-200 bg-background px-2 py-1 focus:outline-none focus:ring-1 focus:ring-ring rounded cursor-pointer"
+                >
+                  {MONTH_OPTIONS.map((m) => (
+                    <option key={m.value} value={m.value}>
+                      {m.label}
+                    </option>
+                  ))}
+                </select>
+              )}
+
+              <select
+                value={selectedYear}
+                onChange={(e) => setSelectedYear(Number(e.target.value))}
+                className="text-xs border border-gray-200 bg-background px-2 py-1 focus:outline-none focus:ring-1 focus:ring-ring rounded cursor-pointer"
+              >
+                {YEAR_OPTIONS.map((y) => (
+                  <option key={y} value={y}>
+                    {y}
+                  </option>
+                ))}
+              </select>
+            </div>
           </CardHeader>
           <CardContent className="pl-2">
-            <ResponsiveContainer width="100%" height={350}>
-              <BarChart data={salesData}>
-                <XAxis
-                  dataKey="name"
-                  stroke="#888888"
-                  fontSize={12}
-                  tickLine={false}
-                  axisLine={false}
-                />
-                <YAxis
-                  stroke="#888888"
-                  fontSize={12}
-                  tickLine={false}
-                  axisLine={false}
-                  tickFormatter={(value) => `$${value}`}
-                />
-                <RechartsTooltip
-                  cursor={{ fill: 'transparent' }}
-                  contentStyle={{
-                    borderRadius: '8px',
-                    border: 'none',
-                    boxShadow: '0 4px 6px -1px rgb(0 0 0 / 0.1)'
-                  }}
-                />
-                <Bar
-                  dataKey="total"
-                  fill="currentColor"
-                  radius={[4, 4, 0, 0]}
-                  className="fill-primary"
-                />
-              </BarChart>
-            </ResponsiveContainer>
+            {loadingReports ? (
+              <div className="flex h-[350px] items-center justify-center text-muted-foreground">
+                <Loader2 className="h-5 w-5 animate-spin mr-2" />
+                <span className="text-sm">Loading chart…</span>
+              </div>
+            ) : chartData.length === 0 ? (
+              <div className="flex h-[350px] items-center justify-center text-sm text-muted-foreground">
+                No data available for the selected period.
+              </div>
+            ) : (
+              <ResponsiveContainer width="100%" height={350}>
+                <AreaChart data={chartData} margin={{ top: 10, right: 10, left: -20, bottom: 0 }}>
+                  <defs>
+                    <linearGradient id="colorOrders" x1="0" y1="0" x2="0" y2="1">
+                      <stop offset="5%" stopColor="hsl(var(--primary))" stopOpacity={0.15} />
+                      <stop offset="95%" stopColor="hsl(var(--primary))" stopOpacity={0} />
+                    </linearGradient>
+                    <linearGradient id="colorValue" x1="0" y1="0" x2="0" y2="1">
+                      <stop offset="5%" stopColor="#22c55e" stopOpacity={0.12} />
+                      <stop offset="95%" stopColor="#22c55e" stopOpacity={0} />
+                    </linearGradient>
+                  </defs>
+                  <CartesianGrid strokeDasharray="3 3" vertical={false} stroke="#e5e7eb" />
+                  <XAxis
+                    dataKey="name"
+                    stroke="#888888"
+                    fontSize={11}
+                    tickLine={false}
+                    axisLine={false}
+                    dy={10}
+                  />
+                  <YAxis
+                    stroke="#888888"
+                    fontSize={11}
+                    tickLine={false}
+                    axisLine={false}
+                    tickFormatter={(v) => v}
+                  />
+                  <RechartsTooltip
+                    cursor={{
+                      stroke: 'hsl(var(--primary))',
+                      strokeWidth: 1,
+                      strokeDasharray: '3 3'
+                    }}
+                    contentStyle={{
+                      borderRadius: '8px',
+                      border: '1px solid #e5e7eb',
+                      boxShadow: '0 4px 6px -1px rgb(0 0 0 / 0.1)',
+                      fontSize: '12px'
+                    }}
+                  />
+                  <Area
+                    type="monotone"
+                    dataKey="Orders"
+                    stroke="hsl(var(--primary))"
+                    strokeWidth={2}
+                    fillOpacity={1}
+                    fill="url(#colorOrders)"
+                    activeDot={{ r: 4, strokeWidth: 0 }}
+                  />
+                  <Area
+                    type="monotone"
+                    dataKey="Value"
+                    stroke="#22c55e"
+                    strokeWidth={2}
+                    fillOpacity={1}
+                    fill="url(#colorValue)"
+                    activeDot={{ r: 4, strokeWidth: 0 }}
+                  />
+                </AreaChart>
+              </ResponsiveContainer>
+            )}
           </CardContent>
+
+          {/* Summary strip */}
+          {summary && (
+            <div className="border-t px-6 py-3 grid grid-cols-3 gap-2">
+              {[
+                { icon: ShoppingCart, label: 'Total Orders', value: summary.totalOrders },
+                { icon: Package, label: 'Items Sold', value: summary.totalItemsSold },
+                {
+                  icon: TrendingUp,
+                  label: 'Order Value',
+                  value: `₹${summary.totalOrderValue ?? 0}`
+                }
+              ].map(({ icon: Icon, label, value }) => (
+                <div key={label} className="flex items-center gap-2">
+                  <Icon className="h-4 w-4 text-muted-foreground shrink-0" />
+                  <div>
+                    <p className="text-xs text-muted-foreground">{label}</p>
+                    <p className="text-sm font-semibold">{value}</p>
+                  </div>
+                </div>
+              ))}
+            </div>
+          )}
         </Card>
 
         {/* Recent Sales List */}
         <Card className="col-span-3">
           <CardHeader>
-            <CardTitle>Recent Sales</CardTitle>
-            <CardDescription>You made 265 sales this month.</CardDescription>
+            <CardTitle>Recent Orders</CardTitle>
           </CardHeader>
           <CardContent>
-            <div className="space-y-8">
-              {recentSales.map((sale, index) => (
-                <div key={index} className="flex items-center">
+            <div className="space-y-4">
+              {invoices?.map((sale, index) => (
+                <div key={index} className="flex items-center border-b border-gray-400 pb-2">
                   <div className="h-9 w-9 rounded-full bg-primary/10 flex items-center justify-center">
                     <span className="text-xs font-medium text-primary">
-                      {sale.name.charAt(0)}
-                      {sale.name.split(' ')[1]?.charAt(0)}
+                      {sale?.CustomerDetails?.CustName.charAt(0)}
                     </span>
                   </div>
                   <div className="ml-4 space-y-1">
-                    <p className="text-sm font-medium leading-none">{sale.name}</p>
-                    <p className="text-xs text-muted-foreground">{sale.email}</p>
+                    <p className="text-sm font-medium leading-none">
+                      {sale?.CustomerDetails?.CustName}
+                    </p>
+                    <p className="text-xs text-muted-foreground">
+                      {sale?.CustomerDetails?.CustMobile}
+                    </p>
                   </div>
-                  <div className="ml-auto font-medium">{sale.amount}</div>
+                  <div className="ml-auto font-medium">
+                    {sale?.PaymentDetails?.paymentmodeAmount}
+                  </div>
                 </div>
               ))}
             </div>
           </CardContent>
-        </Card>
-      </div>
-
-      <div className="grid gap-3 md:grid-cols-2 lg:grid-cols-7">
-        {/* Low Stock Alerts */}
-        <Card className="col-span-3">
-          <CardHeader>
-            <CardTitle className="flex items-center gap-2">
-              <AlertTriangle className="h-5 w-5 text-destructive" />
-              Low Stock Alerts
-            </CardTitle>
-            <CardDescription>Medicines running low on inventory.</CardDescription>
-          </CardHeader>
-          <CardContent>
-            <div className="space-y-2">
-              {lowStockProducts &&
-                lowStockProducts.slice(0, 5).map((item, index) => (
-                  <div
-                    key={index}
-                    className="flex items-center justify-between border p-3 shadow-sm bg-destructive/5 border-destructive/20"
-                  >
-                    <div className="space-y-0.5">
-                      <div className="text-sm font-medium">{item.name}</div>
-                      <div className="text-xs text-muted-foreground">
-                        Current Stock:{' '}
-                        <span className="font-bold text-destructive">{item.stock}</span>
-                      </div>
-                    </div>
-                  </div>
-                ))}
-            </div>
-          </CardContent>
           <CardFooter>
             <Button className="w-full" variant="outline" asChild>
-              <Link to="/admin/stock-expiry">View All</Link>
+              <Link to={`/admin/invoices`}>View All</Link>
             </Button>
           </CardFooter>
         </Card>
+      </div>
 
-        {/* Another Chart (Area) */}
-        <Card className="col-span-4">
-          <CardHeader>
-            <CardTitle>Customer Growth</CardTitle>
-            <CardDescription>Active users over the last 6 months.</CardDescription>
-          </CardHeader>
-          <CardContent>
-            <ResponsiveContainer width="100%" height={300}>
-              <AreaChart data={salesData}>
-                <defs>
-                  <linearGradient id="colorTotal" x1="0" y1="0" x2="0" y2="1">
-                    <stop offset="5%" stopColor="hsl(var(--primary))" stopOpacity={0.8} />
-                    <stop offset="95%" stopColor="hsl(var(--primary))" stopOpacity={0} />
-                  </linearGradient>
-                </defs>
-                <XAxis
-                  dataKey="name"
-                  stroke="#888888"
-                  fontSize={12}
-                  tickLine={false}
-                  axisLine={false}
-                />
-                <YAxis stroke="#888888" fontSize={12} tickLine={false} axisLine={false} />
-                <RechartsTooltip />
-                <CartesianGrid strokeDasharray="3 3" vertical={false} stroke="#eee" />
-                <Area
-                  type="monotone"
-                  dataKey="total"
-                  stroke="hsl(var(--primary))"
-                  fillOpacity={1}
-                  fill="url(#colorTotal)"
-                />
-              </AreaChart>
-            </ResponsiveContainer>
-          </CardContent>
-        </Card>
+      {/* Inventory Alerts Row */}
+      <div className="grid gap-3 md:grid-cols-2 lg:grid-cols-7">
+        <Suspense
+          fallback={
+            <Card className="col-span-3">
+              <CardHeader>
+                <CardTitle className="flex items-center gap-2">
+                  <AlertTriangle className="h-5 w-5 text-destructive" />
+                  Low Stock Alerts
+                </CardTitle>
+
+                <CardDescription>Medicines running low on inventory.</CardDescription>
+              </CardHeader>
+
+              <CardContent>
+                <div className="space-y-2">
+                  {[1, 2, 3, 4, 5].map((_, index) => (
+                    <div
+                      key={index}
+                      className="flex items-center justify-between border p-3 shadow-sm bg-destructive/5 border-destructive/20"
+                    >
+                      <div className="space-y-2 w-full animate-pulse">
+                        {/* Product name */}
+                        <div className="h-4 w-40 bg-muted rounded"></div>
+
+                        {/* Stock text */}
+                        <div className="h-3 w-28 bg-muted rounded"></div>
+                      </div>
+                    </div>
+                  ))}
+                </div>
+              </CardContent>
+
+              <CardFooter>
+                <div className="w-full h-10 bg-muted rounded animate-pulse"></div>
+              </CardFooter>
+            </Card>
+          }
+        >
+          <LowStockProducts lowStockProducts={lowStockProducts} role={'admin'} />
+        </Suspense>
+
+        {/* Inventory Summary Card */}
+        <Suspense
+          fallback={
+            <Card className="col-span-4">
+              <CardHeader>
+                <CardTitle className="flex items-center gap-2">
+                  <CreditCard className="h-5 w-5 text-primary" />
+                  Inventory Summary
+                </CardTitle>
+                <CardDescription>Quick overview of your current inventory health.</CardDescription>
+              </CardHeader>
+
+              <CardContent>
+                <div className="grid grid-cols-2 gap-4 animate-pulse">
+                  {/* Low Stock Skeleton */}
+                  <div className="border p-4 rounded-lg bg-destructive/5 border-destructive/20 space-y-2">
+                    <div className="h-3 w-28 bg-muted rounded"></div>
+                    <div className="h-7 w-16 bg-muted rounded"></div>
+                    <div className="h-3 w-36 bg-muted rounded"></div>
+                  </div>
+
+                  {/* Expiring Products Skeleton */}
+                  <div className="border p-4 rounded-lg bg-orange-50 border-orange-200 space-y-2">
+                    <div className="h-3 w-32 bg-muted rounded"></div>
+                    <div className="h-7 w-16 bg-muted rounded"></div>
+                    <div className="h-3 w-40 bg-muted rounded"></div>
+                  </div>
+
+                  {/* Action Required Skeleton */}
+                  <div className="col-span-2 border p-4 rounded-lg bg-muted/30 space-y-2">
+                    <div className="h-3 w-28 bg-muted rounded"></div>
+                    <div className="h-4 w-full bg-muted rounded"></div>
+                  </div>
+                </div>
+              </CardContent>
+
+              <CardFooter>
+                <div className="w-full h-10 bg-muted rounded animate-pulse"></div>
+              </CardFooter>
+            </Card>
+          }
+        >
+          <InventorySummary lowStockProducts={lowStockProducts} expiredProducts={expiredProducts} />
+        </Suspense>
       </div>
     </div>
   )

@@ -1,13 +1,16 @@
-import React, { useState } from 'react'
-import { useNavigate } from 'react-router'
+import { authApi } from '@/api'
+import { Button } from '@/components/ui/button'
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@/components/ui/card'
 import { Input } from '@/components/ui/input'
 import { Label } from '@/components/ui/label'
-import { Button } from '@/components/ui/button'
-import { authApi } from '@/api'
-import { LogIn, AlertCircle, Loader2 } from 'lucide-react'
+import { login } from '@/store/features/authSlice'
+import { AlertCircle, Loader2, LogIn } from 'lucide-react'
+import { useState } from 'react'
+import { useDispatch } from 'react-redux'
+import { useNavigate } from 'react-router'
 
 function Login() {
+  const dispatch = useDispatch()
   const navigate = useNavigate()
   const [formData, setFormData] = useState({
     userId: '',
@@ -22,7 +25,6 @@ function Login() {
       ...prev,
       [name]: value
     }))
-    // Clear error when user starts typing
     if (error) setError('')
   }
 
@@ -30,48 +32,48 @@ function Login() {
     e.preventDefault()
     setError('')
 
-    // Basic validation
     if (!formData.userId || !formData.password) {
       setError('All fields are required')
       return
     }
 
-    if (formData.userId === 'admin' && formData.password === 'admin') {
-      navigate('/admin/dashboard')
-    } else if (formData.userId === 'staff' && formData.password === 'staff') {
-      navigate('/staff/dashboard')
-    } else {
-      setError('Invalid credentials')
+    setLoading(true)
+
+    try {
+      const response = await authApi.login(formData)
+
+      if (response.success) {
+        const user = response.data.user
+        const token = response.data.token
+
+        localStorage.setItem('token', token)
+        localStorage.setItem('salerId', user.userId)
+        localStorage.setItem('role', user.role)
+
+        console.log('Login successful:', response.data)
+
+        dispatch(login({ user, token }))
+
+        if (String(user?.role).toLowerCase() === 'admin') {
+          navigate('/admin/dashboard')
+        } else if (String(user?.role).toLowerCase() === 'staff') {
+          navigate('/staff/dashboard')
+        } else {
+          setError('Invalid user role')
+        }
+      } else {
+        setError(response.message || 'Login failed')
+      }
+    } catch (err) {
+      console.error('Login error:', err)
+      setError(
+        err?.response?.data?.message ||
+          err?.message ||
+          'An error occurred during login. Please try again.'
+      )
+    } finally {
+      setLoading(false)
     }
-
-    // setLoading(true)
-
-    // try {
-    //   const response = await authApi.login(formData)
-
-    //   if (response.success) {
-    //     const user = response.data
-
-    //     // Store user data in localStorage
-    //     localStorage.setItem('user', JSON.stringify(user))
-
-    //     // Redirect based on role
-    //     if (user.role === 'admin') {
-    //       navigate('/admin/dashboard')
-    //     } else if (user.role === 'staff') {
-    //       navigate('/staff/dashboard')
-    //     } else {
-    //       setError('Invalid user role')
-    //     }
-    //   } else {
-    //     setError(response.message || 'Login failed')
-    //   }
-    // } catch (err) {
-    //   console.error('Login error:', err)
-    //   setError(err.message || 'An error occurred during login. Please try again.')
-    // } finally {
-    //   setLoading(false)
-    // }
   }
 
   return (
@@ -88,15 +90,12 @@ function Login() {
         </CardHeader>
         <CardContent>
           <form onSubmit={handleSubmit} className="space-y-4">
-            {/* Error Alert */}
             {error && (
               <div className="flex items-center gap-2 p-3 bg-destructive/10 border border-destructive/20 text-destructive text-sm">
                 <AlertCircle className="h-4 w-4shrink-0" />
                 <span>{error}</span>
               </div>
             )}
-
-            {/* User ID Field */}
             <div className="space-y-2">
               <Label htmlFor="userId">User ID</Label>
               <Input
@@ -111,8 +110,6 @@ function Login() {
                 className="w-full"
               />
             </div>
-
-            {/* Password Field */}
             <div className="space-y-2">
               <Label htmlFor="password">Password</Label>
               <Input
@@ -127,8 +124,6 @@ function Login() {
                 className="w-full"
               />
             </div>
-
-            {/* Submit Button */}
             <Button type="submit" className="w-full" disabled={loading}>
               {loading ? (
                 <>
@@ -143,8 +138,6 @@ function Login() {
               )}
             </Button>
           </form>
-
-          {/* Additional Info */}
           <div className="mt-6 text-center text-sm text-muted-foreground">
             <p>DS Pharma Management System</p>
           </div>

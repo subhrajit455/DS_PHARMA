@@ -6,7 +6,8 @@ export const websiteApi = createApi(BASE_URLS.WEBSITE)
 
 export const authApi = {
   login: (data) => desktopApi.post('/auth/login', data),
-  logout: () => desktopApi.post('/auth/logout')
+  logout: () => desktopApi.post('/auth/logout'),
+  me: () => desktopApi.get('/auth/profile')
 }
 
 export const dashboardApi = {
@@ -48,17 +49,33 @@ export const incomingOrderApi = {
   getAllIncomingOrders: (params) => websiteApi.get('/getallorder', { params }),
   getIncomingOrderById: (id) => websiteApi.get(`/orders/${id}`),
   updateIncomingOrder: (id, data) => websiteApi.put(`/orderstatusupdate/${id}`, data),
-  deleteIncomingOrder: (id) => websiteApi.delete(`/orders/${id}`)
+  deleteIncomingOrder: (id) => websiteApi.delete(`/orders/${id}`),
+  getOrderReport: (params) => websiteApi.get(`/order/monthly-report`, { params })
+}
+
+export const outgoingOrderApi = {
+  createOutgoingOrder: (data, salesId) => desktopApi.post(`/order/${salesId}`, data),
+  getOutgoingOrderBySalesId: (salesId, params) => desktopApi.get(`/order/${salesId}`, { params }),
+  getAllOrders: (params) => desktopApi.get(`/order`, { params }),
+  getOrdersReport: (params) => desktopApi.get(`/order/monthly-report`, { params })
 }
 
 export const syncApi = {
-  syncMasterData: () => desktopApi.get('/master-sync')
+  syncMasterData: () => desktopApi.get('/master-sync'),
+  createOrder: (payload) => desktopApi.post('/master-sync/order/301245', payload)
 }
 
 export const staffApi = {
   marggetAllStaff: (params) => desktopApi.get('/staff/marg-users'),
   getAllStaff: (params) => desktopApi.get('/staff'),
   getStaffById: (id) => desktopApi.get(`/staff/${id}`),
-  createStaff: (data) => desktopApi.post('/staff/assign-staff', data),
-  updateStaff: (id, data) => desktopApi.patch(`/staff/${id}`, data) // deleteStaff: (id) => desktopApi.delete(`/staff/${id}`)
+  createStaff: (data) => desktopApi.post('/staff', data),
+  updateStaff: (id, data) => desktopApi.patch(`/staff/${id}`, data),
+  getStaffOrders: (id, params) => desktopApi.get(`/order/${id}`, { params }),
+  getStaffReports: (id, params) => desktopApi.get(`/staff/${id}/monthly-report`, { params })
+}
+
+export const createHsnCode = {
+  getHsnCode: () => desktopApi.get('/hsn'),
+  postHsnCode: (data) => desktopApi.post('/hsn', data)
 }

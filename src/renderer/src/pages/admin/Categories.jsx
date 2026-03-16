@@ -11,9 +11,7 @@ import {
   SelectTrigger,
   SelectValue
 } from '@/components/ui/select'
-import { categoryUrl } from '@/config'
-import { deleteCategory, setCategories } from '@/store/features/categorySlice'
-import axios from 'axios'
+import { setCategories } from '@/store/features/categorySlice'
 import {
   CheckCircle2,
   ChevronLeft,
@@ -35,15 +33,15 @@ function Categories() {
 
   const [loading, setLoading] = useState(false)
   const [stats, setStats] = useState({
-    total: 0,
-    active: 0,
-    hidden: 0
+    total: categories.length,
+    active: categories.filter((cat) => cat.visibility).length,
+    hidden: categories.filter((cat) => !cat.visibility).length
   })
   const [pagination, setPagination] = useState({
     page: 1,
     limit: 12,
-    total: 0,
-    totalPages: 0
+    total: categories.length,
+    totalPages: Math.ceil(categories.length / 12)
   })
   const [query, setQuery] = useState('')
   const [searchInput, setSearchInput] = useState('')
@@ -102,27 +100,6 @@ function Categories() {
 
   const handleLimitChange = (newLimit) => {
     setPagination((prev) => ({ ...prev, limit: parseInt(newLimit), page: 1 }))
-  }
-
-  const handleEdit = (category) => {
-    setSelectedCategory(category)
-    setOpen(true)
-  }
-
-  const handleDelete = async (categoryId) => {
-    if (!confirm('Are you sure you want to delete this category?')) return
-
-    try {
-      const response = await axios.delete(`${categoryUrl.deleteCategory}/${categoryId}`)
-
-      if (response.data.success) {
-        toast.success(response.data.message)
-        dispatch(deleteCategory(categoryId))
-      }
-    } catch (error) {
-      console.log(error)
-      toast.error(error.response.data.message)
-    }
   }
 
   return (

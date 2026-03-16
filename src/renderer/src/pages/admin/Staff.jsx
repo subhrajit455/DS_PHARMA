@@ -19,22 +19,15 @@ import {
   TableHeader,
   TableRow
 } from '@/components/ui/table'
-import {
-  ChevronLeft,
-  ChevronRight,
-  Edit2,
-  Eye,
-  Plus,
-  Search,
-  Trash2,
-  Users,
-  Power
-} from 'lucide-react'
+import { ChevronLeft, ChevronRight, Edit2, Eye, Plus, Power, Search, Users } from 'lucide-react'
 import { useEffect, useState } from 'react'
 import toast from 'react-hot-toast'
 import { IoIosRefresh } from 'react-icons/io'
+import { useLocation, useNavigate } from 'react-router'
 
 function Staff() {
+  const navigate = useNavigate()
+
   const [staff, setStaff] = useState([])
   const [loading, setLoading] = useState(false)
   const [stats, setStats] = useState({
@@ -104,8 +97,11 @@ function Staff() {
   }
 
   const handleView = (staffMember) => {
-    setSelectedStaff(staffMember)
-    setOpenView(true)
+    navigate(`/admin/staff/${staffMember._id}`, {
+      state: {
+        staffMember
+      }
+    })
   }
 
   const handleEdit = (staffMember) => {

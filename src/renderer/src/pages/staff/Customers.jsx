@@ -3,33 +3,31 @@ import { Button } from '@/components/ui/button'
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card'
 import { Input } from '@/components/ui/input'
 import {
-  Select,
-  SelectContent,
-  SelectItem,
-  SelectTrigger,
-  SelectValue
+    Select,
+    SelectContent,
+    SelectItem,
+    SelectTrigger,
+    SelectValue
 } from '@/components/ui/select'
 import {
-  Table,
-  TableBody,
-  TableCell,
-  TableHead,
-  TableHeader,
-  TableRow
+    Table,
+    TableBody,
+    TableCell,
+    TableHead,
+    TableHeader,
+    TableRow
 } from '@/components/ui/table'
 import ViewCustomerDialog from '@/components/ViewCustomerDialog'
-import { customerUrl } from '@/config'
-import axios from 'axios'
 import {
-  ChevronLeft,
-  ChevronRight,
-  Eye,
-  FileText,
-  Loader2,
-  Search,
-  TrendingUp,
-  Users,
-  Wallet
+    ChevronLeft,
+    ChevronRight,
+    Eye,
+    FileText,
+    Loader2,
+    Search,
+    TrendingUp,
+    Users,
+    Wallet
 } from 'lucide-react'
 import { useEffect, useState } from 'react'
 import toast from 'react-hot-toast'
@@ -128,12 +126,7 @@ function Customers() {
   }
 
   return (
-    <div className="flex flex-col h-screen overflow-hidden p-8 pt-6 gap-4">
-      {/* Header */}
-      <div className="flex items-center justify-between shrink-0">
-        <h2 className="text-3xl font-bold tracking-tight">Customers</h2>
-      </div>
-
+    <div className="flex flex-col h-full overflow-hidden px-6 py-4 gap-4">
       {/* Stats Cards */}
       <div className="grid gap-4 md:grid-cols-2 lg:grid-cols-4 shrink-0">
         <Card>
@@ -296,14 +289,14 @@ function Customers() {
                                 : 'text-muted-foreground'
                             }
                           >
-                            ₹{customer.balance?.toFixed(2) || '0.00'}
+                            ₹{parseInt(customer.balance)?.toFixed(2) || '0.00'}
                           </span>
                         </TableCell>
                         <TableCell className="text-right">
                           <span
                             className={customer.pdc > 0 ? 'font-medium' : 'text-muted-foreground'}
                           >
-                            ₹{customer.pdc?.toFixed(2) || '0.00'}
+                            ₹{parseInt(customer.pdc)?.toFixed(2) || '0.00'}
                           </span>
                         </TableCell>
                         <TableCell className="text-right">

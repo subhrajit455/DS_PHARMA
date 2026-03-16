@@ -1,7 +1,7 @@
 import { ClipboardList, Home, Layers, LogOut, Package, Settings, Users } from 'lucide-react'
 import { Link, useLocation, useNavigate } from 'react-router'
 
-import { syncApi } from '@/api'
+import { authApi, syncApi } from '@/api'
 import { Button } from '@/components/ui/button'
 import {
   Sidebar,
@@ -22,6 +22,8 @@ import { AiOutlineCloudSync } from 'react-icons/ai'
 import { BiAlarm } from 'react-icons/bi'
 import { LiaFileInvoiceSolid } from 'react-icons/lia'
 import { VscGraphLine } from 'react-icons/vsc'
+import { useDispatch } from 'react-redux'
+import { logout } from '@/store/features/authSlice'
 
 // Menu items.
 const items = [
@@ -55,31 +57,32 @@ const items = [
     url: '/admin/billing',
     icon: ClipboardList
   },
-  {
-    title: 'E-commerce Orders',
-    url: '/admin/ecommerce-orders',
-    icon: BiAlarm
-  },
+  // {
+  //   title: 'E-commerce Orders',
+  //   url: '/admin/ecommerce-orders',
+  //   icon: BiAlarm
+  // },
   {
     title: 'Invoices',
     url: '/admin/invoices',
     icon: LiaFileInvoiceSolid
-  },
-  {
-    title: 'Reports',
-    url: '/admin/reports',
-    icon: VscGraphLine
-  },
-  {
-    title: 'Settings',
-    url: '/admin/settings',
-    icon: Settings
   }
+  // {
+  //   title: 'Reports',
+  //   url: '/admin/reports',
+  //   icon: VscGraphLine
+  // }
+  // {
+  //   title: 'Settings',
+  //   url: '/admin/settings',
+  //   icon: Settings
+  // }
 ]
 
 export function AdminAppSidebar() {
   const location = useLocation()
   const navigate = useNavigate()
+  const dispatch = useDispatch()
 
   const [syncing, setSyncing] = useState(false)
 
@@ -104,19 +107,20 @@ export function AdminAppSidebar() {
   }
 
   const handleLogout = async () => {
+    // Always clear local state immediately — don't wait for API
+    localStorage.removeItem('token')
+    localStorage.removeItem('salerId')
+    localStorage.removeItem('role')
+    dispatch(logout())
     navigate('/')
 
-    // try {
-    //   const response = await authApi.logout()
-
-    //   if (response.success) {
-    //     localStorage.removeItem('user')
-    //     toast.success('Logged out successfully')
-    //     navigate('/login')
-    //   }
-    // } catch (error) {
-    //   toast.error(error || 'Failed to logout')
-    // }
+    // Best-effort server-side session invalidation
+    try {
+      await authApi.logout()
+      toast.success('Logged out successfully')
+    } catch (error) {
+      // Already logged out locally, silently ignore
+    }
   }
 
   return (

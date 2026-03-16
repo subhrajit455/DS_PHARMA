@@ -291,14 +291,14 @@ function Customers() {
                                 : 'text-muted-foreground'
                             }
                           >
-                            ₹{customer.balance?.toFixed(2) || '0.00'}
+                            ₹{parseInt(customer.balance)?.toFixed(2) || '0.00'}
                           </span>
                         </TableCell>
                         <TableCell className="text-right">
                           <span
                             className={customer.pdc > 0 ? 'font-medium' : 'text-muted-foreground'}
                           >
-                            ₹{customer.pdc?.toFixed(2) || '0.00'}
+                            ₹{parseInt(customer.pdc)?.toFixed(2) || '0.00'}
                           </span>
                         </TableCell>
                         <TableCell className="text-right">

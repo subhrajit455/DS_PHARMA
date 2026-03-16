@@ -20,6 +20,7 @@ function AddEditStaffDialog({ open, setOpen, onSuccess, isEdit = false, staffDat
     email: '',
     password: '',
     phone: '',
+    address: '',
     assignedTo: 'none',
     role: 'staff',
     joinDate: new Date().toISOString().split('T')[0]
@@ -58,6 +59,10 @@ function AddEditStaffDialog({ open, setOpen, onSuccess, isEdit = false, staffDat
         return
       }
 
+      console.log('payload', formData)
+
+      // return
+
       let response
 
       if (isEdit) {
@@ -65,6 +70,7 @@ function AddEditStaffDialog({ open, setOpen, onSuccess, isEdit = false, staffDat
           name: formData.name,
           email: formData.email,
           phone: formData.phone,
+          address: formData.address,
           role: formData.role,
           joinDate: formData.joinDate
         }
@@ -94,6 +100,7 @@ function AddEditStaffDialog({ open, setOpen, onSuccess, isEdit = false, staffDat
           payload.address1 = selectedStaffUser.Address1 || ''
           payload.address2 = selectedStaffUser.Address2 || ''
           payload.address3 = selectedStaffUser.Address3 || ''
+          payload.address = selectedStaffUser.Address || ''
         } else {
           if (!payload.assignedTo || payload.assignedTo === 'none') delete payload.assignedTo
         }
@@ -109,6 +116,7 @@ function AddEditStaffDialog({ open, setOpen, onSuccess, isEdit = false, staffDat
           email: '',
           password: '',
           phone: '',
+          address: '',
           assignedTo: 'none',
           role: 'staff',
           joinDate: new Date().toISOString().split('T')[0]
@@ -133,6 +141,7 @@ function AddEditStaffDialog({ open, setOpen, onSuccess, isEdit = false, staffDat
         email: staffData.email || '',
         password: '',
         phone: staffData.phone || '',
+        address: staffData.address || '',
         assignedTo: staffData.assignedTo || 'none',
         role: staffData.role || 'staff',
         joinDate: staffData.joinDate
@@ -191,46 +200,6 @@ function AddEditStaffDialog({ open, setOpen, onSuccess, isEdit = false, staffDat
         </DialogHeader>
 
         <form onSubmit={handleSubmit} className="space-y-4">
-          {/* Assigned To Select */}
-          <div className="space-y-2">
-            <Label htmlFor="assignedTo">Assign To (required)</Label>
-            <Select
-              name="assignedTo"
-              value={formData.assignedTo}
-              onValueChange={(value) => {
-                setFormData((prev) => ({ ...prev, assignedTo: value }))
-                // Store the full selected staff object
-                const selected = staffOptions.find((opt) => opt.UserID === value)
-                setSelectedStaffUser(selected || null)
-                setFormData({
-                  assignedTo: selected?.UserID || '',
-                  name: selected?.Name || '',
-                  email: selected?.Email || '',
-                  phone: selected?.Phone || ''
-                })
-              }}
-              className="w-full"
-            >
-              <SelectTrigger className="w-full">
-                <SelectValue
-                  placeholder={optionsLoading ? 'Loading...' : 'Select staff to assign'}
-                />
-              </SelectTrigger>
-              <SelectContent>
-                {staffOptions.length === 0 ? (
-                  <SelectItem value="none" disabled>
-                    No staff available
-                  </SelectItem>
-                ) : (
-                  staffOptions.map((opt, index) => (
-                    <SelectItem key={index} value={opt.UserID}>
-                      {opt.UserID} - {opt.Name || opt.Email || 'Unnamed'}
-                    </SelectItem>
-                  ))
-                )}
-              </SelectContent>
-            </Select>
-          </div>
 
           <div className="space-y-2">
             <Label htmlFor="name">Name *</Label>
@@ -262,7 +231,7 @@ function AddEditStaffDialog({ open, setOpen, onSuccess, isEdit = false, staffDat
           {/* Password Field */}
           <div className="space-y-2">
             <Label htmlFor="password">
-              Password{' '}
+              Password *{' '}
               {isEdit && (
                 <span className="text-xs text-muted-foreground">(Leave empty to keep current)</span>
               )}
@@ -280,7 +249,7 @@ function AddEditStaffDialog({ open, setOpen, onSuccess, isEdit = false, staffDat
 
           {/* Phone Field */}
           <div className="space-y-2">
-            <Label htmlFor="phone">Phone</Label>
+            <Label htmlFor="phone">Phone *</Label>
             <Input
               id="phone"
               type="tel"
@@ -289,6 +258,36 @@ function AddEditStaffDialog({ open, setOpen, onSuccess, isEdit = false, staffDat
               value={formData.phone}
               onChange={handleChange}
             />
+          </div>
+
+          <div className="space-y-2">
+            <Label htmlFor="address">Address</Label>
+            <Input
+              id="address"
+              type="text"
+              placeholder="Enter address"
+              name="address"
+              value={formData.address}
+              onChange={handleChange}
+            />
+          </div>
+
+          {/* Role Selector */}
+          <div className="space-y-2">
+            <Label htmlFor="role">Role</Label>
+            <Select
+              name="role"
+              value={formData.role}
+              onValueChange={(value) => setFormData((prev) => ({ ...prev, role: value }))}
+            >
+              <SelectTrigger className="w-full" id="role">
+                <SelectValue placeholder="Select role" />
+              </SelectTrigger>
+              <SelectContent>
+                <SelectItem value="staff">Staff</SelectItem>
+                <SelectItem value="admin">Admin</SelectItem>
+              </SelectContent>
+            </Select>
           </div>
 
           {/* Submit Button */}

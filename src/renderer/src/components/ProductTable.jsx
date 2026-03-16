@@ -97,10 +97,19 @@ function ProductTable({ apiFn, apiParams = {}, tableType = 'all', onEdit, onView
     setViewDialog(true)
   }
 
-  const handleSearch = () => {
-    setQuery(searchInput)
-    setPagination((prev) => ({ ...prev, page: 1 }))
-  }
+  useEffect(() => {
+    const timer = setTimeout(() => {
+      setQuery((prevQuery) => {
+        if (prevQuery !== searchInput) {
+          setPagination((prev) => ({ ...prev, page: 1 }))
+          return searchInput
+        }
+        return prevQuery
+      })
+    }, 500)
+    
+    return () => clearTimeout(timer)
+  }, [searchInput])
 
   const handlePageChange = (newPage) => {
     setPagination((prev) => ({ ...prev, page: newPage }))
@@ -445,11 +454,9 @@ function ProductTable({ apiFn, apiParams = {}, tableType = 'all', onEdit, onView
             placeholder="Search products by name or code..."
             value={searchInput}
             onChange={(e) => setSearchInput(e.target.value)}
-            onKeyDown={(e) => e.key === 'Enter' && handleSearch()}
             className="pl-9"
           />
         </div>
-        <Button onClick={handleSearch}>Search</Button>
         <Select value={sort} onValueChange={(value) => setSort(value)}>
           <SelectTrigger className="w-40">
             <SelectValue placeholder="Sort by" />

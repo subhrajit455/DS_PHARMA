@@ -1,6 +1,6 @@
-import { app, shell, BrowserWindow, ipcMain } from 'electron'
+import { electronApp, is, optimizer } from '@electron-toolkit/utils'
+import { app, BrowserWindow, ipcMain, shell } from 'electron'
 import { join } from 'path'
-import { electronApp, optimizer, is } from '@electron-toolkit/utils'
 import icon from '../../resources/icon.png?asset'
 
 function createWindow() {
@@ -38,7 +38,7 @@ function createWindow() {
 // This method will be called when Electron has finished
 // initialization and is ready to create browser windows.
 // Some APIs can only be used after this event occurs.
-app.whenReady().then(() => {
+app.whenReady().then(async () => {
   // Set app user model id for windows
   electronApp.setAppUserModelId('com.electron')
 
@@ -48,6 +48,20 @@ app.whenReady().then(() => {
   app.on('browser-window-created', (_, window) => {
     optimizer.watchWindowShortcuts(window)
   })
+
+  if (is.dev) {
+    try {
+      const installer = await import('electron-devtools-installer')
+      const installExtension = installer.installExtension ?? installer.default
+      const { REDUX_DEVTOOLS } = installer
+      await installExtension(REDUX_DEVTOOLS, {
+        loadExtensionOptions: { allowFileAccess: true }
+      })
+      console.log('Redux DevTools installed')
+    } catch (err) {
+      console.log('Redux DevTools failed:', err)
+    }
+  }
 
   // IPC test
   ipcMain.on('ping', () => console.log('pong'))

@@ -10,6 +10,7 @@ import Invoices from '@/pages/admin/Invoices'
 import StockExpiry from '@/pages/admin/StockExpiry'
 import Staff from '@/pages/admin/Staff'
 import Reports from '@/pages/admin/Reports'
+import StaffDetails from '@/pages/admin/StaffDetails'
 
 export {
   Layout as AdminLayout,
@@ -23,5 +24,6 @@ export {
   Invoices as AdminInvoices,
   StockExpiry as AdminStockExpiry,
   Staff as AdminStaff,
-  Reports as AdminReports
+  Reports as AdminReports,
+  StaffDetails as AdminStaffDetails
 }
