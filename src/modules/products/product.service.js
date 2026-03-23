@@ -2,6 +2,9 @@ import fs from 'fs';
 import { uploadImage } from '../../config/vaisBucket.js';
 import MargProducts from '../mastersync/marg_products.model.js';
 import ProductInfo from './productInfo.model.js';
+import ApiError from '../../utils/apiError.js';
+import MargParties from '../mastersync/marg_parties.model.js';
+import RequestedProduct from './requestedProduct.model.js';
 
 export const fetchProductsService = async (
   page,
@@ -30,9 +33,6 @@ export const fetchProductsService = async (
               $options: 'i',
             },
           },
-          // { company: { $regex: query, $options: 'i' } },
-          // { code: { $regex: query, $options: 'i' } },
-          // { curbatch: { $regex: query, $options: 'i' } },
         ],
       }),
     };
@@ -54,20 +54,6 @@ export const fetchProductsService = async (
     const result = await MargProducts.aggregate([
       { $match: baseMatch },
       ...(priceFilter ? [{ $match: priceFilter }] : []),
-
-      // 🔹 Early projection (reduce memory)
-      // {
-      //   $project: {
-      //     rid: 1,
-      //     name: 1,
-      //     company: 1,
-      //     stock: 1,
-      //     MRP: 1,
-      //     Prate: 1,
-      //     code: 1,
-      //     curbatch: 1,
-      //   },
-      // },
       {
         $facet: {
           // ---------------- PRODUCTS ----------------
@@ -901,5 +887,140 @@ export const fetchExpiredProductsService = async (page, limit, query) => {
     };
   } catch (error) {
     throw new Error(error.message);
+  }
+};
+
+export const createProductRequestService = async ({
+  productId,
+  requestedBy,
+  quantity,
+  remarks,
+}) => {
+  try {
+    const product = await MargProducts.findOne({
+      rid: productId,
+    });
+
+    if (!product) throw new ApiError(404, 'Invalid product code');
+
+    const party = await MargParties.findOne({
+      rid: requestedBy,
+    });
+
+    if (!party) throw new ApiError(404, 'Invalid party code');
+
+    const request = await RequestedProduct.create({
+      productId,
+      requestedBy,
+      quantity,
+      remarks,
+    });
+
+    return request;
+  } catch (error) {
+    throw error;
+  }
+};
+
+export const updateRequestStatusService = async ({ requestId, status }) => {
+  try {
+    const request = await RequestedProduct.findById(requestId);
+
+    if (!request) throw new ApiError(404, 'Invalid request id');
+
+    request.status = status;
+
+    await request.save();
+
+    return request;
+  } catch (error) {
+    throw error;
+  }
+};
+
+export const fetchProductRequestsService = async ({
+  page = 1,
+  limit = 10,
+  query,
+  status,
+}) => {
+  try {
+    const skip = (page - 1) * limit;
+
+    const pipeline = [
+      {
+        $addFields: {
+          productIdStr: { $toString: '$productId' },
+          requestedByStr: { $toString: '$requestedBy' },
+        },
+      },
+      ...(status ? [{ $match: { status } }] : []),
+      {
+        $lookup: {
+          from: 'marg_products',
+          localField: 'productIdStr',
+          foreignField: 'rid',
+          as: 'product',
+        },
+      },
+      {
+        $unwind: {
+          path: '$product',
+          preserveNullAndEmptyArrays: true,
+        },
+      },
+      {
+        $lookup: {
+          from: 'marg_parties',
+          localField: 'requestedByStr',
+          foreignField: 'rid',
+          as: 'requestedByUser',
+        },
+      },
+      {
+        $unwind: {
+          path: '$requestedByUser',
+          preserveNullAndEmptyArrays: true,
+        },
+      },
+      ...(query
+        ? [
+            {
+              $match: {
+                $or: [
+                  { 'product.name': { $regex: query, $options: 'i' } },
+                  { 'requestedByUser.name': { $regex: query, $options: 'i' } },
+                  { remarks: { $regex: query, $options: 'i' } },
+                ],
+              },
+            },
+          ]
+        : []),
+      {
+        $facet: {
+          requests: [
+            { $sort: { createdAt: -1 } },
+            { $skip: skip },
+            { $limit: parseInt(limit) },
+          ],
+          totalCount: [{ $count: 'total' }],
+        },
+      },
+    ];
+
+    const result = await RequestedProduct.aggregate(pipeline);
+
+    const requests = result[0]?.requests || [];
+    const totalRequests = result[0]?.totalCount[0]?.total || 0;
+    const totalPages = Math.ceil(totalRequests / limit);
+
+    return {
+      requests,
+      totalRequests,
+      totalPages,
+      currentPage: parseInt(page),
+    };
+  } catch (error) {
+    throw error;
   }
 };

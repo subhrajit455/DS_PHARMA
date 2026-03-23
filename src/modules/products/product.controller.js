@@ -1,7 +1,9 @@
+import ApiError from '../../utils/apiError.js';
 import ApiResponse from '../../utils/apiResponse.js';
 import asyncHandler from '../../utils/asyncHandler.js';
 import {
   addCategoryToProductService,
+  createProductRequestService,
   fetchExpiredProductsService,
   fetchExpiringProductsService,
   fetchFeaturedProductsService,
@@ -10,6 +12,8 @@ import {
   fetchProductsService,
   getProductDetailsService,
   updateProductDetailsService,
+  updateRequestStatusService,
+  fetchProductRequestsService,
 } from './product.service.js';
 
 export const fetchProducts = asyncHandler(async (req, res) => {
@@ -224,3 +228,63 @@ export const fetchExpiredProducts = asyncHandler(async (req, res) => {
     ),
   );
 });
+
+export const createProductRequest = asyncHandler(async (req, res) => {
+  const { productId, requestedBy, quantity, remarks } = req.body;
+
+  if (!productId || !requestedBy)
+    throw new ApiError(500, 'Product code and customer code is required');
+
+  const request = await createProductRequestService({
+    productId,
+    requestedBy,
+    quantity,
+    remarks,
+  });
+
+  return res
+    .status(200)
+    .json(new ApiResponse(200, request, 'Product request created'));
+});
+
+export const updateRequestStatus = asyncHandler(async (req, res) => {
+  const { requestId } = req.params;
+  const { status } = req.body;
+
+  if (!requestId) throw new ApiError(500, 'Request ID is required');
+
+  const request = await updateRequestStatusService({ requestId, status });
+
+  return res
+    .status(200)
+    .json(new ApiResponse(200, request, 'Request status updated'));
+});
+
+export const fetchProductRequests = asyncHandler(async (req, res) => {
+  const { page = 1, limit = 10, query = '', status = '' } = req.query;
+
+  const { requests, totalRequests, totalPages, currentPage } =
+    await fetchProductRequestsService({
+      page: Number(page),
+      limit: Number(limit),
+      query: query.trim().toLowerCase(),
+      status: status,
+    });
+
+  res.status(200).json(
+    new ApiResponse(
+      200,
+      {
+        requests,
+        totalRequests,
+        page: Number(page),
+        limit: Number(limit),
+        totalPages: Number(totalPages),
+        currentPage: Number(page),
+        hasMore: Number(page) < Number(totalPages),
+      },
+      "Product requests fetched successfully",
+    ),
+  );
+});
+

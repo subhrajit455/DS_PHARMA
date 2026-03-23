@@ -1,6 +1,7 @@
 import { Router } from 'express';
 import {
   addCategoryToProduct,
+  createProductRequest,
   fetchExpiredProducts,
   fetchExpiringProducts,
   fetchFeaturedProducts,
@@ -9,7 +10,13 @@ import {
   fetchProductsByCategory,
   getProductDetails,
   updateProductDetails,
+  updateRequestStatus,
+  fetchProductRequests,
 } from './product.controller.js';
+import {
+  authMiddleware,
+  authorize,
+} from '../../middlewares/auth.middleware.js';
 
 const productRoute = Router();
 
@@ -22,5 +29,17 @@ productRoute.put('/update/:rid', updateProductDetails);
 productRoute.get('/low-stock', fetchLowStockProducts);
 productRoute.get('/expiring', fetchExpiringProducts);
 productRoute.get('/expired', fetchExpiredProducts);
+productRoute.post(
+  '/request',
+  createProductRequest,
+);
+productRoute.get(
+  '/request',
+  fetchProductRequests,
+);
+productRoute.patch(
+  '/request/:requestId',
+  updateRequestStatus,
+);
 
 export default productRoute;

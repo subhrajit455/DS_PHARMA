@@ -5,8 +5,18 @@ import { syncMasterOrderDataService } from '../mastersync/masterSync.service.js'
 import Orders from './order.model.js';
 
 const MONTH_NAMES = [
-  'January', 'February', 'March', 'April', 'May', 'June',
-  'July', 'August', 'September', 'October', 'November', 'December'
+  'January',
+  'February',
+  'March',
+  'April',
+  'May',
+  'June',
+  'July',
+  'August',
+  'September',
+  'October',
+  'November',
+  'December',
 ];
 
 export const createOrderService = async (
@@ -73,12 +83,13 @@ export const fetchOrdersService = async (page, limit, query) => {
 
     if (query) {
       filter.$or = [
-        { "CustomerDetails.CustName": { $regex: query, $options: 'i' } },
+        { 'CustomerDetails.CustName': { $regex: query, $options: 'i' } },
         { OrderID: { $regex: query, $options: 'i' } },
       ];
     }
 
-    const baseQuery = Orders.find(filter).populate("Sid")
+    const baseQuery = Orders.find(filter)
+      .populate('Sid')
       .sort({ createdAt: -1 })
       .select('-OTP')
       .lean();
@@ -98,7 +109,7 @@ export const fetchOrdersService = async (page, limit, query) => {
       hasMore: parsedPage < totalPages,
     };
   } catch (error) {
-    console.log("error : ", error);
+    console.log('error : ', error);
     throw new ApiError(500, error.message);
   }
 };
@@ -124,7 +135,7 @@ export const fetchOrdersBySalesmanService = async (
 
     if (query) {
       filter.$or = [
-        { "CustomerDetails.CustName": { $regex: query, $options: 'i' } },
+        { 'CustomerDetails.CustName': { $regex: query, $options: 'i' } },
         { OrderID: { $regex: query, $options: 'i' } },
       ];
     }
@@ -258,7 +269,7 @@ export const updatePaymentStatusService = async (OrderID, status) => {
   }
 };
 
-export const fetchMonthlyReportService = async (options) => {
+export const fetchMonthlyReportService = async options => {
   try {
     const {
       mode = 'yearly',
@@ -287,7 +298,9 @@ export const fetchMonthlyReportService = async (options) => {
     } else if (mode === 'custom' && startDate && endDate) {
       dateFilter = {
         $gte: new Date(startDate),
-        $lt: new Date(new Date(endDate).setDate(new Date(endDate).getDate() + 1)), // inclusive end
+        $lt: new Date(
+          new Date(endDate).setDate(new Date(endDate).getDate() + 1),
+        ), // inclusive end
       };
     }
 
@@ -300,33 +313,65 @@ export const fetchMonthlyReportService = async (options) => {
     // ── Group key differs per mode ─────────────────────────────────
     const groupId =
       mode === 'monthly'
-        ? { year: { $year: '$createdAt' }, month: { $month: '$createdAt' }, day: { $dayOfMonth: '$createdAt' } }
+        ? {
+            year: { $year: '$createdAt' },
+            month: { $month: '$createdAt' },
+            day: { $dayOfMonth: '$createdAt' },
+          }
         : { year: { $year: '$createdAt' }, month: { $month: '$createdAt' } };
 
     const pipeline = [
       matchStage,
-      { $unwind: { path: '$ProductDetails', preserveNullAndEmptyArrays: true } },
+      {
+        $unwind: { path: '$ProductDetails', preserveNullAndEmptyArrays: true },
+      },
       {
         $group: {
-          _id: { ...groupId, orderId: '$_id', customerId: '$CustomerDetails.CustomerID' },
+          _id: {
+            ...groupId,
+            orderId: '$_id',
+            customerId: '$CustomerDetails.CustomerID',
+          },
           totalQty: {
             $sum: {
               $add: [
-                { $convert: { input: '$ProductDetails.Quantity', to: 'double', onError: 0, onNull: 0 } },
-                { $convert: { input: '$ProductDetails.Free', to: 'double', onError: 0, onNull: 0 } },
+                {
+                  $convert: {
+                    input: '$ProductDetails.Quantity',
+                    to: 'double',
+                    onError: 0,
+                    onNull: 0,
+                  },
+                },
+                {
+                  $convert: {
+                    input: '$ProductDetails.Free',
+                    to: 'double',
+                    onError: 0,
+                    onNull: 0,
+                  },
+                },
               ],
             },
           },
           orderValue: {
-            $first: { $convert: { input: '$PaymentDetails.paymentmodeAmount', to: 'double', onError: 0, onNull: 0 } },
+            $first: {
+              $convert: {
+                input: '$PaymentDetails.paymentmodeAmount',
+                to: 'double',
+                onError: 0,
+                onNull: 0,
+              },
+            },
           },
         },
       },
       {
         $group: {
-          _id: mode === 'monthly'
-            ? { year: '$_id.year', month: '$_id.month', day: '$_id.day' }
-            : { year: '$_id.year', month: '$_id.month' },
+          _id:
+            mode === 'monthly'
+              ? { year: '$_id.year', month: '$_id.month', day: '$_id.day' }
+              : { year: '$_id.year', month: '$_id.month' },
           totalOrders: { $sum: 1 },
           totalItemsSold: { $sum: '$totalQty' },
           uniqueCustomers: { $addToSet: '$_id.customerId' },
@@ -395,7 +440,10 @@ export const fetchMonthlyReportService = async (options) => {
     const summary = {
       mode,
       year: parsedYear,
-      ...(mode === 'monthly' && { month: parsedMonth, monthName: MONTH_NAMES[parsedMonth - 1] }),
+      ...(mode === 'monthly' && {
+        month: parsedMonth,
+        monthName: MONTH_NAMES[parsedMonth - 1],
+      }),
       ...(mode === 'custom' && { startDate, endDate }),
       totalOrders: report.reduce((s, m) => s + m.totalOrders, 0),
       totalItemsSold: report.reduce((s, m) => s + m.totalItemsSold, 0),

@@ -39,6 +39,8 @@ app.get('/status', (req, res) => {
   res.send('Server is running');
 });
 
+app.use("/downloads", express.static(path.join(process.cwd(), "public/downloads")));
+
 // Routes import
 import authRouter from './modules/auth/auth.route.js';
 import categoryRouter from './modules/category/category.route.js';
@@ -58,6 +60,7 @@ import wishlistRouter from './modules/wishlist/wishlist.route.js';
 
 // Middleware import
 import { errorHandler } from './middlewares/errorHandler.middleware.js';
+import path from 'path';
 
 // Routes declaration
 app.use('/api/v1/auth', authRouter);
