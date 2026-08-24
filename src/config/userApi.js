@@ -3,7 +3,7 @@ const config = {
     userUpdateBaseUrl: `${import.meta.env.VITE_URL}/updateuser`,
     userAddressBaseUrl: `${import.meta.env.VITE_URL}/address`,
     setAddressBaseUrl: `${import.meta.env.VITE_URL}/setaddress`,
-    orderBaseUrl: `${import.meta.env.VITE_URL}/userorder`,
+    orderBaseUrl: `${import.meta.env.VITE_URL}/userOrder`,
     cartBaseUrl: `${import.meta.env.VITE_URL}`,
     searchProductsBaseUrl: `${import.meta.env.VITE_MEDIA_CLOUD_BASE_URL}/api/v1/products`,
 };
@@ -32,7 +32,7 @@ export const customerUrl = {
     getCustomers: `${config.cartBaseUrl}/getadmincustomer`,
 }
 export const adminOrderUrl = {
-    getAllOrders: `${config.cartBaseUrl}/getallorder`,
+    getAllOrders: `${config.cartBaseUrl}/api/v1/order`,
     updateOrderStatus: `${config.cartBaseUrl}/orderstatusupdate`,
 };
 export const userOrderUrl = {
@@ -40,7 +40,7 @@ export const userOrderUrl = {
 };
 //for order
 export const cartUrl = {
-    checkout: `${config.cartBaseUrl}/addorder`,
+    checkout:`${config.cartBaseUrl}/api/v1/order/${import.meta.env.VITE_SALE_ID}`,
     getCart: `${config.cartBaseUrl}/cartget`,
     updateCart: `${config.cartBaseUrl}/cartupdate`,
     removeFromCart: `${config.cartBaseUrl}/cartdelete`,

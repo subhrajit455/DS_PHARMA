@@ -165,8 +165,6 @@ const CategoriesList = () => {
                                     <TableHead className="w-16 font-semibold text-gray-700 text-[8px] sm:text-sm text-center" style={{ padding: '6px 8px' }}>SR NO</TableHead>
                                     <TableHead className="font-semibold text-gray-700 text-[8px] sm:text-sm" style={{ padding: '6px 8px' }}>Image</TableHead>
                                     <TableHead className="font-semibold text-gray-700 text-[8px] sm:text-sm" style={{ padding: '6px 8px' }}>Name</TableHead>
-                                    <TableHead className="font-semibold text-gray-700 text-[8px] sm:text-sm hidden sm:table-cell" style={{ padding: '6px 8px' }}>Slug</TableHead>
-                                    <TableHead className="font-semibold text-gray-700 text-[8px] sm:text-sm hidden md:table-cell text-center" style={{ padding: '6px 8px' }}>Products</TableHead>
                                     <TableHead className="font-semibold text-gray-700 text-[8px] sm:text-sm" style={{ padding: '6px 8px' }}>Visibility</TableHead>
                                     <TableHead className="text-right font-semibold text-gray-700 text-[8px] sm:text-sm" style={{ padding: '6px 8px' }}>Actions</TableHead>
                                 </TableRow>
@@ -215,10 +213,7 @@ const CategoriesList = () => {
                                                 <TableCell className="font-semibold text-gray-800 text-[8px] sm:text-sm" style={{ padding: '8px' }}>
                                                     {category.name}
                                                 </TableCell>
-                                                <TableCell className="text-gray-500 text-[8px] sm:text-xs hidden sm:table-cell font-mono" style={{ padding: '6px' }}>{category.slug || '-'}</TableCell>
-                                                <TableCell className="text-gray-900 text-[8px] sm:text-xs hidden md:table-cell text-center" style={{ padding: '6px' }}>
-                                                    <span className="px-2.5 py-0.5 bg-emerald-100 text-emerald-700 rounded-full text-[10px] font-bold ring-1 ring-inset ring-emerald-600/20">{productCount}</span>
-                                                </TableCell>
+                                               
                                                 <TableCell className="text-[8px] sm:text-xs text-center" style={{ padding: '6px' }}>
                                                     <Button
                                                         variant="ghost"

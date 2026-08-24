@@ -1,7 +1,7 @@
-
 import { userOrderUrl } from "@/config/userApi";
 import axios from "axios";
 import React, { useEffect, useState } from "react";
+import { OrderPDFButton } from "./OrderPDF";
 
 const Orders = () => {
   const [orders, setOrders] = useState([]);
@@ -13,31 +13,115 @@ const Orders = () => {
     return localStorage.getItem("authToken") || sessionStorage.getItem("token");
   };
   // 🔹 Fetch orders from backend
+  const fetchOrders = async () => {
+    setLoading(true);
+    setError("");
+
+    try {
+      const res = await axios.get(`${userOrderUrl.getAllOrders}`, {
+        headers: {
+          Authorization: `Bearer ${getAuthToken()}`,
+        },
+      });
+
+      setOrders(res.data.data || []);
+      console.log("Fetched orders:", res.data.data);
+    } catch (err) {
+      setError("❌ Failed to load orders");
+    } finally {
+      setLoading(false);
+    }
+  };
+
   useEffect(() => {
-    const fetchOrders = async () => {
-      try {
-        const res = await axios.get(`${userOrderUrl.getAllOrders}`, {
-          headers: {
-            Authorization: `Bearer ${getAuthToken()}`,
-          },
-        });
-
-        setOrders(res.data.orders || []);
-      } catch (err) {
-        setError("Failed to load orders");
-      } finally {
-        setLoading(false);
-      }
-    };
-
     fetchOrders();
   }, []);
 
+  const getOrderItems = (order) =>
+    order.orderItems || order.ProductDetails || [];
+  const getOrderId = (order) =>
+    order.OrderID || order.OrderNo || order._id || "";
+  const getOrderStatus = (order) => order.Status || order.orderStatus || "";
+  const getOrderTotal = (order) =>
+    order.totalPrice ||
+    order.PaymentDetails?.totalInvoiceValue ||
+    order.PaymentDetails?.totalAmount ||
+    0;
+  const getOrderDiscount = (order) =>
+    order.discount || order.PaymentDetails?.totalDiscountAmount || 0;
+  const getOrderShipping = (order) => order.shippingPrice || 0;
+  const getOrderPaymentMethod = (order) =>
+    order.paymentMethod ||
+    (order.PaymentDetails?.paymentmode === "1" ? "COD" : "PREPAID") ||
+    "";
+
   // 🔹 Loading / Error states
   if (loading) return <p style={{ textAlign: "center" }}>Loading orders...</p>;
-  if (error)
-    return <p style={{ textAlign: "center", color: "red" }}>{error}</p>;
 
+ if (error) {
+
+
+  return (
+    <div
+      style={{
+        minHeight: "100vh",
+        display: "flex",
+        alignItems: "center",
+        justifyContent: "center",
+        padding: 16,
+        background: "linear-gradient(#fef2f2, #fff)",
+      }}
+    >
+      <div
+        style={{
+          width: "100%",
+          maxWidth: 420,
+          backgroundColor: "#ffffff",
+          borderRadius: 16,
+          padding: 28,
+          textAlign: "center",
+          boxShadow: "0 10px 30px rgba(0,0,0,0.08)",
+        }}
+      >
+        {/* Icon */}
+       
+
+        {/* Title */}
+        <h2
+          style={{
+            margin: 0,
+            fontSize: 22,
+            color:"green",
+          }}
+        >
+          Please Login to view your orders
+        </h2>
+
+      
+        {/* Buttons */}
+        <div style={{ marginTop: 20, display: "flex", gap: 10, justifyContent: "center" }}>
+          
+         
+            <button
+              onClick={() => (window.location.href = "/login")}
+              style={{
+                padding: "10px 18px",
+                backgroundColor: "green",
+                color: "#fff",
+                border: "none",
+                borderRadius: 8,
+                fontWeight: 600,
+                cursor: "pointer",
+              }}
+            >
+              Login
+            </button>
+         
+        </div>
+      </div>
+    </div>
+  );
+}
   if (!selectedOrder) {
     return (
       <div
@@ -85,13 +169,14 @@ const Orders = () => {
           )}
           <div style={{ display: "flex", flexDirection: "column", gap: 24 }}>
             {orders.map((order) => {
-              const totalItems = order.orderItems.reduce(
-                (sum, item) => sum + item.Quantity,
+              const items = getOrderItems(order);
+              const totalItems = items.reduce(
+                (sum, item) => sum + (item.Quantity || item.quantity || 0),
                 0,
               );
               return (
                 <div
-                  key={order._id}
+                  key={getOrderId(order) || order._id}
                   onClick={() => setSelectedOrder(order)}
                   className=""
                   style={{
@@ -119,7 +204,9 @@ const Orders = () => {
                     <span style={{ fontWeight: 600, color: "#0f766e" }}>
                       Order ID:
                     </span>
-                    <span style={{ color: "#374151" }}>#{order._id}</span>
+                    <span style={{ color: "#374151" }}>
+                      #{getOrderId(order)}
+                    </span>
                   </div>
                   <div
                     style={{
@@ -136,13 +223,13 @@ const Orders = () => {
                     <span style={{ color: "#4b5563" }}>
                       Status:{" "}
                       <span style={{ fontWeight: 500 }}>
-                        {order.orderStatus}
+                        {getOrderStatus(order)}
                       </span>
                     </span>
                     <span style={{ color: "#4b5563" }}>
                       Total:{" "}
                       <span style={{ fontWeight: 500 }}>
-                        ₹{order.totalPrice}
+                        ₹{getOrderTotal(order)}
                       </span>
                     </span>
                     <span style={{ color: "#4b5563" }}>
@@ -156,7 +243,15 @@ const Orders = () => {
                       </span>
                     </span>
                   </div>
-                </div>
+                  <div style={{ display: "flex", justifyContent: "flex-end", marginTop: 12 }}>
+                    <div
+                      onClick={(e) => {
+                        e.stopPropagation();
+                      }}
+                    >
+                      <OrderPDFButton order={order} />
+                    </div>
+                  </div>                </div>
               );
             })}
           </div>
@@ -182,22 +277,35 @@ const Orders = () => {
       }}
     >
       <div style={{ width: "100%", maxWidth: 640 }}>
-        <button
-          onClick={() => setSelectedOrder(null)}
-          className=""
+        <div
           style={{
+            display: "flex",
+            justifyContent: "space-between",
+            alignItems: "center",
             marginBottom: 24,
-            padding: "8px 16px",
-            backgroundColor: "#14b8a6",
-            color: "#ffffff",
-            borderRadius: 8,
-            fontWeight: 600,
-            border: "none",
-            cursor: "pointer",
+            gap: 12,
           }}
         >
-          ← Back to Orders
-        </button>
+          <button
+            onClick={() => setSelectedOrder(null)}
+            className=""
+            style={{
+              padding: "8px 16px",
+              backgroundColor: "#14b8a6",
+              color: "#ffffff",
+              borderRadius: 8,
+              fontWeight: 600,
+              border: "none",
+              cursor: "pointer",
+            }}
+          >
+            ← Back to Orders
+          </button>
+
+          <div>
+            <OrderPDFButton order={selectedOrder} />
+          </div>
+        </div>
         <h2
           className=""
           style={{
@@ -229,7 +337,9 @@ const Orders = () => {
             }}
           >
             <span style={{ fontWeight: 600, color: "#0f766e" }}>Order ID:</span>
-            <span style={{ color: "#374151" }}>#{selectedOrder._id}</span>
+            <span style={{ color: "#374151" }}>
+              #{getOrderId(selectedOrder)}
+            </span>
           </div>
           <div
             style={{
@@ -242,30 +352,32 @@ const Orders = () => {
             <span style={{ color: "#4b5563" }}>
               Status:{" "}
               <span style={{ fontWeight: 500 }}>
-                {selectedOrder.orderStatus}
+                {getOrderStatus(selectedOrder)}
               </span>
             </span>
             <span style={{ color: "#4b5563" }}>
               Payment:{" "}
               <span style={{ fontWeight: 500 }}>
-                {selectedOrder.paymentMethod}
+                {getOrderPaymentMethod(selectedOrder)}
               </span>
             </span>
             <span style={{ color: "#4b5563" }}>
               Total:{" "}
               <span style={{ fontWeight: 500 }}>
-                ₹{selectedOrder.totalPrice}
+                ₹{getOrderTotal(selectedOrder)}
               </span>
             </span>
             <span style={{ color: "#4b5563" }}>
               Shipping:{" "}
               <span style={{ fontWeight: 500 }}>
-                ₹{selectedOrder.shippingPrice}
+                ₹{getOrderShipping(selectedOrder)}
               </span>
             </span>
             <span style={{ color: "#4b5563" }}>
               Discount:{" "}
-              <span style={{ fontWeight: 500 }}>₹{selectedOrder.discount}</span>
+              <span style={{ fontWeight: 500 }}>
+                ₹{getOrderDiscount(selectedOrder)}
+              </span>
             </span>
             <span style={{ color: "#4b5563" }}>
               Date:{" "}
@@ -298,7 +410,7 @@ const Orders = () => {
             marginBottom: 32,
           }}
         >
-          {selectedOrder.orderItems.map((item, index) => (
+          {getOrderItems(selectedOrder).map((item, index) => (
             <div
               key={index}
               className=""
@@ -314,8 +426,8 @@ const Orders = () => {
             >
               {/* ✅ Product Image */}
               <img
-                src={item.image}
-                alt={item.name}
+                src={item.image || item.imageUrl || "/placeholder.png"}
+                alt={item.name || item.code || "Product"}
                 style={{
                   width: 80,
                   height: 80,
@@ -341,7 +453,9 @@ const Orders = () => {
               >
                 <span style={{ color: "#374151" }}>
                   Product Code:{" "}
-                  <span style={{ fontWeight: 500 }}>{item.productCode}</span>
+                  <span style={{ fontWeight: 500 }}>
+                    {item.productCode || item.code || item.rid}
+                  </span>
                 </span>
 
                 <span style={{ color: "#374151" }}>
@@ -350,15 +464,19 @@ const Orders = () => {
                 </span>
 
                 <span style={{ color: "#374151" }}>
-                  Qty: <span style={{ fontWeight: 500 }}>{item.Quantity}</span>
+                  Qty:{" "}
+                  <span style={{ fontWeight: 500 }}>
+                    {item.Quantity || item.quantity || 0}
+                  </span>
                 </span>
 
                 <span style={{ color: "#374151" }}>
-                  Free: <span style={{ fontWeight: 500 }}>{item.Free}</span>
+                  Free:{" "}
+                  <span style={{ fontWeight: 500 }}>{item.Free || 0}</span>
                 </span>
 
                 <span style={{ color: "#374151", fontWeight: 600 }}>
-                  ₹{item.price}
+                  ₹{item.price || item.Rate || item.MRP || 0}
                 </span>
               </div>
             </div>
@@ -385,13 +503,17 @@ const Orders = () => {
             borderRadius: 8,
           }}
         >
-          <p>{selectedOrder.address}</p>
-          <p>{selectedOrder.street}</p>
           <p>
-            {selectedOrder.city}, {selectedOrder.state} -{" "}
-            {selectedOrder.postalCode}
+            {selectedOrder.CustomerDetails?.Address || selectedOrder.address}
           </p>
-          <p>{selectedOrder.landmark}</p>
+          <p>
+            {selectedOrder.CustomerDetails?.shipAdd1 || selectedOrder.street}
+          </p>
+          <p>{selectedOrder.CustomerDetails?.shipname || ""}</p>
+          <p>{selectedOrder.CustomerDetails?.shipAdd2 || ""}</p>
+          <p>{selectedOrder.CustomerDetails?.shipAdd3 || ""}</p>
+          <p>{selectedOrder.CustomerDetails?.CustName || ""}</p>
+          <p>{selectedOrder.CustomerDetails?.CustMobile || ""}</p>
         </div>
       </div>
     </div>

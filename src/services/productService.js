@@ -258,8 +258,13 @@ export const normalizeProduct = (p) => {
     mrp > price && mrp > 0 ? Math.round(((mrp - price) / mrp) * 100) : 0;
 
   // Normalize stock
-  const stock = Number(p.stock ?? 0);
-  const inStock = p.inStock !== false && stock > 0;
+  // Treat missing stock as "unknown" (prefer to show as available) rather than forcing to 0.
+  const stock =
+    p.stock !== undefined && p.stock !== null ? Number(p.stock) : undefined;
+
+  // Determine in-stock status only when stock is explicitly provided or explicitly false.
+  // This prevents products without stock info from appearing as out-of-stock.
+  const inStock = p.inStock !== false && (stock === undefined || stock > 0);
 
   return {
     ...p,
@@ -929,21 +934,27 @@ const getAllProducts = async ({ page = 1, limit = 12, filters = {} } = {}) => {
     const result = await resilientFetch(
       requestKey,
       async (signal) => {
-        const response = await apiClient.get(`${productfetchapi}/api/v1/products`, {
-          params: { page: pageNum, limit: limitNum, ...filters },
-          signal,
-        });
+        const response = await apiClient.get(
+          `${productfetchapi}/api/v1/products`,
+          {
+            params: { page: pageNum, limit: limitNum, ...filters },
+            signal,
+          },
+        );
         // console.log("response from getAllProducts in productService", response);
 
         const data = response.data?.data || response.data || [];
         const pagination = response.data?.pagination || {};
-        
+
         // Calculate hasMore based on actual data received vs limit
         // If we received exactly the limit amount and there are more pages, there might be more
-        const hasMore = Array.isArray(data) && data.length === limitNum && 
-                     ((pagination.totalPages && (pagination.currentPage || pageNum) < pagination.totalPages) ||
-                      !pagination.totalPages); // If no totalPages is provided, assume there could be more
-        
+        const hasMore =
+          Array.isArray(data) &&
+          data.length === limitNum &&
+          ((pagination.totalPages &&
+            (pagination.currentPage || pageNum) < pagination.totalPages) ||
+            !pagination.totalPages); // If no totalPages is provided, assume there could be more
+
         return {
           data: Array.isArray(data)
             ? data.map(normalizeProduct).filter(Boolean)

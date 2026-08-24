@@ -4,7 +4,7 @@ import { motion as Motion, AnimatePresence } from 'framer-motion';
 import { CartButton } from '@/user/components/navigation/CartButton';
 import { SearchBar } from '@/user/components/navigation/SearchBar';
 import SearchInput from '@/user/components/search/SearchInput';
-
+import logo from "../../../assets/images/Logo.png";
 /**
  * Mobile top bar component
  */
@@ -29,8 +29,10 @@ export const MobileTopBar = ({ totalCartItems }) => {
             color: '#000000',
             letterSpacing: '0.05em'
           }}
+          onClick={() => navigate("/")}
+          className="cursor-pointer"
         >
-          DS Pharma 
+          <img src={logo} alt="Logo" className="w-32 h-10 cursor-pointer" />
         </span>
 
           <div className="flex items-center gap-3">

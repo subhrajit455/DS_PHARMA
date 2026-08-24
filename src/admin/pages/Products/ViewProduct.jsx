@@ -15,7 +15,7 @@ import {
   FlaskConical,
   Percent,
   CircleDollarSign,
-  Barcode
+  Barcode,
 } from "lucide-react";
 import { productUrl } from "@/config/adminApi";
 import { Button } from "@/admin/components/ui/Button";
@@ -56,7 +56,9 @@ const ViewProductModal = ({ open, onClose, productId }) => {
     const fetchProduct = async () => {
       setLoading(true);
       try {
-        const res = await axios.get(`${productUrl.getAllProducts}/details/${productId}`);
+        const res = await axios.get(
+          `${productUrl.getAllProducts}/details/${productId}`,
+        );
         setProduct(res.data.data || res.data);
       } catch {
         toastUtil.error("Failed to fetch product details");
@@ -70,7 +72,7 @@ const ViewProductModal = ({ open, onClose, productId }) => {
 
   const getCategoryName = (category) => {
     if (!category) return "Uncategorized";
-    if (typeof category === 'object' && category.name) return category.name;
+    if (typeof category === "object" && category.name) return category.name;
     return categoryMap[category] || category;
   };
 
@@ -87,10 +89,21 @@ const ViewProductModal = ({ open, onClose, productId }) => {
 
   return (
     <div className="fixed inset-0 z-50 flex items-center justify-center bg-slate-900/60 backdrop-blur-md p-4 animate-in fade-in duration-300">
-      <div className="bg-white w-full max-w-6xl rounded-[2.5rem] shadow-2xl overflow-hidden flex flex-col h-[90vh] animate-in slide-in-from-bottom-8 duration-500 border border-white/20">
-
+      <div
+        className="bg-white w-full max-w-6xl rounded-[2.5rem] shadow-2xl overflow-hidden flex flex-col h-[90vh] animate-in slide-in-from-bottom-8 duration-500 border border-white/20"
+        style={{
+          boxShadow:
+            "0 25px 50px -12px rgba(0,0,0,0.25), 0 0 0 1px rgba(255,255,255,0.05), 0 0 40px rgba(16,185,129,0.1)",
+        }}
+      >
         {/* Header Section */}
-        <div className="relative border-b shrink-0 bg-gradient-to-r from-emerald-50/50 to-teal-50/50 p-8 sm:p-10">
+        <div
+          className="relative border-b shrink-0 p-8 sm:p-10"
+          style={{
+            background:
+              "linear-gradient(135deg, rgba(16,185,129,0.05) 0%, rgba(20,184,166,0.05) 50%, rgba(6,182,212,0.05) 100%), radial-gradient(circle at 20% 50%, rgba(16,185,129,0.05) 0%, transparent 50%), radial-gradient(circle at 80% 20%, rgba(20,184,166,0.05) 0%, transparent 50%)",
+          }}
+        >
           <div className="flex flex-col sm:flex-row justify-between items-start sm:items-center gap-6">
             <div className=" " style={{ marginLeft: "18px" }}>
               <div className="flex items-center gap-3 ">
@@ -98,21 +111,38 @@ const ViewProductModal = ({ open, onClose, productId }) => {
                   PRODUCT #{product?.rid || "---"}
                 </Badge>
                 {product?.categoryDetails?.name && (
-                  <Badge variant="outline" className="border-emerald-200 text-emerald-700 font-bold bg-emerald-50 text-red-500">
+                  <Badge
+                    variant="outline"
+                    className="border-emerald-200 text-emerald-700 font-bold bg-emerald-50"
+                  >
                     {product.categoryDetails.name}
                   </Badge>
                 )}
               </div>
               <h2 className="text-2xl sm:text-3xl font-black text-slate-900 tracking-tight flex items-center gap-3">
                 <Package className="w-8 h-8 text-emerald-600" />
-                {loading ? "Loading..." : product?.name || "Product Name"}
+                {loading
+                  ? "Loading..."
+                  : (product?.name || "Product Name").replace(/\*\*/g, "")}
               </h2>
               <div className="flex items-center gap-2 text-slate-500 font-medium">
                 <Building2 className="w-4 h-4 text-slate-400" />
-                <span className="text-sm truncate max-w-md">{product?.company || "Manufacturer Unknown"}</span>
+                <span className="text-sm truncate max-w-md">
+                  {product?.company || "Manufacturer Unknown"}
+                </span>
               </div>
             </div>
-
+            {product?.images?.length > 0 && (
+              <div className="hidden sm:block">
+                <div className="w-32 h-32 rounded-3xl overflow-hidden border-4 border-white shadow-xl hover:scale-105 transition-transform duration-300">
+                  <img
+                    src={product.images[0].url}
+                    alt="product"
+                    className="w-full h-full object-cover"
+                  />
+                </div>
+              </div>
+            )}
             <button
               onClick={onClose}
               className="absolute top-6 right-6 p-2 rounded-full hover:bg-slate-100 transition-colors text-slate-400 border border-transparent hover:border-slate-200"
@@ -128,13 +158,14 @@ const ViewProductModal = ({ open, onClose, productId }) => {
             {loading ? (
               <div className="flex flex-col items-center justify-center py-32 space-y-4">
                 <div className="w-12 h-12 border-4 border-emerald-600 border-t-transparent rounded-full animate-spin"></div>
-                <p className="text-slate-400 font-bold uppercase tracking-widest text-xs">Synchronizing Product Data...</p>
+                <p className="text-slate-400 font-bold uppercase tracking-widest text-xs">
+                  Synchronizing Product Data...
+                </p>
               </div>
             ) : product ? (
-              <div className="grid grid-cols-1 lg:grid-cols-12 gap-10">
-
+              <div className="grid grid-cols-1 md:grid-cols-12 gap-10">
                 {/* LH Column - Media & Key Metrics */}
-                <div className="lg:col-span-4 space-y-8">
+                <div className="lg:col-span-4 md:col-span-4 space-y-8">
                   <section className="space-y-4">
                     <h4 className="text-xs font-black uppercase tracking-widest text-slate-400 flex items-center gap-2">
                       <Layers className="w-4 h-4" /> Media Assets
@@ -142,14 +173,25 @@ const ViewProductModal = ({ open, onClose, productId }) => {
                     <div className="grid grid-cols-2 gap-4">
                       {product.images?.length > 0 ? (
                         product.images.map((img, i) => (
-                          <div key={i} className={cn(
-                            "group relative aspect-square rounded-3xl border-2 overflow-hidden bg-white transition-all hover:border-emerald-500/50 shadow-sm",
-                            i === 0 ? "col-span-2 border-emerald-100 shadow-xl shadow-emerald-50" : "border-slate-100"
-                          )}>
-                            <img src={img.url} alt="product" className="w-full h-full object-cover group-hover:scale-110 transition-transform duration-700" />
+                          <div
+                            key={i}
+                            className={cn(
+                              "group relative aspect-square rounded-3xl border-2 overflow-hidden bg-white transition-all hover:border-emerald-500/50 shadow-sm",
+                              i === 0
+                                ? "col-span-2 border-emerald-100 shadow-xl shadow-emerald-50"
+                                : "border-slate-100",
+                            )}
+                          >
+                            <img
+                              src={img.url}
+                              alt="product"
+                              className="w-full h-full object-cover group-hover:scale-110 transition-transform duration-700"
+                            />
                             {i === 0 && (
                               <div className="absolute top-3 left-3">
-                                <Badge className="bg-emerald-500 text-white border-0 font-bold px-3 py-1 text-[9px] shadow-lg">PRIMARY</Badge>
+                                <Badge className="bg-emerald-500 text-white border-0 font-bold px-3 py-1 text-[9px] shadow-lg">
+                                  PRIMARY
+                                </Badge>
                               </div>
                             )}
                           </div>
@@ -157,51 +199,101 @@ const ViewProductModal = ({ open, onClose, productId }) => {
                       ) : (
                         <div className="col-span-2 aspect-video rounded-3xl bg-slate-100 border-2 border-dashed border-slate-200 flex flex-col items-center justify-center gap-3">
                           <ImageIcon className="w-10 h-10 text-slate-300" />
-                          <span className="text-xs font-bold text-slate-400 uppercase tracking-tight">No imagery available</span>
+                          <span className="text-xs font-bold text-slate-400 uppercase tracking-tight">
+                            No imagery available
+                          </span>
                         </div>
                       )}
                     </div>
                   </section>
 
-                  <section className="bg-white rounded-[2rem] border border-slate-100 shadow-sm p-6 space-y-6">
+                  <section className="bg-white rounded-4xl border border-slate-100 shadow-sm p-6 space-y-6">
                     <h4 className="text-xs font-black uppercase tracking-widest text-slate-400 flex items-center gap-2">
                       <Truck className="w-4 h-4" /> Quick Inventory
                     </h4>
                     <div className="space-y-4">
-                      <ProgressMetric label="Current Stock" value={product.stock} unit="Units" icon={Archive} color="emerald" />
-                      <ProgressMetric label="Batch Number" value={product.curbatch} icon={Barcode} color="blue" />
-                      <ProgressMetric label="Expiry Date" value={formatDate(product.exp)} icon={Calendar} color="amber" />
+                      <ProgressMetric
+                        label="Current Stock"
+                        value={product.stock}
+                        unit="Units"
+                        icon={Archive}
+                        color="emerald"
+                      />
+                      <ProgressMetric
+                        label="Batch Number"
+                        value={product.curbatch}
+                        icon={Barcode}
+                        color="blue"
+                      />
+                      <ProgressMetric
+                        label="Expiry Date"
+                        value={formatDate(product.exp)}
+                        icon={Calendar}
+                        color="amber"
+                      />
                     </div>
                   </section>
                 </div>
 
                 {/* RH Column - Detailed Specs */}
-                <div className="lg:col-span-8 space-y-10">
-
+                <div className="lg:col-span-8 md:col-span-8 space-y-10">
                   {/* General Info */}
                   <div className="space-y-4">
                     <h4 className="text-xs font-black uppercase tracking-widest text-slate-400 flex items-center gap-2">
                       <Tag className="w-4 h-4" /> Product Classification
                     </h4>
                     <div className="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 gap-4">
-                      <SpecCard icon={Tag} label="Category" value={product.categoryDetails.name} />
-                      <SpecCard icon={Building2} label="Manufacturer" value={product.company} />
-                      <SpecCard icon={FlaskConical} label="Salt/Composition" value={product.Salt} />
-                      <SpecCard icon={Hash} label="Shop Code" value={product.shopcode} />
-                      <SpecCard icon={Layers} label="Conversion" value={product.Conversion} />
-                      <SpecCard icon={Database} label="Marg Code" value={product.MargCode} />
+                      <SpecCard
+                        icon={Tag}
+                        label="Category"
+                        value={product.categoryDetails.name}
+                      />
+                      <SpecCard
+                        icon={Building2}
+                        label="Manufacturer"
+                        value={product.company}
+                      />
+                      <SpecCard
+                        icon={FlaskConical}
+                        label="Salt/Composition"
+                        value={product.Salt}
+                      />
+                      <SpecCard
+                        icon={Hash}
+                        label="Shop Code"
+                        value={product.shopcode}
+                      />
+                      <SpecCard
+                        icon={Layers}
+                        label="Conversion"
+                        value={product.Conversion}
+                      />
+                      <SpecCard
+                        icon={Database}
+                        label="Marg Code"
+                        value={product.MargCode}
+                      />
                     </div>
                   </div>
 
                   {/* Financial Details */}
                   <div className="space-y-4">
-                    <h4 className="text-xs font-black uppercase tracking-widest text-slate-400 flex items-center gap-2 text-emerald-600">
-                      <CircleDollarSign className="w-4 h-4" /> Pricing & Financials
+                    <h4 className="text-xs font-black uppercase tracking-widest flex items-center gap-2 text-emerald-600">
+                      <CircleDollarSign className="w-4 h-4" /> Pricing &
+                      Financials
                     </h4>
                     <div className="grid grid-cols-1 sm:grid-cols-3 gap-4">
                       <PriceCard label="MRP" value={product.MRP} type="mrp" />
-                      <PriceCard label="Sale Rate" value={product.Rate} type="rate" />
-                      <PriceCard label="Purchase Rate" value={product.PRate} type="prate" />
+                      <PriceCard
+                        label="Sale Rate"
+                        value={product.Rate}
+                        type="rate"
+                      />
+                      <PriceCard
+                        label="Purchase Rate"
+                        value={product.PRate}
+                        type="prate"
+                      />
                     </div>
                   </div>
 
@@ -211,10 +303,26 @@ const ViewProductModal = ({ open, onClose, productId }) => {
                       <Percent className="w-4 h-4" /> Offers & Secondary IDs
                     </h4>
                     <div className="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-4 gap-4">
-                      <SmallSpec icon={Percent} label="Deal Offer" value={product.Deal} />
-                      <SmallSpec icon={Archive} label="Free Item" value={product.Free} />
-                      <SmallSpec icon={Barcode} label="GCode-6" value={product.Gcode6} />
-                      <SmallSpec icon={CreditCard} label="Marg GCode" value={product.gcode} />
+                      <SmallSpec
+                        icon={Percent}
+                        label="Deal Offer"
+                        value={product.Deal}
+                      />
+                      <SmallSpec
+                        icon={Archive}
+                        label="Free Item"
+                        value={product.Free}
+                      />
+                      <SmallSpec
+                        icon={Barcode}
+                        label="GCode-6"
+                        value={product.Gcode6}
+                      />
+                      <SmallSpec
+                        icon={CreditCard}
+                        label="Marg GCode"
+                        value={product.gcode}
+                      />
                     </div>
                   </div>
 
@@ -236,7 +344,9 @@ const ViewProductModal = ({ open, onClose, productId }) => {
                 <div className="p-8 bg-slate-50 rounded-full">
                   <Package className="w-12 h-12 text-slate-300" />
                 </div>
-                <p className="text-slate-400 font-bold uppercase tracking-widest text-xs">Resource Not Found</p>
+                <p className="text-slate-400 font-bold uppercase tracking-widest text-xs">
+                  Resource Not Found
+                </p>
               </div>
             )}
           </div>
@@ -246,7 +356,9 @@ const ViewProductModal = ({ open, onClose, productId }) => {
         <div className="shrink-0 p-8 border-t flex justify-between items-center bg-white">
           <div className="flex items-center gap-3 text-slate-400">
             <div className="w-2 h-2 rounded-full bg-emerald-500 animate-pulse"></div>
-            <span className="text-xs font-black uppercase tracking-tight">Active Product Record</span>
+            <span className="text-xs font-black uppercase tracking-tight">
+              Active Product Record
+            </span>
           </div>
           <Button
             variant="outline"
@@ -270,8 +382,12 @@ const SpecCard = ({ icon: Icon, label, value }) => (
         <Icon className="w-4 h-4" />
       </div>
       <div className="space-y-1">
-        <label className="text-[10px] font-black text-slate-400 uppercase tracking-widest leading-none">{label}</label>
-        <p className="font-bold text-slate-800 text-sm break-words">{value || "---"}</p>
+        <label className="text-[10px] font-black text-slate-400 uppercase tracking-widest leading-none">
+          {label}
+        </label>
+        <p className="font-bold text-slate-800 text-sm break-words">
+          {value || "---"}
+        </p>
       </div>
     </div>
   </div>
@@ -281,27 +397,42 @@ const SmallSpec = ({ icon: Icon, label, value }) => (
   <div className="bg-white border border-slate-100 rounded-2xl px-4 py-3 flex items-center justify-between group">
     <div className="flex items-center gap-2">
       <Icon className="w-3 h-3 text-slate-300" />
-      <span className="text-[10px] font-black text-slate-400 uppercase tracking-tight">{label}</span>
+      <span className="text-[10px] font-black text-slate-400 uppercase tracking-tight">
+        {label}
+      </span>
     </div>
     <span className="text-xs font-bold text-slate-800">{value || "0"}</span>
   </div>
 );
 
 const PriceCard = ({ label, value, type }) => (
-  <div className={cn(
-    "rounded-[2rem] p-6 border-2 flex flex-col gap-2 relative overflow-hidden",
-    type === "mrp" ? "bg-slate-50 border-slate-100" :
-      type === "rate" ? "bg-emerald-50 border-emerald-100" : "bg-blue-50 border-blue-100"
-  )}>
-    <label className="text-[10px] font-black uppercase tracking-widest text-slate-400 relative z-10 text-center">{label}</label>
-    <p className={cn(
-      "text-2xl font-black tracking-tight relative z-10 text-center",
-      type === "mrp" ? "text-slate-900" :
-        type === "rate" ? "text-emerald-700" : "text-blue-700"
-    )}>
-      ₹{Number(value || 0).toLocaleString('en-IN', { minimumFractionDigits: 2 })}
+  <div
+    className={cn(
+      "rounded-4xl p-6 border-2 flex flex-col gap-2 relative overflow-hidden",
+      type === "mrp"
+        ? "bg-slate-50 border-slate-100"
+        : type === "rate"
+          ? "bg-emerald-50 border-emerald-100"
+          : "bg-blue-50 border-blue-100",
+    )}
+  >
+    <label className="text-[10px] font-black uppercase tracking-widest text-slate-400 relative z-10 text-center">
+      {label}
+    </label>
+    <p
+      className={cn(
+        "text-2xl font-black tracking-tight relative z-10 text-center",
+        type === "mrp"
+          ? "text-slate-900"
+          : type === "rate"
+            ? "text-emerald-700"
+            : "text-blue-700",
+      )}
+    >
+      ₹
+      {Number(value || 0).toLocaleString("en-IN", { minimumFractionDigits: 2 })}
     </p>
-    <div className="absolute right-[-10px] bottom-[-10px] opacity-10 text-slate-300">
+    <div className="absolute -right-2.5 -bottom-2.5 opacity-10 text-slate-300">
       <CircleDollarSign className="w-20 h-20" />
     </div>
   </div>
@@ -312,9 +443,13 @@ const ProgressMetric = ({ label, value, icon: Icon, color }) => (
     <div className="flex justify-between items-end">
       <div className="flex items-center gap-2">
         <Icon className={cn("w-4 h-4", `text-${color}-500`)} />
-        <span className="text-[11px] font-black text-slate-500 uppercase tracking-tight">{label}</span>
+        <span className="text-[11px] font-black text-slate-500 uppercase tracking-tight">
+          {label}
+        </span>
       </div>
-      <span className="text-sm font-black text-slate-900">{value || "---"}</span>
+      <span className="text-sm font-black text-slate-900">
+        {value || "---"}
+      </span>
     </div>
     <div className="h-1.5 bg-slate-100 rounded-full overflow-hidden">
       <div className={cn("h-full rounded-full w-full", `bg-${color}-500`)} />

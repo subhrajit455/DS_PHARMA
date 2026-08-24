@@ -15,6 +15,7 @@ import AnnouncementsList from './pages/Announcements/AnnouncementsList';
 import MarqueeForm from './pages/Announcements/MarqueeForm';
 import FeaturedProducts from './pages/Products/FeaturedProducts';
 import ContactList from './pages/Contact/ContactList';
+import RequestList from './pages/Products/RequestList';
 
 const AdminRouter = () => {
   return (
@@ -29,6 +30,7 @@ const AdminRouter = () => {
         <Route path="products/featured" element={<FeaturedProducts />} />
         <Route path="products/:id" element={<ProductDetails />} />
         <Route path="products/:id/edit" element={<ProductForm />} />
+        <Route path="requests" element={<RequestList />} />
         
         {/* Categories */}
         <Route path="categories" element={<CategoriesList />} />

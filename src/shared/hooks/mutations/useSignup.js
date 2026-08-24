@@ -21,6 +21,7 @@ export const useSignup = () => {
     },
 
     onSuccess: (response) => {
+          toastUtil.success("Thank you for registering! We have received your details and will get back to you shortly.");
       let user = response.data?.user || response.user;
       const token = response.data?.token || response.token;
 

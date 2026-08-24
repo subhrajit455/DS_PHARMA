@@ -8,7 +8,9 @@ export const API_ENDPOINTS = {
   // Products (Generic - Admin)
   PRODUCTS: "product",
   PRODUCT_BY_ID: (id) => `product/${id}`, 
-  PRODUCT_ALL: "product",
+  PRODUCT_ALL: "api/v1/products",
+   ADMIN_LOGIN: "api/v1/auth/login",
+
 
   // Products (User-Facing - New Backend APIs)
   PRODUCT_USER_SEARCH: "productusersearch",
@@ -37,7 +39,7 @@ export const API_ENDPOINTS = {
   CART_REMOVE: "cart/remove",
 
   // Orders
-  ORDERS: "orders",
+  ORDERS: (salesID) => `api/v1/order/${salesID}`,
   ORDER_BY_ID: (id) => `orders/${id}`,
   CREATE_ORDER: "orders/create",
 
@@ -72,7 +74,7 @@ export const API_ENDPOINTS = {
   DELETE_ADDRESS: (id) => `addresses/${id}`,
 
   // Title / Heading (Marquee System)
-  GET_HEADINGS: "getheading",
+  GET_HEADINGS:() => "getheading",
   GET_HEADING_BY_ID: (id) => `getheadingbyid/${id}`,
   UPDATE_HEADING: (id) => `updateheading/${id}`,
   DELETE_HEADING: (id) => `deleteheading/${id}`,

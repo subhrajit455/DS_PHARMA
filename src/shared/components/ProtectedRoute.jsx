@@ -1,7 +1,7 @@
-import React from 'react';
-import { Navigate, useLocation } from 'react-router-dom';
-import { useAuthStore } from '@/store/useAuthStore';
-import PageLoader from './loaders/PageLoader';
+import React from "react";
+import { Navigate, useLocation } from "react-router-dom";
+import { useAuthStore } from "@/store/useAuthStore";
+import PageLoader from "./loaders/PageLoader";
 
 /**
  * Protected Route Component
@@ -10,6 +10,16 @@ import PageLoader from './loaders/PageLoader';
 const ProtectedRoute = ({ children, adminOnly = false }) => {
   const { isAuthenticated, user, isLoading } = useAuthStore();
   const location = useLocation();
+
+  // If store has not hydrated yet, show a loader to avoid redirect flashes
+  const hasHydrated =
+    typeof useAuthStore.persist?.hasHydrated === "function"
+      ? useAuthStore.persist.hasHydrated()
+      : true;
+
+  if (!hasHydrated) {
+    return <PageLoader />;
+  }
 
   // If still loading auth state, show a loader
   if (isLoading) {
@@ -23,7 +33,7 @@ const ProtectedRoute = ({ children, adminOnly = false }) => {
 
   // If adminOnly is true and user is not an admin, redirect to home
   // Assuming backend returns role: 'admin' for admin users
-  if (adminOnly && user?.role !== 'admin') {
+  if (adminOnly && user?.role !== "admin") {
     return <Navigate to="/" replace />;
   }
 

@@ -18,6 +18,7 @@ export const SortDropdown = ({ currentSort, onSortChange }) => {
     { value: "price_asc", label: "Price: Low to High" },
     { value: "price_desc", label: "Price: High to Low" },
     { value: "name_asc", label: "Name: A to Z" },
+    { value: "name_desc", label: "Name: Z to A" },
   ];
 
   const currentLabel =
@@ -157,7 +158,7 @@ export const SearchFilters = ({
     { label: "All Prices", value: "all" },
     { label: "Under ₹100", value: "0-100" },
     { label: "₹100 - ₹500", value: "100-500" },
-    { label: "Over ₹500", value: "500-10000" },
+    { label: "₹500 - ₹1000", value: "500-1000" },
   ];
 
   // Helper change handlers...
@@ -211,7 +212,7 @@ export const SearchFilters = ({
         </h3>
       </div>
 
-      <FilterSection
+      {/* <FilterSection
         title="Categories"
         icon={Tag}
         isOpen={openSections.categories}
@@ -238,7 +239,7 @@ export const SearchFilters = ({
             </span>
           </label>
         ))}
-      </FilterSection>
+      </FilterSection> */}
 
       <FilterSection
         title="Price Range"
@@ -310,7 +311,7 @@ export const SearchFilters = ({
                 style={{ padding: "3px 5px" }}
                 onClick={() => {
                   const min = Number(minPrice) || 0;
-                  const max = Number(maxPrice) || 10000;
+                  const max = Number(maxPrice) || 1000;
                   if (min > max) {
                     alert("Min price cannot be greater than Max price");
                     return;
@@ -330,7 +331,7 @@ export const SearchFilters = ({
         </div>
       </FilterSection>
 
-      <FilterSection
+      {/* <FilterSection
         title="Availability"
         icon={ShoppingBag}
         isOpen={openSections.availability}
@@ -355,9 +356,9 @@ export const SearchFilters = ({
             Exclude Out of Stock
           </span>
         </label>
-      </FilterSection>
+      </FilterSection> */}
 
-      <FilterSection
+      {/* <FilterSection
         title="Prescription"
         icon={Percent} // used percent merely as visual placeholder, maybe "FileText" is better but using Lucide icons available
         isOpen={openSections.type}
@@ -387,7 +388,7 @@ export const SearchFilters = ({
             OTC Products Only
           </span>
         </label>
-      </FilterSection>
+      </FilterSection> */}
 
       {/* View All Products Button */}
       {onViewAll && (

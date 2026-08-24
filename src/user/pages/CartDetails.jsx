@@ -55,6 +55,9 @@ const CartDetails = () => {
 
   const [deliveryAddress, setDeliveryAddress] = useState(null);
 
+  // State for thank you modal
+  const [showThankYouModal, setShowThankYouModal] = useState(false);
+
   // Load Razorpay script
   useEffect(() => {
     const script = document.createElement("script");
@@ -151,7 +154,7 @@ const CartDetails = () => {
         }
       } catch (error) {
         console.error("Error fetching cart items:", error);
-        toastUtil.error("Failed to load cart items. Please refresh the page.");
+        toastUtil.error("Please login to view your cart");
         setLocalCartItems([]);
       } finally {
         setIsLoadingCart(false);
@@ -364,6 +367,11 @@ const CartDetails = () => {
       }, 0),
     );
 
+    const totalQuantity = cartItems.reduce(
+      (sum, item) => sum + (Number(item.quantity) || 0),
+      0,
+    );
+
     const productDiscount = cartItems.reduce((sum, item) => {
       const price = Number(item.price || item.unitPrice || item.Rate || 0);
       const originalPrice = Number(
@@ -397,6 +405,7 @@ const CartDetails = () => {
 
     return {
       totalCartValue,
+      totalQuantity,
       discount: Math.round(productDiscount),
       coupon: finalCouponDiscount,
       gst,
@@ -445,7 +454,7 @@ const CartDetails = () => {
     }
 
     // Update currentUser reference for subsequent logic
-    const userId = effectiveUser._id || effectiveUser.id;
+    const userId = effectiveUser.rid || effectiveUser.rid;
     const userName = effectiveUser.name || "Guest User";
     const userEmail = effectiveUser.email || "user@example.com";
     const userPhone = effectiveUser.phone || "";
@@ -486,16 +495,16 @@ const CartDetails = () => {
     }
 
     // 5. Validate cart items data integrity
-    const invalidItems = cartItems.filter(
-      (item) => !item._id || !item.price || !item.name,
-    );
-    if (invalidItems.length > 0) {
-      console.log("[CartDetails] Invalid items:", invalidItems);
-      setValidationError(
-        "Some items in your cart have invalid data. Please refresh the page and try again.",
-      );
-      return;
-    }
+    // const invalidItems = cartItems.filter(
+    //   (item) => !item._id || !item.price || !item.name,
+    // );
+    // if (invalidItems.length > 0) {
+    //   console.log("[CartDetails] Invalid items:", invalidItems);
+    //   setValidationError(
+    //     "Some items in your cart have invalid data. Please refresh the page and try again.",
+    //   );
+    //   return;
+    // }
 
     // 6. Validate totals
     if (!totals || totals.total < 0) {
@@ -508,8 +517,36 @@ const CartDetails = () => {
 
     // All validations passed - prepare and place order with checkout API
     const orderPayload = {
-      user: userId,
-      orderItems: cartItems.map((item) => {
+      Sid: import.meta.env.VITE_STORE_SID || "301245", // replace with real store ID
+      OrderID: `${Date.now()}`, // replace with server-generated order id if available
+      OrderNo: `${Date.now()}`, // replace with server-generated order number if available
+      TotalQuantity: totals.totalQuantity || 0,
+      CustomerDetails: {
+        CustomerID: userId || "",
+        Lat: effectiveUser.lat || "",
+        Lng: effectiveUser.lng || "",
+        Address: deliveryAddress.address || "",
+        GpsID: effectiveUser.gpsId || "0",
+        UserType: effectiveUser.userType || "1",
+        Points: (effectiveUser.points != null
+          ? effectiveUser.points
+          : "0.00"
+        ).toString(),
+        Discounts: (totals.discount || 0).toString(),
+        Transport: effectiveUser.transport || "",
+        Delivery: effectiveUser.delivery || "",
+        Bankname: effectiveUser.bankName || "",
+        BankAdd1: effectiveUser.bankAdd1 || "",
+        BankAdd2: effectiveUser.bankAdd2 || "",
+        shipname: deliveryAddress.name || "",
+        shipAdd1: deliveryAddress.address || "",
+        shipAdd2: deliveryAddress.street || "",
+        shipAdd3: deliveryAddress.landmark || "",
+        order_remarks: effectiveUser.orderRemarks || "",
+        CustName: effectiveUser.name || "",
+        CustMobile: effectiveUser.phone || "",
+      },
+      ProductDetails: cartItems.map((item) => {
         // Get first image URL
         let imageUrl = "";
         if (
@@ -523,30 +560,50 @@ const CartDetails = () => {
         }
 
         return {
+          _id: item._id || item.id || "",
+          rid: item.rid || "",
+          catcode: item.catcode || "",
+          code: item.productCode || item.code || "",
           name: item.name || "",
-          productCode: item.productCode || item.rid || "",
-          Quantity: item.quantity,
-          Free: item.free || 0,
-          price: item.price,
+          stock: String(item.stock ?? ""),
+          remark: item.remark || "",
+          company: item.company || "",
+          shopcode: item.shopcode || "",
+          MRP: Number(item.originalPrice ?? item.mrp ?? item.MRP ?? 0),
+          Rate: Number(item.price ?? 0),
+          Quantity: Number(item.quantity ?? item.qty ?? 1),
+          Deal: Number(item.deal ?? 0),
+          Free: Number(item.free ?? 0),
+          PRate: Number(item.PRate ?? 0),
+          Is_Deleted: item.isDeleted ? "1" : "0",
+          curbatch: item.curbatch || "",
+          exp: item.exp || "",
+          gcode: item.gcode || "",
+          MargCode: item.MargCode || "",
+          Conversion: item.Conversion || "0",
+          Salt: item.Salt || "",
+          ENCODE: item.ENCODE || "",
+          remarks: item.remarks || "",
+          Gcode6: item.Gcode6 || "",
+          ProductCode: item.ProductCode || "",
           image: imageUrl,
         };
       }),
-      paymentMethod: paymentMethod === "cod" ? "COD" : "PREPAID",
-      orderStatus: "Processing",
-      shippingPrice: totals.deliveryCharges,
-      discount: totals.discount + totals.coupon,
-      totalPrice: totals.total,
-      paidAt: paymentMethod === "cod" ? null : new Date().toISOString(),
-      address: deliveryAddress.address || "",
-      street: deliveryAddress.street || "",
-      city: deliveryAddress.city || "",
-      state: deliveryAddress.state || "",
-      postalCode: deliveryAddress.postalCode || deliveryAddress.pincode || "",
-      district: deliveryAddress.district || "",
-      landmark: deliveryAddress.landmark || "",
+      PaymentDetails: {
+        paymentmode: paymentMethod === "cod" ? "1" : "2",
+        paymentmodeAmount: totals.total || 0,
+        payment_remarks: "",
+        gstType: "cgst_sgst",
+        totalAmount: totals.total || 0,
+        totalTaxAmount: totals.gst || 0,
+        totalDiscountAmount: totals.discount || 0,
+        totalInvoiceValue: totals.total || 0,
+        paymentStatus: paymentMethod === "cod" ? "PENDING" : "COMPLETED",
+      },
     };
 
     console.log("[CartDetails] Checkout payload:", orderPayload);
+    // return; // Remove this line after testing payload structure
 
     // If COD, proceed directly
     if (paymentMethod === "cod") {
@@ -564,7 +621,7 @@ const CartDetails = () => {
         if (setCartItems) {
           setCartItems([]);
         }
-        navigate("/orders");
+        setShowThankYouModal(true);
       } catch (error) {
         console.error("Error placing order:", error);
         toastError(
@@ -659,11 +716,92 @@ const CartDetails = () => {
 
                 try {
                   const finalOrderPayload = {
-                    ...orderPayload,
-                    paymentMethod: "PREPAID",
-                    paidAmount: amountToCharge,
-                    dueAmount: 0,
-                    paidAt: new Date().toISOString(),
+                    Sid: import.meta.env.VITE_STORE_SID || "301245", // replace with real store ID
+                    OrderID: `${Date.now()}`, // replace with server-generated order id if available
+                    OrderNo: `${Date.now()}`, // replace with server-generated order number if available
+                    TotalQuantity: totals.totalQuantity || 0,
+                    CustomerDetails: {
+                      CustomerID: userId || "",
+                      Lat: effectiveUser.lat || "",
+                      Lng: effectiveUser.lng || "",
+                      Address: deliveryAddress.address || "",
+                      GpsID: effectiveUser.gpsId || "0",
+                      UserType: effectiveUser.userType || "1",
+                      Points: (effectiveUser.points != null
+                        ? effectiveUser.points
+                        : "0.00"
+                      ).toString(),
+                      Discounts: (totals.discount || 0).toString(),
+                      Transport: effectiveUser.transport || "",
+                      Delivery: effectiveUser.delivery || "",
+                      Bankname: effectiveUser.bankName || "",
+                      BankAdd1: effectiveUser.bankAdd1 || "",
+                      BankAdd2: effectiveUser.bankAdd2 || "",
+                      shipname: deliveryAddress.name || "",
+                      shipAdd1: deliveryAddress.address || "",
+                      shipAdd2: deliveryAddress.street || "",
+                      shipAdd3: deliveryAddress.landmark || "",
+                      order_remarks: effectiveUser.orderRemarks || "",
+                      CustName: effectiveUser.name || "",
+                      CustMobile: effectiveUser.phone || "",
+                    },
+                    ProductDetails: cartItems.map((item) => {
+                      // Get first image URL
+                      let imageUrl = "";
+                      if (
+                        item.images &&
+                        Array.isArray(item.images) &&
+                        item.images.length > 0
+                      ) {
+                        imageUrl = item.images[0].url || item.images[0];
+                      } else {
+                        imageUrl = item.image || "";
+                      }
+
+                      return {
+                        _id: item._id || item.id || "",
+                        rid: item.rid || "",
+                        catcode: item.catcode || "",
+                        code: item.productCode || item.code || "",
+                        name: item.name || "",
+                        stock: String(item.stock ?? ""),
+                        remark: item.remark || "",
+                        company: item.company || "",
+                        shopcode: item.shopcode || "",
+                        MRP: Number(
+                          item.originalPrice ?? item.mrp ?? item.MRP ?? 0,
+                        ),
+                        Rate: Number(item.price ?? 0),
+                        Quantity: Number(item.quantity ?? item.qty ?? 1),
+                        Deal: Number(item.deal ?? 0),
+                        Free: Number(item.free ?? 0),
+                        PRate: Number(item.PRate ?? 0),
+                        Is_Deleted: item.isDeleted ? "1" : "0",
+                        curbatch: item.curbatch || "",
+                        exp: item.exp || "",
+                        gcode: item.gcode || "",
+                        MargCode: item.MargCode || "",
+                        Conversion: item.Conversion || "0",
+                        Salt: item.Salt || "",
+                        ENCODE: item.ENCODE || "",
+                        remarks: item.remarks || "",
+                        Gcode6: item.Gcode6 || "",
+                        ProductCode: item.ProductCode || "",
+                        image: imageUrl,
+                      };
+                    }),
+                    PaymentDetails: {
+                      paymentmode: paymentMethod === "cod" ? "1" : "2",
+                      paymentmodeAmount: totals.total || 0,
+                      payment_remarks: "",
+                      gstType: "cgst_sgst",
+                      totalAmount: totals.total || 0,
+                      totalTaxAmount: totals.gst || 0,
+                      totalDiscountAmount: totals.discount || 0,
+                      totalInvoiceValue: totals.total || 0,
+                      paymentStatus:
+                        paymentMethod === "cod" ? "PENDING" : "COMPLETED",
+                    },
                   };
 
                   const createOrderRes = await axios.post(
@@ -684,7 +822,7 @@ const CartDetails = () => {
                   toastSuccess("Order created successfully!");
                   setLocalCartItems([]);
                   if (setCartItems) setCartItems([]);
-                  navigate("/orders");
+                  setShowThankYouModal(true);
                 } catch (orderErr) {
                   console.error("Order creation failed:", orderErr);
                   toastError(
@@ -855,6 +993,115 @@ const CartDetails = () => {
                 </div>
               )}
             </div>
+          </div>
+        </div>
+      )}
+
+      {/* Thank You Modal */}
+      {showThankYouModal && (
+        <div
+          style={{
+            position: "fixed",
+            inset: 0,
+            zIndex: 999,
+            display: "flex",
+            alignItems: "center",
+            justifyContent: "center",
+            padding: "20px",
+            background: "rgba(0,0,0,0.65)",
+            backdropFilter: "blur(6px)",
+          }}
+        >
+          <div
+            style={{
+              width: "100%",
+              maxWidth: "420px",
+              borderRadius: "28px",
+              background:
+                "linear-gradient(135deg, #ffffff 0%, #ecfdf5 60%, #f0fdfa 100%)",
+              padding: "40px 30px",
+              textAlign: "center",
+              boxShadow:
+                "0 20px 60px rgba(0,0,0,0.25), 0 10px 20px rgba(0,0,0,0.15)",
+              position: "relative",
+              animation: "scaleIn 0.35s ease",
+            }}
+          >
+            {/* Decorative Circle */}
+            <div
+              style={{
+                width: "90px",
+                height: "90px",
+                borderRadius: "50%",
+                margin: "0 auto 20px",
+                display: "flex",
+                alignItems: "center",
+                justifyContent: "center",
+                background: "linear-gradient(135deg, #34d399 0%, #10b981 100%)",
+                boxShadow: "0 8px 20px rgba(16,185,129,0.4)",
+              }}
+            >
+              <CheckCircle size={44} color="white" />
+            </div>
+
+            {/* Title */}
+            <h2
+              style={{
+                fontSize: "28px",
+                fontWeight: "700",
+                color: "#064e3b",
+                marginBottom: "6px",
+                fontFamily: "Gyrotrope",
+                letterSpacing: "0.5px",
+              }}
+            >
+              Thank You!
+            </h2>
+
+            {/* Subtitle */}
+            <p
+              style={{
+                fontSize: "16px",
+                color: "#374151",
+                marginBottom: "25px",
+                fontFamily: "Gyrotrope",
+              }}
+            >
+              Your order has been placed successfully. We look forward to
+              serving you again!
+            </p>
+
+            {/* Button */}
+            <button
+              onClick={() => {
+                setShowThankYouModal(false);
+                navigate("/orders");
+              }}
+              style={{
+                width: "100%",
+                padding: "14px",
+                borderRadius: "12px",
+                border: "none",
+                fontSize: "16px",
+                fontWeight: "600",
+                color: "#fff",
+                cursor: "pointer",
+                background: "linear-gradient(135deg, #10b981 0%, #059669 100%)",
+                boxShadow: "0 6px 16px rgba(16,185,129,0.4)",
+                transition: "all 0.25s ease",
+                fontFamily: "Gyrotrope",
+              }}
+              onMouseOver={(e) => {
+                e.target.style.transform = "translateY(-2px)";
+                e.target.style.boxShadow = "0 10px 24px rgba(16,185,129,0.5)";
+              }}
+              onMouseOut={(e) => {
+                e.target.style.transform = "translateY(0)";
+                e.target.style.boxShadow = "0 6px 16px rgba(16,185,129,0.4)";
+              }}
+            >
+              View My Orders
+            </button>
           </div>
         </div>
       )}

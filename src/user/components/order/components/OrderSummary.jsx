@@ -25,7 +25,7 @@ const OrderSummary = ({
 }) => {
   const [paymentMethod, setPaymentMethod] = useState("online");
 
-  const navigate = useNavigate()
+  const navigate = useNavigate();
 
   return (
     <div className="sticky top-32 space-y-3">
@@ -125,7 +125,9 @@ const OrderSummary = ({
             Change Address
           </button>
           <button
-            onClick={()=>{navigate("/profile")}}
+            onClick={() => {
+              navigate("/profile");
+            }}
             className="flex-1 transition-colors text-[12px] sm:text-xs cursor-pointer hover:bg-gray-50 flex items-center justify-center gap-1"
             style={{
               fontFamily: "Gyrotrope",
@@ -142,7 +144,7 @@ const OrderSummary = ({
           </button>
         </div>
       </div>
-      {/* Apply Coupon */}
+      {/* Apply Coupon
       <div
         className="bg-orange-100"
         style={{
@@ -211,7 +213,7 @@ const OrderSummary = ({
             {appliedCoupon ? "Remove" : "Apply"}
           </button>
         </div>
-      </div>
+      </div> */}
       {/* Payment Breakdown */}
       <div
         style={{
@@ -554,7 +556,9 @@ const OrderSummary = ({
 
         <button
           onClick={() => onOrderNow(paymentMethod)}
-          disabled={isPlacingOrder || cartItems.length === 0}
+          disabled={
+            isPlacingOrder || cartItems.length === 0 || totals.total <= 1000
+          }
           className="w-full transition-all duration-200 hover:opacity-90 cursor-pointer disabled:opacity-50 disabled:cursor-not-allowed"
           style={{
             fontFamily: "Gyrotrope",
@@ -571,10 +575,11 @@ const OrderSummary = ({
         >
           {isPlacingOrder
             ? "Placing Order..."
-            : `Proceed to Pay ₹${totals.total}`}
+            : totals.total > 1000
+              ? `Proceed to Pay ₹${totals.total}`
+              : "Please add more products above ₹1000 to place order"}
         </button>
       </div>
- 
     </div>
   );
 };

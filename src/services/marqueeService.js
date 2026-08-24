@@ -1,4 +1,5 @@
 import apiClient from "./api/apiClient";
+import websiteApi from "./api/websiteApi";
 import { API_ENDPOINTS } from "./api/baseURL";
 
 const marqueeService = {
@@ -31,7 +32,8 @@ const marqueeService = {
    */
   getMessages: async (options = {}) => {
     try {
-      const response = await apiClient.get(API_ENDPOINTS.GET_HEADINGS, options);
+      // Use the website-facing endpoint to fetch headings content
+      const response = await websiteApi.get("/getheading", options);
       const data = response.data.data || response.data || [];
 
       // Deduplicate by ID and Content
@@ -72,7 +74,8 @@ const marqueeService = {
    */
   getVisibleMessages: async (options = {}) => {
     try {
-      const response = await apiClient.get(API_ENDPOINTS.GET_HEADINGS, options);
+      // Use the website-facing endpoint to fetch headings content
+      const response = await websiteApi.get("/getheading", options);
       const data = response.data.data || response.data || [];
 
       // Deduplicate and Filter

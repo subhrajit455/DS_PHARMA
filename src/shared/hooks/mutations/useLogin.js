@@ -15,8 +15,8 @@ export const useLogin = () => {
   const { login: storeLogin } = useAuthStore();
 
   return useMutation({
-    mutationFn: async ({ email, password }) => {
-      const response = await authService.login({ email, password });
+    mutationFn: async ({ userId, password }) => {
+      const response = await authService.login({ userId, password });
       // console.log("login response in useLogin", response)
       return response;
     },

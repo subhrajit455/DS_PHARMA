@@ -1,50 +1,48 @@
-import React, { useEffect, useState } from 'react';
-import { Outlet, useNavigate } from 'react-router-dom';
-import AdminSidebar from '@/admin/components/layout/AdminSidebar';
-import AdminHeader from '@/admin/components/layout/AdminHeader';
-import useDataStore from '@/store/useDataStore';
-import { cn } from '@/admin/utils/cn';
-import { useAuthStore } from '@/store/useAuthStore';
+import React, { useEffect, useState } from "react";
+import { Outlet, useNavigate } from "react-router-dom";
+import AdminSidebar from "@/admin/components/layout/AdminSidebar";
+import AdminHeader from "@/admin/components/layout/AdminHeader";
+import useDataStore from "@/store/useDataStore";
+import { cn } from "@/admin/utils/cn";
+import { useAuthStore } from "@/store/useAuthStore";
 
 const AdminLayout = () => {
   const [sidebarOpen, setSidebarOpen] = useState(false);
   const [isCollapsed, setIsCollapsed] = useState(false);
 
-
-  const {user, isAuthenticated} = useAuthStore();
-
-  // console.log("user from admin layout",user, isAuthenticated);
-
-// const isAuthenticated =true;
-// const user = {
-//   role: 'admin'
-// };
+  const token = localStorage.getItem("adminToken");
+  const user = JSON.parse(localStorage.getItem("adminUser") || "null");
+  const isAuthenticated = !!token;
+  
+  const isAdminLoggedIn = isAuthenticated && user?.role === "ADMIN";
+  console.log("AdminLayout - Auth State:", { token, user, isAuthenticated, isAdminLoggedIn });
 
   const navigate = useNavigate();
-  // console.log(isAuthenticated, user);
 
   // Basic route protection
   useEffect(() => {
-    if (!isAuthenticated || user?.role !== 'admin') {
-      navigate('/login');
+    if (!isAdminLoggedIn) {
+      navigate("/admin");
     }
-  }, [isAuthenticated, user, navigate]);
+  }, [isAdminLoggedIn, navigate]);
 
-  if (!isAuthenticated || user?.role !== 'admin') return null;
+  if (!isAdminLoggedIn) return null;
 
   return (
     <div className="flex h-screen bg-gradient-to-br from-gray-50 via-emerald-50/20 to-teal-50/30 relative overflow-hidden max-w-full">
       {/* Decorative gradient blobs */}
       <div className="absolute top-0 right-0 w-96 h-96 bg-emerald-200/20 rounded-full blur-3xl pointer-events-none" />
       <div className="absolute bottom-0 left-0 w-96 h-96 bg-teal-200/20 rounded-full blur-3xl pointer-events-none" />
-      
+
       {/* Mobile Sidebar Overlay */}
-      <div 
-          className={cn(
-            "fixed inset-0 z-[90] bg-slate-950/60 backdrop-blur-sm lg:hidden transition-all duration-300",
-            sidebarOpen ? "opacity-100 pointer-events-auto" : "opacity-0 pointer-events-none"
-          )}
-          onClick={() => setSidebarOpen(false)}
+      <div
+        className={cn(
+          "fixed inset-0 z-[90] bg-slate-950/60 backdrop-blur-sm lg:hidden transition-all duration-300",
+          sidebarOpen
+            ? "opacity-100 pointer-events-auto"
+            : "opacity-0 pointer-events-none",
+        )}
+        onClick={() => setSidebarOpen(false)}
       />
 
       {/* Desktop Sidebar - In Flow */}
@@ -55,13 +53,13 @@ const AdminLayout = () => {
         />
       </div>
 
-       {/* Mobile Sidebar - Fixed Overlay */}
-       {sidebarOpen && (
-          <AdminSidebar 
-             isMobile={true} 
-             onCloseMobile={() => setSidebarOpen(false)}
-          />
-       )}
+      {/* Mobile Sidebar - Fixed Overlay */}
+      {sidebarOpen && (
+        <AdminSidebar
+          isMobile={true}
+          onCloseMobile={() => setSidebarOpen(false)}
+        />
+      )}
 
       {/* Main Content Area - Flexible */}
       <div className="flex-1 flex flex-col min-w-0 h-screen overflow-hidden relative z-10 transition-all duration-300 max-w-full">

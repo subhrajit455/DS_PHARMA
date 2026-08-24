@@ -321,7 +321,7 @@ const ContactPage = () => {
         setSubmitStatus({ type: '', message: '' });
 
         try {
-            const response = await axios.post(`${apiUrl}/contact`, formData);
+            const response = await axios.post(`${apiUrl}/api/v1/contact`, formData);
 
             setSubmitStatus({
                 type: 'success',

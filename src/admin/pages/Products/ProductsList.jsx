@@ -216,7 +216,7 @@ const ProductsList = () => {
               Marg ERP Products
             </h1>
           </div>
-          <div className="flex items-center gap-3 w-full sm:w-auto">
+          {/* <div className="flex items-center gap-3 w-full sm:w-auto">
             <Button
               variant="outline"
               className="flex-1 sm:flex-none h-10 px-4 font-semibold text-gray-700 hover:bg-gray-50 border-gray-300 transition-all active:scale-95"
@@ -231,7 +231,7 @@ const ProductsList = () => {
               <Plus className="mr-2 h-4 w-4" />
               <span>Add Product</span>
             </Button>
-          </div>
+          </div> */}
         </div>
       </header>
 

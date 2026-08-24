@@ -51,7 +51,7 @@ const InputField = ({
             <div className="relative">
                 {label && (
                     <label
-                        className="block mb-2 text-[12px] font-semibold text-gray-700 text-[15px]"
+                        className="block mb-2 text-[12px] font-semibold text-gray-700 "
                         style={{ fontFamily: 'Gyrotrope' }}
                     >
                         {label}
@@ -99,3 +99,4 @@ const InputField = ({
 };
 
 export default InputField;
+ 

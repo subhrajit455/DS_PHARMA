@@ -41,14 +41,14 @@ export const UserProfileButton = ({ isAuthenticated, user, className = '', showN
           <User size={16} strokeWidth={2.5} color="#000000" />
         )}
       </div>
-      {showName && (
+      {/* {showName && (
         <span 
           className="font-sans text-md font-medium text-black tracking-[0.01em]"
           style={{ paddingRight: '1rem' }}
         >
           {getDisplayName()}
         </span>
-      )}
+      )} */}
     </button>
   );
 };

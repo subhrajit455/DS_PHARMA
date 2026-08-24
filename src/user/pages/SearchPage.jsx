@@ -28,6 +28,13 @@ const SearchPage = () => {
     priceRangeStr: "all",
     inStock: searchParams.get("instock") === "true",
     isFeatured: searchParams.get("featured") === "true",
+    priceRange:
+      searchParams.get("minPrice") && searchParams.get("maxPrice")
+        ? [
+            Number(searchParams.get("minPrice")),
+            Number(searchParams.get("maxPrice")),
+          ]
+        : null,
   });
 
   // Temporary filters state for mobile drawer
@@ -88,6 +95,13 @@ const SearchPage = () => {
       inStock: searchParams.get("instock") === "true",
       isFeatured: searchParams.get("featured") === "true",
       isHighlighted: searchParams.get("highlighted") === "true",
+      priceRange:
+        searchParams.get("minPrice") && searchParams.get("maxPrice")
+          ? [
+              Number(searchParams.get("minPrice")),
+              Number(searchParams.get("maxPrice")),
+            ]
+          : null,
       // We generally preserve other local filters unless explicitly cleared or overwritten,
       // but for "View All" links that replace the URL, this ensures we pick up the new intent.
     }));
@@ -102,6 +116,39 @@ const SearchPage = () => {
 
   const handleFilterChange = (newFilters) => {
     setFilters(newFilters);
+
+    // Sync to URL
+    setSearchParams((prev) => {
+      const newParams = new URLSearchParams(prev);
+
+      // Handle Price
+      if (
+        newFilters.priceRange &&
+        Array.isArray(newFilters.priceRange) &&
+        newFilters.priceRange.length === 2
+      ) {
+        newParams.set("minPrice", newFilters.priceRange[0]);
+        newParams.set("maxPrice", newFilters.priceRange[1]);
+      } else {
+        newParams.delete("minPrice");
+        newParams.delete("maxPrice");
+      }
+
+      // Handle Categories (optional, but good for consistency if filter component changes them)
+      if (newFilters.categories) {
+        newParams.delete("category");
+        newFilters.categories.forEach((c) => newParams.append("category", c));
+      }
+
+      // Handle Flags
+      if (newFilters.inStock) newParams.set("instock", "true");
+      else newParams.delete("instock");
+
+      if (newFilters.isFeatured) newParams.set("featured", "true");
+      else newParams.delete("featured");
+
+      return newParams;
+    });
   };
 
   const handleViewAll = () => {
@@ -153,6 +200,7 @@ const SearchPage = () => {
           }}
           className="flex flex-col md:flex-row justify-between items-start md:justify-items-center gap-4 mb-8 sticky top-[50px] sm:top-[60px] md:top-[85px]"
         >
+          
           <div className="flex items-center gap-4">
             {/* Back Button */}
             <button
@@ -179,7 +227,6 @@ const SearchPage = () => {
               </p>
             </div>
           </div>
-
           <div className="flex items-center gap-1 sm:gap-3 w-full md:w-auto">
             <button
               onClick={() => {
