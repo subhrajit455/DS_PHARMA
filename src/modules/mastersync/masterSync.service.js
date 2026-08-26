@@ -62,20 +62,70 @@ const parallelInsertMany = async (model, docs, opts = {}) => {
   return inserted;
 };
 
-export const syncMastersDataService = async (dateTime, index = 0) => {
+export const syncMastersDataService = async (dateTime = '', initialIndex = 0) => {
   try {
-    // Call Marg service to fetch all master data
-    const margData = await fetchMasterData(dateTime, index);
+    let currentIndex = String(initialIndex ?? 0);
+    let currentDateTime = dateTime || '';
+    let isCompleted = false;
+    let iteration = 0;
+    const MAX_ITERATIONS = 50;
+
+    const accumulatedData = {
+      pro_N: [],
+      pro_S: [],
+      pro_R: [],
+      pro_U: [],
+      stype: [],
+      party: [],
+      users: [],
+    };
+
+    while (!isCompleted && iteration < MAX_ITERATIONS) {
+      iteration++;
+      console.log(
+        `[MasterSync] Fetching chunk ${iteration} with Index: ${currentIndex}, Datetime: "${currentDateTime}"`,
+      );
+
+      const margData = await fetchMasterData(currentDateTime, currentIndex);
+
+      if (!margData) {
+        throw new Error('Received null or empty response from Marg API');
+      }
+
+      const details = margData.Details || margData;
+      if (details.pro_N && Array.isArray(details.pro_N)) accumulatedData.pro_N.push(...details.pro_N);
+      if (details.pro_S && Array.isArray(details.pro_S)) accumulatedData.pro_S.push(...details.pro_S);
+      if (details.pro_R && Array.isArray(details.pro_R)) accumulatedData.pro_R.push(...details.pro_R);
+      if (details.pro_U && Array.isArray(details.pro_U)) accumulatedData.pro_U.push(...details.pro_U);
+      if (details.Stype && Array.isArray(details.Stype)) accumulatedData.stype.push(...details.Stype);
+      if (details.Party && Array.isArray(details.Party)) accumulatedData.party.push(...details.Party);
+      if (details.Users && Array.isArray(details.Users)) accumulatedData.users.push(...details.Users);
+
+      const dataStatus = (margData.Datastatus || details.Datastatus || '').toLowerCase();
+      const nextIndex = margData.Index !== undefined ? String(margData.Index) : (details.Index !== undefined ? String(details.Index) : null);
+      const nextDateTime = margData.DateTime || details.DateTime || currentDateTime;
+
+      console.log(
+        `[MasterSync] Chunk ${iteration} response: Datastatus="${margData.Datastatus || details.Datastatus}", Next Index="${nextIndex}", Items accumulated: pro_N=${accumulatedData.pro_N.length}, pro_U=${accumulatedData.pro_U.length}, Party=${accumulatedData.party.length}, Users=${accumulatedData.users.length}`,
+      );
+
+      if (dataStatus === 'completed' || !nextIndex || nextIndex === currentIndex) {
+        isCompleted = true;
+      } else {
+        currentIndex = nextIndex;
+        currentDateTime = nextDateTime;
+      }
+    }
 
     const {
       pro_N,
       pro_S,
       pro_R,
       pro_U,
-      Stype: stype,
-      Party: party,
-      Users: users,
-    } = margData.Details;
+      stype,
+      party,
+      users,
+    } = accumulatedData;
 
     // pro_N + pro_U: Full catalog replacement
     // pro_N = new products, pro_U = updated products.
@@ -305,7 +355,7 @@ export const syncMastersDataService = async (dateTime, index = 0) => {
       console.log('No stypes to sync (stype is empty or invalid)');
     }
 
-    return margData.Details;
+    return accumulatedData;
   } catch (error) {
     throw new Error(`Master sync failed: ${error.message}`);
   }
@@ -327,7 +377,7 @@ export const syncMasterOrderDispatchDataService = async (
       type,
     );
 
-    return margData.Details;
+    return margData.Details || margData;
   } catch (error) {
     throw new Error(`Master sync failed: ${error.message}`);
   }
@@ -339,13 +389,29 @@ export const syncMasterOrderDataService = async (
   data,
 ) => {
   try {
-    console.log('Master Sync Service');
+    console.log('Master Sync Service - Sending Order to Marg');
     // Call Marg service to fetch all master data
     const margData = await fetchMasterOrderData(salesManId, type, data);
 
-    console.log('margData', margData);
+    console.log('Marg InsertOrderDetail Response:', JSON.stringify(margData));
 
-    return margData.Details;
+    if (
+      margData &&
+      (margData.Status === 'Error' ||
+        margData.Status === 'Fail' ||
+        margData.status === '0' ||
+        margData.status === 0)
+    ) {
+      const errorMsg =
+        margData.message ||
+        margData.Msg ||
+        margData.error ||
+        'Marg rejected the order';
+      console.error('Marg Order Rejection:', errorMsg);
+      throw new Error(`Marg order rejected: ${errorMsg}`);
+    }
+
+    return margData.Details || margData;
   } catch (error) {
     throw new Error(`Master sync failed: ${error.message}`);
   }

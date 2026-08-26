@@ -28,10 +28,10 @@ export const createOrderService = async (
     await syncMasterOrderDataService(String(ecomSalesManId), type, {
       OrderID: String(OrderID),
       OrderNo: String(OrderNo),
-      CustomerID: String(CustomerDetails?.CustomerID),
-      ProductCode: String(ProductDetails?.map(item => item.code).join(',')),
-      Quantity: String(ProductDetails?.map(item => item.Quantity).join(',')),
-      Free: String(ProductDetails?.map(item => item.Free).join(',')),
+      CustomerID: String(CustomerDetails?.CustomerID || CustomerDetails?.code || CustomerDetails?.MargCode || ''),
+      ProductCode: String(ProductDetails?.map(item => item.code || item.ProductCode || item.rid).join(',')),
+      Quantity: String(ProductDetails?.map(item => item.Quantity ?? item.quantity ?? 1).join(',')),
+      Free: String(ProductDetails?.map(item => item.Free ?? item.free ?? 0).join(',')),
       Lat: String(CustomerDetails?.Lat) || '',
       Lng: String(CustomerDetails?.Lng) || '',
       Address: String(CustomerDetails?.Address) || '',
@@ -314,10 +314,10 @@ export const fetchMonthlyReportService = async options => {
     const groupId =
       mode === 'monthly'
         ? {
-            year: { $year: '$createdAt' },
-            month: { $month: '$createdAt' },
-            day: { $dayOfMonth: '$createdAt' },
-          }
+          year: { $year: '$createdAt' },
+          month: { $month: '$createdAt' },
+          day: { $dayOfMonth: '$createdAt' },
+        }
         : { year: { $year: '$createdAt' }, month: { $month: '$createdAt' } };
 
     const pipeline = [

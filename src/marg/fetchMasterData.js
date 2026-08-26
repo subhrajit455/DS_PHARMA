@@ -5,7 +5,7 @@ export const fetchMasterData = async (datetime = '', index = 0) => {
   const payload = {
     ...margClient,
     Datetime: datetime,
-    Index: index.toString(),
+    Index: String(index ?? 0),
   };
 
   return makeRequest('MargMST2017', payload);
