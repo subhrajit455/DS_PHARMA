@@ -259,8 +259,16 @@ const ContactPage = () => {
         {
             icon: '📧',
             title: 'Email',
-            text: 'dscommunication3@gmail.com',
-            link: 'mailto:dscommunication3@gmail.com',
+            emails: [
+                {
+                    text: 'dscommunication3@gmail.com',
+                    link: 'mailto:dscommunication3@gmail.com',
+                },
+                {
+                    text: 'helpdesk@dspharma.online',
+                    link: 'mailto:helpdesk@dspharma.online',
+                },
+            ],
         },
         {
             icon: '📍',
@@ -375,17 +383,56 @@ const ContactPage = () => {
                             key={index}
                             style={{
                                 ...contactCardStyle(0.2 + index * 0.1),
-                                ...(hoveredCard === index ? contactCardHoverStyle : {}),
+                                ...(hoveredCard === index
+                                    ? contactCardHoverStyle
+                                    : {}),
                             }}
                             onMouseEnter={() => setHoveredCard(index)}
                             onMouseLeave={() => setHoveredCard(null)}
-                            onClick={() => info.link && window.open(info.link, '_self')}
+                            onClick={() => {
+                                if (info.link) {
+                                    window.open(info.link, '_self');
+                                }
+                            }}
                         >
                             <div style={iconContainerStyle}>
                                 <span>{info.icon}</span>
                             </div>
-                            <h3 style={contactTitleStyle}>{info.title}</h3>
-                            <p style={contactTextStyle}>{info.text}</p>
+
+                            <h3 style={contactTitleStyle}>
+                                {info.title}
+                            </h3>
+
+                            {info.emails ? (
+                                <div
+                                    style={{
+                                        display: 'flex',
+                                        flexDirection: 'column',
+                                        gap: '10px',
+                                        alignItems: 'center',
+                                    }}
+                                >
+                                    {info.emails.map((email, emailIndex) => (
+                                        <a
+                                            key={emailIndex}
+                                            href={email.link}
+                                            style={{
+                                                ...contactTextStyle,
+                                                color: '#667eea',
+                                                textDecoration: 'none',
+                                                fontSize: '1rem',
+                                            }}
+                                            onClick={(e) => e.stopPropagation()}
+                                        >
+                                            {email.text}
+                                        </a>
+                                    ))}
+                                </div>
+                            ) : (
+                                <p style={contactTextStyle}>
+                                    {info.text}
+                                </p>
+                            )}
                         </div>
                     ))}
                 </div>

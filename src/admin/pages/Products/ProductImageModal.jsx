@@ -192,9 +192,6 @@ const ProductImageModal = ({ open, onOpenChange, product, allCategory }) => {
             </div>
 
             <div className="flex items-center gap-3">
-              <Badge className="bg-white text-slate-500 font-bold border border-slate-200">
-                {imageList.length} Assets
-              </Badge>
             </div>
           </div>
         </DialogHeader>

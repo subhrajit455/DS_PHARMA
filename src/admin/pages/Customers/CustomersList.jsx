@@ -10,6 +10,7 @@ import {
   MapPin,
   Building,
   Calendar,
+  RefreshCw,
 } from "lucide-react";
 import toastUtil from "@/shared/utils/toast";
 import { Button } from "@/admin/components/ui/Button";
@@ -55,43 +56,51 @@ const CustomerRow = React.memo(({ customer, onView }) => {
     customer.contact_number ||
     extractedPhone;
 
+  const displayName = customer.name || customer.party_name || "N/A";
+  const initials = displayName
+    .split(" ")
+    .filter(Boolean)
+    .slice(0, 2)
+    .map((part) => part[0]?.toUpperCase())
+    .join("") || "?";
+
   return (
-    <TableRow className="group border-b border-gray-100/80 hover:bg-blue-50/30 transition-all duration-150">
+    <TableRow className="group border-b border-[#EDEAE2] transition-colors duration-150 hover:bg-[#FAF9F6]">
       <TableCell className="py-4 px-6">
         <div className="flex items-center gap-4">
           <div className="relative shrink-0">
-            <div className="w-12 h-12 bg-blue-100 flex items-center justify-center rounded-xl border border-blue-200">
-              <Users className="w-6 h-6 text-blue-600" />
+            <div className="flex h-11 w-11 items-center justify-center rounded-xl border border-[#E7D8CC] bg-[#F3E4DC] text-sm font-bold text-blue-500">
+              {initials}
             </div>
           </div>
-          <div className="flex flex-col min-w-0">
-            <span className="text-sm font-bold text-gray-900 truncate group-hover:text-blue-700 transition-colors">
-              {customer.name || customer.party_name || "N/A"}
+          <div className="flex min-w-0 flex-col">
+            <span className="truncate text-sm font-semibold text-[#1E2A38] transition-colors group-hover:text-blue-500">
+              {displayName}
             </span>
-            <span className="text-[11px] text-gray-500 font-mono mt-0.5">
-              ID: {customer.code }
+            <span className="mt-0.5 font-mono text-[11px] text-[#8A93A0]">
+              ID: {customer.code}
             </span>
           </div>
         </div>
       </TableCell>
       <TableCell className="py-4 px-6 hidden lg:table-cell">
         <div className="flex items-center gap-2">
-          <Phone className="w-4 h-4 text-gray-400" />
-          <span className="text-sm text-gray-600">{phoneNumber || "N/A"}</span>
+          <Phone className="h-4 w-4 shrink-0 text-[#B3AFA4]" />
+          <span className="text-sm text-[#55636F]">{phoneNumber || "N/A"}</span>
         </div>
       </TableCell>
       <TableCell className="py-4 px-6 hidden xl:table-cell">
         <div className="flex items-center gap-2">
-          <Mail className="w-4 h-4 text-gray-400" />
-          <span className="text-sm text-gray-600 truncate max-w-[200px]">
+          <Mail className="h-4 w-4 shrink-0 text-[#B3AFA4]" />
+          <span className="max-w-[200px] truncate text-sm text-[#55636F]">
             {customer.email1 || customer.email2 || "N/A"}
           </span>
         </div>
       </TableCell>
       <TableCell className="py-4 px-6 hidden md:table-cell">
         <div className="flex items-center gap-2">
-          <Building className="w-4 h-4 text-gray-400" />
-          <span className="text-sm text-gray-600 truncate max-w-[150px]">
+          <Building className="h-4 w-4 shrink-0 text-[#B3AFA4]" />
+          <span className="max-w-[150px] truncate text-sm text-[#55636F]">
             {customer.company ||
               customer.organization ||
               customer.business_name ||
@@ -100,24 +109,24 @@ const CustomerRow = React.memo(({ customer, onView }) => {
         </div>
       </TableCell>
       <TableCell className="py-4 px-6 hidden lg:table-cell">
-        <div className="flex flex-col gap-1 max-w-[200px]">
+        <div className="flex max-w-[220px] flex-col gap-1">
           <div className="flex items-start gap-2">
-            <MapPin className="w-4 h-4 text-gray-400 mt-0.5 flex-shrink-0" />
-            <div className="flex flex-col gap-0.5 min-w-0">
+            <MapPin className="mt-0.5 h-4 w-4 flex-shrink-0 text-[#B3AFA4]" />
+            <div className="flex min-w-0 flex-col gap-0.5">
               {cleanAddress && (
-                <span className="text-sm text-gray-600 leading-tight">
+                <span className="text-sm leading-tight text-[#55636F]">
                   {cleanAddress}
                 </span>
               )}
               {customer.city && (
-                <span className="text-xs text-gray-500 leading-tight">
+                <span className="text-xs leading-tight text-[#8A93A0]">
                   {customer.city}
                   {customer.state && `, ${customer.state}`}
                   {customer.pincode && ` - ${customer.pincode}`}
                 </span>
               )}
               {customer.country && (
-                <span className="text-xs text-gray-500 leading-tight">
+                <span className="text-xs leading-tight text-[#8A93A0]">
                   {customer.country}
                 </span>
               )}
@@ -126,7 +135,7 @@ const CustomerRow = React.memo(({ customer, onView }) => {
                 !customer.state &&
                 !customer.pincode &&
                 !customer.country && (
-                  <span className="text-sm text-gray-400 italic">
+                  <span className="text-sm italic text-[#B3AFA4]">
                     No address
                   </span>
                 )}
@@ -134,40 +143,7 @@ const CustomerRow = React.memo(({ customer, onView }) => {
           </div>
         </div>
       </TableCell>
-      {/* <TableCell className="py-4 px-6 text-center">
-        <Badge
-          variant={
-            customer.status === "active" || customer.is_active
-              ? "success"
-              : "secondary"
-          }
-          className="px-3"
-        >
-          {customer.status || (customer.is_active ? "Active" : "Inactive")}
-        </Badge>
-      </TableCell> */}
-      {/* <TableCell className="py-4 px-6 hidden xl:table-cell text-center">
-        <div className="flex items-center justify-center gap-2">
-          <Calendar className="w-4 h-4 text-gray-400" />
-          <span className="text-xs text-gray-500">
-            {customer.createdAt
-              ? new Date(customer.createdAt).toLocaleDateString()
-              : "N/A"}
-          </span>
-        </div>
-      </TableCell> */}
-      {/* <TableCell className="py-4 px-6 text-right">
-        <div className="flex items-center justify-end gap-1">
-          <Button
-            variant="ghost"
-            size="icon"
-            className="h-9 w-9 text-gray-500 hover:text-blue-600 hover:bg-blue-50 rounded-lg transition-colors"
-            onClick={() => onView(customer)}
-          >
-            <Eye className="h-4 w-4" />
-          </Button>
-        </div>
-      </TableCell> */}
+
     </TableRow>
   );
 });
@@ -211,7 +187,7 @@ const CustomersList = () => {
       // Handle different response structures
       const customerData = response.data.parties;
       const totalCount =
-        response.data.totalActiveParties ||0;
+        response.data.totalActiveParties || 0;
       const totalPagesCount =
         response.data.totalPages ||
         response.data.pages ||
@@ -263,134 +239,159 @@ const CustomersList = () => {
   };
 
   return (
-    <div className="flex flex-col h-screen max-h-screen bg-[#F9FAFB] overflow-hidden">
+    <div className="flex h-screen max-h-screen flex-col overflow-hidden bg-[#F7F6F2] overflow-x-hidden">
       {/* Header Section */}
-      <header className="shrink-0 px-6 py-4 bg-white border-b border-gray-200/80 shadow-sm z-30">
-        <div className="max-w-[1600px] mx-auto flex flex-col sm:flex-row justify-between items-start sm:items-center gap-4">
+      <header className="z-30 shrink-0 border-b border-[#E7E3DA] bg-white px-6 py-4 shadow-sm">
+        <div className="mx-auto flex max-w-[1600px] flex-col items-start justify-between gap-4 sm:flex-row sm:items-center">
           <div>
-            <h1 className="text-xl sm:text-2xl font-extrabold text-gray-900 tracking-tight">
-              Customers Management
+
+            <h1 className="mt-1 text-xl font-bold tracking-tight text-[#1E2A38] sm:text-2xl">
+              Customers
             </h1>
-            <p className="text-sm text-gray-600 mt-1">
+            <p className="mt-1 text-sm text-[#6B7580]">
               Manage your customer database and party information
             </p>
           </div>
-          {/* <div className="flex items-center gap-3 w-full sm:w-auto">
-            <Button
-              variant="outline"
-              className="flex-1 sm:flex-none h-10 px-4 font-semibold text-gray-700 hover:bg-gray-50 border-gray-300 transition-all active:scale-95"
-              onClick={() => navigate("/admin/dashboard")}
-            >
-              Dashboard
-            </Button>
-            <Button
-              onClick={() => navigate("/admin/customers/new")}
-              className="flex-1 sm:flex-none bg-blue-600 hover:bg-blue-700 text-white shadow-lg shadow-blue-600/20 transition-all active:scale-95 h-10 px-5 font-bold"
-            >
-              <Plus className="mr-2 h-4 w-4" />
-              <span>Add Customer</span>
-            </Button>
-          </div> */}
+       
         </div>
       </header>
 
       {/* Search Toolbar */}
-      <div className="shrink-0 px-6 py-4 bg-gray-50/50 border-b border-gray-200/60 z-20">
-        <div className="max-w-[1600px] mx-auto flex flex-col md:flex-row items-center gap-4">
-          <div className="relative w-full max-w-xl group">
-            <Search className="absolute left-3 top-1/2 transform -translate-y-1/2 text-gray-400 h-4 w-4" />
+      <div className="z-20 shrink-0 border-b border-[#E7E3DA] bg-[#FAF9F6] px-6 py-4">
+        <form
+          onSubmit={(e) => e.preventDefault()}
+          className="mx-auto flex max-w-[1600px] w-full flex-col items-center gap-4 md:flex-row"
+          role="search"
+          aria-label="Search customers"
+        >
+          <div className="relative w-full max-w-xl">
+            <label htmlFor="customer-search" className="sr-only">
+              Search customers by name, phone, or email
+            </label>
+{/* 
+            <div className="absolute inset-y-0 left-0 flex items-center pl-3 pointer-events-none">
+              <Search className="h-4 w-4 text-[#B3AFA4]" />
+            </div> */}
+
             <input
-              type="text"
-              placeholder="Search customers by name, phone, or email..."
+              id="customer-search"
+              type="search"
+              inputMode="search"
+              placeholder="Search customers by name, phone, or email…"
               value={search}
               onChange={handleSearchChange}
-              className="block w-full pl-10 pr-4 py-2.5 bg-white border border-gray-300/80 rounded-xl text-sm placeholder:text-gray-400 focus:outline-none focus:ring-4 focus:ring-blue-500/10 focus:border-blue-500 transition-all shadow-sm group-hover:border-gray-400"
+              className="block h-11 w-full rounded-xl border border-[#E7E3DA] bg-white py-2.5 pl-10 pr-12 text-sm text-[#1E2A38] placeholder:text-[#B3AFA4] shadow-sm soft-transition focus-glow"
             />
+
+            {/* Clear / Reset button */}
+            {search && (
+              <button
+                type="button"
+                aria-label="Clear search"
+                onClick={() => {
+                  setSearch("");
+                  setPagination((p) => ({ ...p, currentPage: 1 }));
+                }}
+                className="absolute right-2 top-1/2 -translate-y-1/2 flex h-8 w-8 items-center justify-center rounded-full bg-slate-100 text-slate-600 hover:bg-slate-200 transition"
+              >
+                ×
+              </button>
+            )}
           </div>
-          <div className="flex items-center gap-2 ml-auto shrink-0 overflow-x-auto w-full md:w-auto pb-2 md:pb-0 no-scrollbar">
-            <Badge
-              variant="secondary"
-              className="cursor-default bg-white border-gray-200 text-gray-600"
-            >
-              {pagination.total.toLocaleString()} Customers Found
-            </Badge>
-          </div>
-        </div>
+
+              <div className="flex w-full shrink-0 items-center gap-3 justify-end md:w-auto">
+              <div
+                className="inline-flex items-center rounded-full bg-[#F3E4DC] px-3 py-1 text-xs font-semibold text-blue-500 shadow-sm"
+                aria-live="polite"
+              >
+                <Users className="h-4 w-4 mr-10 text-blue-500 hidden sm:inline" />
+                <span className="text-sm font-bold mr-1">{pagination.total.toLocaleString()}</span>
+                <span className="md:inline-block text-xs text-[#55636F]">Customers</span>
+              </div>
+
+              <button
+                type="button"
+                onClick={() => {
+                  setPagination((p) => ({ ...p, currentPage: 1 }));
+                  fetchCustomers();
+                }}
+                disabled={loading}
+                aria-busy={loading}
+                className="inline-flex h-10 w-24 items-center justify-center gap-2 rounded-xl bg-[#0096FF] px-4 text-sm font-semibold text-white shadow-md shadow-indigo-200 transition-all hover:bg-[#0096FF] hover:shadow-lg disabled:cursor-not-allowed disabled:opacity-70 soft-transition"
+                aria-label="Refresh customers"
+              >
+                <RefreshCw className={`h-4 w-4 text-[#6B7280] ${loading ? 'animate-spin' : ''}`} />
+                <span className="hidden sm:inline">{loading ? "Refreshing" : "Refresh"}</span>
+              </button>
+            </div>
+        </form>
       </div>
 
       {/* Main Content Area */}
-      <main className="flex-1 overflow-hidden p-4 sm:p-6 lg:p-8 bg-gray-50/30">
-        <div className="max-w-[1600px] mx-auto h-full flex flex-col">
-          <Card className="flex-1 flex flex-col min-h-0 border border-gray-200/80 shadow-xl shadow-gray-200/40 bg-white rounded-2xl overflow-hidden">
-            <CardContent className="flex flex-col flex-1 p-0 overflow-hidden">
+      <main className="flex-1 overflow-hidden bg-[#F7F6F2] p-4 sm:p-6 lg:p-8">
+        <div className="mx-auto flex h-full max-w-[1600px] flex-col">
+          <Card className="flex min-h-0 flex-1 flex-col overflow-hidden rounded-2xl border border-[#E7E3DA] bg-white shadow-sm card-improved animate-fade-in">
+            <CardContent className="flex flex-1 flex-col overflow-hidden p-0">
               {/* Scrollable Table Area */}
               <div
                 id="admin-customer-table"
-                className="flex-1 overflow-auto no-scrollbar relative"
+                className="no-scrollbar relative flex-1 overflow-auto overflow-x-auto"
               >
-                <Table className="relative border-collapse min-w-full">
+                <Table className="relative min-w-full border-collapse">
                   <TableHeader className="sticky top-0 z-20">
-                    <TableRow className="bg-gray-50 border-b border-gray-200 hover:bg-gray-50">
-                      <TableHead className="py-4 px-6 text-[11px] font-bold text-gray-500 uppercase tracking-wider sticky top-0 bg-gray-50 z-20">
+                    <TableRow className="border-b border-[#E7E3DA] bg-[#FAF9F6] hover:bg-[#FAF9F6]">
+                      <TableHead className="sticky top-0 z-20 bg-[#FAF9F6] px-6 py-3.5 text-[11px] font-semibold uppercase tracking-wider text-[#8A93A0]">
                         Customer Information
                       </TableHead>
-                      <TableHead className="py-4 px-6 text-[11px] font-bold text-gray-500 uppercase tracking-wider hidden lg:table-cell sticky top-0 bg-gray-50 z-20">
+                      <TableHead className="sticky top-0 z-20 hidden bg-[#FAF9F6] px-6 py-3.5 text-[11px] font-semibold uppercase tracking-wider text-[#8A93A0] lg:table-cell">
                         Phone
                       </TableHead>
-                      <TableHead className="py-4 px-6 text-[11px] font-bold text-gray-500 uppercase tracking-wider hidden xl:table-cell sticky top-0 bg-gray-50 z-20">
+                      <TableHead className="sticky top-0 z-20 hidden bg-[#FAF9F6] px-6 py-3.5 text-[11px] font-semibold uppercase tracking-wider text-[#8A93A0] xl:table-cell">
                         Email
                       </TableHead>
-                      <TableHead className="py-4 px-6 text-[11px] font-bold text-gray-500 uppercase tracking-wider hidden md:table-cell sticky top-0 bg-gray-50 z-20">
+                      <TableHead className="sticky top-0 z-20 hidden bg-[#FAF9F6] px-6 py-3.5 text-[11px] font-semibold uppercase tracking-wider text-[#8A93A0] md:table-cell">
                         Company
                       </TableHead>
-                      <TableHead className="py-4 px-6 text-[11px] font-bold text-gray-500 uppercase tracking-wider hidden lg:table-cell sticky top-0 bg-gray-50 z-20">
+                      <TableHead className="sticky top-0 z-20 hidden bg-[#FAF9F6] px-6 py-3.5 text-[11px] font-semibold uppercase tracking-wider text-[#8A93A0] lg:table-cell">
                         Address
                       </TableHead>
-                      {/* <TableHead className="py-4 px-6 text-[11px] font-bold text-gray-500 uppercase tracking-wider text-center sticky top-0 bg-gray-50 z-20">
-                        Status
-                      </TableHead> */}
-                      {/* <TableHead className="py-4 px-6 text-[11px] font-bold text-gray-500 uppercase tracking-wider hidden xl:table-cell sticky top-0 bg-gray-50 z-20">
-                        Created
-                      </TableHead> */}
-                      {/* <TableHead className="py-4 px-6 text-right text-[11px] font-bold text-gray-500 uppercase tracking-wider sticky top-0 bg-gray-50 z-20">
-                        Actions
-                      </TableHead> */}
+            
                     </TableRow>
                   </TableHeader>
                   <TableBody>
                     {loading ? (
                       // Loading skeleton
                       Array.from({ length: pagination.limit }, (_, i) => (
-                        <TableRow key={i}>
+                        <TableRow key={i} className="border-b border-[#EDEAE2]">
                           <TableCell className="py-4 px-6">
                             <div className="flex items-center gap-4">
-                              <div className="w-12 h-12 bg-gray-200 rounded-xl animate-pulse" />
+                              <div className="h-11 w-11 animate-pulse rounded-xl bg-[#EDEAE2]" />
                               <div className="flex flex-col gap-2">
-                                <div className="w-32 h-4 bg-gray-200 rounded animate-pulse" />
-                                <div className="w-20 h-3 bg-gray-200 rounded animate-pulse" />
+                                <div className="h-4 w-32 animate-pulse rounded bg-[#EDEAE2]" />
+                                <div className="h-3 w-20 animate-pulse rounded bg-[#EDEAE2]" />
                               </div>
                             </div>
                           </TableCell>
                           <TableCell className="py-4 px-6 hidden lg:table-cell">
-                            <div className="w-24 h-4 bg-gray-200 rounded animate-pulse" />
+                            <div className="h-4 w-24 animate-pulse rounded bg-[#EDEAE2]" />
                           </TableCell>
                           <TableCell className="py-4 px-6 hidden xl:table-cell">
-                            <div className="w-32 h-4 bg-gray-200 rounded animate-pulse" />
+                            <div className="h-4 w-32 animate-pulse rounded bg-[#EDEAE2]" />
                           </TableCell>
                           <TableCell className="py-4 px-6 hidden md:table-cell">
-                            <div className="w-28 h-4 bg-gray-200 rounded animate-pulse" />
+                            <div className="h-4 w-28 animate-pulse rounded bg-[#EDEAE2]" />
                           </TableCell>
                           <TableCell className="py-4 px-6 hidden lg:table-cell">
-                            <div className="w-36 h-4 bg-gray-200 rounded animate-pulse" />
+                            <div className="h-4 w-36 animate-pulse rounded bg-[#EDEAE2]" />
                           </TableCell>
                           <TableCell className="py-4 px-6 text-center">
-                            <div className="w-16 h-6 bg-gray-200 rounded-full animate-pulse mx-auto" />
+                            <div className="mx-auto h-6 w-16 animate-pulse rounded-full bg-[#EDEAE2]" />
                           </TableCell>
                           <TableCell className="py-4 px-6 hidden xl:table-cell text-center">
-                            <div className="w-20 h-4 bg-gray-200 rounded animate-pulse mx-auto" />
+                            <div className="mx-auto h-4 w-20 animate-pulse rounded bg-[#EDEAE2]" />
                           </TableCell>
                           <TableCell className="py-4 px-6 text-right">
-                            <div className="w-18 h-9 bg-gray-200 rounded animate-pulse ml-auto" />
+                            <div className="ml-auto h-9 w-18 animate-pulse rounded bg-[#EDEAE2]" />
                           </TableCell>
                         </TableRow>
                       ))
@@ -398,18 +399,18 @@ const CustomersList = () => {
                       <TableRow>
                         <TableCell colSpan={8} className="h-96 text-center">
                           <div className="flex flex-col items-center justify-center p-12">
-                            <div className="w-20 h-20 bg-red-50 rounded-full flex items-center justify-center mb-4">
-                              <Users className="w-10 h-10 text-red-400" />
+                            <div className="mb-4 flex h-20 w-20 items-center justify-center rounded-full bg-[#FBE7E7]">
+                              <Users className="h-10 w-10 text-blue-500" />
                             </div>
-                            <h3 className="text-lg font-bold text-gray-900">
+                            <h3 className="text-lg font-bold text-[#1E2A38]">
                               Error loading customers
                             </h3>
-                            <p className="text-sm text-gray-500 mt-1 max-w-xs mx-auto">
+                            <p className="mx-auto mt-1 max-w-xs text-sm text-[#8A93A0]">
                               {error}
                             </p>
                             <Button
                               onClick={fetchCustomers}
-                              className="mt-4 bg-blue-600 hover:bg-blue-700"
+                              className="mt-4 bg-[#1E2A38] text-white hover:bg-[#141D28]"
                             >
                               Try Again
                             </Button>
@@ -428,13 +429,13 @@ const CustomersList = () => {
                       <TableRow>
                         <TableCell colSpan={8} className="h-96 text-center">
                           <div className="flex flex-col items-center justify-center p-12">
-                            <div className="w-20 h-20 bg-gray-50 rounded-full flex items-center justify-center mb-4">
-                              <Users className="w-10 h-10 text-gray-200" />
+                            <div className="mb-4 flex h-20 w-20 items-center justify-center rounded-full bg-[#F3E4DC]">
+                              <Users className="h-10 w-10 text-blue-500" />
                             </div>
-                            <h3 className="text-lg font-bold text-gray-900">
+                            <h3 className="text-lg font-bold text-[#1E2A38]">
                               No customers found
                             </h3>
-                            <p className="text-sm text-gray-500 mt-1 max-w-xs mx-auto">
+                            <p className="mx-auto mt-1 max-w-xs text-sm text-[#8A93A0]">
                               {search
                                 ? "Try adjusting your search terms."
                                 : "Start by adding your first customer."}
@@ -448,7 +449,7 @@ const CustomersList = () => {
               </div>
 
               {/* Pagination Footer */}
-              <div className="shrink-0 px-6 py-4 bg-white border-t border-gray-200/80 z-30 shadow-[0_-4px_6px_-1px_rgba(0,0,0,0.05)]">
+              <div className="z-30 shrink-0 border-t border-[#E7E3DA] bg-white px-6 py-4 shadow-[0_-4px_6px_-1px_rgba(0,0,0,0.03)]">
                 <Pagination
                   currentPage={pagination.currentPage}
                   totalPages={pagination.totalPages}
@@ -458,7 +459,7 @@ const CustomersList = () => {
                   onItemsPerPageChange={handleItemsPerPageChange}
                   loading={loading}
                   variant="enterprise"
-                  className="shadow-none border-none p-0 bg-transparent"
+                  className="border-none bg-transparent p-0 shadow-none"
                 />
               </div>
             </CardContent>
@@ -468,27 +469,36 @@ const CustomersList = () => {
 
       {/* Customer View Modal - Placeholder for now */}
       {viewModalOpen && selectedCustomer && (
-        <div className="fixed inset-0 bg-black bg-opacity-50 flex items-center justify-center z-50">
-          <div className="bg-white rounded-lg p-6 max-w-md w-full mx-4">
-            <h3 className="text-lg font-bold mb-4">Customer Details</h3>
-            <div className="space-y-2">
+        <div className="fixed inset-0 z-50 flex items-center justify-center bg-[#1E2A38]/50 backdrop-blur-sm">
+          <div className="mx-4 w-full max-w-md rounded-2xl border border-[#E7E3DA] bg-white p-6 shadow-xl card-improved animate-pop">
+            <h3 className="mb-4 text-lg font-bold text-[#1E2A38]">
+              Customer Details
+            </h3>
+            <div className="space-y-2.5 text-sm text-[#3B4652]">
               <p>
-                <strong>Name:</strong>{" "}
+                <span className="font-semibold text-[#1E2A38]">Name: </span>
                 {selectedCustomer.name || selectedCustomer.party_name}
               </p>
               <p>
-                <strong>Phone:</strong>{" "}
+                <span className="font-semibold text-[#1E2A38]">Phone: </span>
                 {selectedCustomer.phone || selectedCustomer.mobile}
               </p>
               <p>
-                <strong>Email:</strong> {selectedCustomer.email}
+                <span className="font-semibold text-[#1E2A38]">Email: </span>
+                {selectedCustomer.email}
               </p>
               <p>
-                <strong>Company:</strong> {selectedCustomer.company}
+                <span className="font-semibold text-[#1E2A38]">Company: </span>
+                {selectedCustomer.company}
               </p>
             </div>
-            <div className="flex justify-end mt-4">
-              <Button onClick={() => setViewModalOpen(false)}>Close</Button>
+            <div className="mt-5 flex justify-end">
+              <Button
+                onClick={() => setViewModalOpen(false)}
+                className="bg-[#1E2A38] text-white hover:bg-[#141D28]"
+              >
+                Close
+              </Button>
             </div>
           </div>
         </div>

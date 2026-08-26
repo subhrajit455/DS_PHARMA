@@ -89,11 +89,11 @@ const AdminHeader = ({ onMobileMenuToggle }) => {
       {/* Go to Website Link */}
       <Link
         to="/"
-        className="flex items-center gap-2 group px-2 sm:px-3 py-1.5 rounded-xl text-emerald-700 hover:text-emerald-800 hover:bg-emerald-50/80 transition-all duration-300 border border-emerald-100/50 hover:border-emerald-200 shadow-sm hover:shadow-md h-8 sm:h-9 md:h-10 relative z-10"
+        className="flex items-center gap-3 group px-2 sm:px-3 py-1.5 rounded-xl text-emerald-700 hover:text-emerald-800 hover:bg-emerald-50/80 transition-all duration-300 border border-emerald-100/50 hover:border-emerald-200 shadow-sm hover:shadow-md h-8 sm:h-9 md:h-10 relative z-10"
         title="Visit Main Website"
       >
         <span
-          className="text-[10px] sm:text-xs md:text-sm font-bold tracking-tight bg-gradient-to-r from-emerald-700 to-teal-700 bg-clip-text text-transparent group-hover:scale-105 transition-transform"
+          className="text-[16px] sm:text-xs md:text-sm font-bold tracking-tight bg-gradient-to-r from-emerald-700 to-teal-700 bg-clip-text text-transparent group-hover:scale-105 transition-transform"
           style={{ marginTop: "2px" }}
         >
           DS Pharma
@@ -101,16 +101,7 @@ const AdminHeader = ({ onMobileMenuToggle }) => {
         <ExternalLink className="h-3 w-3 sm:h-4 sm:w-4 md:h-4.5 group-hover:translate-x-0.5 group-hover:-translate-y-0.5 transition-transform" />
       </Link>
 
-      {/* <button
-        onClick={handleSyncFromMarg}
-        className="flex items-center gap-2 group px-2 sm:px-3 py-1.5 rounded-xl text-blue-700 hover:text-blue-800 hover:bg-blue-50/80 transition-all duration-300 border border-blue-100/50 hover:border-blue-200 shadow-sm hover:shadow-md h-8 sm:h-9 md:h-10 relative z-10"
-        title="Sync from marg"
-      >
-        <span className="text-[10px] sm:text-xs md:text-sm font-bold tracking-tight bg-gradient-to-r from-blue-700 to-blue-800 bg-clip-text text-transparent group-hover:scale-105 transition-transform" style={{marginTop:'2px',padding:'2px'}}>
-          Sync 
-        </span>
-        <FolderSync className="h-3 w-3 sm:h-4 sm:w-4 md:h-4.5 group-hover:translate-x-0.5 group-hover:-translate-y-0.5 transition-transform" />
-      </button> */}
+    
 
       <div className="flex flex-1 gap-x-2 sm:gap-x-4 self-stretch items-center lg:gap-x-6 relative z-10 justify-end">
         {/* Center spacing or other element in place of search */}

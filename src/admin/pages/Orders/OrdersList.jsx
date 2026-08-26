@@ -1,6 +1,6 @@
 import React, { useState, useEffect } from "react";
 import axios from "axios";
-import { Search, Filter, Eye, Sparkles } from "lucide-react";
+import { Search, Filter, Eye, Package } from "lucide-react";
 import toastUtil from "@/shared/utils/toast";
 import { Button } from "@/admin/components/ui/Button";
 import { Input } from "@/admin/components/ui/Input";
@@ -26,6 +26,16 @@ import { Pagination } from "@/admin/components/ui/Pagination";
 import Loading from "@/shared/components/common/Loading";
 import { adminOrderUrl } from "@/config/userApi";
 import OrderDetailsModal from "./OrderDetailsModal";
+
+// Presentational-only helper: maps an order status to badge colors.
+// Does not affect any data or logic.
+const ORDER_STATUS_STYLES = {
+  Processing: "bg-[#FBF1D9] text-[#8A6600] border border-[#EFDBA0]",
+  Shipped: "bg-[#E4EEF3] text-[#2E5A70] border border-[#C7DEE7]",
+  "Out for Delivery": "bg-[#F3E4DC] text-[#8A4B2C] border border-[#E7D8CC]",
+  Delivered: "bg-[#E7EEE7] text-[#3A5340] border border-[#CFE0CF]",
+  Cancelled: "bg-[#FBE7E7] text-[#8E2E3A] border border-[#F3D3D3]",
+};
 
 const OrdersList = () => {
   const [orders, setOrders] = useState([]);
@@ -108,34 +118,37 @@ const OrdersList = () => {
 
   if (isLoading && orders.length === 0) {
     return (
-      <div className="flex h-[50vh] items-center justify-center">
+      <div className="flex h-[50vh] items-center justify-center bg-[#F7F6F2]">
         <Loading size="large" text="Loading orders..." />
       </div>
     );
   }
 
   return (
-    <div className="h-full flex flex-col space-y-4 p-4">
+    <div className="flex h-full flex-col space-y-5 bg-[#F7F6F2] p-4 sm:p-6">
+      <div className="container-max mx-auto w-full">
       {/* Header */}
-      <div className="flex justify-between items-center">
+      <div className="flex items-center justify-between">
         <div>
-          <h2 className="text-3xl font-bold flex items-center gap-2">
-            Orders <Sparkles className="text-emerald-500" />
+         
+          <h2 className="mt-1 flex items-center gap-2 text-2xl font-bold tracking-tight text-[#1E2A38] sm:text-3xl">
+            Orders
+            <Package className="h-6 w-6 text-blue-500" />
           </h2>
-          <p className="text-gray-500 text-sm">
+          <p className="mt-1 text-sm text-[#6B7580]">
             Manage and track customer orders
           </p>
         </div>
       </div>
 
-      <Card>
-        <CardContent className="p-4">
+      <Card className="rounded-2xl border border-[#E7E3DA] bg-white shadow-sm card-improved animate-fade-in">
+        <CardContent className="p-4 sm:p-5">
           {/* Filters */}
-          <div className="flex justify-between mb-4">
+          <div className="mb-4 flex flex-col gap-3 sm:flex-row sm:items-center sm:justify-between">
             {/* Status Filter */}
             <DropdownMenu>
-              <DropdownMenuTrigger className="flex items-center gap-2 border px-3 py-2 rounded">
-                <Filter size={16} />
+              <DropdownMenuTrigger className="flex items-center gap-2 rounded-lg border border-[#E7E3DA] bg-white px-3.5 py-2 text-sm font-medium text-[#1E2A38] shadow-sm transition-colors hover:border-[#D8D2C4] hover:bg-[#FAF9F6] soft-transition">
+                <Filter size={16} className="text-blue-500" />
                 {activeStatus === "All" ? "Filter Status" : activeStatus}
               </DropdownMenuTrigger>
 
@@ -155,42 +168,68 @@ const OrdersList = () => {
             </DropdownMenu>
 
             {/* Search */}
-            <div className="relative w-72">
+            <div className="relative w-full sm:w-72">
               <Search
-                className="absolute right-3 top-3 text-gray-500"
+                className="absolute right-3 top-1/2 -translate-y-1/2 text-[#B3AFA4]"
                 size={16}
               />
               <Input
-                placeholder="Search Order..."
+                placeholder="Search order…"
+                placeholderTextColor="gray-500"
                 value={searchQuery}
                 onChange={(e) => {
                   setSearchQuery(e.target.value);
                   setCurrentPage(1);
                 }}
+                className="border-blue-400 focus-visible:ring-[#B5502D]/20"
               />
             </div>
           </div>
 
           {/* Table */}
-          <div className="overflow-auto border rounded">
+          <div className="overflow-auto rounded-xl border border-[#E7E3DA] animate-fade-in">
             <Table>
               <TableHeader>
-                <TableRow>
-                  <TableHead>Order ID</TableHead>
-                  <TableHead>Date</TableHead>
-                  <TableHead>Shop Name</TableHead>
-                  <TableHead>Total</TableHead>
-                  <TableHead>Payment</TableHead>
-                  <TableHead>Status</TableHead>
-                  <TableHead className="text-right">Actions</TableHead>
+                <TableRow className="border-b border-[#E7E3DA] bg-[#FAF9F6] hover:bg-[#FAF9F6]">
+                  <TableHead className="text-[11px] font-semibold uppercase tracking-wider text-[#8A93A0]">
+                    Order ID
+                  </TableHead>
+                  <TableHead className="text-[11px] font-semibold uppercase tracking-wider text-[#8A93A0]">
+                    Date
+                  </TableHead>
+                  <TableHead className="text-[11px] font-semibold uppercase tracking-wider text-[#8A93A0]">
+                    Shop Name
+                  </TableHead>
+                  <TableHead className="text-[11px] font-semibold uppercase tracking-wider text-[#8A93A0]">
+                    Total
+                  </TableHead>
+                  <TableHead className="text-[11px] font-semibold uppercase tracking-wider text-[#8A93A0]">
+                    Payment
+                  </TableHead>
+                   <TableHead className="text-[11px] font-semibold uppercase tracking-wider text-[#8A93A0]">
+                    Method
+                  </TableHead>
+                  <TableHead className="text-[11px] font-semibold uppercase tracking-wider text-[#8A93A0]">
+                    Status
+                  </TableHead>
+                  <TableHead className="text-right text-[11px] font-semibold uppercase tracking-wider text-[#8A93A0]">
+                    Actions
+                  </TableHead>
                 </TableRow>
               </TableHeader>
 
               <TableBody>
                 {orders.length === 0 ? (
                   <TableRow>
-                    <TableCell colSpan={7} className="text-center">
-                      No Orders Found
+                    <TableCell colSpan={7} className="py-14 text-center">
+                      <div className="flex flex-col items-center gap-2">
+                        <div className="flex h-12 w-12 items-center justify-center rounded-full bg-[#F3E4DC]">
+                          <Package className="h-6 w-6 text-[#B5502D]" />
+                        </div>
+                        <p className="text-sm font-semibold text-[#1E2A38]">
+                          No orders found
+                        </p>
+                      </div>
                     </TableCell>
                   </TableRow>
                 ) : (
@@ -203,30 +242,30 @@ const OrdersList = () => {
                     .map((order) => (
                       <TableRow
                         key={order._id}
-                        className="hover:bg-gray-50 cursor-pointer"
+                        className="cursor-pointer border-b border-[#EDEAE2] transition-colors hover:bg-[#FAF9F6]"
                         onClick={() => {
                           setSelectedOrder(order);
                           setIsModalOpen(true);
                         }}
                       >
-                        <TableCell>
+                        <TableCell className="font-mono text-[13px] font-semibold text-[#1E2A38]">
                           #{order._id.slice(-6).toUpperCase()}
                         </TableCell>
 
-                        <TableCell>
+                        <TableCell className="text-sm text-[#55636F]">
                           {new Date(order.createdAt).toLocaleDateString()}
                         </TableCell>
 
-                        <TableCell>
+                        <TableCell className="text-sm font-medium text-[#1E2A38]">
                           {order.CustomerDetails?.CustName || "N/A"}
                         </TableCell>
 
-                        <TableCell>
+                        <TableCell className="text-sm text-[#55636F]">
                           {order.ProductDetails?.length || 0} items
                         </TableCell>
 
-                        <TableCell className="font-bold">
-                          ₹{order.PaymentDetails?.totalInvoiceValue || 0}
+                        <TableCell className="text-sm font-bold text-[#1E2A38]">
+                          ₹ {Number(order.PaymentDetails?.totalInvoiceValue || 0).toFixed(2)}
                         </TableCell>
 
                         <TableCell>
@@ -235,6 +274,11 @@ const OrdersList = () => {
                               order.PaymentDetails?.paymentmode == "0"
                                 ? "success"
                                 : "secondary"
+                            }
+                            className={
+                              order.PaymentDetails?.paymentmode == "0"
+                                ? "border border-[#CFE0CF] bg-[#E7EEE7] text-[#3A5340]"
+                                : "border border-[#E7D8CC] bg-[#F3E4DC] text-blue-500"
                             }
                           >
                             {order.PaymentDetails?.paymentmode == "1"
@@ -249,7 +293,11 @@ const OrdersList = () => {
                             onChange={(e) =>
                               handleStatusUpdate(order._id, e.target.value)
                             }
-                            className="border p-1 rounded"
+                            className={`rounded-full px-3 py-1.5 text-xs font-semibold shadow-sm outline-none transition-all focus:ring-2 focus:ring-[#B5502D]/20 ${
+                              ORDER_STATUS_STYLES[
+                                order.orderStatus || "Processing"
+                              ] || "bg-[#EEEFF1] text-[#4B5563] border border-[#E2E4E8]"
+                            }`}
                           >
                             <option value="Processing">Processing</option>
                             <option value="Shipped">Shipped</option>
@@ -265,6 +313,7 @@ const OrdersList = () => {
                           <Button
                             variant="ghost"
                             size="sm"
+                            className="gap-1.5 text-[#55636F] hover:bg-[#F3E4DC] hover:text-[#B5502D]"
                             onClick={(e) => {
                               e.stopPropagation();
                               setSelectedOrder(order);
@@ -303,6 +352,7 @@ const OrdersList = () => {
         isOpen={isModalOpen}
         onClose={setIsModalOpen}
       />
+      </div>
     </div>
   );
 };

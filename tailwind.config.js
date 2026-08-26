@@ -49,7 +49,8 @@ export default {
         },
       },
       fontFamily: {
-        sans: ["Gyrotrope", "sans-serif"],
+        sans: ["Inter", "Gyrotrope", "system-ui", "-apple-system", "Segoe UI", "Roboto", "Helvetica Neue", "Arial"],
+        display: ["Gyrotrope", "Inter", "system-ui", "sans-serif"],
         gyrotrope: ["Gyrotrope", "sans-serif"],
       },
       backgroundImage: {

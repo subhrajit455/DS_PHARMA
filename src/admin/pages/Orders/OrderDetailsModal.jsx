@@ -19,16 +19,17 @@ const OrderDetailsModal = ({ order, isOpen, onClose }) => {
     <Dialog open={isOpen} onOpenChange={onClose}>
       <DialogContent className="max-w-4xl max-h-[90vh] overflow-y-auto">
         <DialogHeader>
-          <div className="flex justify-between items-center w-full">
+          <div className="flex justify-between items-center ">
             <DialogTitle>
               Order Details #{order._id?.slice(-6).toUpperCase()}
+             
             </DialogTitle>
             <Badge
               variant={
                 order.orderStatus === "Delivered" ? "success" : "secondary"
               }
             >
-              {order.orderStatus || "N/A"}
+              {order.orderStatus || ""}
             </Badge>
           </div>
           <p className="text-sm text-gray-500">
@@ -40,7 +41,7 @@ const OrderDetailsModal = ({ order, isOpen, onClose }) => {
                   month: "long",
                   day: "numeric",
                 })
-              : "N/A"}
+              : ""}
           </p>
         </DialogHeader>
 

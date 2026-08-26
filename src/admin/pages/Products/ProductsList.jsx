@@ -244,7 +244,7 @@ const ProductsList = () => {
               placeholder="Search products by brand, code, or salt name..."
               value={search}
               onChange={handleSearchChange}
-              className="block w-full pl-10 pr-4 py-2.5 bg-white border border-gray-300/80 rounded-xl text-sm placeholder:text-gray-400 focus:outline-none focus:ring-4 focus:ring-emerald-500/10 focus:border-emerald-500 transition-all shadow-sm group-hover:border-gray-400"
+              className="block w-full h-12 pl-10 pr-4 py-2.5 bg-white border border-gray-300/80 rounded-xl text-sm placeholder:text-gray-400 focus:outline-none focus:ring-4 focus:ring-emerald-500/10 focus:border-emerald-500 transition-all shadow-sm group-hover:border-gray-400"
             />
           </div>
           <div className="flex items-center gap-2 ml-auto shrink-0 overflow-x-auto w-full md:w-auto pb-2 md:pb-0 no-scrollbar">

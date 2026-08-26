@@ -8,11 +8,36 @@
 
 @import "tailwindcss";
 
+:root {
+  --color-bg: #fafafa;
+  --color-surface: #ffffff;
+  --color-primary: #14b8a6;
+  --color-primary-600: #0d9488;
+  --color-muted: #6b7280;
+  --radius: 12px;
+  --radius-sm: 8px;
+  --shadow-sm: 0 6px 12px rgba(16,24,40,0.06);
+  --shadow-md: 0 10px 25px rgba(16,24,40,0.08);
+}
+
 * {
   margin: 0;
   padding: 0;
   box-sizing: border-box;
-  font-family: 'Gyrotrope';
+}
+
+/* Use Google-imported Inter as the default UI font, keep Gyrotrope for display if needed */
+body, html {
+  font-family: 'Inter', system-ui, -apple-system, 'Segoe UI', Roboto, 'Helvetica Neue', Arial;
+  background: var(--color-bg);
+  color: #0f172a;
+  -webkit-font-smoothing: antialiased;
+  -moz-osx-font-smoothing: grayscale;
+}
+
+/* A small utility to apply the display font */
+.display-font {
+  font-family: 'Gyrotrope', 'Inter', system-ui, sans-serif;
 }
 
 /* Prevent horizontal scroll on small screens */
@@ -522,4 +547,102 @@ button {
 
 .Toastify__close-button:hover {
   opacity: 1;
+}
+
+/* ==========================
+   UI Spacing & Animations
+   ========================== */
+
+.container-max {
+  max-width: 1400px;
+  margin-left: auto;
+  margin-right: auto;
+  padding-left: 1rem;
+  padding-right: 1rem;
+}
+
+.section {
+  padding-top: 1.25rem;
+  padding-bottom: 1.25rem;
+}
+
+.card-improved {
+  border-radius: 14px;
+  padding: 1rem;
+  background: var(--color-surface);
+  box-shadow: 0 8px 22px rgba(16,24,40,0.06);
+  transition: transform .18s ease, box-shadow .18s ease;
+}
+
+.card-improved:hover {
+  transform: translateY(-4px);
+  box-shadow: 0 20px 40px rgba(16,24,40,0.08);
+}
+
+.table-row-hover:hover {
+  background: rgba(14,165,233,0.02);
+  transform: translateY(-1px);
+}
+
+.soft-transition {
+  transition: all .16s cubic-bezier(.2,.9,.25,1);
+}
+
+@keyframes fadeInUp {
+  from { opacity: 0; transform: translateY(6px); }
+  to { opacity: 1; transform: translateY(0); }
+}
+
+.animate-fade-in {
+  animation: fadeInUp .36s ease both;
+}
+
+@keyframes pop {
+  0% { transform: scale(.98); opacity: 0; }
+  60% { transform: scale(1.02); opacity: 1; }
+  100% { transform: scale(1); }
+}
+
+.animate-pop {
+  animation: pop .32s cubic-bezier(.2,.9,.25,1) both;
+}
+
+/* Utility for consistent gaps
+   Use on flex/stack containers */
+.gap-safe > * + * {
+  margin-top: 0.75rem;
+}
+
+.gap-safe-sm > * + * {
+  margin-top: 0.5rem;
+}
+
+.focus-glow:focus {
+  box-shadow: 0 8px 24px rgba(20,184,166,0.12);
+  border-color: var(--color-primary);
+}
+
+/* ==========================
+   Admin panel font styles
+   Scoped under .admin-root to avoid changing other pages
+   ========================== */
+.admin-root {
+  --admin-font-sans: 'Poppins', Inter, system-ui, -apple-system, 'Segoe UI', Roboto, 'Helvetica Neue', Arial;
+  --admin-font-display: 'Poppins', 'Gyrotrope', system-ui, sans-serif;
+  font-family: var(--admin-font-sans);
+}
+
+.admin-root h1, .admin-root h2, .admin-root h3, .admin-root .card-title {
+  font-family: var(--admin-font-display);
+  font-weight: 600;
+}
+
+.admin-root .admin-sidebar, .admin-root .admin-sidebar a, .admin-root .admin-sidebar button {
+  font-family: var(--admin-font-sans);
+  font-weight: 600;
+  letter-spacing: 0.01em;
+}
+
+.admin-root .min-w-0, .admin-root p, .admin-root span, .admin-root .text-sm, .admin-root .text-xs {
+  font-family: var(--admin-font-sans);
 }

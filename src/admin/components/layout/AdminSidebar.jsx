@@ -142,7 +142,7 @@ const AdminSidebar = ({
             <h1 className="font-bold text-lg bg-linear-to-r from-emerald-400 to-teal-400 bg-clip-text text-transparent">
               AdminPanel
             </h1>
-            <p className="text-[10px] text-slate-500 font-medium">DS Pharma</p>
+            <p className="text-[14px] text-slate-300 font-medium">DS Pharma</p>
           </div>
         </div>
         {!isMobile && (
