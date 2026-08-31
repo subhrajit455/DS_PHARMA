@@ -201,7 +201,7 @@ const Home = () => {
 
       {/* ================= PRODUCTS ================= */}
       <section className="w-full py-8 min-h-screen">
-        <div className="w-full max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
+        <div className="w-full px-4 sm:px-6 lg:px-8">
 
           {/* Header */}
           <div className="flex justify-between items-center mb-6">
