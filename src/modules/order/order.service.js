@@ -27,12 +27,20 @@ export const createOrderService = async (
   type = 'S',
 ) => {
   try {
-    const rawCustomerId = String(CustomerDetails?.CustomerID || '').trim();
-    const rawMobile = String(CustomerDetails?.CustMobile || CustomerDetails?.phone || '').trim();
+    // Helper to sanitize text fields for Marg ERP
+    const sanitizeStr = (val, defaultVal = '') => {
+      if (val === undefined || val === null || val === 'undefined' || val === 'null') {
+        return defaultVal;
+      }
+      return String(val).replace(/[\r\n]+/g, ' ').trim();
+    };
 
-    // 1. Resolve Marg party to get the real Marg Party Code
+    const rawCustomerId = sanitizeStr(CustomerDetails?.CustomerID);
+    const rawMobile = sanitizeStr(CustomerDetails?.CustMobile || CustomerDetails?.phone);
+
+    // 1. Resolve Marg party to get the real Marg Party Code / rid
     const searchConditions = [];
-    if (rawCustomerId && rawCustomerId !== 'undefined') {
+    if (rawCustomerId) {
       searchConditions.push(
         { rid: rawCustomerId },
         { code: rawCustomerId },
@@ -42,63 +50,77 @@ export const createOrderService = async (
         searchConditions.push({ _id: rawCustomerId });
       }
     }
-    if (rawMobile && rawMobile !== 'undefined') {
-      searchConditions.push({ phone1: rawMobile }, { phone2: rawMobile });
+    if (rawMobile) {
+      searchConditions.push(
+        { phone1: rawMobile },
+        { phone2: rawMobile },
+        { userId: rawMobile },
+      );
     }
 
     const party = searchConditions.length > 0
       ? await MargParties.findOne({ $or: searchConditions }).lean()
       : null;
 
-    // Use party.code (or MargCode/rid) as CustomerID for Marg ERP
-    const validCustomerId = party?.code || party?.MargCode || party?.rid || CustomerDetails?.CustomerID || '';
-    const validCustName =
+    // Use party.code (or MargCode/rid) as CustomerID for Marg ERP, trimmed of spaces
+    const validCustomerId = sanitizeStr(
+      party?.code || party?.MargCode || party?.rid || CustomerDetails?.CustomerID
+    );
+    const validCustName = sanitizeStr(
       party?.name ||
       CustomerDetails?.CustName ||
       CustomerDetails?.shipname ||
-      CustomerDetails?.shipName ||
-      '';
-    const validCustMobile =
+      CustomerDetails?.shipName
+    );
+    const validCustMobile = sanitizeStr(
       party?.phone1 ||
       party?.phone2 ||
+      party?.userId ||
       CustomerDetails?.CustMobile ||
-      CustomerDetails?.phone ||
-      '';
-    const validAddress =
+      CustomerDetails?.phone
+    );
+    const validAddress = sanitizeStr(
       party?.address ||
-      CustomerDetails?.Address ||
-      '';
-
+      CustomerDetails?.Address
+    );
+    const shipName = sanitizeStr(
+      CustomerDetails?.shipname ||
+      CustomerDetails?.shipName ||
+      validCustName
+    );
+    const shipAdd1 = sanitizeStr(CustomerDetails?.shipAdd1 || validAddress);
+    const shipAdd2 = sanitizeStr(CustomerDetails?.shipAdd2);
+    const shipAdd3 = sanitizeStr(CustomerDetails?.shipAdd3);
 
     await syncMasterOrderDataService(String(ecomSalesManId), type, {
       OrderID: String(OrderID),
       OrderNo: String(OrderNo),
-      CustomerID: String(validCustomerId),
-      ProductCode: String(ProductDetails?.map(item => item.code || item.ProductCode || item.rid).join(',')),
+      CustomerID: validCustomerId,
+      ProductCode: String(ProductDetails?.map(item => sanitizeStr(item.code || item.ProductCode || item.rid)).join(',')),
       Quantity: String(ProductDetails?.map(item => item.Quantity ?? item.quantity ?? 1).join(',')),
       Free: String(ProductDetails?.map(item => item.Free ?? item.free ?? 0).join(',')),
-      Lat: String(CustomerDetails?.Lat) || '',
-      Lng: String(CustomerDetails?.Lng) || '',
-      Address: String(validAddress) || '',
+      Lat: sanitizeStr(CustomerDetails?.Lat, '0') || '0',
+      Lng: sanitizeStr(CustomerDetails?.Lng, '0') || '0',
+      Address: validAddress,
       GpsID: '0',
       UserType: '1',
       Points: parseFloat(CustomerDetails?.Points || 0).toFixed(2),
-      Discounts: String(CustomerDetails?.Discounts) || '0',
-      Transport: String(CustomerDetails?.Transport) || '',
-      Delivery: String(CustomerDetails?.Delivery) || '',
-      Bankname: String(CustomerDetails?.Bankname) || '',
-      BankAdd1: String(CustomerDetails?.BankAdd1) || '',
-      BankAdd2: String(CustomerDetails?.BankAdd2) || '',
-      shipname: String(CustomerDetails?.shipName) || '',
-      shipAdd1: String(CustomerDetails?.shipAdd1) || '',
-      shipAdd2: String(CustomerDetails?.shipAdd2) || '',
-      shipAdd3: String(CustomerDetails?.shipAdd3) || '',
-      paymentmode: String(PaymentDetails?.paymentmode) || '',
-      paymentmodeAmount: String(PaymentDetails?.totalInvoiceValue) || '0',
-      payment_remarks: String(PaymentDetails?.payment_remarks) || '',
-      order_remarks: String(CustomerDetails?.order_remarks) || '',
-      CustName: String(validCustName) || '',
-      CustMobile: String(validCustMobile) || '',
+      Discounts: sanitizeStr(CustomerDetails?.Discounts, '0') || '0',
+      Transport: sanitizeStr(CustomerDetails?.Transport),
+      Delivery: sanitizeStr(CustomerDetails?.Delivery),
+      Bankname: sanitizeStr(CustomerDetails?.Bankname),
+      BankAdd1: sanitizeStr(CustomerDetails?.BankAdd1),
+      BankAdd2: sanitizeStr(CustomerDetails?.BankAdd2),
+      shipname: shipName,
+      shipAdd1: shipAdd1,
+      shipAdd2: shipAdd2,
+      shipAdd3: shipAdd3,
+      paymentmode: sanitizeStr(PaymentDetails?.paymentmode, '1'),
+      paymentmodeAmount: String(PaymentDetails?.totalInvoiceValue || PaymentDetails?.totalAmount || '0'),
+      payment_remarks: sanitizeStr(PaymentDetails?.payment_remarks),
+      order_remarks: sanitizeStr(CustomerDetails?.order_remarks),
+      CustName: validCustName,
+      CustMobile: validCustMobile,
     });
 
     const otp = generateOTP();
@@ -110,7 +132,7 @@ export const createOrderService = async (
       CustomerDetails: {
         ...CustomerDetails,
         CustomerID: validCustomerId,
-        partyCode: party?.code || '',
+        partyCode: party?.code ? sanitizeStr(party.code) : '',
         rid: party?.rid || CustomerDetails?.CustomerID || '',
         CustName: validCustName,
         CustMobile: validCustMobile,
