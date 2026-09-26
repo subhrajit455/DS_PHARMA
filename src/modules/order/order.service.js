@@ -62,10 +62,13 @@ export const createOrderService = async (
       ? await MargParties.findOne({ $or: searchConditions }).lean()
       : null;
 
-    // Use party.code (or MargCode/rid) as CustomerID for Marg ERP, trimmed of spaces
-    const validCustomerId = sanitizeStr(
-      party?.code || party?.MargCode || party?.rid || CustomerDetails?.CustomerID
+    // Marg ERP expects the party's numeric rid as CustomerID, blank OrderID, and integer OrderNo (<= 8 digits)
+    const margCustomerId = sanitizeStr(
+      party?.rid || CustomerDetails?.CustomerID || party?.code
     );
+    const margOrderNo = String(OrderNo).length > 8
+      ? String(OrderNo).slice(-8)
+      : String(OrderNo);
     const validCustName = sanitizeStr(
       party?.name ||
       CustomerDetails?.CustName ||
@@ -93,9 +96,9 @@ export const createOrderService = async (
     const shipAdd3 = sanitizeStr(CustomerDetails?.shipAdd3);
 
     await syncMasterOrderDataService(String(ecomSalesManId), type, {
-      OrderID: String(OrderID),
-      OrderNo: String(OrderNo),
-      CustomerID: validCustomerId,
+      OrderID: '',
+      OrderNo: margOrderNo,
+      CustomerID: margCustomerId,
       ProductCode: String(ProductDetails?.map(item => sanitizeStr(item.code || item.ProductCode || item.rid)).join(',')),
       Quantity: String(ProductDetails?.map(item => item.Quantity ?? item.quantity ?? 1).join(',')),
       Free: String(ProductDetails?.map(item => item.Free ?? item.free ?? 0).join(',')),
@@ -131,7 +134,7 @@ export const createOrderService = async (
       Sid: salesManId,
       CustomerDetails: {
         ...CustomerDetails,
-        CustomerID: validCustomerId,
+        CustomerID: margCustomerId,
         partyCode: party?.code ? sanitizeStr(party.code) : '',
         rid: party?.rid || CustomerDetails?.CustomerID || '',
         CustName: validCustName,
