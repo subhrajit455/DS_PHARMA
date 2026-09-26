@@ -15,6 +15,8 @@ export const createOrder = asyncHandler(async (req, res) => {
   const { salesManId } = req.params;
   const { OrderID, OrderNo, CustomerDetails, ProductDetails, PaymentDetails } =
     req.body;
+  
+  console.log('req.body :: ', req.body);
 
   if (
     !OrderID ||

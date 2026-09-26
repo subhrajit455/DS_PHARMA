@@ -26,11 +26,11 @@ export const loginService = async payload => {
     '-password',
   );
 
-  console.log('details :: ', {
-    id: userDetails._id,
-    userId: userDetails.phone,
-    role: userDetails.role,
-  });
+  // console.log('details :: ', {
+  //   id: userDetails._id,
+  //   userId: userDetails.phone,
+  //   role: userDetails.role,
+  // });
 
   const token = generateToken({
     id: userDetails._id,
@@ -47,7 +47,7 @@ export const loginService = async payload => {
 export const getUserProfile = async userId => {
   const user = await Staff.findOne({ phone: userId }).select('-password');
 
-  console.log('user :: ', user);
+  // console.log('user :: ', user);
 
   if (!user) {
     throw new ApiError(404, 'User not found');

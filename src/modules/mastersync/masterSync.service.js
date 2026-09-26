@@ -395,15 +395,25 @@ export const syncMasterOrderDataService = async (
 
     console.log('Marg InsertOrderDetail Response:', JSON.stringify(margData));
 
-    if (
-      margData &&
-      (margData.Status === 'Error' ||
-        margData.Status === 'Fail' ||
-        margData.status === '0' ||
-        margData.status === 0)
-    ) {
+    const statusVal = (
+      margData?.Status ||
+      margData?.Details?.Status ||
+      margData?.status ||
+      margData?.Details?.status ||
+      ''
+    ).toString().toLowerCase();
+
+    const isError =
+      statusVal === 'error' ||
+      statusVal === 'fail' ||
+      statusVal === 'failure' ||
+      statusVal === '0';
+
+    if (isError) {
       const errorMsg =
         margData.message ||
+        margData.Details?.Message ||
+        margData.Details?.message ||
         margData.Msg ||
         margData.error ||
         'Marg rejected the order';

@@ -6,7 +6,6 @@ import {
   fetchOrderByParty,
   fetchOrderBySalesman,
   fetchOrders,
-  resendOTP,
   updateOrderStatus,
 } from "./order.controller.js";
 
@@ -24,3 +23,4 @@ export default orderRouter;
 export const userOrder = Router();
 
 userOrder.get("/userOrder", authMiddleware, fetchOrderByParty);
+userOrder.put("/orderstatusupdate/:OrderID", authMiddleware, updateOrderStatus);

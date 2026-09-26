@@ -1,7 +1,9 @@
+import mongoose from 'mongoose';
 import { ecomSalesManId } from '../../config/credentials.js';
 import { generateOTP } from '../../helpers/generateOTP.js';
 import ApiError from '../../utils/apiError.js';
 import { syncMasterOrderDataService } from '../mastersync/masterSync.service.js';
+import MargParties from '../mastersync/marg_parties.model.js';
 import Orders from './order.model.js';
 
 const MONTH_NAMES = [
@@ -25,16 +27,59 @@ export const createOrderService = async (
   type = 'S',
 ) => {
   try {
+    const rawCustomerId = String(CustomerDetails?.CustomerID || '').trim();
+    const rawMobile = String(CustomerDetails?.CustMobile || CustomerDetails?.phone || '').trim();
+
+    // 1. Resolve Marg party to get the real Marg Party Code
+    const searchConditions = [];
+    if (rawCustomerId && rawCustomerId !== 'undefined') {
+      searchConditions.push(
+        { rid: rawCustomerId },
+        { code: rawCustomerId },
+        { MargCode: rawCustomerId },
+      );
+      if (mongoose.isValidObjectId(rawCustomerId)) {
+        searchConditions.push({ _id: rawCustomerId });
+      }
+    }
+    if (rawMobile && rawMobile !== 'undefined') {
+      searchConditions.push({ phone1: rawMobile }, { phone2: rawMobile });
+    }
+
+    const party = searchConditions.length > 0
+      ? await MargParties.findOne({ $or: searchConditions }).lean()
+      : null;
+
+    // Use party.code (or MargCode/rid) as CustomerID for Marg ERP
+    const validCustomerId = party?.code || party?.MargCode || party?.rid || CustomerDetails?.CustomerID || '';
+    const validCustName =
+      party?.name ||
+      CustomerDetails?.CustName ||
+      CustomerDetails?.shipname ||
+      CustomerDetails?.shipName ||
+      '';
+    const validCustMobile =
+      party?.phone1 ||
+      party?.phone2 ||
+      CustomerDetails?.CustMobile ||
+      CustomerDetails?.phone ||
+      '';
+    const validAddress =
+      party?.address ||
+      CustomerDetails?.Address ||
+      '';
+
+
     await syncMasterOrderDataService(String(ecomSalesManId), type, {
       OrderID: String(OrderID),
       OrderNo: String(OrderNo),
-      CustomerID: String(CustomerDetails?.CustomerID || CustomerDetails?.code || CustomerDetails?.MargCode || ''),
+      CustomerID: String(validCustomerId),
       ProductCode: String(ProductDetails?.map(item => item.code || item.ProductCode || item.rid).join(',')),
       Quantity: String(ProductDetails?.map(item => item.Quantity ?? item.quantity ?? 1).join(',')),
       Free: String(ProductDetails?.map(item => item.Free ?? item.free ?? 0).join(',')),
       Lat: String(CustomerDetails?.Lat) || '',
       Lng: String(CustomerDetails?.Lng) || '',
-      Address: String(CustomerDetails?.Address) || '',
+      Address: String(validAddress) || '',
       GpsID: '0',
       UserType: '1',
       Points: parseFloat(CustomerDetails?.Points || 0).toFixed(2),
@@ -52,8 +97,8 @@ export const createOrderService = async (
       paymentmodeAmount: String(PaymentDetails?.totalInvoiceValue) || '0',
       payment_remarks: String(PaymentDetails?.payment_remarks) || '',
       order_remarks: String(CustomerDetails?.order_remarks) || '',
-      CustName: String(CustomerDetails?.CustName) || '',
-      CustMobile: String(CustomerDetails?.CustMobile) || '',
+      CustName: String(validCustName) || '',
+      CustMobile: String(validCustMobile) || '',
     });
 
     const otp = generateOTP();
@@ -62,7 +107,14 @@ export const createOrderService = async (
       OrderID: OrderID,
       OrderNo: OrderNo,
       Sid: salesManId,
-      CustomerDetails,
+      CustomerDetails: {
+        ...CustomerDetails,
+        CustomerID: validCustomerId,
+        partyCode: party?.code || '',
+        rid: party?.rid || CustomerDetails?.CustomerID || '',
+        CustName: validCustName,
+        CustMobile: validCustMobile,
+      },
       PaymentDetails,
       ProductDetails,
       OTP: otp,
@@ -211,8 +263,12 @@ export const updateOrderService = async (OrderID, status) => {
   }
 
   try {
+    const filter = mongoose.isValidObjectId(OrderID)
+      ? { $or: [{ _id: OrderID }, { OrderID }] }
+      : { OrderID };
+
     const order = await Orders.findOneAndUpdate(
-      { OrderID },
+      filter,
       { $set: { Status: status } },
       {
         new: true,
@@ -231,12 +287,35 @@ export const updateOrderService = async (OrderID, status) => {
 };
 
 export const fetchOrderByPartyService = async CustomerId => {
-  console.log(CustomerId);
+  console.log('fetchOrderByPartyService CustomerId:', CustomerId);
 
   try {
+    const rawId = String(CustomerId || '').trim();
+    const party = rawId
+      ? await MargParties.findOne({
+          $or: [
+            { rid: rawId },
+            { code: rawId },
+            { MargCode: rawId },
+            ...(mongoose.isValidObjectId(rawId) ? [{ _id: rawId }] : []),
+          ],
+        }).lean()
+      : null;
+
+    const possibleIds = [
+      rawId,
+      party?.rid,
+      party?.code,
+      party?.MargCode,
+    ].filter(Boolean);
+
     const orders = await Orders.find({
-      'CustomerDetails.CustomerID': CustomerId,
-    });
+      $or: [
+        { 'CustomerDetails.CustomerID': { $in: possibleIds } },
+        { 'CustomerDetails.rid': { $in: possibleIds } },
+        { 'CustomerDetails.partyCode': { $in: possibleIds } },
+      ],
+    }).sort({ createdAt: -1 });
 
     return orders;
   } catch (error) {

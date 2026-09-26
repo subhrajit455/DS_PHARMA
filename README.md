@@ -222,5 +222,57 @@ For issues or questions:
 3. Check Marg ERP API documentation
 
 ---
+# ------------------------------------------ DEVELOPEMENT ------------------------------------------
+# MONGO_URI=mongodb://vaisdt06:vaisdt06@ac-n0z6qnj-shard-00-00.k7etnh3.mongodb.net:27017,ac-n0z6qnj-shard-00-01.k7etnh3.mongodb.net:27017,ac-n0z6qnj-shard-00-02.k7etnh3.mongodb.net:27017/?ssl=true&replicaSet=atlas-11wy6v-shard-0&authSource=admin&appName=Cluster0/DSPharma
+# MONGO_URI=mongodb://localhost:27017/DSPharma
+# PORT=8080
+# JWT_SECRET=e991764d333fabaac43b351fada68b85c0c5200ad9156ce2
+# JWT_EXPIRES_IN=1d
+# VITE_MARG_API_BASE_URL=https://corporate.margerp.com/api/eOnlineData
+# VITE_COMPANY_CODE=DSPHARMA3
+# VITE_MARG_ID=423875
+# VITE_DECRYPTION_KEY=N9JB7B4H0QHV
+# VAIS_BUCKET_API_KEY=fup_232a28a4_de6f29b910ac06959d690901f3221b97301657e6b2459173eae6562244022e42
+# VAIS_BUCKET_FOLDER_ID=697b4c400829419d7080fe7c
+# BACKEND_URL=http://192.168.0.123:5000
+# DEFAULT_PRODUCT_IMAGE_URL=https://jetsonpharma.com/wp-content/uploads/2023/05/medicine-placeholder-300x300.png
+# NODE_ENV=dev
+# EMAIL_USER=vaisdt81@gmail.com
+# EMAIL_PASSWORD=bamz lxml mzhy rmmd
+# ADMIN_ID=0b188583-9796-40e5-a332-2c2d572e7f85
+# ADMIN_USER_ID=DSPHARMA
+# ADMIN_PASSWORD=DSPHARMA@2026
+# PHONEPE_CLIENT_ID=
+# PHONEPE_CLIENT_VERSION=
+# PHONEPE_CLIENT_SECRET=
+# PHONEPE_ENV=SANDBOX
+# ECOM_SALESMAN_ID=301245
+# HOSTINGER_EMAIL=helpdesk@dspharma.online
+# HOSTINGER_PASSWORD=Dspharma@2026
 
+# ------------------------------------------ DEPLOYMENT ------------------------------------------
+MONGO_URI=mongodb://localhost:27017/DSPharma
+PORT=8081
+JWT_SECRET=e991764d333fabaac43b351fada68b85c0c5200ad9156ce2
+JWT_EXPIRES_IN=1d
+VITE_MARG_API_BASE_URL=https://corporate.margerp.com/api/eOnlineData
+VITE_COMPANY_CODE=DSPHARMA3
+VITE_MARG_ID=423875
+VITE_DECRYPTION_KEY=N9JB7B4H0QHV
+VAIS_BUCKET_API_KEY=fup_232a28a4_de6f29b910ac06959d690901f3221b97301657e6b2459173eae6562244022e42
+VAIS_BUCKET_FOLDER_ID=697b4c400829419d7080fe7c
+BACKEND_URL=https://server2.vais.co.in/dsecom
+NODE_ENV=production
+EMAIL_USER=vaisdt81@gmail.com
+EMAIL_PASSWORD=bamz lxml mzhy rmmd
+ADMIN_ID=0b188583-9796-40e5-a332-2c2d572e7f85
+ADMIN_USER_ID=DSPHARMA
+ADMIN_PASSWORD=DSPHARMA@2026
+PHONEPE_CLIENT_ID=
+PHONEPE_CLIENT_VERSION=
+PHONEPE_CLIENT_SECRET=
+PHONEPE_ENV=PRODUCTION
+ECOM_SALESMAN_ID=301245
+HOSTINGER_EMAIL=helpdesk@dspharma.online
+HOSTINGER_PASSWORD=Dspharma@2026
 **Built with ❤️ for DS Pharma**
