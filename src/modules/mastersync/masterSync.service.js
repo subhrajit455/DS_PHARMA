@@ -395,6 +395,12 @@ export const syncMasterOrderDataService = async (
 
     console.log('Marg InsertOrderDetail Response:', JSON.stringify(margData));
 
+    if (margData?.error || !margData) {
+      const errorMsg = margData?.error || 'Invalid or empty response from Marg ERP';
+      console.error('Marg Order Error:', errorMsg);
+      throw new Error(`Marg order failed: ${errorMsg}`);
+    }
+
     const statusVal = (
       margData?.Status ||
       margData?.Details?.Status ||

@@ -1,11 +1,17 @@
 import ApiError from "../../utils/apiError.js";
 import ApiResponse from "../../utils/apiResponse.js";
 import asyncHandler from "../../utils/asyncHandler.js";
+import MargUser from "../staff/margUser.model.js";
 import {
     syncMasterOrderDataService,
     syncMasterOrderDispatchDataService,
     syncMastersDataService,
 } from "./masterSync.service.js";
+
+export const getMargUsers = asyncHandler(async (req, res) => {
+  const users = await MargUser.find({}).sort({ RowId: 1 }).lean();
+  res.status(200).json(new ApiResponse(200, users, "Marg users fetched successfully"));
+});
 
 export const syncMastersData = asyncHandler(async (req, res) => {
   try {

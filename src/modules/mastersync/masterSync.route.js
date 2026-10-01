@@ -1,5 +1,6 @@
 import { Router } from "express";
 import {
+  getMargUsers,
   syncMasterOrderData,
   syncMasterOrderDispatchData,
   syncMastersData,
@@ -7,6 +8,7 @@ import {
 
 const masterSyncRouter = Router();
 
+masterSyncRouter.get("/users", getMargUsers);
 masterSyncRouter.get("/", syncMastersData);
 masterSyncRouter.post("/", syncMastersData);
 
