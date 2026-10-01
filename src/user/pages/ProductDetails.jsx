@@ -22,8 +22,6 @@ const ProductDetails = () => {
 
   const [productDetails, setProductDetails] = useState(null);
 
-  // console.log("product id : ", productDetails);
-
   useEffect(() => {
     const fetchProductDetails = async () => {
       try {
@@ -42,18 +40,20 @@ const ProductDetails = () => {
     fetchProductDetails();
   }, [id]);
 
-  // Queries
-  // const { data: productData, isLoading: isProductLoading } = useProductDetails(id);
-  // const { data: reviewsData, isLoading: isReviewsLoading } = useReviews(id);
   const { isAuthenticated, token } = useAuthStore();
   const addItemToLocalCart = useCartStore((state) => state.addItem);
   const { mutate: addToCartMutation, isPending: isAddingToCart } =
     useAddToCart();
 
+  // ===== Request stock modal state =====
   const [isRequestModalOpen, setIsRequestModalOpen] = useState(false);
   const [requestQty, setRequestQty] = useState(1);
   const [requestRemark, setRequestRemark] = useState("");
   const [isRequesting, setIsRequesting] = useState(false);
+
+  // ===== Add to cart modal state =====
+  const [isCartModalOpen, setIsCartModalOpen] = useState(false);
+  const [cartQty, setCartQty] = useState("1"); // string so the user can clear the field while typing
 
   const decodeJwt = (token) => {
     if (!token) return null;
@@ -71,24 +71,8 @@ const ProductDetails = () => {
   const tokenPayload = decodeJwt(token);
   const currentUserId = tokenPayload?.rid;
 
-  // const reviews = reviewsData?.data || [];
-
-  // Get product (service already normalizes and returns the object)
   const fetchedProduct = productDetails;
 
-  // Fetch suggested items based on category of current product
-  // Category identification must be done ONLY using _id
-  // const categoryId = fetchedProduct?.categoryId || fetchedProduct?.category?._id || fetchedProduct?.category;
-
-  // const { data: suggestedData } = useProducts({
-  //     categoryId: categoryId,
-  //     limit: 5,
-  //     page: 1 // Always first page for related products
-  // });
-
-  // const suggestedItems = suggestedData?.data || [];
-
-  // If loading, show skeleton (implemented simply for now)
   if (isProductLoading)
     return (
       <div className="flex justify-center items-center min-h-screen pt-20">
@@ -96,7 +80,6 @@ const ProductDetails = () => {
       </div>
     );
 
-  // Use real data or fallback object structure
   const product = fetchedProduct
     ? {
         ...fetchedProduct,
@@ -149,6 +132,7 @@ const ProductDetails = () => {
     }
   };
 
+  // ---------- Step 1: "Add to Cart" button opens the quantity popup ----------
   const handleAddToCart = () => {
     if (!productDetails) return;
 
@@ -156,6 +140,50 @@ const ProductDetails = () => {
       toastUtil.info(
         "This product is out of stock. Please request stock to be notified when it becomes available.",
       );
+      return;
+    }
+
+    setCartQty("1");
+    setIsCartModalOpen(true);
+  };
+
+  const closeCartModal = () => {
+    if (isAddingToCart) return;
+    setIsCartModalOpen(false);
+  };
+
+  // ---------- Quantity helpers ----------
+  const handleCartQtyChange = (e) => {
+    setCartQty(e.target.value.replace(/[^0-9]/g, "")); // digits only
+  };
+
+  const decreaseCartQty = () => {
+    const current = parseInt(cartQty, 10) || 1;
+    if (current > 1) setCartQty(String(current - 1));
+  };
+
+  const increaseCartQty = () => {
+    const current = parseInt(cartQty, 10) || 0;
+    if (current < product.stock) {
+      setCartQty(String(current + 1));
+    } else {
+      toastUtil.info(`Only ${product.stock} in stock`);
+    }
+  };
+
+  // ---------- Step 2: confirm inside the popup ----------
+  const handleConfirmAddToCart = () => {
+    if (!productDetails) return;
+
+    const quantity = parseInt(cartQty, 10);
+
+    if (!quantity || quantity < 1) {
+      toastUtil.error("Please enter a valid quantity.");
+      return;
+    }
+
+    if (quantity > product.stock) {
+      toastUtil.error(`Only ${product.stock} in stock.`);
       return;
     }
 
@@ -168,24 +196,30 @@ const ProductDetails = () => {
         return;
       }
       // Authenticated flow
-      addToCartMutation({
-        rid: productRid,
-        image: productDetails?.images?.[0]?.url || productDetails?.image,
-        quantity: 1,
-      });
+      addToCartMutation(
+        {
+          rid: productRid,
+          image: productDetails?.images?.[0]?.url || productDetails?.image,
+          quantity,
+        },
+        {
+          // close the popup only when the request succeeds
+          onSuccess: () => setIsCartModalOpen(false),
+        },
+      );
     } else {
       // Guest flow
       addItemToLocalCart(
         {
           ...productDetails,
-          // Ensure properties needed for local cart calculation are correct
           id: productDetails.id || productDetails._id,
           rid: productDetails.rid,
           image: productDetails.images?.[0]?.url || productDetails?.image,
         },
-        1,
+        quantity,
       );
 
+      setIsCartModalOpen(false);
       toastUtil.info("Login to sync your cart!");
       navigate(`/login?redirect=${window.location.pathname}`);
     }
@@ -313,18 +347,6 @@ const ProductDetails = () => {
                     >
                       {productDetails?.name}
                     </h1>
-
-                    {/* Wishlist Button */}
-                    {/* <button
-                      onClick={handleWishlistToggle}
-                      className="p-2 rounded-full hover:bg-gray-100 transition-colors flex-shrink-0"
-                      aria-label={isInWishlist ? 'Remove from wishlist' : 'Add to wishlist'}
-                    >
-                      <Heart
-                        size={24}
-                        className={isInWishlist ? 'fill-red-500 text-red-500' : 'text-gray-400'}
-                      />
-                    </button> */}
                   </div>
 
                   <ProductPriceSection
@@ -348,6 +370,113 @@ const ProductDetails = () => {
               {/* Description Section */}
               <ProductDescription product={product} />
 
+              {/* ================= ADD TO CART QUANTITY MODAL ================= */}
+              {isCartModalOpen && (
+                <div
+                  className="fixed inset-0 z-50 flex items-center justify-center bg-black/40 p-4"
+                  style={{ padding: "20px" }}
+                  onClick={closeCartModal}
+                >
+                  <div
+                    className="w-full max-w-sm overflow-hidden rounded-xl bg-white shadow-lg"
+                    style={{ padding: "20px" }}
+                    onClick={(e) => e.stopPropagation()}
+                  >
+                    {/* Header */}
+                    <div className="flex items-center justify-between">
+                      <h2 className="text-lg font-semibold">Add to Cart</h2>
+                      <button
+                        type="button"
+                        onClick={closeCartModal}
+                        disabled={isAddingToCart}
+                        className="text-2xl font-bold leading-none text-gray-500 hover:text-gray-700"
+                        aria-label="Close add to cart modal"
+                      >
+                        ×
+                      </button>
+                    </div>
+
+                    {/* Product info */}
+                    <p
+                      className="mt-3 text-sm font-semibold text-gray-900"
+                      style={{ marginTop: "12px" }}
+                    >
+                      {productDetails?.name}
+                    </p>
+                    <p
+                      className="text-xs text-gray-500"
+                      style={{ marginTop: "2px" }}
+                    >
+                      Available stock: {product.stock}
+                    </p>
+
+                    {/* Quantity */}
+                    <label
+                      className="block text-sm font-semibold text-gray-700"
+                      style={{ marginTop: "16px", marginBottom: "8px" }}
+                    >
+                      Quantity
+                    </label>
+                    <div className="flex items-center justify-center gap-3">
+                      <button
+                        type="button"
+                        onClick={decreaseCartQty}
+                        className="flex h-10 w-10 items-center justify-center rounded-lg bg-gray-100 text-xl font-bold text-gray-900 hover:bg-gray-200"
+                        aria-label="Decrease quantity"
+                      >
+                        −
+                      </button>
+
+                      <input
+                        type="text"
+                        inputMode="numeric"
+                        value={cartQty}
+                        onChange={handleCartQtyChange}
+                        onFocus={(e) => e.target.select()}
+                        maxLength={4}
+                        placeholder="1"
+                        className="h-10 w-24 rounded-lg border border-gray-300 text-center text-lg font-semibold focus:border-emerald-500 focus:outline-none"
+                      />
+
+                      <button
+                        type="button"
+                        onClick={increaseCartQty}
+                        className="flex h-10 w-10 items-center justify-center rounded-lg bg-gray-100 text-xl font-bold text-gray-900 hover:bg-gray-200"
+                        aria-label="Increase quantity"
+                      >
+                        +
+                      </button>
+                    </div>
+
+                    {/* Actions */}
+                    <div
+                      className="flex flex-col gap-2 sm:flex-row sm:justify-end"
+                      style={{ marginTop: "20px" }}
+                    >
+                      <button
+                        style={{ padding: "10px" }}
+                        type="button"
+                        onClick={closeCartModal}
+                        disabled={isAddingToCart}
+                        className="rounded-lg border border-gray-300 bg-white px-4 py-2 text-sm font-semibold text-gray-700 hover:bg-gray-50 disabled:opacity-70"
+                      >
+                        Cancel
+                      </button>
+                      <button
+                        style={{ padding: "10px" }}
+                        type="button"
+                        onClick={handleConfirmAddToCart}
+                        disabled={isAddingToCart}
+                        className="rounded-lg bg-emerald-500 px-4 py-2 text-sm font-semibold text-white hover:bg-emerald-600 disabled:cursor-not-allowed disabled:opacity-70"
+                      >
+                        {isAddingToCart ? "Adding..." : "Add to Cart"}
+                      </button>
+                    </div>
+                  </div>
+                </div>
+              )}
+
+              {/* ================= REQUEST STOCK MODAL ================= */}
               {isRequestModalOpen && (
                 <div
                   className="fixed inset-0 z-50 flex items-center justify-center bg-black/40 p-4"
@@ -434,22 +563,6 @@ const ProductDetails = () => {
                   </div>
                 </div>
               )}
-
-              {/* Reviews Section */}
-              {/* <ProductReviews reviews={reviews} isLoading={isReviewsLoading} /> */}
-
-              {/* Suggested Medicine Section */}
-              {/* <SuggestedItemsSection
-                title="Suggested Medicine"
-                items={suggestedItems}
-                className="mb-5"
-                titleStyle={{
-                  textDecorationThickness: '2px',
-                  textDecorationColor: '#111827',
-                  lineHeight: '1.2'
-                }}
-                containerStyle={{}}
-              /> */}
             </div>
           </div>
         </main>
